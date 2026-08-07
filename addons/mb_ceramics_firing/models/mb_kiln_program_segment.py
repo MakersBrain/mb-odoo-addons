@@ -88,7 +88,7 @@ class MbKilnProgramSegment(models.Model):
             # where it starts without the ones before it.
             siblings = program.segment_ids.sorted(
                 key=lambda segment: (segment.number, segment.id))
-            for segment, row in zip(siblings, schedule(siblings)):
+            for segment, row in zip(siblings, schedule(siblings), strict=True):
                 if segment not in self:
                     continue
                 segment.full_power = (

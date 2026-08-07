@@ -39,7 +39,7 @@ could start a firing or edit provider data.
 """
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import requests
 
@@ -210,8 +210,8 @@ class MykilnClient:
             raise MykilnError("GET %s returned %s" % (path, response.status_code))
         try:
             return response.json()
-        except ValueError:
-            raise MykilnError("GET %s did not return JSON" % path)
+        except ValueError as exc:
+            raise MykilnError("GET %s did not return JSON" % path) from exc
 
     # -- read surface ------------------------------------------------------
 

@@ -9,7 +9,6 @@ SKUs. Existing Odoo images are skipped unless ``--overwrite`` is explicit.
 import argparse
 import json
 from pathlib import Path
-import shutil
 import subprocess
 import tempfile
 import uuid

@@ -595,33 +595,36 @@ export.
 
 ## Environment
 
-**As built, not as planned.** The stack runs from the sibling `odoo-poc/`
-repository, which bind-mounts this one:
+**This repository now stands up on its own**, which is what POC-PLAN section
+10.2 asked for. `make bootstrap` on a clean checkout copies `.env`, pulls the
+images, starts Postgres and Odoo, creates the database and installs all eleven
+addons. See [README.md](README.md) for the full target list.
 
 ```text
-odoo-poc/                          docker compose: db (postgres:17-alpine), odoo:19, cloudflared
-├── config/odoo.conf               addons_path, workers = 0, list_db = False, dbfilter = ^odoo$
-├── oca/                           vendored: stock-logistics-{workflow,warehouse,reporting}, sale-workflow
-└── addons/                        -> /mnt/extra-addons
-
-makersbrain-odoo/addons            -> /mnt/makersbrain-addons   (first on addons_path, so it wins)
+docker-compose.yml    db (postgres:17-alpine) + odoo:19 + mailpit (profile)
+config/odoo.conf      addons_path, workers = 0, list_db = True, proxy_mode = False
+Makefile              bootstrap, up, dev, logs, shell, psql, install, upgrade,
+                      test, check, lint, oca, reset-poc
+tools/                check_addons.py, vendor-oca.sh
+.github/workflows/    static, install, upgrade, test
+oca/                  vendored, gitignored, and optional — nothing depends on it
 ```
 
-`addons_path` order:
-`/mnt/makersbrain-addons`, `/mnt/extra-addons`, the four OCA repositories,
-then Odoo's own.
+Ports default to **8169** and **5442**, not 8069/5432, so this stack and the
+sibling `odoo-poc/` can run at once.
 
-`proxy_mode = True` because cloudflared terminates TLS and forwards plain HTTP;
-without it every absolute URL Odoo builds, password-reset mail included, gets an
-`http://` scheme. `list_db = False` because the stack is reachable from the
-internet, which makes `/web/database/manager` 403 for everyone — create and drop
-databases with the CLI. `dbfilter = ^odoo$` is required as a consequence, since
-the host holds several databases and an unfiltered request cannot resolve.
+**The local config is not the published one, deliberately.** Here `list_db` is
+True and `proxy_mode` is False because nothing terminates TLS in front of it and
+nothing outside the host can reach it. The sibling stack publishes through
+cloudflared and makes the opposite choices — `list_db = False`, a pinned
+`dbfilter`, `proxy_mode = True`. Copying this config toward anything public means
+revisiting all three.
 
-`POC-PLAN.md` section 10.2 says active code should not be split across two
-repositories and the sibling should not be modified. That is not the current
-arrangement, and the decision is open: either bring the Compose setup into this
-repository, or amend the plan.
+The sibling remains useful reference material and is unmodified. It still holds
+the databases with real data; this stack creates its own.
+
+`reset-poc` accepts only `mb_scratch`, `mb_ci` or `mb_test` and refuses every
+other name, so a mistyped variable cannot destroy a demonstration database.
 
 `scripts/` holds nine one-off data operations, each driving `odoo shell` through
 `docker exec` and a `subprocess` call rather than a network API, so nothing needs
@@ -666,48 +669,55 @@ Verified beyond unit tests:
 | POS projection is bounded | 1,001 aliases, 202,214-byte projection, 0.0671 s bootstrap query |
 | myKiln programme endpoints | Checked against the live service, 7 August 2026 |
 
+Verified by CI, on every push:
+
+| Lane | Result |
+| --- | --- |
+| Static: ruff, manifests, data paths, assets, XML, access rules, dependency graph | 11 addons clean |
+| Clean install on an empty database, with an empty OCA path | 11 modules installed |
+| Upgrade in place (`-u` after `-i`) | no-op rather than crash |
+| Server tests, scoped to these addons | **192 tests, 0 failed, 0 errors** |
+
 Not verified:
 
 - Physical printer and scanner qualification. Phomemo M110 and NIIMBOT D110
   packet builders are tested against fixtures only; no device is attached to any
   test run.
-- The three SumUp addons against the live database.
-- Any clean-checkout reproduction, because there is no bootstrap path.
+- The 17 Hoot tests, in CI. They need a browser and the `odoo:19` image has
+  none; see README.md for the tag and the command to run them by hand.
+- Migration from a previously released version, as opposed to `-u` being a
+  no-op. Nine addons have no migration scripts to exercise.
+- The three SumUp addons against the live database. They install and their
+  tests pass on a fresh one.
 - Cross-company denial, which is untested throughout.
 
 ## Known gaps
 
 Ordered by consequence, not by effort.
 
-1. **The repository is not under version control.** No `.git` here; the directory
-   is untracked inside the parent `ateliera` repository. Eleven addons and two
-   migration scripts with no history. Immutable label versioning rests on a
-   repository that has none.
-2. **`backups/` is not gitignored** and holds ~122 MB of database dumps with real
-   product and customer data. Fix before the first `git add`, not after.
-3. **Nine of eleven addons have no migration scripts.** Four have already been
+1. **Nine of eleven addons have no migration scripts.** Four have already been
    released past `1.0.0` — `l10n_fr_micro_enterprise` at 2.1.0,
    `mb_kiln_bridge` and `mb_catalogue_sync` at 1.2.0, `mb_workshop_base` at
    1.1.0 — with no `migrations/` directory. With one database per artisan, an
    addon without a migration path is an outage multiplied by the tenant count.
-4. **No bootstrap, no CI, no test runner.** There is no Makefile, no `.env.example`,
-   no umbrella addon and no automated lane for install, upgrade or test in this
-   repository. Every result above was produced by hand.
-5. **Two credentials at rest in the tenant database**, both knowingly:
+2. **The Hoot suite is outside CI**, and the browser image that would let it in
+   does not exist yet. 17 tests covering the label editor, printer protocols,
+   old-JSON conversion and POS QR parsing run only when someone runs them.
+3. **Two credentials at rest in the tenant database**, both knowingly:
    `mb.kiln.connection` (myKiln password and non-expiring token) and the SumUp
    provider record. Both reverse on the move to multi-tenancy.
-6. **`admin_passwd = poc-master-change-me`** in `odoo-poc/config/odoo.conf` on a
-   host published through cloudflared. `list_db = False` limits the blast radius;
-   the password is still a default.
-7. **Ten scratch databases** on the POC server, with no allowlisted reset command
-   guarding the demonstration database against a mistyped drop.
-8. **Reverse-engineered printer protocols** regress silently on untested
+4. **`admin_passwd = poc-master-change-me`** in the sibling
+   `odoo-poc/config/odoo.conf`, on a host published through cloudflared.
+   `list_db = False` limits the blast radius; the password is still a default.
+   This repository's own config uses a distinct local-only value and publishes
+   nothing.
+5. **Reverse-engineered printer protocols** regress silently on untested
    firmware. Keep the packet fixtures, and smoke-test each model before
    advertising support for it.
-9. **Unofficial myKiln API.** No contract, no versioning. The connector is
+6. **Unofficial myKiln API.** No contract, no versioning. The connector is
    isolated and stops on auth or schema failure, which is the mitigation; there
    is no warning.
-10. **`mb_catalogue_sync` and `mb_depot` do not depend on `mb_workshop_base`**,
+7. **`mb_catalogue_sync` and `mb_depot` do not depend on `mb_workshop_base`**,
     so a database can hold ceramics materials and consignment stock without the
     food-contact identity that gives them their tracking rules. Intentional or
     not, it should be decided rather than inherited.

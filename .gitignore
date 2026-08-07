@@ -12,10 +12,16 @@ backups/
 *.sql
 *.tar.gz
 
+# Vendored OCA repositories. Upstream code, pinned and reproducible from
+# tools/vendor-oca.sh, so committing it would only duplicate someone else's
+# history. No addon here depends on one; see README.md.
+oca/
+
 __pycache__/
 *.py[cod]
 .direnv/
 .venv/
+.ruff_cache/
 
 # Editor and OS noise.
 .idea/

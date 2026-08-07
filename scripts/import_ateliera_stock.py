@@ -99,7 +99,7 @@ def read_archive(path):
     titles = {sku_by_product[pid]: p["title"]
               for pid, p in products.items() if pid in sku_by_product}
     return {
-        "on_hand": {sku: qty for sku, qty in on_hand.items()},
+        "on_hand": dict(on_hand),
         "titles": titles,
         "skipped_raw": dict(skipped_raw),
         "movements_total": len(tables["movements"]),

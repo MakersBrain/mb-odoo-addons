@@ -257,7 +257,8 @@ class MbLabelRenderService(models.AbstractModel):
         image = Image.new("L", (width, height), 255)
         elements = sorted(
             version.document_json.get("elements", []), key=lambda item: item.get("z", 0))
-        mm = lambda value: round(float(value or 0) * px_per_mm)
+        def mm(value):
+            return round(float(value or 0) * px_per_mm)
 
         def shape_mask(kind, box, stroke, filled):
             result = Image.new("L", (width, height), 0)
