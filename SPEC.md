@@ -127,6 +127,19 @@ recommended but never declared as a dependency — `mb_depot` documents the one
 case (`sale_order_global_stock_route`) and degrades to manual route selection
 without it.
 
+**Migration scripts start at first release, not before.** Nothing here is
+released and no artisan database exists, so a version bump today is free: the
+development and demonstration databases are rebuilt from `make bootstrap` and
+the seed scripts, not migrated. Version numbers still move, because they are how
+Odoo decides to re-run an addon's data files.
+
+The rule changes the day the first tenant database exists. From then on, one
+database per artisan means an addon without a migration path is an outage
+multiplied by the tenant count, and every version bump that touches stored data
+needs a script. `mb_ceramics_firing` already carries two, written when
+`mb.kiln.program` moved out of `mb_kiln_bridge` — proof the practice starts when
+something actually needs moving, rather than as ceremony on every bump.
+
 ## Workshop foundation
 
 ### `mb_workshop_base`
@@ -686,7 +699,8 @@ Not verified:
 - The 17 Hoot tests, in CI. They need a browser and the `odoo:19` image has
   none; see README.md for the tag and the command to run them by hand.
 - Migration from a previously released version, as opposed to `-u` being a
-  no-op. Nine addons have no migration scripts to exercise.
+  no-op. Deliberate: nothing is released, so there is no prior version to
+  migrate from. See "Migration scripts start at first release".
 - The three SumUp addons against the live database. They install and their
   tests pass on a fresh one.
 - Cross-company denial, which is untested throughout.
@@ -695,29 +709,24 @@ Not verified:
 
 Ordered by consequence, not by effort.
 
-1. **Nine of eleven addons have no migration scripts.** Four have already been
-   released past `1.0.0` — `l10n_fr_micro_enterprise` at 2.1.0,
-   `mb_kiln_bridge` and `mb_catalogue_sync` at 1.2.0, `mb_workshop_base` at
-   1.1.0 — with no `migrations/` directory. With one database per artisan, an
-   addon without a migration path is an outage multiplied by the tenant count.
-2. **The Hoot suite is outside CI**, and the browser image that would let it in
+1. **The Hoot suite is outside CI**, and the browser image that would let it in
    does not exist yet. 17 tests covering the label editor, printer protocols,
    old-JSON conversion and POS QR parsing run only when someone runs them.
-3. **Two credentials at rest in the tenant database**, both knowingly:
+2. **Two credentials at rest in the tenant database**, both knowingly:
    `mb.kiln.connection` (myKiln password and non-expiring token) and the SumUp
    provider record. Both reverse on the move to multi-tenancy.
-4. **`admin_passwd = poc-master-change-me`** in the sibling
+3. **`admin_passwd = poc-master-change-me`** in the sibling
    `odoo-poc/config/odoo.conf`, on a host published through cloudflared.
    `list_db = False` limits the blast radius; the password is still a default.
    This repository's own config uses a distinct local-only value and publishes
    nothing.
-5. **Reverse-engineered printer protocols** regress silently on untested
+4. **Reverse-engineered printer protocols** regress silently on untested
    firmware. Keep the packet fixtures, and smoke-test each model before
    advertising support for it.
-6. **Unofficial myKiln API.** No contract, no versioning. The connector is
+5. **Unofficial myKiln API.** No contract, no versioning. The connector is
    isolated and stops on auth or schema failure, which is the mitigation; there
    is no warning.
-7. **`mb_catalogue_sync` and `mb_depot` do not depend on `mb_workshop_base`**,
+6. **`mb_catalogue_sync` and `mb_depot` do not depend on `mb_workshop_base`**,
     so a database can hold ceramics materials and consignment stock without the
     food-contact identity that gives them their tracking rules. Intentional or
     not, it should be decided rather than inherited.
