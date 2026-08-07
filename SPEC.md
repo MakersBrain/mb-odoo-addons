@@ -243,16 +243,22 @@ immutable version.
 
 **Printing.** `printer_registry.js` selects a transport without the renderer
 knowing which: `system_adapter` (browser and system print through a zero-margin
-`@page` route), `phomemo_adapter` (M110) or `niimbot_adapter` (D110). Both BLE
-adapters check browser capability and fall back to system print. Remembered
-device selection is persisted.
+`@page` route), `phomemo_adapter` (Ateliera's 18 Phomemo definitions and seven
+protocol families) or `niimbot_adapter` (D110). Both BLE adapters check browser
+capability and fall back to system print. Remembered device selection is
+persisted. The Phomemo path is Ateliera's complete vendored `phomymo` browser
+transport and print wrapper: persistent connection, service/characteristic
+selection, retries, notifications, write-without-response fallback and the
+serial-named M110 model override. Its UI exposes model, roll position, media
+sensing, feed, density, speed, dithering, connection diagnostics and a
+renderer-independent test pattern.
 
 **Routes.** `/mb_label/job/<id>/label.pdf`, `/preview.png`, `/print`.
 
 **Security.** `group_mb_label_manager` designs templates;
 `group_mb_label_user` prints but cannot edit.
 
-19 server test methods, 10 Hoot tests.
+19 server test methods, 20 Hoot tests across `mb_label` and `mb_label_pos`.
 
 ### `mb_label_pos`
 
@@ -746,10 +752,10 @@ That last row is what the script prevents.
 
 Not verified:
 
-- Physical printer and scanner qualification. Phomemo M110 and NIIMBOT D110
-  packet builders are tested against fixtures only; no device is attached to any
-  test run.
-- The 17 Hoot tests, in CI. They need a browser and the `odoo:19` image has
+- Physical printer and scanner qualification. The synchronized Ateliera
+  Phomemo browser transport/protocol path and NIIMBOT D110 packet builder are tested
+  against fixtures only; no device is attached to any test run.
+- The 20 Hoot tests, in CI. They need a browser and the `odoo:19` image has
   none; see README.md for the tag and the command to run them by hand.
 - Migration from a previously released version, as opposed to `-u` being a
   no-op. Deliberate: nothing is released, so there is no prior version to
@@ -763,7 +769,7 @@ Not verified:
 Ordered by consequence, not by effort.
 
 1. **The Hoot suite is outside CI**, and the browser image that would let it in
-   does not exist yet. 17 tests covering the label editor, printer protocols,
+   does not exist yet. 20 tests covering the label editor, printer protocols,
    old-JSON conversion and POS QR parsing run only when someone runs them.
 2. **Two credentials at rest in the tenant database**, both knowingly:
    `mb.kiln.connection` (myKiln password and non-expiring token) and the SumUp

@@ -1,5 +1,14 @@
 import { expect, test } from "@odoo/hoot";
-import { buildPhomemoM110Job } from "@mb_label/printer/phomemo_adapter";
+import {
+    assertRasterFitsDevice, phomymoRasterFor,
+} from "@mb_label/printer/phomemo_adapter";
+import { BLETransport } from "@mb_label/printer/phomymo/ble";
+import {
+    loadPrinterDefinitions, print as printPhomymo,
+} from "@mb_label/printer/phomymo/printer";
+import {
+    allDevices, detectDevice, resolveDevice,
+} from "@mb_label/printer/ateliera_phomemo/devices";
 import { buildNiimbotD110Job, niimbotPacket } from "@mb_label/printer/niimbot_adapter";
 import { exportLegacyTemplate, importLegacyTemplate } from "@mb_label/editor/legacy_template";
 import { shouldClearWorkspaceSelection } from "@mb_label/editor/selection";
@@ -94,15 +103,61 @@ test("template filters format money, decimals, defaults, and text in the preview
     expect(formatTemplateText("{{manual.note|default:No note}}", { ...values, "manual.note": "" })).toBe("No note");
 });
 
-test("Phomemo M110 job declares a 48-byte head and contains raster data", () => {
+test("Ateliera phomymo sends the working M110 command stream", async () => {
+    await loadPrinterDefinitions();
     const image = whiteImage(8, 2);
     blackPixel(image, 0, 0);
-    const packets = buildPhomemoM110Job(image, { density: 12, speed: 4 });
-    expect([...packets[0]]).toEqual([0x1b, 0x4e, 0x0d, 4]);
-    expect([...packets[1]]).toEqual([0x1b, 0x4e, 0x04, 12]);
-    expect([...packets[3].slice(0, 6)]).toEqual([0x1d, 0x76, 0x30, 0, 48, 0]);
-    expect(packets[4].length).toBe(96);
-    expect(packets[4].some((value) => value !== 0)).toBe(true);
+    const raster = phomymoRasterFor(image, "M110", "m110", "threshold");
+    const writes = [];
+    const transport = {
+        send: async (bytes) => writes.push([...bytes]),
+        delay: async () => {},
+    };
+    await printPhomymo(transport, raster, {
+        isBLE: true, deviceName: "M110", printerModel: "m110",
+        density: 6, feed: 32, continuous: false,
+    });
+    expect(writes[0]).toEqual([0x1b, 0x4e, 0x0d, 5]);
+    expect(writes[1].slice(0, 3)).toEqual([0x1b, 0x4e, 0x04]);
+    expect(writes[2]).toEqual([0x1f, 0x11, 0x0a]);
+    expect(writes[3]).toEqual([0x1d, 0x76, 0x30, 0, 48, 0, 2, 0]);
+    expect(writes.at(-1)).toEqual([0x1f, 0xf0, 0x05, 0, 0x1f, 0xf0, 0x03, 0]);
+    expect(writes.slice(4, -1).flat().length).toBe(96);
+});
+
+test("Ateliera Phomemo definitions cover every supported protocol family", () => {
+    const devices = allDevices();
+    expect(devices.length).toBe(18);
+    expect(new Set(devices.map((device) => device.protocol))).toEqual(new Set([
+        "m-series", "m02", "m04", "m110", "d-series", "p12", "tspl",
+    ]));
+    expect(detectDevice("M110").id).toBe("m110");
+    expect(detectDevice("D110").id).toBe("d-series");
+    expect(resolveDevice("auto", "Q199G4130440005").id).toBe("m110");
+});
+
+test("Ateliera transport falls back to acknowledged writes on this M110 link", async () => {
+    const acknowledged = [];
+    const transport = {
+        isConnected: () => true,
+        _useWriteWithResponse: false,
+        writeChar: {
+            writeValueWithoutResponse: async () => {
+                throw new Error("write without response rejected");
+            },
+            writeValue: async (buffer) => acknowledged.push([...new Uint8Array(buffer)]),
+        },
+    };
+    const source = Uint8Array.from([9, 1, 2, 3, 9]);
+    await BLETransport.prototype.send.call(transport, source.subarray(1, 4));
+    expect(transport._useWriteWithResponse).toBe(true);
+    expect(acknowledged).toEqual([[1, 2, 3]]);
+});
+
+test("Phomemo rejects paper wider than the selected head instead of cropping it", () => {
+    expect(() => assertRasterFitsDevice(whiteImage(385, 20), resolveDevice("m110"))).toThrow();
+    expect(() => assertRasterFitsDevice(whiteImage(384, 20), resolveDevice("m110"))).not.toThrow();
+    expect(() => assertRasterFitsDevice(whiteImage(160, 97), resolveDevice("p12"))).toThrow();
 });
 
 test("NIIMBOT packets use guarded framing and XOR checksum", () => {

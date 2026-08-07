@@ -19,11 +19,50 @@
                         </select>
                         <t t-if="state.adapter === 'phomemo' || state.adapter === 'niimbot'">
                             <label class="form-label mt-3">Density: <t t-esc="state.density"/></label>
-                            <input class="form-range" type="range" min="1" t-att-max="state.adapter === 'niimbot' ? 5 : 15" t-model="state.density"/>
+                            <input class="form-range" type="range" min="1" t-att-max="state.adapter === 'niimbot' ? 5 : 15" t-att-value="state.density" t-on-change="updateDensity"/>
                         </t>
                         <t t-if="state.adapter === 'phomemo'">
+                            <label class="form-label mt-3">Printer model</label>
+                            <select class="form-select" data-setting="model" t-on-change="updatePhomemoSetting" t-att-value="state.model">
+                                <option value="auto">Automatic from Bluetooth name</option>
+                                <t t-foreach="state.phomemoModels" t-as="model" t-key="model.id">
+                                    <option t-att-value="model.id" t-att-disabled="!model.ble">
+                                        <t t-esc="model.name"/> · <t t-esc="model.dpi"/> dpi<t t-if="!model.ble"> · USB only</t>
+                                    </option>
+                                </t>
+                            </select>
                             <label class="form-label mt-3">Speed: <t t-esc="state.speed"/></label>
-                            <input class="form-range" type="range" min="1" max="15" t-model="state.speed"/>
+                            <input class="form-range" type="range" min="1" max="15" t-model="state.speed" data-setting="speed" t-on-change="updatePhomemoSetting"/>
+                            <label class="form-label mt-3">Paper position on print head</label>
+                            <select class="form-select" data-setting="align" t-on-change="updatePhomemoSetting" t-att-value="state.align">
+                                <option value="auto">Model default</option>
+                                <option value="left">Left</option>
+                                <option value="center">Centre</option>
+                                <option value="right">Right</option>
+                            </select>
+                            <div class="row g-2 mt-1">
+                                <div class="col-6">
+                                    <label class="form-label">Image treatment</label>
+                                    <select class="form-select" data-setting="dither" t-on-change="updatePhomemoSetting" t-att-value="state.dither">
+                                        <t t-foreach="state.ditherModes" t-as="mode" t-key="mode[0]">
+                                            <option t-att-value="mode[0]"><t t-esc="mode[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Feed after label (dots)</label>
+                                    <input class="form-control" type="number" min="0" max="255" data-setting="feed" t-on-change="updatePhomemoSetting" t-att-value="state.feed"/>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mt-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="o_mb_phomemo_continuous" data-setting="continuous" t-on-change="updatePhomemoSetting" t-att-checked="state.continuous"/>
+                                <label class="form-check-label" for="o_mb_phomemo_continuous">Continuous paper (disable gap sensing)</label>
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-outline-secondary" t-on-click="testConnection" t-att-disabled="state.busy">Test Ateliera connection</button>
+                                <button class="btn btn-outline-secondary" t-on-click="testPhomemoPrint" t-att-disabled="state.busy">Print hardware test pattern</button>
+                            </div>
+                            <pre t-if="state.diagnostic" class="small bg-light border rounded p-2 mt-2 text-start" style="white-space: pre-wrap"><t t-esc="state.diagnostic"/></pre>
                         </t>
                         <div class="alert alert-warning mt-3" t-if="(state.adapter === 'phomemo' || state.adapter === 'niimbot') &amp;&amp; !state.bleAvailable">
                             Web Bluetooth requires Chrome or Edge on desktop/Android. Use system print on iPhone/iPad.

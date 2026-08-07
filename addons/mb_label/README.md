@@ -55,11 +55,13 @@ background knockout, inverted ink, thermal tint patterns, image paste/upload,
 four image dithering modes, round/continuous media, printer target and real
 product/lot preview values.
 
-The printer selector applies a matching resolution and recommended stock:
-System/PDF uses 300 dpi, while the supported Phomemo M110/M120 and NIIMBOT
-D110 families use 203 dpi. Selecting a printer applies its default stock size;
-the dependent **Label stock** selector offers die-cut, round and continuous
-presets while **Custom / manual** keeps arbitrary dimensions available.
+The printer selector applies a matching resolution and recommended stock.
+System/PDF uses 300 dpi and NIIMBOT D110 uses 203 dpi. The Phomemo print screen
+uses the selected model's 203 or 300 dpi definition and preserves physical size
+when the saved artifact was rendered at another resolution. Selecting a
+printer applies its default stock size; the dependent **Label stock** selector
+offers die-cut, round and continuous presets while **Custom / manual** keeps
+arbitrary dimensions available.
 
 **Import JSON** accepts the old Ateliera/phomymo version-3 format. Old element
 coordinates are printer dots and are converted using `dotsPerMm` (8 when the
@@ -80,13 +82,31 @@ template and snapshotted in each immutable version. Every rendered value is mate
 - **System/PDF:** supported in normal desktop and mobile browsers. The PDF page
   is exactly the template size. Browser print requests the same size with zero
   margin; the driver still needs scale 100% and matching media.
-- **Phomemo:** Web Bluetooth adapter for the M110/M120 203 dpi lineage.
+- **Phomemo:** Ateliera's vendored `phomymo` browser transport, raster packer
+  and protocol implementation, plus its 18 model definitions across the M,
+  M02, M04, M110, D, P12/A30 and TSPL families. PM-241 remains listed as
+  USB-only; the other definitions are reachable through Web Bluetooth.
 - **NIIMBOT:** Web Bluetooth adapter for the common D110 protocol family.
 
 Web Bluetooth requires Chrome/Edge on desktop or Android and is unavailable in
 iOS Safari. PDF/system printing remains the fallback. The BLE protocols are
 reverse-engineered and isolated in `static/src/printer/`; adding or correcting a
 device does not change stored templates or the renderer.
+
+The Phomemo settings expose explicit model override, paper position on the
+head (model default/left/centre/right), die-cut versus continuous media,
+post-label feed, density, speed and four dithering modes. **Test Ateliera
+connection** uses the same persistent transport, service/characteristic
+selection, notification setup and write-mode fallback as Ateliera and reports
+printer status. **Print hardware test pattern** bypasses the label renderer so
+a blank result isolates the transport/protocol/hardware path.
+
+Do not substitute a generic MTU wrapper for this transport. Ateliera's browser
+fix hands the complete print to its vendored `phomymo` implementation, keeps
+one connection for the session, selects the write mode from the actual
+characteristic, and falls back from unacknowledged to acknowledged writes when
+the unit rejects them. Serial-named `Q199…` units are explicitly forced onto
+the 48-byte M110 model instead of the incorrect generic 72-byte path.
 
 The device-print client action opens as a modal and remains open after a
 successful send. It remembers the last destination and the identifier of the

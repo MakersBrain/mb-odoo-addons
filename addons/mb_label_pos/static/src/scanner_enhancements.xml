@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="mb_label_pos.BarcodeVideoScannerLight"
+       t-inherit="web.BarcodeVideoScanner" t-inherit-mode="extension">
+        <xpath expr="//CropOverlay/video" position="after">
+            <div t-if="state.torchSupported || state.brightnessSupported"
+                 class="o_mb_scanner_light_controls d-flex flex-column gap-2 rounded-3 p-2"
+                 t-on-mousedown.stop="() => {}" t-on-touchstart.stop="() => {}">
+                <button t-if="state.torchSupported" type="button"
+                        class="btn btn-light d-flex align-items-center justify-content-center gap-2"
+                        t-att-class="{'active': state.torchEnabled}"
+                        t-on-click.stop="togglePhoneTorch" t-att-disabled="state.lightBusy">
+                    <i t-att-class="state.torchEnabled ? 'fa fa-lightbulb-o text-warning' : 'fa fa-lightbulb-o'"/>
+                    <t t-if="state.torchEnabled">Flash on</t>
+                    <t t-else="">Flash off</t>
+                </button>
+                <label t-if="state.brightnessSupported"
+                       class="o_mb_scanner_brightness d-flex align-items-center gap-2 text-white mb-0">
+                    <i class="fa fa-sun-o" title="Scan brightness"/>
+                    <input type="range" class="form-range m-0"
+                           t-att-min="state.brightnessMin" t-att-max="state.brightnessMax"
+                           t-att-step="state.brightnessStep" t-att-value="state.brightnessValue"
+                           t-on-input="changeScanBrightness"/>
+                </label>
+                <small t-if="state.lightError" class="text-warning"><t t-esc="state.lightError"/></small>
+            </div>
+        </xpath>
+    </t>
+</templates>

@@ -22,6 +22,15 @@ export class LabelDevicePrint extends Component {
         this.state = useState({
             job: null, adapter: "system", busy: false, density: 10, speed: 5,
             bleAvailable: Boolean(globalThis.navigator?.bluetooth), printedCount: 0,
+            model: "auto", align: "auto", feed: 32,
+            continuous: false, dither: "threshold", diagnostic: "",
+            phomemoModels: [],
+            ditherModes: [
+                ["threshold", "Threshold (sharp)"],
+                ["floyd-steinberg", "Floyd-Steinberg (photo)"],
+                ["atkinson", "Atkinson (light)"],
+                ["ordered", "Ordered pattern"],
+            ],
             adapters: printerAdapters().map((item) => ({
                 id: item.id, label: item.label, available: item.available?.() !== false,
             })),
@@ -36,12 +45,53 @@ export class LabelDevicePrint extends Component {
             if (this.state.adapters.some((item) => item.id === destination && item.available)) {
                 this.state.adapter = destination;
             }
+            const phomemo = printerAdapter("phomemo");
+            const settings = phomemo?.settings?.() || {};
+            Object.assign(this.state, {
+                model: settings.model || "auto",
+                align: settings.align || "auto",
+                feed: settings.feed ?? 32,
+                continuous: Boolean(settings.continuous),
+                dither: settings.dither || "threshold",
+                density: settings.density ?? 10,
+                speed: settings.speed ?? 5,
+                phomemoModels: phomemo?.models?.() || [],
+            });
         });
     }
 
     selectAdapter(event) {
         this.state.adapter = event.target.value;
+        this.state.diagnostic = "";
         rememberAdapter(this.state.adapter);
+    }
+
+    phomemoOptions(forceChooser = false) {
+        return {
+            model: this.state.model,
+            align: this.state.align === "auto" ? undefined : this.state.align,
+            feed: Number(this.state.feed),
+            continuous: Boolean(this.state.continuous),
+            dither: this.state.dither,
+            density: Number(this.state.density),
+            speed: Number(this.state.speed),
+            forceChooser,
+        };
+    }
+
+    updatePhomemoSetting(event) {
+        const key = event.currentTarget.dataset.setting;
+        const value = event.currentTarget.type === "checkbox"
+            ? event.currentTarget.checked : event.currentTarget.value;
+        this.state[key] = value;
+        printerAdapter("phomemo")?.saveSettings?.(this.phomemoOptions());
+    }
+
+    updateDensity(event) {
+        this.state.density = event.currentTarget.value;
+        if (this.state.adapter === "phomemo") {
+            printerAdapter("phomemo")?.saveSettings?.(this.phomemoOptions());
+        }
     }
 
     async print() { return this._print(false); }
@@ -55,9 +105,13 @@ export class LabelDevicePrint extends Component {
         this.state.busy = true;
         try {
             await adapter.print(this.state.job, {
-                density: this.state.adapter === "niimbot" ? Math.min(5, this.state.density) : this.state.density,
-                speed: this.state.speed,
-                forceChooser,
+                ...(this.state.adapter === "phomemo"
+                    ? this.phomemoOptions(forceChooser)
+                    : {
+                        density: Math.min(5, Number(this.state.density)),
+                        speed: Number(this.state.speed),
+                        forceChooser,
+                    }),
             });
             await this.orm.call("mb.label.print.job", "mark_printed", [[this.state.job.id], this.state.adapter]);
             this.state.printedCount++;
@@ -65,6 +119,41 @@ export class LabelDevicePrint extends Component {
         } catch (error) {
             const cancelled = error?.name === "NotFoundError";
             if (!cancelled) this.notification.add(error.message || "Printing failed.", { type: "danger", sticky: true });
+        } finally {
+            this.state.busy = false;
+        }
+    }
+
+    async testConnection() {
+        const adapter = printerAdapter("phomemo");
+        if (!adapter?.testConnection || this.state.busy) return;
+        this.state.busy = true;
+        this.state.diagnostic = "";
+        try {
+            this.state.diagnostic = await adapter.testConnection(this.phomemoOptions());
+            this.notification.add("Printer connection is healthy.", { type: "success" });
+        } catch (error) {
+            this.state.diagnostic = error.message || "Connection test failed.";
+            this.notification.add(this.state.diagnostic, { type: "danger", sticky: true });
+        } finally {
+            this.state.busy = false;
+        }
+    }
+
+    async testPhomemoPrint() {
+        const adapter = printerAdapter("phomemo");
+        if (!adapter?.testPrint || this.state.busy) return;
+        this.state.busy = true;
+        try {
+            const result = await adapter.testPrint(this.phomemoOptions());
+            this.notification.add(
+                `Test pattern sent (${result.bytes} bytes, ${(result.ink * 100).toFixed(1)}% ink).`,
+                { type: "success" }
+            );
+        } catch (error) {
+            this.notification.add(error.message || "Test print failed.", {
+                type: "danger", sticky: true,
+            });
         } finally {
             this.state.busy = false;
         }

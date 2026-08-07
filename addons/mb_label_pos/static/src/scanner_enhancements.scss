@@ -1,0 +1,16 @@
+.o_crop_container .o_mb_scanner_light_controls {
+    position: absolute;
+    z-index: 3;
+    bottom: 1rem;
+    left: 50%;
+    width: calc(100% - 2rem);
+    max-width: 22rem;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    pointer-events: auto;
+
+    .o_mb_scanner_brightness {
+        min-height: 2.5rem;
+    }
+}
