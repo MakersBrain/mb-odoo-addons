@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_lot_form_mb_label" model="ir.ui.view">
+        <field name="name">stock.lot.form.mb.label</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_mb_create_label" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="mb_label.group_mb_label_manager">
+                    <div class="o_field_widget o_stat_info"><span class="o_stat_text">Create Label</span></div>
+                </button>
+                <button name="action_mb_print_label" type="object" class="oe_stat_button" icon="fa-print" groups="mb_label.group_mb_label_user">
+                    <div class="o_field_widget o_stat_info"><span class="o_stat_text">Print Label</span></div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

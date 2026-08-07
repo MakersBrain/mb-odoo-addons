@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mb_kiln_connection_view_list" model="ir.ui.view">
+        <field name="name">mb.kiln.connection.list</field>
+        <field name="model">mb.kiln.connection</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state == 'error'">
+                <field name="name" />
+                <field name="provider" />
+                <field name="username" />
+                <field name="kiln_count" />
+                <field name="firing_count" />
+                <field name="last_sync" />
+                <field name="state" widget="badge" />
+            </list>
+        </field>
+    </record>
+
+    <record id="mb_kiln_connection_view_form" model="ir.ui.view">
+        <field name="name">mb.kiln.connection.form</field>
+        <field name="model">mb.kiln.connection</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="action_test_connection" type="object"
+                        string="Test connection" class="oe_highlight"
+                    />
+                    <button name="action_sync" type="object" string="Sync now" />
+                    <button
+                        name="action_refresh_programs" type="object"
+                        string="Refresh programmes"
+                        title="Read each kiln's programmes back from its controller"
+                    />
+                    <button
+                        name="action_start_backfill" type="object"
+                        string="Import full history"
+                        invisible="backfill_state == 'running'"
+                        confirm="This imports every firing the provider holds, a page at a time in the background. Continue?"
+                    />
+                    <button
+                        name="action_stop_backfill" type="object"
+                        string="Stop backfill"
+                        invisible="backfill_state != 'running'"
+                    />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="myKiln" /></h1>
+                    </div>
+                    <group>
+                        <group string="Provider">
+                            <field name="provider" />
+                            <field name="base_url" />
+                            <field name="firing_limit" />
+                            <field name="timeout" />
+                            <field name="store_raw_payload" />
+                            <field name="sync_programs" />
+                            <field name="program_scan_limit" />
+                        </group>
+                        <group string="Credentials">
+                            <field name="username" />
+                            <field name="password" password="True" />
+                            <field name="company_id" groups="base.group_multi_company" />
+                        </group>
+                    </group>
+                    <group string="History import" invisible="backfill_state == 'idle'">
+                        <field name="backfill_state" />
+                        <field name="backfill_progress" widget="progressbar" />
+                        <field name="backfill_offset" />
+                        <field name="backfill_total" />
+                        <field name="backfill_page_size" />
+                    </group>
+                    <group string="Last run">
+                        <field name="last_sync" />
+                        <field name="last_error" invisible="not last_error" />
+                        <field name="kiln_count" />
+                        <field name="firing_count" />
+                        <field name="program_count" />
+                    </group>
+                    <notebook>
+                        <page string="Kilns" name="kilns">
+                            <field name="kiln_ids" readonly="1">
+                                <list>
+                                    <field name="name" />
+                                    <field name="provider_external_id" />
+                                    <field name="manufacturer" />
+                                    <field name="model_number" />
+                                    <field name="chamber_litres" />
+                                    <field name="max_temperature" />
+                                    <field name="power_kw" />
+                                    <field name="workcenter_id" />
+                                    <field name="equipment_id" />
+                                </list>
+                            </field>
+                            <p class="text-muted">
+                                Make, model and chamber are read from the
+                                provider on every sync; the name and everything
+                                about how the workshop uses the kiln are left
+                                alone. Open a kiln to see its programmes.
+                            </p>
+                        </page>
+                    </notebook>
+                    <field name="active" invisible="1" />
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mb_kiln_connection_action" model="ir.actions.act_window">
+        <field name="name">Kiln connections</field>
+        <field name="res_model">mb.kiln.connection</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_mb_kiln_connection"
+        name="Kiln connections"
+        parent="mb_workshop_base.menu_mb_workshop_root"
+        action="mb_kiln_connection_action"
+        sequence="50"
+    />
+</odoo>

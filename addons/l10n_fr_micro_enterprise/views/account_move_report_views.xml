@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<template id="report_invoice_document_franchise_mention" inherit_id="account.report_invoice_document">
+		<xpath expr="//p[@name='taxes_legal_notes']" position="after">
+			<p t-if="o.l10n_fr_micro_franchise_invoice and is_html_empty(o.taxes_legal_notes)"
+				name="l10n_fr_micro_franchise_mention" class="mb-2">
+				TVA non applicable, article 293 B du CGI
+			</p>
+		</xpath>
+	</template>
+</odoo>

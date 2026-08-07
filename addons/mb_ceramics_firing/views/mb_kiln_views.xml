@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mb_kiln_view_list" model="ir.ui.view">
+        <field name="name">mb.kiln.list</field>
+        <field name="model">mb.kiln</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="workcenter_id" />
+                <field name="equipment_id" />
+                <field name="max_temperature" />
+                <field name="pieces_per_load" />
+                <field name="provider" />
+            </list>
+        </field>
+    </record>
+
+    <record id="mb_kiln_view_form" model="ir.ui.view">
+        <field name="name">mb.kiln.form</field>
+        <field name="model">mb.kiln</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Kiln name" /></h1>
+                    </div>
+                    <group>
+                        <group string="Where Odoo keeps it">
+                            <field name="workcenter_id" />
+                            <field name="equipment_id" />
+                            <div class="text-muted" colspan="2">
+                                Created with the kiln and renamed with it. The
+                                work centre is what planning queues against, the
+                                equipment is where servicing history goes. Point
+                                them at existing records instead if this kiln
+                                already has either.
+                            </div>
+                        </group>
+                        <group string="Chamber">
+                            <field name="max_temperature" />
+                            <field name="chamber_litres" />
+                            <field name="pieces_per_load" />
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Make and model">
+                            <field name="manufacturer" />
+                            <field name="model_number" />
+                            <field name="series" />
+                            <field name="configuration" />
+                            <field name="serial_number" />
+                            <field name="purchase_date" />
+                        </group>
+                        <group string="Supply">
+                            <field name="heating_method" />
+                            <field name="power_kw" />
+                            <field name="zone_count" />
+                            <field name="voltage" />
+                            <field name="phases" />
+                        </group>
+                    </group>
+                    <group string="Telemetry">
+                        <field name="provider" />
+                        <field
+                            name="provider_external_id"
+                            invisible="provider == 'none'"
+                        />
+                        <div class="text-muted" colspan="2" invisible="provider == 'none'">
+                            The make, model and chamber above are read from the
+                            provider and refreshed on every sync. They describe
+                            the machine, so the kiln it is connected to is the
+                            authority on them; everything else on this form is
+                            yours.
+                        </div>
+                    </group>
+                    <notebook>
+                        <page string="Programmes" name="programs">
+                            <field name="program_ids">
+                                <list>
+                                    <field name="program_number" />
+                                    <field name="name" />
+                                    <field name="kind" />
+                                    <field name="peak_temperature" />
+                                    <field name="segment_count" />
+                                    <field name="firing_hours" />
+                                    <field name="scheduled_hours" />
+                                    <field name="measured_hours" />
+                                    <field name="cooling_hours" />
+                                    <field name="firing_count" />
+                                    <field name="source" widget="badge" />
+                                    <button
+                                        name="action_adopt_measured"
+                                        type="object"
+                                        string="Adopt measured"
+                                        icon="fa-arrow-left"
+                                        title="Make the measured duration the declared one"
+                                        invisible="not measured_hours"
+                                    />
+                                    <button
+                                        name="action_adopt_scheduled"
+                                        type="object"
+                                        string="Adopt scheduled"
+                                        icon="fa-clock-o"
+                                        title="Make what the segments add up to the declared one"
+                                        invisible="not scheduled_hours"
+                                    />
+                                </list>
+                            </field>
+                            <p class="text-muted">
+                                A controller reports only a programme slot. This
+                                is where it becomes a bisque or a glaze firing,
+                                where the cooling hold that gates unloading comes
+                                from, and where a routing operation gets the
+                                length of a firing instead of somebody typing it.
+                                Open one to see its ramps and holds. Scheduled is
+                                what those add up to, measured is the median of
+                                what actually ran; adopting either is deliberate,
+                                so a plan never moves on its own.
+                            </p>
+                        </page>
+                    </notebook>
+                    <field name="active" invisible="1" />
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mb_kiln_program_view_form" model="ir.ui.view">
+        <field name="name">mb.kiln.program.form</field>
+        <field name="model">mb.kiln.program</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="action_adopt_scheduled" type="object"
+                        string="Adopt scheduled" invisible="not scheduled_hours"
+                        title="Make what the segments add up to the declared duration"
+                    />
+                    <button
+                        name="action_adopt_measured" type="object"
+                        string="Adopt measured" invisible="not measured_hours"
+                        title="Make the median of past firings the declared duration"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Programme 4" /></h1>
+                    </div>
+                    <group>
+                        <group string="What it is">
+                            <field name="kiln_id" />
+                            <field name="program_number" />
+                            <field name="kind" />
+                            <field name="peak_temperature" />
+                        </group>
+                        <group string="How long it takes">
+                            <field name="firing_hours" />
+                            <field name="scheduled_hours" />
+                            <field name="measured_hours" />
+                            <field name="firing_count" />
+                            <field name="cooling_hours" />
+                        </group>
+                    </group>
+                    <group string="Read from the kiln" invisible="source != 'provider'">
+                        <field name="source" />
+                        <field name="provider_firing_at" />
+                        <field name="provider_synced_at" />
+                        <div class="text-muted" colspan="2">
+                            The segments below were read from the controller as
+                            it ran that firing, and a refresh replaces them with
+                            whatever the most recent firing used. The name, the
+                            kind and the cooling hold are yours and no refresh
+                            touches them.
+                        </div>
+                    </group>
+                    <notebook>
+                        <page string="Segments" name="segments">
+                            <field name="segment_ids">
+                                <list editable="bottom" default_order="number">
+                                    <field name="number" />
+                                    <field name="start_temperature" />
+                                    <field name="ramp_rate" />
+                                    <field name="target_temperature" />
+                                    <field name="soak_time" />
+                                    <field name="ramp_minutes" />
+                                    <field name="duration_minutes" />
+                                    <field name="elapsed_minutes" />
+                                    <field name="full_power" />
+                                </list>
+                            </field>
+                            <p class="text-muted">
+                                Rate, target and hold, exactly as the controller
+                                stores them. A rate of 999 or more means full
+                                power: the kiln climbs as fast as its elements
+                                allow, so that ramp cannot be scheduled and
+                                counts as nothing here. The first segment is
+                                assumed to start from a cold chamber at 20 C.
+                            </p>
+                        </page>
+                        <page string="Firings" name="firings">
+                            <field name="firing_ids" readonly="1">
+                                <list>
+                                    <field name="name" />
+                                    <field name="date_start" />
+                                    <field name="duration_hours" />
+                                    <field name="peak_temperature" />
+                                    <field name="state" widget="badge" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <field name="active" invisible="1" />
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mb_kiln_action" model="ir.actions.act_window">
+        <field name="name">Kilns</field>
+        <field name="res_model">mb.kiln</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

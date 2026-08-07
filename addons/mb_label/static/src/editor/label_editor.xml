@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="mb_label.LabelEditor">
+        <div class="o_mb_label_editor d-flex flex-column h-100">
+            <header class="o_mb_label_toolbar d-flex align-items-center gap-2 border-bottom p-2 bg-white">
+                <select class="form-select w-auto" t-on-change="onTemplateSelect" t-att-value="state.selectedTemplateId">
+                    <t t-foreach="state.templates" t-as="item" t-key="item.id">
+                        <option t-att-value="item.id" t-att-selected="item.id === state.selectedTemplateId"><t t-esc="item.name"/> · v<t t-esc="item.version_number"/></option>
+                    </t>
+                </select>
+                <button class="btn btn-outline-primary" t-on-click="createTemplate">New template</button>
+                <label class="btn btn-outline-primary mb-0">Import JSON<input class="d-none" type="file" accept="application/json,.json" t-on-change="importJson"/></label>
+                <button class="btn btn-outline-primary" t-on-click="exportJson" t-att-disabled="!template">Export JSON</button>
+                <span class="vr mx-1"/>
+                <t t-foreach="types" t-as="type" t-key="type">
+                    <button class="btn btn-outline-secondary text-capitalize" t-on-click="() => this.add(type)"><t t-esc="type"/></button>
+                </t>
+                <span class="flex-grow-1"/>
+                <button class="btn btn-light" t-on-click="undo" t-att-disabled="!state.undo.length">Undo</button>
+                <button class="btn btn-light" t-on-click="redo" t-att-disabled="!state.redo.length">Redo</button>
+                <button class="btn btn-light" t-on-click="group" t-att-disabled="selectedElements.length &lt; 2">Group</button>
+                <button class="btn btn-light" t-on-click="ungroup" t-att-disabled="!selectedElements.length">Ungroup</button>
+                <button class="btn btn-primary" t-on-click="save" t-att-disabled="state.saving || !state.dirty"><t t-if="state.saving">Saving…</t><t t-else="">Save new version</t></button>
+            </header>
+            <div class="o_mb_label_body d-flex flex-grow-1 overflow-hidden" t-on-paste="pasteImage">
+                <main class="o_mb_label_workspace flex-grow-1 overflow-auto p-4" t-on-click="clearSelection">
+                    <t t-if="template">
+                        <div class="d-flex justify-content-center mb-3 gap-3">
+                            <label>Zoom <input type="range" min="2" max="10" step="0.5" t-model="state.zoom"/></label>
+                            <label><input type="checkbox" t-model="state.grid"/> Snap 0.5 mm</label>
+                            <span><t t-esc="template.width_mm"/> × <t t-esc="template.height_mm"/> mm · <t t-esc="template.dpi"/> dpi</span>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center align-items-end mb-3 gap-3">
+                            <label>Preview product<select class="form-select" t-on-change="onPreviewProduct"><option value="">Sample values</option><t t-foreach="state.previewProducts" t-as="product" t-key="product.id"><option t-att-value="product.id" t-att-selected="state.previewProductId === product.id"><t t-esc="product.name"/></option></t></select></label>
+                            <label>Preview lot/serial<select class="form-select" t-on-change="onPreviewLot" t-att-disabled="!state.previewProductId"><option value="">Product only</option><t t-foreach="previewLots" t-as="lot" t-key="lot.id"><option t-att-value="lot.id" t-att-selected="state.previewLotId === lot.id"><t t-esc="lot.name"/></option></t></select></label>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center align-items-end mb-3 gap-3">
+                            <label>Width (mm)<input class="form-control" type="number" min="5" max="300" step="0.1" name="width_mm" t-att-value="template.width_mm" t-on-change="patchTemplateField"/></label>
+                            <label>Height (mm)<input class="form-control" type="number" min="5" max="500" step="0.1" name="height_mm" t-att-value="template.height_mm" t-on-change="patchTemplateField"/></label>
+                            <label>DPI<input class="form-control" type="number" min="72" max="600" step="1" name="dpi" t-att-value="template.dpi" t-on-change="patchTemplateField"/></label>
+                            <label>Printer
+                                <select class="form-select" t-on-change="onPrinterProfile" t-att-value="selectedPrinterProfileId">
+                                    <option value="custom" t-att-selected="selectedPrinterProfileId === 'custom'">Custom / manual</option>
+                                    <t t-foreach="printerProfiles" t-as="profile" t-key="profile.id">
+                                        <option t-att-value="profile.id" t-att-selected="selectedPrinterProfileId === profile.id"><t t-esc="profile.label"/> · <t t-esc="profile.dpi"/> dpi</option>
+                                    </t>
+                                </select>
+                            </label>
+                            <label t-if="selectedPrinterProfile">Label stock
+                                <select class="form-select" t-on-change="onMediaPreset" t-att-value="selectedMediaPresetId">
+                                    <option value="" t-att-selected="!selectedMediaPresetId">Custom size</option>
+                                    <t t-foreach="selectedPrinterProfile.media" t-as="media" t-key="media.id">
+                                        <option t-att-value="media.id" t-att-selected="selectedMediaPresetId === media.id"><t t-esc="media.label"/></option>
+                                    </t>
+                                </select>
+                            </label>
+                            <label class="mb-2"><input type="checkbox" name="round_media" t-att-checked="template.round_media" t-on-change="patchTemplateField"/> Round</label>
+                            <label class="mb-2"><input type="checkbox" name="continuous_media" t-att-checked="template.continuous_media" t-on-change="patchTemplateField"/> Continuous</label>
+                        </div>
+                        <p t-if="selectedPrinterProfile" class="small text-muted text-center mb-3"><t t-esc="selectedPrinterProfile.hint"/></p>
+                        <div class="d-flex flex-wrap justify-content-center align-items-end mb-3 gap-3">
+                            <label class="flex-grow-1" style="max-width: 34rem;">QR URL prefix
+                                <input class="form-control" type="url" name="qr_url_prefix"
+                                       placeholder="https://instagram.com/username"
+                                       t-att-value="template.qr_url_prefix || ''" t-on-change="patchTemplateField"/>
+                            </label>
+                            <label class="flex-grow-1" style="max-width: 24rem;">QR payload expression
+                                <input class="form-control" type="text" name="qr_payload_template"
+                                       t-att-value="template.qr_payload_template || '{{qr}}'" t-on-change="patchTemplateField"/>
+                            </label>
+                        </div>
+                        <div t-att-class="'o_mb_label_canvas' + (template.round_media ? ' round' : '')" tabindex="0" t-on-keydown="onCanvasKeydown" t-att-style="`width:${template.width_mm}mm;height:${template.height_mm}mm;--mb-zoom:${state.zoom};`">
+                            <t t-foreach="state.document.elements" t-as="element" t-key="element.id">
+                                <div t-att-class="'o_mb_label_element o_mb_type_' + element.type + (state.selectedElementIds.includes(element.id) ? ' selected' : '') + (element.filled ? ' filled' : '') + (element.tint ? ' tint-' + element.tint : '')"
+                                     t-att-style="elementStyle(element)" t-on-pointerdown="(event) => this.beginDrag(event, element.id)">
+                                    <t t-if="element.type === 'image' &amp;&amp; element.data"><img t-att-src="element.data"/></t>
+                                    <t t-elif="element.type === 'qr'">▦<small>QR</small></t>
+                                    <t t-elif="element.type === 'barcode'">▥<small>BARCODE</small></t>
+                                    <t t-elif="element.type === 'text'"><t t-esc="elementText(element)"/></t>
+                                    <span t-if="state.selectedElementId === element.id" class="o_mb_resize_handle" t-on-pointerdown="(event) => this.beginResize(event, element.id)"/>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </main>
+                <aside class="o_mb_label_properties border-start bg-white p-3 overflow-auto">
+                    <t t-if="selected">
+                        <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0 text-capitalize"><t t-esc="selected.type"/></h5><span class="text-muted"><t t-esc="selected.id"/></span></div>
+                        <div class="row g-2">
+                            <t t-foreach="['x', 'y', 'width', 'height']" t-as="field" t-key="field">
+                                <div class="col-6"><label class="form-label text-capitalize"><t t-esc="field"/> (mm)</label><input class="form-control" type="number" step="0.1" min="0" t-att-name="field" t-att-value="selected[field]" t-on-change="patchField"/></div>
+                            </t>
+                        </div>
+                        <label class="form-label mt-3">Rotation</label><input class="form-control" type="number" name="rotation" step="1" t-att-value="selected.rotation || 0" t-on-change="patchField"/>
+                        <div t-if="['text', 'qr', 'barcode'].includes(selected.type)" class="mt-3">
+                            <label><input type="checkbox" name="required" t-att-checked="selected.required !== false" t-on-change="patchField"/> Required value</label>
+                            <p class="small text-muted mb-0">Turn this off for optional content such as a product lot or serial. If every binding resolves empty, the whole element is omitted.</p>
+                        </div>
+                        <t t-if="selected.type === 'text'">
+                            <label class="form-label mt-3">Text and bindings</label><textarea class="form-control" name="text" rows="3" t-on-change="patchField"><t t-esc="selected.text"/></textarea>
+                            <label class="form-label mt-3">Font size (mm)</label><input class="form-control" type="number" name="font_size" step="0.1" t-att-value="selected.font_size || 3" t-on-change="patchField"/>
+                            <label class="form-label mt-3">Font</label><select class="form-select" name="font" t-on-change="patchField"><t t-foreach="['sans', 'serif', 'mono']" t-as="font" t-key="font"><option t-att-value="font" t-att-selected="selected.font === font"><t t-esc="font"/></option></t></select>
+                            <label class="form-label mt-3">Horizontal</label><select class="form-select" name="align" t-on-change="patchField"><t t-foreach="['left', 'center', 'right']" t-as="align" t-key="align"><option t-att-value="align" t-att-selected="selected.align === align"><t t-esc="align"/></option></t></select>
+                            <label class="form-label mt-3">Vertical</label><select class="form-select" name="valign" t-on-change="patchField"><t t-foreach="['top', 'middle', 'bottom']" t-as="valign" t-key="valign"><option t-att-value="valign" t-att-selected="(selected.valign || 'middle') === valign"><t t-esc="valign"/></option></t></select>
+                            <div class="d-flex flex-column gap-1 mt-2"><label><input type="checkbox" name="bold" t-att-checked="selected.bold" t-on-change="patchField"/> Bold</label><label><input type="checkbox" name="italic" t-att-checked="selected.italic" t-on-change="patchField"/> Italic</label><label><input type="checkbox" name="underline" t-att-checked="selected.underline" t-on-change="patchField"/> Underline</label><label><input type="checkbox" name="no_wrap" t-att-checked="selected.no_wrap" t-on-change="patchField"/> No wrap</label></div>
+                        </t>
+                        <t t-if="selected.type === 'qr' || selected.type === 'barcode'">
+                            <label class="form-label mt-3">Encoded value</label><textarea class="form-control" name="data" rows="2" t-on-change="patchField"><t t-esc="selected.data"/></textarea>
+                            <t t-if="selected.type === 'qr'"><label class="form-label mt-3">Quiet zone (modules)</label><select class="form-select" name="quiet_zone" t-on-change="patchField"><t t-foreach="[0, 1, 2, 4]" t-as="margin" t-key="margin"><option t-att-value="margin" t-att-selected="(selected.quiet_zone === undefined ? 4 : selected.quiet_zone) === margin"><t t-esc="margin"/><t t-if="margin === 0"> — fill the box</t><t t-if="margin === 4"> — scan-safe standard</t></option></t></select><p class="small text-muted mb-0">QR elements remain square. Use 0 to fill the defined box; use 2–4 when dark artwork touches the QR.</p></t>
+                            <t t-if="selected.type === 'barcode'"><label class="form-label mt-3">Format</label><select class="form-select" name="format" t-on-change="patchField"><t t-foreach="['auto', 'Code128', 'EAN13', 'UPCA', 'Code39', 'I2of5']" t-as="format" t-key="format"><option t-att-value="format" t-att-selected="(selected.format || 'auto') === format"><t t-esc="format"/></option></t></select><label class="mt-2"><input type="checkbox" name="show_value" t-att-checked="selected.show_value" t-on-change="patchField"/> Human-readable value</label></t>
+                        </t>
+                        <t t-if="['rect', 'ellipse', 'triangle', 'line'].includes(selected.type)">
+                            <label class="form-label mt-3">Stroke (mm)</label><input class="form-control" type="number" min="0.1" step="0.1" name="stroke_width" t-att-value="selected.stroke_width || 0.25" t-on-change="patchField"/>
+                            <label class="mt-2"><input type="checkbox" name="filled" t-att-checked="selected.filled" t-on-change="patchField"/> Filled</label>
+                            <label class="form-label mt-3">Thermal tint</label><select class="form-select" name="tint" t-on-change="patchField"><t t-foreach="['solid', '75', '50', '25']" t-as="tint" t-key="tint"><option t-att-value="tint" t-att-selected="(selected.tint || 'solid') === tint"><t t-esc="tint"/></option></t></select>
+                        </t>
+                        <label class="form-label mt-3">Background</label><select class="form-select" name="background" t-on-change="patchField"><t t-foreach="['transparent', 'white', 'black']" t-as="background" t-key="background"><option t-att-value="background" t-att-selected="(selected.background || 'transparent') === background"><t t-esc="background"/></option></t></select>
+                        <label class="mt-2"><input type="checkbox" name="inverted" t-att-checked="selected.inverted" t-on-change="patchField"/> Inverted ink</label>
+                        <t t-if="selected.type === 'image'">
+                            <label class="form-label mt-3">Upload image</label><input class="form-control" type="file" accept="image/*" t-on-change="uploadImage"/>
+                            <label class="form-label mt-3">Image data URL</label><textarea class="form-control" name="data" rows="4" t-on-change="patchField"><t t-esc="selected.data"/></textarea>
+                            <label class="form-label mt-3">Dithering</label><select class="form-select" name="dither" t-on-change="patchField"><t t-foreach="['threshold', 'floyd-steinberg', 'atkinson', 'ordered']" t-as="dither" t-key="dither"><option t-att-value="dither" t-att-selected="(selected.dither || 'threshold') === dither"><t t-esc="dither"/></option></t></select>
+                            <label class="form-label mt-3">Threshold (0–255)</label><input class="form-control" type="number" min="0" max="255" step="1" name="dither_threshold" t-att-value="selected.dither_threshold || 160" t-on-change="patchField"/>
+                            <label class="mt-2"><input type="checkbox" name="pre_binarised" t-att-checked="selected.pre_binarised" t-on-change="patchField"/> Already 1-bit; preserve pixels</label>
+                        </t>
+                        <div class="d-flex flex-wrap gap-2 mt-4"><button class="btn btn-outline-secondary" t-on-click="duplicate">Duplicate</button><button class="btn btn-outline-secondary" t-on-click="() => this.reorder(1)">Bring forward</button><button class="btn btn-outline-secondary" t-on-click="() => this.reorder(-1)">Send backward</button><button class="btn btn-outline-danger" t-on-click="remove">Delete</button></div>
+                        <hr/>
+                        <p class="small text-muted">Bindings: {{product.name}}, {{product.price}}, {{product.price.raw}}, {{product.default_code}}, {{product.barcode}}, {{lot.name}}, {{company.name}}, {{company.currency}}, {{qr}}, {{qr.path}}.</p><p class="small text-muted">Format filters: {{product.price|money_trim}} removes a zero-only decimal; {{product.price.raw|money}} keeps currency decimals; {{product.price.raw|fixed:1}}, |number, |upper, |lower, |title, |trim and |default:Text can be chained. Expressions: [[date]], [[time]], [[datetime]], [[iso]], [[month]], [[monthyear]], [[date|DD.MM.YY]].</p><p class="small text-muted">Shift-click multi-selects. Keyboard: arrows move 0.5 mm, Shift+arrows 0.1 mm, Ctrl+A select all, Ctrl+G group, Ctrl+Shift+G ungroup, Ctrl+D duplicate, Delete remove, Ctrl+Z/Ctrl+Y history.</p>
+                    </t>
+                    <t t-else=""><p class="text-muted">Select an element to edit its exact geometry and content.</p></t>
+                </aside>
+            </div>
+        </div>
+    </t>
+</templates>

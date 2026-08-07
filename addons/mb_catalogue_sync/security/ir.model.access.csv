@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mb_catalogue_service_user,mb.catalogue.service.user,model_mb_catalogue_service,base.group_user,1,0,0,0
+access_mb_catalogue_service_manager,mb.catalogue.service.manager,model_mb_catalogue_service,base.group_system,1,1,1,1
+access_mb_catalogue_supplier_user,mb.catalogue.supplier.user,model_mb_catalogue_supplier,base.group_user,1,0,0,0
+access_mb_catalogue_supplier_manager,mb.catalogue.supplier.manager,model_mb_catalogue_supplier,purchase.group_purchase_manager,1,1,1,1
+access_mb_catalogue_import,mb.catalogue.import,model_mb_catalogue_import,base.group_user,1,1,1,1
+access_mb_catalogue_import_line,mb.catalogue.import.line,model_mb_catalogue_import_line,base.group_user,1,1,1,1

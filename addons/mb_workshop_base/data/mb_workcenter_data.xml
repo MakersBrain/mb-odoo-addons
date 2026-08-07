@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!--
+      Seed data, not configuration we keep owning. `noupdate="1"` means an addon
+      upgrade never overwrites a cycle time, an hourly cost or a name the artisan
+      has tuned to their own bench - which they will, because nobody else's
+      throwing time is theirs.
+    -->
+    <data noupdate="1">
+
+        <!--
+          A work centre is a resource you queue for, and the working calendar is
+          what says when the queue moves. The workshop calendar is right for
+          anything a person does and wrong for everything else: a kiln fires
+          overnight and a board dries over a weekend, and on a nine-to-five
+          calendar Odoo fragments a fourteen-hour firing across three days.
+
+          UTC, deliberately. Nothing on this calendar keeps office hours, so a
+          local timezone would only introduce a daylight-saving discontinuity
+          into durations that are physical and absolute.
+        -->
+        <record id="mb_calendar_continuous" model="resource.calendar">
+            <field name="name">Continuous (24/7)</field>
+            <field name="tz">UTC</field>
+            <field
+                name="attendance_ids"
+                eval="[
+                    (5, 0, 0),
+                    (0, 0, {'name': 'Monday', 'dayofweek': '0', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Tuesday', 'dayofweek': '1', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Wednesday', 'dayofweek': '2', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Thursday', 'dayofweek': '3', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Friday', 'dayofweek': '4', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Saturday', 'dayofweek': '5', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Sunday', 'dayofweek': '6', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                ]"
+            />
+        </record>
+
+        <!--
+          Three families, because the questions asked of them differ. Forming
+          load is labour and answers "can I take this order". Firing load is
+          equipment and energy and answers "when does this leave". Surface sits
+          between and is where the rework rate shows up.
+        -->
+        <record id="mb_workcenter_tag_forming" model="mrp.workcenter.tag">
+            <field name="name">Forming</field>
+            <field name="color">4</field>
+        </record>
+
+        <record id="mb_workcenter_tag_surface" model="mrp.workcenter.tag">
+            <field name="name">Surface</field>
+            <field name="color">6</field>
+        </record>
+
+        <record id="mb_workcenter_tag_firing" model="mrp.workcenter.tag">
+            <field name="name">Firing</field>
+            <field name="color">1</field>
+        </record>
+
+        <record id="mb_workcenter_tag_waiting" model="mrp.workcenter.tag">
+            <field name="name">Waiting</field>
+            <field name="color">7</field>
+        </record>
+
+        <!--
+          One work centre per operation type rather than one per person. In a one
+          or two person atelier the binding constraint really is the artisan, and
+          Odoo will not stop itself scheduling throwing and glazing in the same
+          hour because they are different work centres. That is a known and
+          accepted limit: planning at this scale is human, and the reason to keep
+          the operations apart is that cycle times and cost per hour differ per
+          operation and a single "Bench" work centre would report none of it.
+
+          Split further - Wheel 1, Wheel 2 - only when there really are several
+          identical stations contending for the same queue.
+
+          Every one of these is per-piece work: leave the capacity at one and put
+          the minutes per piece on the routing operation, because the duration of
+          throwing thirty mugs is thirty times the duration of throwing one.
+          Glazing is the exception and says so.
+        -->
+        <record id="mb_workcenter_throwing" model="mrp.workcenter">
+            <field name="name">Throwing</field>
+            <field name="code">FORM-THR</field>
+            <field name="sequence">10</field>
+            <field name="tag_ids" eval="[(4, ref('mb_workcenter_tag_forming'))]" />
+            <!-- Wedging and centring before the first pot, wheel and bats after
+                 the last. Real minutes, and they belong to the session rather
+                 than to any one piece. -->
+            <field name="time_start">15</field>
+            <field name="time_stop">15</field>
+        </record>
+
+        <record id="mb_workcenter_handbuilding" model="mrp.workcenter">
+            <field name="name">Handbuilding</field>
+            <field name="code">FORM-HB</field>
+            <field name="sequence">20</field>
+            <field name="tag_ids" eval="[(4, ref('mb_workcenter_tag_forming'))]" />
+            <field name="time_start">10</field>
+            <field name="time_stop">10</field>
+        </record>
+
+        <record id="mb_workcenter_trimming" model="mrp.workcenter">
+            <field name="name">Trimming</field>
+            <field name="code">FORM-TRIM</field>
+            <field name="sequence">30</field>
+            <field name="tag_ids" eval="[(4, ref('mb_workcenter_tag_forming'))]" />
+            <field name="time_start">5</field>
+            <field name="time_stop">5</field>
+        </record>
+
+        <record id="mb_workcenter_assembly" model="mrp.workcenter">
+            <field name="name">Assembly</field>
+            <field name="code">FORM-ASM</field>
+            <field name="sequence">40</field>
+            <field name="tag_ids" eval="[(4, ref('mb_workcenter_tag_forming'))]" />
+        </record>
+
+        <!--
+          Drying is a wait, not work. No resource is consumed, the constraint is
+          shelf space and shelf space is almost never what binds, so it gets a
+          capacity far past anything a batch will reach and no hourly cost.
+          Modelling it as ordinary work would put phantom load on the shop floor
+          dashboard and drag the OEE figure down with hours nobody worked.
+
+          It is here at all because leather-hard and bone-dry are days, and a
+          promised date that ignores them is wrong. Drop the operation from the
+          routing entirely if the lead time is not worth the extra work order.
+        -->
+        <record id="mb_workcenter_drying" model="mrp.workcenter">
+            <field name="name">Drying</field>
+            <field name="code">DRY</field>
+            <field name="sequence">50</field>
+            <field name="tag_ids" eval="[(4, ref('mb_workcenter_tag_waiting'))]" />
+            <field name="resource_calendar_id" ref="mb_calendar_continuous" />
+            <field name="costs_hour">0.0</field>
+        </record>
+
+        <record id="mb_workcenter_capacity_drying" model="mrp.workcenter.capacity">
+            <field name="workcenter_id" ref="mb_workcenter_drying" />
+            <field name="product_uom_id" ref="uom.product_uom_unit" />
+            <field name="capacity">1000</field>
+        </record>
+
+        <!--
+          Glazing is the one forming-side operation that is genuinely batched: a
+          rack of ware is dipped or sprayed in one pass, so the capacity is the
+          rack and not the piece. Set it per product where sizes differ enough to
+          matter - a capacity line with no product is the fallback for the rest.
+        -->
+        <record id="mb_workcenter_glazing" model="mrp.workcenter">
+            <field name="name">Glazing</field>
+            <field name="code">SURF-GLZ</field>
+            <field name="sequence">60</field>
+            <field name="tag_ids" eval="[(4, ref('mb_workcenter_tag_surface'))]" />
+            <!-- Buckets stirred and sieved before, and washed after. Glaze that
+                 has not been stirred is a different glaze. -->
+            <field name="time_start">20</field>
+            <field name="time_stop">20</field>
+        </record>
+
+        <record id="mb_workcenter_capacity_glazing" model="mrp.workcenter.capacity">
+            <field name="workcenter_id" ref="mb_workcenter_glazing" />
+            <field name="product_uom_id" ref="uom.product_uom_unit" />
+            <field name="capacity">12</field>
+        </record>
+
+        <record id="mb_workcenter_decorating" model="mrp.workcenter">
+            <field name="name">Decorating</field>
+            <field name="code">SURF-DEC</field>
+            <field name="sequence">70</field>
+            <field name="tag_ids" eval="[(4, ref('mb_workcenter_tag_surface'))]" />
+        </record>
+
+    </data>
+</odoo>

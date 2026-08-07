@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="pos_payment_method_view_form_inherit_mb_pos_sumup" model="ir.ui.view">
+        <field name="name">pos.payment.method.form.inherit.sumup</field>
+        <field name="model">pos.payment.method</field>
+        <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='use_payment_terminal']" position="after">
+                <field name="sumup_affiliate_key"
+                       invisible="use_payment_terminal != 'sumup_mobile'"
+                       required="use_payment_terminal == 'sumup_mobile'"
+                       password="True"/>
+                <field name="sumup_app_id"
+                       invisible="use_payment_terminal != 'sumup_mobile'"/>
+                <field name="sumup_payment_provider_id"
+                       invisible="use_payment_terminal != 'sumup_mobile'"/>
+                <field name="sumup_skip_success_screen"
+                       invisible="use_payment_terminal != 'sumup_mobile'"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

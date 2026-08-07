@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mb_label_template_user,label.template.user,model_mb_label_template,group_mb_label_user,1,0,0,0
+access_mb_label_template_manager,label.template.manager,model_mb_label_template,group_mb_label_manager,1,1,1,0
+access_mb_label_version_user,label.version.user,model_mb_label_template_version,group_mb_label_user,1,0,0,0
+access_mb_label_version_manager,label.version.manager,model_mb_label_template_version,group_mb_label_manager,1,0,1,0
+access_mb_label_alias_user,label.alias.user,model_mb_label_qr_alias,group_mb_label_user,1,0,1,0
+access_mb_label_alias_manager,label.alias.manager,model_mb_label_qr_alias,group_mb_label_manager,1,1,1,0
+access_mb_label_job_user,label.job.user,model_mb_label_print_job,group_mb_label_user,1,1,1,0
+access_mb_label_print_wizard,label.print.wizard,model_mb_label_print_wizard,group_mb_label_user,1,1,1,1

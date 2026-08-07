@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mb_kiln_user,mb.kiln.user,model_mb_kiln,mrp.group_mrp_user,1,0,0,0
+access_mb_kiln_manager,mb.kiln.manager,model_mb_kiln,mrp.group_mrp_manager,1,1,1,1
+access_mb_firing_user,mb.firing.user,model_mb_firing,mrp.group_mrp_user,1,1,1,0
+access_mb_firing_manager,mb.firing.manager,model_mb_firing,mrp.group_mrp_manager,1,1,1,1
+access_mb_kiln_program_user,mb.kiln.program.user,model_mb_kiln_program,mrp.group_mrp_user,1,0,0,0
+access_mb_kiln_program_manager,mb.kiln.program.manager,model_mb_kiln_program,mrp.group_mrp_manager,1,1,1,1
+access_mb_kiln_program_segment_user,mb.kiln.program.segment.user,model_mb_kiln_program_segment,mrp.group_mrp_user,1,0,0,0
+access_mb_kiln_program_segment_manager,mb.kiln.program.segment.manager,model_mb_kiln_program_segment,mrp.group_mrp_manager,1,1,1,1

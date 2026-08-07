@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_mb_catalogue_import_form" model="ir.ui.view">
+    <field name="name">mb.catalogue.import.form</field>
+    <field name="model">mb.catalogue.import</field>
+    <field name="arch" type="xml">
+      <form string="Import from catalogue">
+        <group>
+          <group>
+            <field name="query" placeholder="PC-20, SC74, hot tamale"
+                   options="{'autofocus': True}"/>
+            <field name="manufacturer" placeholder="mayco, amaco - optional"/>
+          </group>
+          <group>
+            <field name="service_id" options="{'no_create': True}"/>
+            <field name="result_count" string="Results"/>
+          </group>
+        </group>
+        <div class="text-end mb-2">
+          <button name="action_search" type="object" string="Search"
+                  class="btn-primary"/>
+          <button name="action_select_all" type="object" string="Select all new"
+                  class="btn-secondary" invisible="result_count == 0"/>
+        </div>
+        <field name="line_ids" nolabel="1" invisible="result_count == 0">
+          <list editable="bottom" create="false" delete="false">
+            <field name="selected" widget="boolean_toggle"
+                   readonly="product_tmpl_id != False"/>
+            <field name="brand" readonly="1"/>
+            <field name="manufacturer_sku" readonly="1"/>
+            <field name="name" readonly="1"/>
+            <field name="family" readonly="1" optional="show"/>
+            <field name="firing_range" readonly="1" optional="hide"/>
+            <field name="source_count" readonly="1"/>
+            <field name="unit_price_low" readonly="1" optional="show"/>
+            <field name="unit_price_high" readonly="1" optional="show"/>
+            <field name="unit_price_per" readonly="1" optional="show"/>
+            <field name="product_tmpl_id" readonly="1" optional="show"/>
+            <field name="canonical_id" column_invisible="1"/>
+          </list>
+        </field>
+        <div invisible="result_count != 0" class="text-muted mt-3">
+          <p>Search the master catalogue by manufacturer code or product name.
+             Punctuation in a code does not matter: <b>PC-20</b> and
+             <b>pc20</b> both find AMACO Blue Rutile.</p>
+          <p>Results are ordered by how many suppliers carry the product, because
+             a code eleven shops sell is more likely the one you mean than a code
+             one shop sells.</p>
+        </div>
+        <footer>
+          <button name="action_import" type="object" string="Import selected"
+                  class="btn-primary" invisible="result_count == 0"/>
+          <button string="Close" class="btn-secondary" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_mb_catalogue_import" model="ir.actions.act_window">
+    <field name="name">Import from catalogue</field>
+    <field name="res_model">mb.catalogue.import</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
+  <menuitem id="menu_mb_catalogue_import" name="Import materials"
+            parent="menu_mb_catalogue_root"
+            action="action_mb_catalogue_import" sequence="5"/>
+
+</odoo>

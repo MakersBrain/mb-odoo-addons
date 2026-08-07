@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="l10n_fr_micro_setup_wizard_view_form" model="ir.ui.view">
+		<field name="name">l10n.fr.micro.setup.wizard.form</field>
+		<field name="model">l10n.fr.micro.setup.wizard</field>
+		<field name="arch" type="xml">
+			<form string="French EI Setup">
+				<sheet>
+					<field name="company_partner_id" invisible="1"/>
+					<field name="facturx_ready" invisible="1"/>
+					<div class="oe_title">
+						<label for="company_id"/>
+						<h1><field name="company_id"/></h1>
+					</div>
+					<field name="readiness_html" nolabel="1" readonly="1" class="mb16"/>
+					<group string="Legal identity" col="4">
+						<field name="legal_name"/>
+						<field name="trade_name"/>
+						<field name="legal_form"/>
+						<field name="siren"/>
+						<field name="siret"/>
+						<field name="ape_code" placeholder="32.99Z"/>
+						<field name="activity_description" colspan="2"/>
+					</group>
+					<group string="Registered office" col="4">
+						<field name="street"/>
+						<field name="street2"/>
+						<field name="zip"/>
+						<field name="city"/>
+						<field name="country_id"/>
+						<field name="email"/>
+						<field name="phone"/>
+					</group>
+					<group string="Tax and electronic invoicing" col="4">
+						<field name="tax_regime"/>
+						<field name="tax_effective_date"/>
+						<field name="vat" invisible="tax_regime != 'vat'"/>
+						<field name="edi_mode" colspan="2"/>
+					</group>
+					<group string="Payment details" col="4">
+						<field name="bank_account_id" options="{'no_create': True}"/>
+						<field name="iban"/>
+						<field name="bic"/>
+					</group>
+				</sheet>
+				<footer>
+					<button name="action_apply" type="object" string="Save and validate" class="btn-primary"/>
+					<button string="Cancel" special="cancel" class="btn-secondary"/>
+				</footer>
+			</form>
+		</field>
+	</record>
+
+	<record id="action_l10n_fr_micro_setup_wizard" model="ir.actions.act_window">
+		<field name="name">French EI Setup</field>
+		<field name="res_model">l10n.fr.micro.setup.wizard</field>
+		<field name="view_mode">form</field>
+		<field name="target">current</field>
+	</record>
+
+	<menuitem id="menu_l10n_fr_micro_setup_wizard"
+		name="French EI Setup"
+		parent="account.menu_finance_configuration"
+		action="action_l10n_fr_micro_setup_wizard"
+		groups="account.group_account_manager"
+		sequence="5"/>
+</odoo>

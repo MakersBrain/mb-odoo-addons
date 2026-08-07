@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mb_sumup_link_wizard_invoice,mb.sumup.link.wizard invoicing,model_mb_sumup_link_wizard,account.group_account_invoice,1,1,1,1
+access_mb_sumup_link_wizard_readonly,mb.sumup.link.wizard readonly,model_mb_sumup_link_wizard,account.group_account_readonly,1,1,1,1

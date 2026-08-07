@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mrp_routing_workcenter_view_form_firing" model="ir.ui.view">
+        <field name="name">mrp.routing.workcenter.form.firing</field>
+        <field name="model">mrp.routing.workcenter</field>
+        <field name="inherit_id" ref="mrp.mrp_routing_workcenter_form_view" />
+        <field name="arch" type="xml">
+            <!-- Above the duration, because on a firing operation it is what
+                 decides the duration rather than a detail beside it. -->
+            <field name="time_mode" position="before">
+                <field name="mb_kiln_program_id" />
+                <field
+                    name="mb_kiln_occupies_cooling"
+                    invisible="not mb_kiln_program_id"
+                />
+            </field>
+            <field name="time_cycle_manual" position="attributes">
+                <attribute name="readonly">mb_kiln_program_id</attribute>
+            </field>
+            <xpath expr="//group[@name='workorder']" position="inside">
+                <div class="text-muted" colspan="2" invisible="not mb_kiln_program_id">
+                    Set by the programme, cooling included where the kiln is held
+                    while it cools. Change it on the kiln and every routing that
+                    fires this programme follows.
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

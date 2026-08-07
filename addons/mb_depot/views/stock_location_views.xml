@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_location_form_depot" model="ir.ui.view">
+    <field name="name">stock.location.form.depot</field>
+    <field name="model">stock.location</field>
+    <field name="inherit_id" ref="stock.view_location_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//group" position="inside">
+        <group string="Dépôt-vente">
+          <field name="is_depot"/>
+          <field name="depot_partner_id" invisible="not is_depot"
+                 required="is_depot"/>
+          <field name="depot_commission" invisible="not is_depot"/>
+          <field name="depot_route_id" invisible="not is_depot" readonly="1"/>
+          <field name="depot_pricelist_id" invisible="not is_depot" readonly="1"/>
+          <field name="depot_qty" invisible="not is_depot" readonly="1"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_depot_list" model="ir.ui.view">
+    <field name="name">stock.location.list.depot</field>
+    <field name="model">stock.location</field>
+    <field name="arch" type="xml">
+      <list string="Dépôts">
+        <field name="complete_name" string="Depot"/>
+        <field name="depot_partner_id"/>
+        <field name="depot_commission" widget="percentage" optional="show"/>
+        <field name="depot_qty"/>
+        <field name="depot_route_id" optional="hide"/>
+        <field name="depot_pricelist_id" optional="hide"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="action_depot" model="ir.actions.act_window">
+    <field name="name">Dépôts</field>
+    <field name="res_model">stock.location</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[('is_depot', '=', True)]</field>
+    <field name="context">{'search_default_is_depot': 1}</field>
+    <field name="view_id" ref="view_depot_list"/>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Create a dépôt-vente</p>
+      <p>A depot is an internal location we own and someone else holds. Use
+         <b>New depot</b> rather than creating the location by hand: a depot is a
+         location, a route, a pull rule and a commission pricelist, and they have
+         to agree with each other.</p>
+    </field>
+  </record>
+
+</odoo>

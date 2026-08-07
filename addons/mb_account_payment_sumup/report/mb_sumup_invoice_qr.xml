@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Placed on the same anchor Odoo uses for its own portal QR code, which
+         `_compute_display_link_qr_code` switches off whenever this one has
+         something to print. -->
+    <template id="report_invoice_document_sumup_qr"
+              inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='show_link_qr']" position="before">
+            <div t-if="o.mb_sumup_checkout_url and o.amount_residual"
+                 id="mb_sumup_qrcode"
+                 class="d-flex mb-3 avoid-page-break-inside">
+                <t t-set="mb_sumup_qr" t-value="o._mb_sumup_payment_qr()"/>
+                <div class="qrcode me-3 position-relative" t-if="mb_sumup_qr">
+                    <a t-att-href="o.mb_sumup_checkout_url" target="_blank"
+                       class="top-0 start-0 position-absolute w-100 h-100 z-1"/>
+                    <p class="position-relative mb-0">
+                        <img t-att-src="mb_sumup_qr"/>
+                    </p>
+                </div>
+                <div class="d-inline lh-sm" t-if="mb_sumup_qr">
+                    <p class="fw-bold mb-0">Payer par carte</p>
+                    <p class="text-muted fst-italic">
+                        Scannez ce code<br/>pour payer par SumUp
+                    </p>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

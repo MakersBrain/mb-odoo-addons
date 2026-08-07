@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_depot_statement_document">
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h2>Relevé de dépôt-vente</h2>
+        <div class="row mb-4">
+          <div class="col-6">
+            <strong>Dépositaire</strong><br/>
+            <span t-field="doc.partner_id"/><br/>
+            <span t-field="doc.depot_id.complete_name"/>
+          </div>
+          <div class="col-6">
+            <strong>Période</strong><br/>
+            du <span t-field="doc.date_from"/> au <span t-field="doc.date_to"/>
+          </div>
+        </div>
+
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Pièce</th>
+              <th>N° de série</th>
+              <th class="text-end">Début</th>
+              <th class="text-end">Déposé</th>
+              <th class="text-end">Vendu</th>
+              <th class="text-end">Repris</th>
+              <th class="text-end">En dépôt</th>
+              <th class="text-end">Prix public</th>
+              <th class="text-end">Commission</th>
+              <th class="text-end">Net</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr t-foreach="doc.line_ids" t-as="line">
+              <td><span t-field="line.product_id"/></td>
+              <td><span t-field="line.lot_name"/></td>
+              <td class="text-end"><span t-field="line.qty_opening"/></td>
+              <td class="text-end"><span t-field="line.qty_placed"/></td>
+              <td class="text-end"><span t-field="line.qty_sold"/></td>
+              <td class="text-end"><span t-field="line.qty_returned"/></td>
+              <td class="text-end"><strong><span t-field="line.qty_closing"/></strong></td>
+              <td class="text-end">
+                <span t-field="line.amount_gross"
+                      t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+              </td>
+              <td class="text-end">
+                <span t-field="line.amount_commission"
+                      t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+              </td>
+              <td class="text-end">
+                <span t-field="line.amount_net"
+                      t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="row justify-content-end">
+          <div class="col-5">
+            <table class="table table-sm">
+              <tr>
+                <td>Total prix public</td>
+                <td class="text-end">
+                  <span t-field="doc.total_gross"
+                        t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                </td>
+              </tr>
+              <tr>
+                <td>Commission dépositaire</td>
+                <td class="text-end">
+                  <span t-field="doc.total_commission"
+                        t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                </td>
+              </tr>
+              <tr class="border-black">
+                <td><strong>Net à facturer</strong></td>
+                <td class="text-end">
+                  <strong>
+                    <span t-field="doc.total_sold"
+                          t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                  </strong>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <p class="text-muted mt-4">
+          Les pièces en dépôt restent la propriété du déposant jusqu'à leur vente.
+        </p>
+      </div>
+    </t>
+  </template>
+
+  <template id="report_depot_statement">
+    <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="doc">
+        <t t-call="mb_depot.report_depot_statement_document"/>
+      </t>
+    </t>
+  </template>
+
+</odoo>

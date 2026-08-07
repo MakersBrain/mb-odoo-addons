@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_production_lot_form_mb_workshop" model="ir.ui.view">
+        <field name="name">stock.lot.form.mb.workshop</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="mb_food_contact" readonly="1" />
+                <field name="mb_migration_passed" readonly="1" />
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Migration tests" name="mb_migration_tests">
+                        <field name="mb_migration_test_ids" />
+                    </page>
+                    <page string="Glaze lots consumed" name="mb_glaze_lots">
+                        <field name="mb_glaze_lot_ids" readonly="1" />
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>

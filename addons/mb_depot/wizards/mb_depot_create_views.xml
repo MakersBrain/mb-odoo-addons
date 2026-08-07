@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_mb_depot_create_form" model="ir.ui.view">
+    <field name="name">mb.depot.create.form</field>
+    <field name="model">mb.depot.create</field>
+    <field name="arch" type="xml">
+      <form string="New depot">
+        <p class="text-muted">
+          Creates the internal location, the route that sources sales from it,
+          and the commission pricelist. Pieces placed there stay on your books
+          until the depositary reports them sold.
+        </p>
+        <group>
+          <field name="partner_id"/>
+          <field name="commission"/>
+          <field name="warehouse_id"/>
+          <field name="assign_pricelist"/>
+        </group>
+        <footer>
+          <button name="action_create" type="object" string="Create depot"
+                  class="btn-primary"/>
+          <button special="cancel" string="Cancel" class="btn-secondary"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_mb_depot_create" model="ir.actions.act_window">
+    <field name="name">New depot</field>
+    <field name="res_model">mb.depot.create</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
+</odoo>

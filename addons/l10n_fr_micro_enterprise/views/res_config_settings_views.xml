@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="res_config_settings_view_form_micro_enterprise" model="ir.ui.view">
+		<field name="name">res.config.settings.view.form.micro.enterprise</field>
+		<field name="model">res.config.settings</field>
+		<field name="inherit_id" ref="account.res_config_settings_view_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//setting[@id='default_taxes']" position="after">
+				<setting id="l10n_fr_micro_tax_regime" string="Micro-enterprise VAT regime" company_dependent="1"
+					help="Keep economic VAT on products and switch domestic sales through an auditable fiscal position."
+					invisible="country_code != 'FR'">
+					<div class="content-group">
+						<div class="row mt16">
+							<label for="l10n_fr_micro_tax_regime" class="col-lg-4 o_light_label"/>
+							<field name="l10n_fr_micro_tax_regime" class="oe_inline"/>
+						</div>
+						<div class="row mt8" invisible="not l10n_fr_micro_fiscal_position_id">
+							<label for="l10n_fr_micro_fiscal_position_id" class="col-lg-4 o_light_label"/>
+							<field name="l10n_fr_micro_fiscal_position_id" class="oe_inline"/>
+						</div>
+						<div class="row mt8" invisible="not l10n_fr_micro_goods_tax_id">
+							<label for="l10n_fr_micro_goods_tax_id" class="col-lg-4 o_light_label"/>
+							<field name="l10n_fr_micro_goods_tax_id" class="oe_inline"/>
+						</div>
+						<div class="row mt8" invisible="not l10n_fr_micro_service_tax_id">
+							<label for="l10n_fr_micro_service_tax_id" class="col-lg-4 o_light_label"/>
+							<field name="l10n_fr_micro_service_tax_id" class="oe_inline"/>
+						</div>
+						<div class="row mt8" invisible="not l10n_fr_micro_tax_switch_date">
+							<label for="l10n_fr_micro_tax_switch_date" class="col-lg-4 o_light_label"/>
+							<field name="l10n_fr_micro_tax_switch_date" class="oe_inline"/>
+						</div>
+						<div class="d-flex flex-wrap gap-2 mt16">
+							<button name="action_l10n_fr_micro_prepare_tax_setup" type="object" string="Prepare / repair setup" class="btn-secondary"/>
+							<button name="action_l10n_fr_micro_activate_franchise" type="object" string="Activate franchise en base" class="btn-primary" confirm="Apply the Article 293 B exemption to future domestic sales?"/>
+							<button name="action_l10n_fr_micro_activate_vat" type="object" string="Activate VAT liable" class="btn-warning" confirm="Disable automatic franchise mapping for future domestic sales?"/>
+						</div>
+						<p class="text-muted mt8 mb-0">This switch never rewrites products, posted invoices, or historical tax lines.</p>
+					</div>
+				</setting>
+			</xpath>
+		</field>
+	</record>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="action_report_depot_statement" model="ir.actions.report">
+    <field name="name">Depot statement</field>
+    <field name="model">mb.depot.statement</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">mb_depot.report_depot_statement</field>
+    <field name="report_file">mb_depot.report_depot_statement</field>
+    <field name="print_report_name">'Relevé %s' % (object.partner_id.name or '')</field>
+    <field name="binding_model_id" eval="False"/>
+  </record>
+
+  <!-- The bon de dépôt has to exist here because stock_picking_report_valued
+       cannot serve: every monetary field on it is related to or computed from
+       move_id.sale_line_id, and a placement is an internal transfer with no
+       sale line, so it renders blank. -->
+  <record id="action_report_bon_depot" model="ir.actions.report">
+    <field name="name">Bon de dépôt</field>
+    <field name="model">stock.picking</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">mb_depot.report_bon_depot</field>
+    <field name="report_file">mb_depot.report_bon_depot</field>
+    <field name="print_report_name">'Bon de dépôt %s' % (object.name)</field>
+    <field name="binding_model_id" ref="stock.model_stock_picking"/>
+    <field name="binding_type">report</field>
+  </record>
+
+</odoo>

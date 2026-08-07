@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_mb_catalogue_service_form" model="ir.ui.view">
+    <field name="name">mb.catalogue.service.form</field>
+    <field name="model">mb.catalogue.service</field>
+    <field name="arch" type="xml">
+      <form string="Catalogue service">
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="base_url" placeholder="https://catalogue.makersbrain.example"/>
+            <field name="api_key" password="True"/>
+            <field name="active"/>
+          </group>
+          <group string="Last import">
+            <field name="last_import_at"/>
+            <field name="last_import_summary" readonly="1"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_mb_catalogue_supplier_list" model="ir.ui.view">
+    <field name="name">mb.catalogue.supplier.list</field>
+    <field name="model">mb.catalogue.supplier</field>
+    <field name="arch" type="xml">
+      <list string="Catalogue suppliers" editable="bottom">
+        <field name="source_id"/>
+        <field name="partner_id"/>
+        <field name="currency_id"/>
+        <field name="vat_status"/>
+        <field name="vat_rate"/>
+        <field name="delay"/>
+        <field name="active" widget="boolean_toggle"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="action_mb_catalogue_supplier" model="ir.actions.act_window">
+    <field name="name">Catalogue suppliers</field>
+    <field name="res_model">mb.catalogue.supplier</field>
+    <field name="view_mode">list</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Map a catalogue source to a vendor</p>
+      <p>Only mapped sources produce supplier prices. A glaze sold by fifteen
+         shops should not put fifteen vendors in front of you.</p>
+    </field>
+  </record>
+
+  <record id="action_mb_catalogue_service" model="ir.actions.act_window">
+    <field name="name">Catalogue service</field>
+    <field name="res_model">mb.catalogue.service</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <!-- Provenance on the product, so it is always visible where an imported
+       material came from and when it was last refreshed. -->
+  <record id="view_product_template_form_catalogue" model="ir.ui.view">
+    <field name="name">product.template.form.catalogue</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="product.product_template_form_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//page[@name='general_information']//field[@name='categ_id']" position="after">
+        <field name="mb_manufacturer" invisible="not mb_canonical_id"/>
+        <field name="mb_manufacturer_sku" invisible="not mb_canonical_id"/>
+        <field name="mb_catalogue_synced_at" invisible="not mb_canonical_id"/>
+        <field name="mb_canonical_id" invisible="1"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Search by manufacturer code, and group by maker. Category filtering and
+       grouping is Odoo's own and needs nothing from us. -->
+  <record id="view_product_template_search_catalogue" model="ir.ui.view">
+    <field name="name">product.template.search.catalogue</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="product.product_template_search_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='name']" position="after">
+        <field name="mb_manufacturer_sku" string="Manufacturer code"
+               filter_domain="[('mb_manufacturer_sku', 'ilike', self)]"/>
+        <field name="mb_manufacturer" string="Manufacturer"/>
+      </xpath>
+      <xpath expr="//filter[@name='group_by_categ_id']" position="after">
+        <filter name="mb_group_manufacturer" string="Manufacturer"
+                context="{'group_by': 'mb_manufacturer'}"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- The manufacturer code in the product list, beside Odoo's own reference. -->
+  <record id="view_product_template_list_catalogue" model="ir.ui.view">
+    <field name="name">product.template.list.catalogue</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="product.product_template_tree_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='name']" position="after">
+        <field name="mb_manufacturer" optional="show"/>
+        <field name="mb_manufacturer_sku" string="Mfr code" optional="show"/>
+      </xpath>
+    </field>
+  </record>
+
+  <menuitem id="menu_mb_catalogue_root" name="Master catalogue"
+            parent="purchase.menu_purchase_config" sequence="90"/>
+  <menuitem id="menu_mb_catalogue_suppliers" name="Suppliers"
+            parent="menu_mb_catalogue_root" action="action_mb_catalogue_supplier" sequence="10"/>
+  <menuitem id="menu_mb_catalogue_service" name="Service"
+            parent="menu_mb_catalogue_root" action="action_mb_catalogue_service" sequence="20"/>
+
+</odoo>

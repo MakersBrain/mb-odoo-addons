@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mb_label_alias_pos_user,label.alias.pos.user,mb_label.model_mb_label_qr_alias,point_of_sale.group_pos_user,1,0,0,0

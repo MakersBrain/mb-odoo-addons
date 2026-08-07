@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mb_migration_test_user,mb.migration.test.user,model_mb_migration_test,stock.group_stock_user,1,0,0,0
+access_mb_migration_test_manager,mb.migration.test.manager,model_mb_migration_test,stock.group_stock_manager,1,1,1,1

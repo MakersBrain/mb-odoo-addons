@@ -1,0 +1,713 @@
+# MakersBrain Odoo addon specification
+
+- Status: **describes what is built**, 7 August 2026
+- Target: Odoo 19 Community, one PostgreSQL database per artisan
+- Licence: LGPL-3 throughout, deliberately (see [Licence boundary](#licence-boundary))
+
+This document specifies the eleven addons that exist in `addons/`. It is written
+from the code, the manifests and the installed state of the running database,
+not from intent.
+
+It replaces the addon table in `POC-PLAN.md` section 4 and the boundary sketch
+in section 10.2, both of which describe a module set that was never built.
+`POC-PLAN.md` remains the strategic document — the edition decision, the
+e-invoicing research, the control plane — and is not superseded here.
+`IDENTITY-SPINE-DESIGN.md` remains the reference for product, lot and QR
+identity, which this specification depends on and does not restate.
+
+A module is listed here only if its code exists. Nothing below is planned work.
+
+## Contents
+
+- [The module set](#the-module-set)
+- [Cross-cutting rules](#cross-cutting-rules)
+- [Workshop foundation](#workshop-foundation) — `mb_workshop_base`
+- [Labels and piece identity](#labels-and-piece-identity) — `mb_label`, `mb_label_pos`
+- [Firing](#firing) — `mb_ceramics_firing`, `mb_kiln_bridge`
+- [Materials](#materials) — `mb_catalogue_sync`
+- [Consignment](#consignment) — `mb_depot`
+- [Payments](#payments) — `mb_payment_sumup`, `mb_pos_sumup`, `mb_account_payment_sumup`
+- [French tax regime](#french-tax-regime) — `l10n_fr_micro_enterprise`
+- [Environment](#environment)
+- [Verification status](#verification-status)
+- [Known gaps](#known-gaps)
+
+## The module set
+
+Four independent trees. Nothing spans them, and that is the design: a workshop
+that sells at a market but owns no kiln installs the label tree and none of the
+firing tree.
+
+```text
+stock, mrp
+└── mb_workshop_base ─────── food-contact identity, work centres, 24/7 calendar
+    ├── mb_label ─────────── web
+    │   └── mb_label_pos ─── point_of_sale
+    └── mb_ceramics_firing ─ mrp, maintenance
+        └── mb_kiln_bridge ─ ROHDE myKiln connector
+
+product, purchase, uom, stock
+└── mb_catalogue_sync ────── master catalogue import
+
+stock, sale_stock
+└── mb_depot ─────────────── dépôt-vente
+
+payment
+└── mb_payment_sumup ─────── SumUp as an Odoo payment provider
+    ├── mb_pos_sumup ─────── point_of_sale
+    └── mb_account_payment_sumup ─ account_payment
+
+l10n_fr_account, account_edi_ubl_cii
+└── l10n_fr_micro_enterprise ── franchise en base
+```
+
+| Addon | Version | Owns | Live state |
+| --- | --- | --- | --- |
+| `mb_workshop_base` | 19.0.1.1.0 | Food-contact declaration, derived tracking, migration tests, seeded work centres, continuous calendar | installed |
+| `mb_label` | 19.0.1.0.0 | Label templates and immutable versions, QR aliases, deterministic renderer, Owl editor, print jobs, BLE printer adapters | installed |
+| `mb_label_pos` | 19.0.1.0.0 | Bounded alias projection into POS, QR resolution, fall-through to native barcodes | installed |
+| `mb_ceramics_firing` | 19.0.1.3.0 | `mb.firing` as the kiln load, kiln records, controller programmes and segments, cooling hold, work-centre creation | installed |
+| `mb_kiln_bridge` | 19.0.1.2.0 | myKiln connection, read-only client, normalization, polling cron, programme derivation | installed |
+| `mb_catalogue_sync` | 19.0.1.2.0 | On-demand import of curated manufacturer identities and supplier offers | installed |
+| `mb_depot` | 19.0.1.0.0 | Depot locations, creation wizard, commission pricelist, ageing, statement, bon de dépôt | installed |
+| `mb_payment_sumup` | 19.0.1.0.0 | SumUp hosted checkout provider, return and webhook routes, polling cron, refunds | **uninstalled** |
+| `mb_pos_sumup` | 19.0.1.0.0 | POS payment through the SumUp app URL scheme on the same phone | **uninstalled** |
+| `mb_account_payment_sumup` | 19.0.1.0.0 | Invoice-bound checkout link and printed QR code | **uninstalled** |
+| `l10n_fr_micro_enterprise` | 19.0.2.1.0 | Franchise-en-base tax preparation, regime switching, Factur-X exemption codes | installed |
+
+Live state is `ir_module_module` in the `odoo` database of the running stack.
+The three uninstalled addons carry 32 test methods between them and have not
+been installed against the database holding real data.
+
+## Cross-cutting rules
+
+These hold across every module and are the first thing to check when adding one.
+
+**One database per artisan.** No addon may assume it is alone in a database, but
+none may assume multi-tenancy either. Records carry `company_id` where Odoo's own
+models do; nothing implements a tenant discriminator of its own.
+
+**Odoo owns inventory identity.** `product.product` and `stock.lot` are the only
+piece identities. `tracking = 'serial'` is a unique piece, `tracking = 'lot'` is
+a batch, untracked is a product-only article. No addon invents a parallel
+identity model. `mb_workshop_base` derives `tracking` from the food-contact
+declaration rather than leaving it as an unexplained setting.
+
+**Odoo's `barcode` stays an ordinary barcode.** EAN, UPC and internal references
+remain on `product.barcode`. Printable QR values live in `mb.label.qr.alias`, and
+POS resolution tries aliases first and then falls through to Odoo's native
+barcode path unchanged.
+
+**Printed identity is durable.** A custom QR template is not generally
+reversible, so every printed value is materialised as an alias at print time.
+Template versions are immutable; editing a template mints a new version and
+leaves every previously printed label scannable. Alias retirement is an explicit
+audited action that deletes no print or POS history.
+
+**Credentials.** Odoo has no secret store. Where a credential must live in the
+database it is a field on a record, restricted by group, never logged, and the
+reason is stated on the model. This currently applies to `mb.kiln.connection`
+(myKiln username, password, provider token) and to the SumUp provider record
+(merchant code, secret key). Both are single-workshop decisions and both reverse
+if the product goes multi-tenant. Development credentials live in gitignored
+`*.env` files at the repository root and nowhere else.
+
+**Untrusted callbacks are claims, not evidence.** Every external callback route
+re-reads the authoritative state from the provider API with the merchant's own
+key before anything settles. This is why forging a call to
+`/payment/sumup/webhook` achieves nothing beyond an early poll, and why the POS
+verifies `smp-status` against the SumUp transactions endpoint.
+
+**Supported seams only.** Core Odoo files are not edited. Extension goes through
+`_inherit`, `patch()`, `_load_pos_data_models()`, `pos.load.mixin`, registries
+and services. `mb_label_pos/README.md` enumerates the POS seams used.
+
+**Licence boundary.** Every addon is LGPL-3. AGPL-3 OCA modules may be
+recommended but never declared as a dependency — `mb_depot` documents the one
+case (`sale_order_global_stock_route`) and degrades to manual route selection
+without it.
+
+## Workshop foundation
+
+### `mb_workshop_base`
+
+Depends on `stock`, `mrp`. The root of the ceramics tree.
+
+**Food contact is a property of the finished article.** Directive 84/500/EEC
+applies to ceramic articles intended for food contact and to nothing else, so a
+mug carries lead and cadmium limits and a decorative plate carries none.
+`mb_food_contact` is declared on `product.template` and `tracking` is derived
+from it, so the traceability setting always has a stated reason.
+
+**`mb.migration.test`** holds a laboratory's lead and cadmium migration result
+against a *glaze lot*, not against the ware: one result covers every article made
+from that lot. `passed` is recorded as the laboratory issued it and is never
+derived from the figures, because the limits in force on the test date are the
+lab's to apply. The migration limit class, the figures and the report attachments
+are kept so the verdict stays auditable.
+
+**No design model.** A piece with its own price gets its own product record.
+Design-level grouping uses `product.tag`, which is native, unique by name,
+filterable and already carries `visible_to_customers`.
+
+**No material-type field.** Material families are `product.category`, mapped by
+`mb_catalogue_sync`. A second taxonomy disagrees with the first the moment
+anyone edits either.
+
+**Work centres are seeded, not modelled.** Throwing, handbuilding, trimming,
+assembly, glazing and decorating are plain `mrp.workcenter` records under
+`noupdate="1"`, so the artisan owns them after install. One per contended
+resource, not one per craft skill. Drying is a wait: no hourly cost, and
+capacity past anything a batch reaches, or it puts phantom load on the shop
+floor. `mb_calendar_continuous` is the 24/7 calendar everything unattended runs
+on, the kiln first among them.
+
+5 test methods.
+
+## Labels and piece identity
+
+### `mb_label`
+
+Depends on `mb_workshop_base`, `web`. Declared as an application; the only one.
+
+Three layers, deliberately separate:
+
+```text
+immutable JSON document + product/lot bindings
+    -> deterministic monochrome PNG and exact-size PDF
+    -> system print, Phomemo BLE, or NIIMBOT BLE adapter
+```
+
+**Models.** `mb.label.template` and immutable `mb.label.template.version`;
+`mb.label.qr.alias`; `mb.label.print.job`; `mb.label.render.service`;
+`mb.label.print.wizard`.
+
+**Document.** Versioned JSON with text, QR, image, rectangle and line elements.
+Geometry is stored in millimetres and converted to pixels only for a selected DPI
+at render time. Version 3 documents from the earlier editor import and export
+with dot-to-millimetre conversion and field, style, group and media mapping.
+
+**Expression grammar is an allowlist**, not Python and not ORM access:
+`{{product.name}}`, `{{product.default_code}}`, `{{product.barcode}}`,
+`{{product.price}}`, `{{product.price.raw}}`, `{{lot.name}}`,
+`{{company.name}}`, `{{company.currency}}`, `{{qr}}`, `{{qr.path}}` and
+`{{manual.<name>}}` for a value typed into the print wizard. Print-time
+expressions `[[date]]`, `[[time]]`, `[[datetime]]`, `[[iso]]`, `[[month]]` are
+carried over from the old editor. A missing required binding fails visibly
+rather than rendering blank.
+
+**Rendering is deterministic and its physical size is asserted.** A 40 × 30 mm
+template at 203 dpi produces a 320 × 240 px monochrome PNG; the PDF MediaBox is
+113.3858 × 85.03937 points. QR box scaling and quiet zones are computed, not
+approximated.
+
+**Editor.** An Owl client action with canvas zoom, grid, safe printable bounds,
+selection, move, resize, duplicate, z-order, delete, numeric geometry controls,
+keyboard-accessible editing, local undo/redo on the unsaved document, and
+product/lot preview selection with visible binding errors. Saving mints a new
+immutable version.
+
+**Printing.** `printer_registry.js` selects a transport without the renderer
+knowing which: `system_adapter` (browser and system print through a zero-margin
+`@page` route), `phomemo_adapter` (M110) or `niimbot_adapter` (D110). Both BLE
+adapters check browser capability and fall back to system print. Remembered
+device selection is persisted.
+
+**Routes.** `/mb_label/job/<id>/label.pdf`, `/preview.png`, `/print`.
+
+**Security.** `group_mb_label_manager` designs templates;
+`group_mb_label_user` prints but cannot edit.
+
+19 server test methods, 10 Hoot tests.
+
+### `mb_label_pos`
+
+Depends on `mb_label`, `point_of_sale`. Upgrade-safe companion; edits no POS
+core.
+
+**Projection.** `pos.session._load_pos_data_models()` adds a bounded
+`mb.label.qr.alias` projection; `pos.load.mixin` supplies fields, relations and
+the IndexedDB payload. The bound is saleable stock available to the configured
+POS, plus product-only aliases. Measured: 1,001 aliases, a 202,214-byte
+projection, a 0.0671-second full bootstrap query. Lookup is a `Map`, so
+constant-time.
+
+**Resolution order.** Exact alias, then compatibility parsing, then
+`super._barcodeProductAction()` unchanged. Compatibility forms are `SKU`,
+`SKU@LOT`, the customer URL fragment form, GS1 Digital Link and GS1 element
+strings.
+
+**QR format.** A prefix set in Label Studio, for example an Instagram profile,
+plus a fragment:
+
+```text
+https://instagram.com/username#SKU
+https://instagram.com/username#SKU/LOT-OR-SERIAL
+```
+
+**Selling.** An exact serial goes through Odoo's tracked-product path at quantity
+one. A batch lot follows Odoo's ordinary quantity and lot rules. A product-only
+QR keeps normal lot selection. Payment produces the ordinary Odoo stock move, not
+a bypass.
+
+**Rejection without mutation.** Zero stock, wrong warehouse or company, archived
+alias, duplicate serial and malformed QR each leave the order untouched.
+
+**Offline.** An already-loaded session resolves from the cached projection with
+no network call; reconnection reconciles through Odoo authoritatively. Aliases
+minted during an open session require a reload, and the module says so.
+
+11 server test methods, 7 Hoot tests.
+
+## Firing
+
+### `mb_ceramics_firing`
+
+Depends on `mb_workshop_base`, `mrp`, `maintenance`.
+
+**A firing is not a work order, and Odoo will not let it be one.**
+`mrp.workorder.production_id` is `required=True`, so a work order belongs to
+exactly one manufacturing order. A kiln is filled because firing is expensive, so
+one load routinely holds ware from several orders, and one order passes through
+at least two firings — bisque then glaze. Firing and manufacturing order are
+many-to-many, so the physical event needs its own record. `mb.firing` owns it,
+and each work order points at the firing it happened in, which gives the
+many-to-many without a join model.
+
+**Boards, not pieces.** No adhesive label survives a kiln, so nothing printed can
+be attached to ware before the last firing. Identity through the process is borne
+by the carrier, which Odoo already models: `stock.package` with a reusable
+package type is a ware board, and `parent_package_id` nests board inside shelf
+inside load. `stock.quant` already joins package to lot.
+
+**Cooling is a property of the firing.** `cooling_end` is the earliest moment a
+load may be unloaded and labelled, which is not the moment the manufacturing
+order is marked done.
+
+**A kiln is one work centre, created with the kiln.** Adding an `mb.kiln` creates
+its `mrp.workcenter` and its `maintenance.equipment` and keeps both named after
+it. One per physical kiln — not one called "Firing", which would serialise two
+kilns that fire in parallel, and not one per firing type, which would let Odoo
+book the same chamber twice. The work centre sits on `mb_calendar_continuous`,
+and `pieces_per_load` becomes its fallback capacity, which is what makes the kiln
+a batch: at forty pieces per load, a firing of eight and a firing of forty cost
+the same time.
+
+**Duration comes from the programme, not from a routing.** `mb.kiln.program`
+carries `firing_hours`; a routing operation points at a programme and takes its
+duration from it. Cooling counts, on by default, or a plan books two firings into
+one night. `mb.kiln.program.segment` holds the ramp rate, target and hold per
+step, which is what a potter reads and what a duration can be derived from.
+
+Declared, scheduled and measured are kept apart: `firing_hours` is what plans
+rest on, `scheduled_hours` is what the segments add up to, `measured_hours` is
+the **median** of firings actually recorded — median rather than mean, because
+one interrupted firing would drag an average somewhere no real firing has been.
+Adopting either is a button, never a drift.
+
+**A kiln says what it is.** Manufacturer, model, series, chamber volume, maximum
+temperature, connected load and zones on `mb.kiln`. Model, serial and purchase
+date are mirrored onto `maintenance.equipment`, where Odoo expects an asset's
+identity to be.
+
+**Curve figures are fields, the curve is an attachment.** A twelve-hour firing
+sampled every thirty seconds is about 1,400 points, never read point by point.
+Peak temperature and hold time are queried and constrained, so they are fields;
+the trace is evidence, so it is an attachment.
+
+The only addon carrying migration scripts: `19.0.1.1.0/post-migrate.py` and
+`19.0.1.2.0/pre-migrate.py`, the latter for the programme model moving here from
+`mb_kiln_bridge`.
+
+39 test methods.
+
+### `mb_kiln_bridge`
+
+Depends on `mb_ceramics_firing`. Pulls kilns, live status and completed firings
+from ROHDE myKiln into the provider-neutral records above.
+
+**Ordinary Odoo shape, reversing an earlier decision.** `POC-PLAN.md` section
+10.7 specified an external sidecar so no tenant database would hold a provider
+credential. That was reversed on 6 August 2026: a single workshop does not need a
+fan-out poller, and a connection record with an `ir.cron` and a Python client is
+the shape an Odoo developer can read and maintain. **The cost is real and is
+stated on the model** — the myKiln password and the provider token are columns in
+this database, restricted to manufacturing managers and never logged. Going
+multi-tenant reverses the decision again, and at that point the credential moves
+out and this addon keeps only the apply surface. The persisted token also
+knowingly departs from section 10.7, because myKiln issues Django REST Framework
+tokens, which have no expiry, so the cron can reuse one; it is cleared whenever
+the connection changes.
+
+**Read-only toward the provider.** The client authenticates, lists kilns and
+controllers, lists firings and fetches samples. There is no method that starts a
+firing, sends a programme or edits provider data. A write-capable connector needs
+its own safety review and explicit authorization.
+
+**Programmes are derived, because there is no library to read.** Checked against
+the live service on 7 August 2026: `/api/v1/programs/` returns one nameless,
+slotless snapshot per firing ever recorded, and `/api/v1/library_programs/` — the
+real library — is empty, which is why `library_program_name` is null on every
+firing. What every firing does report is the controller slot it ran on and the
+programme as it ran, so the programme list is built by grouping firings by slot
+and taking the most recent. Newest wins; an older firing is ignored, so a
+backfill walking the archive cannot overwrite current state. What a programme
+*means* — bisque or glaze, how long the load must stand — stays the potter's, and
+no refresh touches it.
+
+**Connection state.** `state`, `last_sync`, `last_error`, a firing limit, a
+timeout, resumable backfill (`backfill_state`, `backfill_offset`,
+`backfill_total`, `backfill_page_size`, `backfill_progress`), optional programme
+scanning and an optional raw-payload store for debugging.
+
+53 test methods across normalization and sync, against sanitized fixtures in
+`tests/fixtures.py`.
+
+## Materials
+
+### `mb_catalogue_sync`
+
+Depends on `product`, `purchase`, `uom`, `stock`. Reads the cross-tenant
+ceramics catalogue service; never writes back.
+
+**What crosses the boundary.** The catalogue holds roughly 47,000 supplier
+listings across 76 shops with price history. None of that belongs in an artisan's
+database: it is cross-tenant, volatile, and the most independent asset in the
+product. What crosses is the curated manufacturer identity — Mayco SC74 Hot
+Tamale — plus the offers of the suppliers this workshop actually buys from.
+
+**Nothing is imported by searching**, which is why the wizard exists. Search a
+manufacturer code or product name, tick what the workshop uses, import those.
+Punctuation in a code does not matter: AMACO stores `PC20` and prints `PC-20` on
+the jar, and both find Blue Rutile. Results are ordered by how many suppliers
+carry the product, because a code eleven shops sell is more likely the one
+somebody means than a code one shop sells. A product already held is shown as
+held rather than offered again.
+
+Materials are stocked products (`is_storable`), not service lines: a ceramic
+material is bought, held and consumed. Catalogue families map onto
+`product.category`, and that mapping is the single taxonomy.
+
+**Models.** `mb.catalogue.client`, `mb.catalogue.service`,
+`mb.catalogue.supplier`, `mb.catalogue.units`, `mb.catalogue.import` and
+`mb.catalogue.import.line`.
+
+17 test methods. Runs against the read API in
+`catalogue-ceramics/catalogue-service/`.
+
+## Consignment
+
+### `mb_depot`
+
+Depends on `stock`, `sale_stock`. Dépôt-vente: stock held at galleries and shops,
+and the statement that settles it.
+
+**Odoo has no outbound consignment.** Its built-in Consignment setting is the
+other direction — vendor-owned stock in your warehouse — and a search of every
+OCA manifest turns up nothing either. The location model below is not a
+workaround; it is what everyone builds.
+
+**A depot is an internal location we own and a gallery physically holds.**
+Internal matters: unsold pieces stay on our balance sheet and no revenue is
+recognised until the gallery reports a sale, which is the legal situation of
+dépôt-vente. Delivering to the customer location instead would derecognise the
+stock with no counterpart revenue.
+
+**Depots sit in their own root tree**, not under a warehouse. Internal keeps them
+on the books; being outside `WH` keeps an ordinary delivery from reserving a
+piece standing on a shelf in Nantes. Odoo 19 has no Physical Locations root any
+more, so the depots get their own.
+
+```text
+Dépôts                 (view, no parent)
+└── Galerie Truc       (internal, is_depot)
+```
+
+**The commission is a pricelist, not code.** Under achat-revente sur vente the
+gallery buys at list minus its percentage at the moment it sells. For that
+percentage to appear on the invoice as a discount rather than a quietly reduced
+unit price, the pricelist item must be `compute_price='percentage'` **and** the
+Discounts feature must be enabled — see `sale/models/product_pricelist_item.py`,
+`_show_discount()`. The creation wizard sets both.
+
+**What the module adds:** a depot flag on the location carrying gallery,
+commission and sourcing route; a wizard creating location, route, pull rule and
+commission pricelist in one action, because that set repeats per gallery; live
+stock per depot with an ageing column, so a piece unsold for four months is
+visible; and the depot statement — opening, placed, sold, returned, closing over
+a period, per piece.
+
+**Sold and returned are both outgoing moves** and are told apart by destination,
+which is what makes the statement reconcile against the quants rather than drift
+from them.
+
+**Bon de dépôt.** Its own report, because `stock_picking_report_valued` cannot
+serve: every value on it comes from `move_id.sale_line_id`, and a placement is an
+internal transfer with no sale line, so it renders blank.
+
+Selecting the depot route on a quotation needs OCA's
+`sale_order_global_stock_route`. That is deliberately not a dependency — it is
+AGPL-3 and this module is LGPL-3. Without it the route is created and set on the
+order line by hand.
+
+9 test methods.
+
+## Payments
+
+All three are currently **uninstalled** in the live database.
+
+### `mb_payment_sumup`
+
+Depends on `payment`. SumUp as an Odoo payment provider, which Odoo does not
+ship.
+
+SumUp is the acquirer an artisan already has: the reader costs thirty euros and
+there is no monthly fee.
+
+**Hosted checkout, not an inline form.** One POST to `/v0.1/checkouts` with
+`hosted_checkout.enabled` returns a `hosted_checkout_url` that SumUp operates —
+card form, 3-D Secure, wallets, receipt — and Odoo never sees a card number. Same
+shape as `payment_mollie`, and deliberate: an inline form would put this database
+inside the cardholder-data environment.
+
+**Two facts about SumUp's callbacks decide the design.** `return_url` is a
+backend notification, unsigned and carrying no payment evidence, so
+`/payment/sumup/webhook` reads the body not at all: the reference comes from the
+URL this module built, and the payment data is fetched from the API with the
+merchant's key. And a checkout can be paid without anyone returning to Odoo — the
+QR code on a printed invoice is exactly that case — so a cron re-reads pending
+checkouts and the callback is an optimisation rather than a requirement.
+
+`/payment/sumup/return` uses `save_session=False` for the reason every other
+provider does: the session cookie is set without `SameSite`, some browsers drop
+it on a cross-site POST, and the customer would otherwise get a brand new
+session.
+
+**Credentials are the workshop's own** secret key and merchant code on the
+provider record. There is no deployment-wide key: money settles into the account
+named on the request, and that account must be the one printed on the facture.
+
+Refunds POST to `/v1.0/merchants/{code}/payments/{id}/refunds`, which SumUp
+acknowledges with an empty 200 and settles asynchronously. Odoo marks the refund
+done on acknowledgement; a refund SumUp later rejects appears in their dashboard,
+not here.
+
+14 test methods. `post_init_hook` and `uninstall_hook`.
+
+### `mb_pos_sumup`
+
+Depends on `point_of_sale`, `mb_payment_sumup`. Makes the artisan's phone the
+terminal.
+
+**A deep link rather than the terminal API.** SumUp's server-side terminal
+endpoints drive a Solo or an Air Lane — a networked reader with its own identity.
+A reader paired over Bluetooth to a phone has none, and only the SumUp app can
+reach it, so the payment goes where the reader is.
+
+```text
+POS  ──window.location──▶  sumupmerchant://pay/1.0?...&foreign-tx-id=<line uuid>
+SumUp app  ──callback──▶   /pos/ui/<config>/payment/<order uuid>?smp-status=...
+POS boots  ──▶  restores the order from IndexedDB, finds the line, finishes it
+```
+
+**The page is left and reloaded, and that is the part to get right.** The payment
+line is written to IndexedDB *before* the handover; the callback returns to the
+payment screen's own route so the router lands there; the line is found again by
+`foreign-tx-id`, the one parameter SumUp echoes back unchanged. A pending-line
+fallback covers SumUp app versions older than 1.53.2, which do not echo it.
+
+**`smp-status` is a claim, not evidence.** When the payment method names a SumUp
+provider, the result is verified against
+`GET /v2.1/merchants/{code}/transactions?foreign_transaction_id=...`, amount
+included, before the line is marked paid. Without a provider the callback is
+taken at face value, defensible only because it never crosses the network: the
+SumUp app opens it in the same browser on the same device.
+
+Refunds are an API call against the original transaction code, so they need the
+provider configured; without it the POS says so rather than appearing to refund.
+
+**Platform constraints, inherited.** Android or iOS, in Safari or Chrome. The
+native Odoo mobile app has no URL handling and cannot come back from the SumUp
+app; a desktop browser has no SumUp app to open.
+
+10 test methods.
+
+### `mb_account_payment_sumup`
+
+Depends on `mb_payment_sumup`, `account_payment`. An invoice handed over at the
+studio door is paid by someone holding a phone.
+
+One button produces a link and a QR code, the QR code prints on the invoice PDF,
+and the customer pays by scanning it. Two destinations, because they fail
+differently:
+
+- **SumUp hosted checkout** creates the checkout up front and encodes SumUp's own
+  URL. Nothing of ours is on the path between the customer and their card, so it
+  works when this Odoo is behind a VPN, asleep, or unreachable from the
+  customer's phone. Settlement arrives later, through the callback or the polling
+  cron in `mb_payment_sumup`. This is the default, because the common case is a
+  printed invoice and a customer standing in a workshop.
+- **Customer portal** encodes Odoo's `/payment/pay` link. The customer sees what
+  they are paying and can choose any enabled provider — but only if they can
+  reach this instance.
+
+**The link is bound to the invoice, not regenerated per view.** Odoo's
+`payment.link.wizard` recomputes its URL whenever the amount changes, which is
+free for a portal link and not free for a checkout: every recompute would mint
+another checkout in the merchant's reporting. So the SumUp link is created by an
+explicit action, stored on the invoice, and reused while still open.
+
+The QR code is rendered by Odoo's own barcode endpoint, so nothing is fetched
+from outside when the PDF is printed.
+
+8 test methods.
+
+## French tax regime
+
+### `l10n_fr_micro_enterprise`
+
+Depends on `l10n_fr_account`, `account_edi_ubl_cii`. Idempotent franchise-en-base
+setup that does not replace the economic VAT rates stored on products.
+
+For every French fiscal company it prepares separate 0% goods and service sales
+taxes; EN16931 category `E` with exemption code `VATEX-FR-FRANCHISE`; the invoice
+note `TVA non applicable, article 293 B du CGI`; mappings from active or archived
+standard-category (`S`) French sales VAT; and a France-only automatic fiscal
+position.
+
+**Switching is an administrator action, not a migration.** Under **Invoicing →
+Settings → Taxes → Micro-enterprise VAT regime**, *Activate franchise en base*
+enables the automatic domestic mapping and *Activate VAT liable* disables it so
+the original product taxes apply again. The operation records its date and user
+and **never rewrites products or existing accounting documents**. Foreign
+transactions keep Odoo's normal fiscal-position handling, which is why every
+customer needs a valid country: Odoo determines no fiscal position for a partner
+without one.
+
+**Factur-X comes from Odoo's native `account_edi_ubl_cii` exporter** and may be
+downloaded or handed to any approved-platform connector. The addon does not
+require Odoo's PDP service. For a franchise seller with no VAT number, the native
+preflight accepts the company registration identifier Odoo already emits as
+EN16931 BT-30; **no VAT identifier is ever fabricated.**
+
+`post_init_hook`. 7 test methods across setup, regime switching and Factur-X
+export.
+
+## Environment
+
+**As built, not as planned.** The stack runs from the sibling `odoo-poc/`
+repository, which bind-mounts this one:
+
+```text
+odoo-poc/                          docker compose: db (postgres:17-alpine), odoo:19, cloudflared
+├── config/odoo.conf               addons_path, workers = 0, list_db = False, dbfilter = ^odoo$
+├── oca/                           vendored: stock-logistics-{workflow,warehouse,reporting}, sale-workflow
+└── addons/                        -> /mnt/extra-addons
+
+makersbrain-odoo/addons            -> /mnt/makersbrain-addons   (first on addons_path, so it wins)
+```
+
+`addons_path` order:
+`/mnt/makersbrain-addons`, `/mnt/extra-addons`, the four OCA repositories,
+then Odoo's own.
+
+`proxy_mode = True` because cloudflared terminates TLS and forwards plain HTTP;
+without it every absolute URL Odoo builds, password-reset mail included, gets an
+`http://` scheme. `list_db = False` because the stack is reachable from the
+internet, which makes `/web/database/manager` 403 for everyone — create and drop
+databases with the CLI. `dbfilter = ^odoo$` is required as a consequence, since
+the host holds several databases and an unfiltered request cannot resolve.
+
+`POC-PLAN.md` section 10.2 says active code should not be split across two
+repositories and the sibling should not be modified. That is not the current
+arrangement, and the decision is open: either bring the Compose setup into this
+repository, or amend the plan.
+
+`scripts/` holds nine one-off data operations, each driving `odoo shell` through
+`docker exec` and a `subprocess` call rather than a network API, so nothing needs
+the two Compose stacks to share a network. They cover catalogue seeding, stock
+and image import, category assignment, depot and SumUp fixtures, and demo
+cleanup. They are operational tools, not part of any addon, and none is covered
+by a test.
+
+`seed_from_catalogue.py` states it exists because the catalogue service "does not
+exist yet" and reads `catalogue.canonical_catalogue` directly. A healthy
+`catalogue-service` container is now running, and `mb_catalogue_sync/README.md`
+says the addon runs against it. One of the two is stale; the script is the
+likelier candidate and should be retired once that is confirmed.
+
+## Verification status
+
+Test methods on disk, by module:
+
+| Module | Server | Hoot | Migrations |
+| --- | ---: | ---: | --- |
+| `mb_workshop_base` | 5 | — | — |
+| `mb_label` | 19 | 10 | — |
+| `mb_label_pos` | 11 | 7 | — |
+| `mb_ceramics_firing` | 39 | — | 2 |
+| `mb_kiln_bridge` | 53 | — | — |
+| `mb_catalogue_sync` | 17 | — | — |
+| `mb_depot` | 9 | — | — |
+| `mb_payment_sumup` | 14 | — | — |
+| `mb_pos_sumup` | 10 | — | — |
+| `mb_account_payment_sumup` | 8 | — | — |
+| `l10n_fr_micro_enterprise` | 7 | — | — |
+| **Total** | **192** | **17** | **2** |
+
+Verified beyond unit tests:
+
+| Claim | Evidence |
+| --- | --- |
+| Label artifact has correct physical dimensions | 320 × 240 px at 203 dpi; PDF MediaBox 113.3858 × 85.03937 pt |
+| Generated QR decodes to the exact URL | ZXing decode of the generated PNG |
+| Label Studio works at desktop and phone width | Live Odoo action at 1280 × 900 and 390 × 844, real preview options, no browser exceptions |
+| Fresh QR sells the exact serial | Live ProductScreen scan added `RUNTIME-CUP` qty 1, lot `PIECE 2026/01`; paid order created the standard done stock move |
+| POS projection is bounded | 1,001 aliases, 202,214-byte projection, 0.0671 s bootstrap query |
+| myKiln programme endpoints | Checked against the live service, 7 August 2026 |
+
+Not verified:
+
+- Physical printer and scanner qualification. Phomemo M110 and NIIMBOT D110
+  packet builders are tested against fixtures only; no device is attached to any
+  test run.
+- The three SumUp addons against the live database.
+- Any clean-checkout reproduction, because there is no bootstrap path.
+- Cross-company denial, which is untested throughout.
+
+## Known gaps
+
+Ordered by consequence, not by effort.
+
+1. **The repository is not under version control.** No `.git` here; the directory
+   is untracked inside the parent `ateliera` repository. Eleven addons and two
+   migration scripts with no history. Immutable label versioning rests on a
+   repository that has none.
+2. **`backups/` is not gitignored** and holds ~122 MB of database dumps with real
+   product and customer data. Fix before the first `git add`, not after.
+3. **Nine of eleven addons have no migration scripts.** Four have already been
+   released past `1.0.0` — `l10n_fr_micro_enterprise` at 2.1.0,
+   `mb_kiln_bridge` and `mb_catalogue_sync` at 1.2.0, `mb_workshop_base` at
+   1.1.0 — with no `migrations/` directory. With one database per artisan, an
+   addon without a migration path is an outage multiplied by the tenant count.
+4. **No bootstrap, no CI, no test runner.** There is no Makefile, no `.env.example`,
+   no umbrella addon and no automated lane for install, upgrade or test in this
+   repository. Every result above was produced by hand.
+5. **Two credentials at rest in the tenant database**, both knowingly:
+   `mb.kiln.connection` (myKiln password and non-expiring token) and the SumUp
+   provider record. Both reverse on the move to multi-tenancy.
+6. **`admin_passwd = poc-master-change-me`** in `odoo-poc/config/odoo.conf` on a
+   host published through cloudflared. `list_db = False` limits the blast radius;
+   the password is still a default.
+7. **Ten scratch databases** on the POC server, with no allowlisted reset command
+   guarding the demonstration database against a mistyped drop.
+8. **Reverse-engineered printer protocols** regress silently on untested
+   firmware. Keep the packet fixtures, and smoke-test each model before
+   advertising support for it.
+9. **Unofficial myKiln API.** No contract, no versioning. The connector is
+   isolated and stops on auth or schema failure, which is the mitigation; there
+   is no warning.
+10. **`mb_catalogue_sync` and `mb_depot` do not depend on `mb_workshop_base`**,
+    so a database can hold ceramics materials and consignment stock without the
+    food-contact identity that gives them their tracking rules. Intentional or
+    not, it should be decided rather than inherited.

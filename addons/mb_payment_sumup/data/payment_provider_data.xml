@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="payment_provider_sumup" model="payment.provider">
+        <field name="name">SumUp</field>
+        <field name="code">sumup</field>
+        <field name="module_id" ref="base.module_mb_payment_sumup"/>
+        <!-- The hosted checkout offers whatever the merchant account is
+             enabled for; card is the one every SumUp account has, and the one
+             Odoo needs in order to have something to show at checkout. -->
+        <field name="payment_method_ids"
+               eval="[Command.set([ref('payment.payment_method_card')])]"/>
+        <field name="redirect_form_view_id" ref="redirect_form"/>
+    </record>
+
+</odoo>

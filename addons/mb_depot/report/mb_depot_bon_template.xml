@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_bon_depot_document">
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h2>
+          <t t-if="doc.is_depot_placement">Bon de dépôt</t>
+          <t t-else="">Bon de reprise</t>
+          <span t-field="doc.name"/>
+        </h2>
+        <div class="row mb-4">
+          <div class="col-6">
+            <strong>Dépositaire</strong><br/>
+            <span t-field="doc.depot_location_id.depot_partner_id"/><br/>
+            <span t-field="doc.depot_location_id.complete_name"/>
+          </div>
+          <div class="col-6">
+            <strong>Date</strong><br/>
+            <span t-field="doc.date_done"/>
+          </div>
+        </div>
+
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Pièce</th>
+              <th>N° de série</th>
+              <th class="text-end">Qté</th>
+              <th class="text-end">Prix public</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr t-foreach="doc.move_line_ids" t-as="ml">
+              <td><span t-field="ml.product_id"/></td>
+              <td><span t-field="ml.lot_id.name"/></td>
+              <td class="text-end"><span t-field="ml.quantity"/></td>
+              <td class="text-end">
+                <span t-esc="ml.product_id.list_price"
+                      t-options='{"widget": "monetary", "display_currency": doc.company_id.currency_id}'/>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="row justify-content-end">
+          <div class="col-4">
+            <table class="table table-sm">
+              <tr class="border-black">
+                <td><strong>Total prix public</strong></td>
+                <td class="text-end">
+                  <strong>
+                    <span t-esc="sum(ml.product_id.list_price * ml.quantity for ml in doc.move_line_ids)"
+                          t-options='{"widget": "monetary", "display_currency": doc.company_id.currency_id}'/>
+                  </strong>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <p class="text-muted mt-4">
+          Pièces confiées en dépôt-vente. Elles restent la propriété du déposant
+          jusqu'à leur vente. Le total ci-dessus est indicatif et ne constitue
+          pas une facture.
+        </p>
+
+        <div class="row mt-5">
+          <div class="col-6">Le déposant<br/><br/><br/>_______________________</div>
+          <div class="col-6">Le dépositaire<br/><br/><br/>_______________________</div>
+        </div>
+      </div>
+    </t>
+  </template>
+
+  <template id="report_bon_depot">
+    <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="doc">
+        <t t-call="mb_depot.report_bon_depot_document"/>
+      </t>
+    </t>
+  </template>
+
+</odoo>

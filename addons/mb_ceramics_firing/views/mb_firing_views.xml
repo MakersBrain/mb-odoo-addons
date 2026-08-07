@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mb_firing_view_list" model="ir.ui.view">
+        <field name="name">mb.firing.list</field>
+        <field name="model">mb.firing</field>
+        <field name="arch" type="xml">
+            <list decoration-warning="cooling_interrupted">
+                <field name="name" />
+                <field name="kiln_id" />
+                <field name="kind" />
+                <field name="program_name" />
+                <field name="date_start" />
+                <field name="cooling_end" />
+                <field name="peak_temperature" />
+                <field name="cooling_interrupted" optional="show" />
+                <field name="state" widget="badge" />
+            </list>
+        </field>
+    </record>
+
+    <record id="mb_firing_view_form" model="ir.ui.view">
+        <field name="name">mb.firing.form</field>
+        <field name="model">mb.firing</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="action_start" type="object" string="Start firing"
+                        class="oe_highlight" invisible="state != 'draft'"
+                    />
+                    <button
+                        name="action_finish" type="object" string="Finish firing"
+                        class="oe_highlight" invisible="state != 'firing'"
+                    />
+                    <button
+                        name="action_unload" type="object" string="Unload"
+                        class="oe_highlight" invisible="state != 'cooling'"
+                    />
+                    <button
+                        name="action_force_unload" type="object"
+                        string="Open early" invisible="state != 'cooling'"
+                    />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1" /></h1>
+                    </div>
+                    <group>
+                        <group string="Load">
+                            <field name="kiln_id" />
+                            <field name="kind" />
+                        </group>
+                        <group string="Schedule">
+                            <field name="date_start" />
+                            <field name="date_end" />
+                            <field name="cooling_end" />
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Result">
+                            <field name="program_name" />
+                            <field name="peak_temperature" />
+                            <field name="hold_minutes" />
+                            <field name="energy_kwh" />
+                            <field name="curve_attachment_id" />
+                            <field name="raw_attachment_id" />
+                        </group>
+                        <group string="Source">
+                            <field name="provider" />
+                            <field
+                                name="external_id"
+                                invisible="provider == 'manual'"
+                                readonly="1"
+                            />
+                        </group>
+                    </group>
+                    <group
+                        string="Cooling interrupted"
+                        invisible="not cooling_interrupted and not interruption_reason"
+                    >
+                        <field name="cooling_interrupted" />
+                        <field name="interruption_reason" />
+                    </group>
+                    <notebook>
+                        <page string="Boards" name="carriers">
+                            <field name="carrier_ids" />
+                        </page>
+                        <page string="Work orders" name="workorders">
+                            <field name="workorder_ids" readonly="1">
+                                <list>
+                                    <field name="name" />
+                                    <field name="production_id" />
+                                    <field name="product_id" />
+                                    <field name="state" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Manufacturing orders" name="productions">
+                            <field name="production_ids" readonly="1" />
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record id="mb_firing_action" model="ir.actions.act_window">
+        <field name="name">Firings</field>
+        <field name="res_model">mb.firing</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="seq_mb_firing" model="ir.sequence">
+        <field name="name">Kiln firing</field>
+        <field name="code">mb.firing</field>
+        <field name="prefix">FIR/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False" />
+    </record>
+</odoo>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="product_template_form_view_mb_workshop" model="ir.ui.view">
+        <field name="name">product.template.form.mb.workshop</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='general_information']//group" position="after">
+                <group string="Ceramics" name="mb_ceramics">
+                    <field name="mb_clay_body_id" />
+                </group>
+                <group string="Food contact" name="mb_food_contact">
+                    <field name="mb_food_contact" />
+                    <field
+                        name="mb_migration_limit_class"
+                        invisible="not mb_food_contact"
+                        required="mb_food_contact"
+                    />
+                    <field name="mb_tableware_form" />
+                    <field
+                        name="mb_label_food_warning"
+                        invisible="not mb_label_food_warning"
+                    />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

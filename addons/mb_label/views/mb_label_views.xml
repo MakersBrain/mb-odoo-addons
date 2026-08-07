@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mb_label_template_list" model="ir.ui.view">
+        <field name="name">mb.label.template.list</field>
+        <field name="model">mb.label.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="width_mm"/>
+                <field name="height_mm"/>
+                <field name="dpi"/>
+                <field name="current_version_id"/>
+                <field name="is_default"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" optional="show"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_mb_label_template_form" model="ir.ui.view">
+        <field name="name">mb.label.template.form</field>
+        <field name="model">mb.label.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_set_default" type="object" string="Set Default" class="btn-secondary" invisible="is_default"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title"><label for="name"/><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="width_mm"/>
+                            <field name="height_mm"/>
+                            <field name="dpi"/>
+                            <field name="qr_url_prefix" placeholder="https://instagram.com/username"/>
+                            <field name="printer_target"/>
+                            <field name="orientation"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="is_default"/>
+                            <field name="active"/>
+                            <field name="round_media"/>
+                            <field name="continuous_media"/>
+                            <field name="current_version_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Versions">
+                            <field name="version_ids" readonly="1">
+                                <list create="0" delete="0">
+                                    <field name="number"/>
+                                    <field name="author_id"/>
+                                    <field name="create_date"/>
+                                    <field name="width_mm"/>
+                                    <field name="height_mm"/>
+                                    <field name="dpi"/>
+                                    <field name="qr_url_prefix" optional="show"/>
+                                    <field name="printer_target" optional="hide"/>
+                                    <field name="round_media" optional="hide"/>
+                                    <field name="continuous_media" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_mb_label_templates" model="ir.actions.act_window">
+        <field name="name">Label Templates</field>
+        <field name="res_model">mb.label.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="action_mb_label_studio" model="ir.actions.client">
+        <field name="name">Label Studio</field>
+        <field name="tag">mb_label.editor</field>
+    </record>
+    <record id="view_mb_label_print_job_list" model="ir.ui.view">
+        <field name="name">mb.label.print.job.list</field>
+        <field name="model">mb.label.print.job</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0">
+                <field name="create_date"/>
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="copies"/>
+                <field name="state" decoration-success="state == 'printed'"/>
+                <field name="printer_adapter"/>
+                <button name="action_device_print" type="object" icon="fa-print" title="Print"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_mb_label_print_jobs" model="ir.actions.act_window">
+        <field name="name">Print Jobs</field>
+        <field name="res_model">mb.label.print.job</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

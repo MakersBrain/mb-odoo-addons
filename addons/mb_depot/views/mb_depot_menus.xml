@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <menuitem id="menu_depot_root"
+            name="Dépôt-vente"
+            parent="stock.menu_stock_root"
+            sequence="35"
+            groups="stock.group_stock_user"/>
+
+  <menuitem id="menu_depot_quant"
+            name="Stock en dépôt"
+            parent="menu_depot_root"
+            action="action_depot_quant"
+            sequence="10"/>
+
+  <menuitem id="menu_depot_statement"
+            name="Relevé de dépôt"
+            parent="menu_depot_root"
+            action="action_mb_depot_statement"
+            sequence="20"/>
+
+  <menuitem id="menu_depot_locations"
+            name="Dépôts"
+            parent="menu_depot_root"
+            action="action_depot"
+            sequence="30"
+            groups="stock.group_stock_manager"/>
+
+  <menuitem id="menu_depot_create"
+            name="Nouveau dépôt"
+            parent="menu_depot_root"
+            action="action_mb_depot_create"
+            sequence="40"
+            groups="stock.group_stock_manager"/>
+
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="menu_mb_workshop_root"
+        name="Workshop"
+        web_icon="stock,static/description/icon.png"
+        sequence="55"
+    />
+    <menuitem
+        id="menu_mb_migration_test"
+        name="Migration tests"
+        parent="menu_mb_workshop_root"
+        action="mb_migration_test_action"
+        sequence="20"
+    />
+</odoo>

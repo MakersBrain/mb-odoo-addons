@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="menu_mb_firing"
+        name="Firings"
+        parent="mb_workshop_base.menu_mb_workshop_root"
+        action="mb_firing_action"
+        sequence="30"
+    />
+    <menuitem
+        id="menu_mb_kiln"
+        name="Kilns"
+        parent="mb_workshop_base.menu_mb_workshop_root"
+        action="mb_kiln_action"
+        sequence="40"
+    />
+</odoo>

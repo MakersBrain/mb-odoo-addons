@@ -1,0 +1,40 @@
+{
+    "name": "Makersbrain Label Studio",
+    "summary": "Design, version, render and print product and piece labels.",
+    "description": "Versioned thermal-label design and product/lot printing.",
+    "version": "19.0.1.0.0",
+    "license": "LGPL-3",
+    "category": "Inventory/Inventory",
+    "author": "Makersbrain",
+    "depends": ["mb_workshop_base", "web"],
+    "external_dependencies": {
+        "python": ["qrcode", "reportlab"],
+    },
+    "data": [
+        "security/mb_label_security.xml",
+        "security/ir.model.access.csv",
+        "data/mb_label_data.xml",
+        "wizards/mb_label_print_wizard_views.xml",
+        "views/mb_label_views.xml",
+        "views/product_views.xml",
+        "views/stock_lot_views.xml",
+        "views/mb_label_menus.xml",
+    ],
+    "assets": {
+        "web.assets_backend": [
+            "mb_label/static/src/**/*.js",
+            "mb_label/static/src/**/*.xml",
+            "mb_label/static/src/**/*.scss",
+        ],
+        "web.assets_unit_tests": [
+            "mb_label/static/src/printer/raster.js",
+            "mb_label/static/src/printer/printer_registry.js",
+            "mb_label/static/src/printer/device_memory.js",
+            "mb_label/static/src/printer/phomemo_adapter.js",
+            "mb_label/static/src/printer/niimbot_adapter.js",
+            "mb_label/static/tests/**/*.test.js",
+        ],
+    },
+    "installable": True,
+    "application": True,
+}

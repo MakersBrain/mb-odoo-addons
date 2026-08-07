@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mb_sumup_link_wizard_view_form" model="ir.ui.view">
+        <field name="name">mb.sumup.link.wizard.form</field>
+        <field name="model">mb.sumup.link.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="move_id" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="amount_max" invisible="1"/>
+                <group>
+                    <field name="amount"/>
+                    <field name="destination" widget="radio"/>
+                </group>
+                <div class="alert alert-warning" role="alert" invisible="not warning_message">
+                    <field name="warning_message"/>
+                </div>
+                <group invisible="not link">
+                    <field name="link" widget="CopyClipboardChar" string="Link"/>
+                </group>
+                <div class="text-center" invisible="not qr_code">
+                    <field name="qr_code" widget="image" options="{'size': [200, 200]}"/>
+                    <p class="text-muted">
+                        The customer pays by scanning this. It prints on the
+                        invoice PDF as well.
+                    </p>
+                </div>
+                <footer>
+                    <button name="action_generate" type="object" string="Generate"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Close" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
