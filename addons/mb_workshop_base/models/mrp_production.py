@@ -1,14 +1,17 @@
 from odoo import _, models
 from odoo.exceptions import UserError
 
-# The families whose lots carry a migration test. Resolved through
-# mb_catalogue_sync's categories rather than a material-type field of our own,
-# for the reason that addon states: a second taxonomy disagrees with the first
+# The families whose lots carry a migration test. Product categories rather than
+# a material-type field of our own: a second taxonomy disagrees with the first
 # the moment anyone edits either.
+#
+# These moved here from mb_catalogue_sync in 19.0.1.2.0. A compliance gate must
+# not depend on having installed a connector to a catalogue service, and this one
+# used to - it silently checked less when that addon was absent.
 GLAZE_CATEGORY_REFS = (
-    "mb_catalogue_sync.categ_glaze",
-    "mb_catalogue_sync.categ_underglaze",
-    "mb_catalogue_sync.categ_engobe",
+    "mb_workshop_base.categ_glaze",
+    "mb_workshop_base.categ_underglaze",
+    "mb_workshop_base.categ_engobe",
 )
 
 
@@ -16,12 +19,13 @@ class MrpProduction(models.Model):
     _inherit = "mrp.production"
 
     def _mb_glaze_categories(self):
-        """Categories whose products are surface materials, if installed.
+        """Categories whose products are surface materials.
 
-        Empty when mb_catalogue_sync is absent, which makes the gate below fall
-        back to checking only that a lot exists. That is the honest behaviour:
-        without the material taxonomy this addon cannot tell a glaze from a clay,
-        and guessing would be worse than not checking.
+        This addon's own data, so the records are always there. `raise_if_not_
+        found=False` is kept for the one case that remains: a database mid-
+        upgrade, where the model is loaded before the new data file has been
+        applied. A missing category then weakens this run rather than breaking
+        the upgrade, and the next one is complete.
         """
         categories = self.env["product.category"].browse()
         for ref in GLAZE_CATEGORY_REFS:

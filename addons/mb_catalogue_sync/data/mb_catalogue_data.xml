@@ -1,51 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <!-- The material taxonomy moved to mb_workshop_base in 19.0.1.3.0; this addon
+       maps catalogue families onto it rather than owning it. See
+       mb_workshop_base/data/mb_material_categories.xml for why. -->
+
   <!-- The pack size an artisan buys, as a product attribute.
 
        'always' rather than 'dynamic': the packs come from the catalogue and are
        known at import, and an always-variant is the one a purchase order line
        and a stock move can point at without Odoo creating it mid-transaction. -->
-  <!-- The material taxonomy, as product categories rather than a field of our
-       own. Odoo already filters, groups and reports on categ_id everywhere, and
-       a category is where per-material accounting and stock valuation hang if
-       a glaze and a clay body ever need different treatment.
-
-       Under Goods, because that is what they are. The import writes categ_id
-       only when it is empty - see _mb_upsert_canonical. -->
-  <record id="categ_ceramic_materials" model="product.category">
-    <field name="name">Ceramic materials</field>
-    <field name="parent_id" ref="product.product_category_goods"/>
-  </record>
-
-  <record id="categ_glaze" model="product.category">
-    <field name="name">Glazes</field>
-    <field name="parent_id" ref="categ_ceramic_materials"/>
-  </record>
-  <record id="categ_underglaze" model="product.category">
-    <field name="name">Underglazes</field>
-    <field name="parent_id" ref="categ_ceramic_materials"/>
-  </record>
-  <record id="categ_engobe" model="product.category">
-    <field name="name">Engobes</field>
-    <field name="parent_id" ref="categ_ceramic_materials"/>
-  </record>
-  <record id="categ_clay_body" model="product.category">
-    <field name="name">Clay bodies</field>
-    <field name="parent_id" ref="categ_ceramic_materials"/>
-  </record>
-  <record id="categ_stain" model="product.category">
-    <field name="name">Stains</field>
-    <field name="parent_id" ref="categ_ceramic_materials"/>
-  </record>
-  <record id="categ_oxide" model="product.category">
-    <field name="name">Oxides</field>
-    <field name="parent_id" ref="categ_ceramic_materials"/>
-  </record>
-  <record id="categ_raw_material" model="product.category">
-    <field name="name">Raw materials</field>
-    <field name="parent_id" ref="categ_ceramic_materials"/>
-  </record>
-
   <record id="attribute_pack_size" model="product.attribute">
     <field name="name">Pack size</field>
     <field name="create_variant">always</field>

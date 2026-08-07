@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- The material taxonomy, as product categories rather than a field of our
+       own. Odoo already filters, groups and reports on categ_id everywhere, and
+       a category is where per-material accounting and stock valuation hang if a
+       glaze and a clay body ever need different treatment.
+
+       Under Goods, because that is what they are.
+
+       These lived in mb_catalogue_sync until 19.0.1.2.0, on the reasoning that
+       the families came from the catalogue. They did not: a workshop that never
+       imports anything still buys glaze and still owes a lead-and-cadmium
+       migration test on the food-contact ware it makes with it, and this addon's
+       button_mark_done gate needs to know which lots are glaze to enforce it.
+       Leaving the taxonomy in the importer made a compliance check depend on
+       having installed a connector to a catalogue service - so the taxonomy is
+       here, and the importer maps onto it. -->
+
+  <record id="categ_ceramic_materials" model="product.category">
+    <field name="name">Ceramic materials</field>
+    <field name="parent_id" ref="product.product_category_goods"/>
+  </record>
+
+  <record id="categ_glaze" model="product.category">
+    <field name="name">Glazes</field>
+    <field name="parent_id" ref="categ_ceramic_materials"/>
+  </record>
+  <record id="categ_underglaze" model="product.category">
+    <field name="name">Underglazes</field>
+    <field name="parent_id" ref="categ_ceramic_materials"/>
+  </record>
+  <record id="categ_engobe" model="product.category">
+    <field name="name">Engobes</field>
+    <field name="parent_id" ref="categ_ceramic_materials"/>
+  </record>
+  <record id="categ_clay_body" model="product.category">
+    <field name="name">Clay bodies</field>
+    <field name="parent_id" ref="categ_ceramic_materials"/>
+  </record>
+  <record id="categ_stain" model="product.category">
+    <field name="name">Stains</field>
+    <field name="parent_id" ref="categ_ceramic_materials"/>
+  </record>
+  <record id="categ_oxide" model="product.category">
+    <field name="name">Oxides</field>
+    <field name="parent_id" ref="categ_ceramic_materials"/>
+  </record>
+  <record id="categ_raw_material" model="product.category">
+    <field name="name">Raw materials</field>
+    <field name="parent_id" ref="categ_ceramic_materials"/>
+  </record>
+</odoo>

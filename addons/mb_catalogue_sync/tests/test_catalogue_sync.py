@@ -71,9 +71,9 @@ class TestCatalogueSync(TransactionCase):
     def test_family_becomes_a_product_category(self):
         template, _created, _written, _refused = self._import()
         self.assertEqual(template.categ_id,
-                         self.env.ref("mb_catalogue_sync.categ_glaze"))
+                         self.env.ref("mb_workshop_base.categ_glaze"))
         self.assertEqual(template.categ_id.parent_id,
-                         self.env.ref("mb_catalogue_sync.categ_ceramic_materials"))
+                         self.env.ref("mb_workshop_base.categ_ceramic_materials"))
 
     def test_an_unknown_family_lands_somewhere_visible(self):
         """Not nowhere: an uncategorised product is invisible to every filter."""
@@ -81,7 +81,7 @@ class TestCatalogueSync(TransactionCase):
                        family="lustre")
         template, _created = self.template._mb_upsert_canonical(payload)
         self.assertEqual(template.categ_id,
-                         self.env.ref("mb_catalogue_sync.categ_ceramic_materials"))
+                         self.env.ref("mb_workshop_base.categ_ceramic_materials"))
 
     def test_manufacturer_code_is_the_internal_reference_on_every_pack(self):
         """On the variants, because the template's own default_code is a compute

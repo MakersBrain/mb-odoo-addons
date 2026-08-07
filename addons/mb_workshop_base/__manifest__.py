@@ -25,11 +25,21 @@ unique by name, groups and filters natively, and even carries a
 `visible_to_customers` flag for the shop. A model of ours would have added a
 form, a menu and two access rules to reach the same place.
 
-**Material families are categories, not a field of ours.** `mb_catalogue_sync`
-already maps the catalogue's families onto `product.category`, for the reason
-stated there: a second taxonomy disagrees with the first the moment anyone edits
-either. So this addon identifies a glaze by its category and declares no
-material-type field.
+**Material families are categories, not a field of ours.** A second taxonomy
+disagrees with the first the moment anyone edits either, and Odoo already
+filters, groups and reports on `categ_id` everywhere. So a glaze is identified
+by its category and there is no material-type field.
+
+The categories live here, in `data/mb_material_categories.xml`, and moved here
+from `mb_catalogue_sync` in 19.0.1.2.0. They were in the importer on the
+reasoning that the families came from the catalogue; they do not. A workshop
+that never imports anything still buys glaze and still owes a lead-and-cadmium
+migration test on the food-contact ware it makes with it. Leaving the taxonomy
+in the importer made the `button_mark_done` gate below depend on having
+installed a connector to a catalogue service, and its own docstring admitted it
+silently checked less without one. A compliance check does not belong behind an
+optional connector, so `mb_catalogue_sync` now depends on this addon and maps
+onto the taxonomy rather than owning it.
 
 **Work centres are seeded, not modelled.** Throwing, handbuilding, trimming,
 assembly, glazing and decorating are plain `mrp.workcenter` records in
@@ -46,7 +56,7 @@ unattended runs on - a kiln fires overnight, and on the workshop's own calendar
 Odoo would fragment a fourteen-hour firing across three days. `mb.kiln` in
 `mb_ceramics_firing` puts every kiln work centre on it.
 """,
-    "version": "19.0.1.1.0",
+    "version": "19.0.1.2.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
@@ -59,6 +69,7 @@ Odoo would fragment a fourteen-hour firing across three days. `mb.kiln` in
     ],
     "data": [
         "security/ir.model.access.csv",
+        "data/mb_material_categories.xml",
         "data/mb_workcenter_data.xml",
         "views/mb_migration_test_views.xml",
         "views/product_template_views.xml",

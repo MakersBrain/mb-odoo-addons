@@ -21,23 +21,28 @@ from .mb_catalogue_service import IMD_MODULE
 
 _logger = logging.getLogger(__name__)
 
-# The catalogue's material families, as product categories. Odoo already filters,
-# groups and reports on categ_id everywhere, so a family field of our own would
-# be a second taxonomy saying the same thing - and the two would disagree the
-# first time anyone touched either.
+# The catalogue's material families, mapped onto the taxonomy mb_workshop_base
+# owns. Odoo already filters, groups and reports on categ_id everywhere, so a
+# family field of our own would be a second taxonomy saying the same thing - and
+# the two would disagree the first time anyone touched either.
+#
+# The categories are not defined here, and that is the point of the dependency:
+# a workshop that imports nothing still buys glaze and still owes a migration
+# test on the food-contact ware it makes with it, so the taxonomy cannot live
+# behind a connector. This addon maps onto it; mb_workshop_base enforces with it.
 #
 # A family this addon has never heard of lands on the parent category rather than
 # nowhere, so it is visible and correctable instead of silently uncategorised.
 FAMILY_CATEGORY = {
-    "glaze": "mb_catalogue_sync.categ_glaze",
-    "underglaze": "mb_catalogue_sync.categ_underglaze",
-    "engobe": "mb_catalogue_sync.categ_engobe",
-    "clay_body": "mb_catalogue_sync.categ_clay_body",
-    "stain": "mb_catalogue_sync.categ_stain",
-    "oxide": "mb_catalogue_sync.categ_oxide",
-    "raw_material": "mb_catalogue_sync.categ_raw_material",
+    "glaze": "mb_workshop_base.categ_glaze",
+    "underglaze": "mb_workshop_base.categ_underglaze",
+    "engobe": "mb_workshop_base.categ_engobe",
+    "clay_body": "mb_workshop_base.categ_clay_body",
+    "stain": "mb_workshop_base.categ_stain",
+    "oxide": "mb_workshop_base.categ_oxide",
+    "raw_material": "mb_workshop_base.categ_raw_material",
 }
-FAMILY_FALLBACK = "mb_catalogue_sync.categ_ceramic_materials"
+FAMILY_FALLBACK = "mb_workshop_base.categ_ceramic_materials"
 
 
 class ProductTemplate(models.Model):

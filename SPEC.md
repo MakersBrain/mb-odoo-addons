@@ -34,20 +34,18 @@ A module is listed here only if its code exists. Nothing below is planned work.
 
 ## The module set
 
-Four independent trees. Nothing spans them, and that is the design: a workshop
-that sells at a market but owns no kiln installs the label tree and none of the
-firing tree.
+Three independent trees. Nothing spans them, and that is the design: a workshop
+that sells at a market but owns no kiln installs the label branch and none of
+the firing branch.
 
 ```text
 stock, mrp
 └── mb_workshop_base ─────── food-contact identity, work centres, 24/7 calendar
     ├── mb_label ─────────── web
     │   └── mb_label_pos ─── point_of_sale
-    └── mb_ceramics_firing ─ mrp, maintenance
-        └── mb_kiln_bridge ─ ROHDE myKiln connector
-
-product, purchase, uom, stock
-└── mb_catalogue_sync ────── master catalogue import
+    ├── mb_ceramics_firing ─ mrp, maintenance
+    │   └── mb_kiln_bridge ─ ROHDE myKiln connector
+    └── mb_catalogue_sync ── product, purchase, uom
 
 stock, sale_stock
 └── mb_depot ─────────────── dépôt-vente
@@ -63,12 +61,12 @@ l10n_fr_account, account_edi_ubl_cii
 
 | Addon | Version | Owns | Live state |
 | --- | --- | --- | --- |
-| `mb_workshop_base` | 19.0.1.1.0 | Food-contact declaration, derived tracking, migration tests, seeded work centres, continuous calendar | installed |
+| `mb_workshop_base` | 19.0.1.2.0 | Food-contact declaration, derived tracking, migration tests, seeded work centres, continuous calendar | installed |
 | `mb_label` | 19.0.1.0.0 | Label templates and immutable versions, QR aliases, deterministic renderer, Owl editor, print jobs, BLE printer adapters | installed |
 | `mb_label_pos` | 19.0.1.0.0 | Bounded alias projection into POS, QR resolution, fall-through to native barcodes | installed |
 | `mb_ceramics_firing` | 19.0.1.3.0 | `mb.firing` as the kiln load, kiln records, controller programmes and segments, cooling hold, work-centre creation | installed |
 | `mb_kiln_bridge` | 19.0.1.2.0 | myKiln connection, read-only client, normalization, polling cron, programme derivation | installed |
-| `mb_catalogue_sync` | 19.0.1.2.0 | On-demand import of curated manufacturer identities and supplier offers | installed |
+| `mb_catalogue_sync` | 19.0.1.3.0 | On-demand import of curated manufacturer identities and supplier offers | installed |
 | `mb_depot` | 19.0.1.0.0 | Depot locations, creation wizard, commission pricelist, ageing, statement, bon de dépôt | installed |
 | `mb_payment_sumup` | 19.0.1.0.0 | SumUp hosted checkout provider, return and webhook routes, polling cron, refunds | **uninstalled** |
 | `mb_pos_sumup` | 19.0.1.0.0 | POS payment through the SumUp app URL scheme on the same phone | **uninstalled** |
@@ -163,9 +161,18 @@ are kept so the verdict stays auditable.
 Design-level grouping uses `product.tag`, which is native, unique by name,
 filterable and already carries `visible_to_customers`.
 
-**No material-type field.** Material families are `product.category`, mapped by
-`mb_catalogue_sync`. A second taxonomy disagrees with the first the moment
-anyone edits either.
+**No material-type field.** Material families are `product.category`, defined
+here in `data/mb_material_categories.xml`: ceramic materials, and under it
+glazes, underglazes, engobes, clay bodies, stains, oxides and raw materials. A
+second taxonomy disagrees with the first the moment anyone edits either.
+
+They moved here from `mb_catalogue_sync` in 19.0.1.2.0, on the finding that the
+families are not the catalogue's. A workshop that never imports anything still
+buys glaze and still owes a migration test on the food-contact ware it makes
+with it — so leaving the taxonomy in the importer put the `button_mark_done`
+compliance gate behind an optional connector, and its docstring admitted it
+silently checked less without one. `mb_catalogue_sync` now depends on this addon
+and maps onto the taxonomy rather than owning it.
 
 **Work centres are seeded, not modelled.** Throwing, handbuilding, trimming,
 assembly, glazing and decorating are plain `mrp.workcenter` records under
@@ -380,8 +387,13 @@ scanning and an optional raw-payload store for debugging.
 
 ### `mb_catalogue_sync`
 
-Depends on `product`, `purchase`, `uom`, `stock`. Reads the cross-tenant
-ceramics catalogue service; never writes back.
+Depends on `mb_workshop_base`, `product`, `purchase`, `uom`, `stock`. Reads the
+cross-tenant ceramics catalogue service; never writes back.
+
+**Status: undecided.** Nothing depends on it, no product in the live database
+carries a catalogue identity, and no import has ever been run. It is specified
+here because it exists and installs, not because it is settled — see *Known
+gaps*.
 
 **What crosses the boundary.** The catalogue holds roughly 47,000 supplier
 listings across 76 shops with price history. None of that belongs in an artisan's
@@ -398,8 +410,15 @@ somebody means than a code one shop sells. A product already held is shown as
 held rather than offered again.
 
 Materials are stocked products (`is_storable`), not service lines: a ceramic
-material is bought, held and consumed. Catalogue families map onto
-`product.category`, and that mapping is the single taxonomy.
+material is bought, held and consumed.
+
+**Catalogue families map onto the taxonomy, they do not define it.** The
+`product.category` records live in `mb_workshop_base`; this addon translates a
+family name onto one of them and writes `categ_id` only where it is empty. A
+family it has never heard of lands on the parent category rather than nowhere,
+so it is visible and correctable instead of silently uncategorised. Before
+19.0.1.3.0 the categories were defined here, which put a compliance gate behind
+an optional connector.
 
 **Models.** `mb.catalogue.client`, `mb.catalogue.service`,
 `mb.catalogue.supplier`, `mb.catalogue.units`, `mb.catalogue.import` and
@@ -691,6 +710,12 @@ Verified by CI, on every push:
 | Upgrade in place (`-u` after `-i`) | no-op rather than crash |
 | Server tests, scoped to these addons | **192 tests, 0 failed, 0 errors** |
 
+Checked once by hand, on 7 August 2026, and worth repeating whenever the
+question comes up again: installing the other ten addons **without**
+`mb_catalogue_sync` gives 175 tests, 0 failed, 0 errors, and the three glaze
+categories the food-contact gate reads are present and owned by
+`mb_workshop_base`. The importer is removable.
+
 Not verified:
 
 - Physical printer and scanner qualification. Phomemo M110 and NIIMBOT D110
@@ -726,7 +751,13 @@ Ordered by consequence, not by effort.
 5. **Unofficial myKiln API.** No contract, no versioning. The connector is
    isolated and stops on auth or schema failure, which is the mitigation; there
    is no warning.
-6. **`mb_catalogue_sync` and `mb_depot` do not depend on `mb_workshop_base`**,
-    so a database can hold ceramics materials and consignment stock without the
-    food-contact identity that gives them their tracking rules. Intentional or
-    not, it should be decided rather than inherited.
+6. **`mb_depot` does not depend on `mb_workshop_base`**, so a database can hold
+   consignment stock without the food-contact identity that gives products
+   their tracking rules. Unlike the catalogue case this may well be right —
+   consignment is about where a piece is, not what it is made of — but it should
+   be decided rather than inherited.
+7. **`mb_catalogue_sync`'s future is undecided.** Nothing depends on it, no
+   product carries a catalogue identity and no import has ever run; the
+   catalogue service it reads is a separate deliverable. The 19.0.1.3.0 split
+   moved the material taxonomy into `mb_workshop_base` so that dropping the
+   importer is now a self-contained decision with nothing else at stake.
