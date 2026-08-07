@@ -134,9 +134,23 @@ Odoo decides to re-run an addon's data files.
 The rule changes the day the first tenant database exists. From then on, one
 database per artisan means an addon without a migration path is an outage
 multiplied by the tenant count, and every version bump that touches stored data
-needs a script. `mb_ceramics_firing` already carries two, written when
-`mb.kiln.program` moved out of `mb_kiln_bridge` — proof the practice starts when
-something actually needs moving, rather than as ceremony on every bump.
+needs a script.
+
+**The exception is a record that moves between modules**, which needs a script
+whether or not anything is released, because the loss is not recoverable by
+reinstalling. Odoo's end-of-load cleanup deletes the `ir.model.data` rows a
+module no longer accounts for, and takes the records with them. Three scripts
+exist for exactly this and nothing else:
+
+| Script | Moved |
+| --- | --- |
+| `mb_ceramics_firing/19.0.1.1.0/post-migrate.py` | — |
+| `mb_ceramics_firing/19.0.1.2.0/pre-migrate.py` | `mb.kiln.program` out of `mb_kiln_bridge` |
+| `mb_workshop_base/19.0.1.2.0/pre-migrate.py` | the eight material categories out of `mb_catalogue_sync` |
+
+Each reassigns `module` on the affected rows in a pre-migrate on the addon that
+loads first, which turns a drop-and-recreate into a move. Each is one-shot: after
+it runs the source rows are gone and a re-run matches nothing.
 
 ## Workshop foundation
 
@@ -715,6 +729,20 @@ question comes up again: installing the other ten addons **without**
 `mb_catalogue_sync` gives 175 tests, 0 failed, 0 errors, and the three glaze
 categories the food-contact gate reads are present and owned by
 `mb_workshop_base`. The importer is removable.
+
+The category migration was tested the same day against a database built from the
+pre-split commit, with a product filed under `mb_catalogue_sync.categ_glaze`:
+
+| Check | Result |
+| --- | --- |
+| After upgrade, categories owned by | `mb_workshop_base`, all 8 |
+| Category records named `categ_*` | 8 — no duplicates |
+| The product's `categ_id` | unchanged, same record, now re-owned |
+| Re-running the upgrade | no-op, still 8 |
+| Then uninstalling `mb_catalogue_sync` | categories survive; product keeps its category |
+| **Same uninstall on the pre-split code** | **all 8 categories deleted, product's `categ_id` set to NULL** |
+
+That last row is what the script prevents.
 
 Not verified:
 
