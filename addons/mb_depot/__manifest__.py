@@ -22,6 +22,11 @@ This module adds what Odoo and OCA do not have:
   pricelist - in one action, because that set repeats per gallery;
 * live stock per depot with an ageing column, so a piece that has sat unsold
   for four months is visible;
+* a reported sale date on the move line, because a gallery reports last month's
+  sales this month and the move's own date is when we keyed it in: binning the
+  statement on that would put March's sales in April and leave March closing too
+  high. It is a plain writable Date with no effect on stock state, so a sync
+  from a shop's sales sheet can set it;
 * the depot statement: opening, placed, sold, returned and closing over a
   period, per piece. Sold and returned are both outgoing moves and are told
   apart by destination, which is what makes the statement reconcile against the
@@ -42,7 +47,7 @@ sale_order_global_stock_route. That is deliberately not a dependency: it is
 AGPL-3 and this module is LGPL-3. Without it the route is still created and can
 be set on the order line by hand.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.1.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
@@ -56,6 +61,7 @@ be set on the order line by hand.
         "security/ir.model.access.csv",
         "views/stock_location_views.xml",
         "views/stock_quant_views.xml",
+        "views/stock_picking_views.xml",
         "wizards/mb_depot_create_views.xml",
         "wizards/mb_depot_statement_views.xml",
         "report/mb_depot_reports.xml",

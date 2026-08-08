@@ -25,6 +25,7 @@
               <th class="text-end">Début</th>
               <th class="text-end">Déposé</th>
               <th class="text-end">Vendu</th>
+              <th>Vendu le</th>
               <th class="text-end">Repris</th>
               <th class="text-end">En dépôt</th>
               <th class="text-end">Prix public</th>
@@ -39,6 +40,7 @@
               <td class="text-end"><span t-field="line.qty_opening"/></td>
               <td class="text-end"><span t-field="line.qty_placed"/></td>
               <td class="text-end"><span t-field="line.qty_sold"/></td>
+              <td><span t-field="line.date_sold"/></td>
               <td class="text-end"><span t-field="line.qty_returned"/></td>
               <td class="text-end"><strong><span t-field="line.qty_closing"/></strong></td>
               <td class="text-end">

@@ -38,6 +38,7 @@ depot: same sourcing, none of the picking-type and sequence sprawl.
 | | |
 |---|---|
 | `stock.location` | `is_depot`, depositary, commission, route, pricelist, pieces held |
+| `stock.move.line` | `mb_depot_sale_date` — the day the depositary reports the piece sold |
 | `mb.depot.create` | Creates a depot — location, route, pull rule, commission pricelist — in one action, because that set repeats per gallery and has to agree with itself |
 | `mb.depot.statement` | Opening, placed, sold, returned, closing over a period, per piece, with retail / commission / net |
 | `stock.quant` views | Live stock per depot with a days-held column and ageing filters |
@@ -60,8 +61,36 @@ the list price and the commission as a discount. A piece that left without a
 sale order falls back to the product's list price and the depot's recorded
 commission, so it cannot silently value at zero.
 
-Period bounds are `[date_from 00:00, date_to+1 00:00)` in UTC, which is how
-`stock.move.line.date` is stored.
+## The reported date
+
+A gallery reports last month's sales this month. `stock.move.line.date` is when
+the transfer was validated here, so binning on it puts March's sales in April,
+leaves March closing too high, and makes April's opening disagree with the paper
+the gallery signed.
+
+`mb_depot_sale_date` on the move line is the day the movement actually happened
+for the depositary, and the statement bins on `sale_date or date` — for
+placements and returns as well as sales, since a placement keyed in a week late
+lands in the wrong period the same way.
+
+It is a plain writable `Date` on `stock.move.line` with no side effects on stock
+state, so an external sync (a shop's sales sheet, for one) can set it by RPC on
+the lines it matches. `stock.picking.mb_depot_sale_date` sets it on every line of
+a transfer at once and reads back only when the lines agree, which is the
+ordinary case of one transfer standing for one reported sale.
+
+Note that backdating this does **not** backdate the stock valuation layer or its
+accounting entry; those stamp at validation.
+
+The statement carries `date_sold` per row, filled when every sale on the row
+shares one day. One serialised piece is one row is one sale, so it is normally
+filled; an untracked product sold on three days leaves it blank rather than
+picking one. Splitting the row per day instead would make its closing balance
+meaningless.
+
+Period bounds are whole days, compared against the reported date when there is
+one and otherwise against the UTC day of `stock.move.line.date` — the same
+window as before for anything not reported.
 
 ## Two traps worth knowing
 
@@ -96,5 +125,6 @@ the report here.
 odoo -d <db> -u mb_depot --test-enable --test-tags /mb_depot --stop-after-init
 ```
 
-Nine tests, all on the statement arithmetic and the consistency of a created
-depot — the parts that decide money.
+Fifteen tests, all on the statement arithmetic, the reported date that decides
+which period a movement falls in, and the consistency of a created depot — the
+parts that decide money.

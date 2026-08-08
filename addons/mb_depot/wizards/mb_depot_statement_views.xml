@@ -26,6 +26,7 @@
             <field name="qty_opening" sum="Opening"/>
             <field name="qty_placed" sum="Placed"/>
             <field name="qty_sold" sum="Sold"/>
+            <field name="date_sold" string="Sold on"/>
             <field name="qty_returned" sum="Returned"/>
             <field name="qty_closing" sum="Closing" decoration-bf="1"/>
             <field name="amount_gross" sum="Retail"/>

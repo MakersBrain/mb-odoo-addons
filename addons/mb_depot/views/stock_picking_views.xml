@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_picking_form_depot" model="ir.ui.view">
+    <field name="name">stock.picking.form.depot</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="arch" type="xml">
+      <field name="date_done" position="after">
+        <field name="depot_location_id" invisible="1"/>
+        <field name="is_depot_placement" invisible="1"/>
+        <!-- Editable on a done transfer on purpose: the depositary reports the
+             sale after the fact, which is the whole point of the field. -->
+        <field name="mb_depot_sale_date"
+               invisible="not depot_location_id or is_depot_placement"/>
+      </field>
+    </field>
+  </record>
+
+  <record id="view_move_line_tree_depot" model="ir.ui.view">
+    <field name="name">stock.move.line.list.depot</field>
+    <field name="model">stock.move.line</field>
+    <field name="inherit_id" ref="stock.view_move_line_tree"/>
+    <field name="arch" type="xml">
+      <field name="date" position="after">
+        <field name="mb_depot_sale_date" optional="hide"/>
+      </field>
+    </field>
+  </record>
+
+</odoo>

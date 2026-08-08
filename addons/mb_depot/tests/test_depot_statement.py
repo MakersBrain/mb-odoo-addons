@@ -32,10 +32,14 @@ class TestDepotStatement(TransactionCase):
         })
         cls.customers = cls.env.ref("stock.stock_location_customers")
 
-    def _move(self, source, destination, qty, date=None):
+    def _move(self, source, destination, qty, date=None, sale_date=None):
         """A done move line, dated. Written straight rather than through a
         picking because the statement reads move lines, and going through the
         UI flow would test Odoo rather than this module.
+
+        `date` is when the transfer was validated here, `sale_date` what the
+        depositary reports. They differ whenever a gallery reports after the
+        fact, which is the ordinary case.
         """
         move = self.env["stock.move"].create({
             "product_id": self.product.id,
@@ -54,6 +58,8 @@ class TestDepotStatement(TransactionCase):
         move._action_done()
         if date:
             move.move_line_ids.write({"date": date})
+        if sale_date:
+            move.move_line_ids.write({"mb_depot_sale_date": sale_date})
         return move
 
     def _statement(self, date_from, date_to):
@@ -161,6 +167,118 @@ class TestDepotStatement(TransactionCase):
         self.assertEqual(line.amount_net, 120.0, "100 less 40% commission, twice")
         self.assertEqual(line.amount_commission, 80.0)
         self.assertEqual(statement.total_sold, 120.0)
+
+    def test_a_reported_sale_date_decides_the_period(self):
+        """The gallery sold in August and told us in September. It is August
+        business, and September must not claim it.
+        """
+        stock = self.warehouse.lot_stock_id
+        self._move(stock, self.depot, 5, date="2026-08-05 09:00:00")
+        self._move(self.depot, self.customers, 2,
+                   date="2026-09-04 11:00:00", sale_date="2026-08-20")
+
+        august = self._statement("2026-08-01", "2026-08-31").line_ids
+        self.assertEqual(august.qty_sold, 2, "a sale reported late is still an "
+                                             "August sale")
+        self.assertEqual(august.qty_closing, 3)
+
+        september = self._statement("2026-09-01", "2026-09-30").line_ids
+        self.assertEqual(september.qty_sold, 0)
+        self.assertEqual(september.qty_opening, 3,
+                         "August's closing has to be September's opening")
+
+    def test_a_reported_date_also_moves_a_placement(self):
+        """The date is applied to every crossing move, not only to sales. A
+        placement keyed in a week late would otherwise land in the wrong period
+        and take the opening balance with it.
+        """
+        stock = self.warehouse.lot_stock_id
+        self._move(stock, self.depot, 4,
+                   date="2026-08-03 09:00:00", sale_date="2026-07-28")
+
+        line = self._statement("2026-08-01", "2026-08-31").line_ids
+        self.assertEqual(line.qty_placed, 0)
+        self.assertEqual(line.qty_opening, 4)
+        self.assertEqual(line.qty_closing, 4)
+
+    def test_the_statement_reports_the_day_a_piece_sold(self):
+        stock = self.warehouse.lot_stock_id
+        self._move(stock, self.depot, 3, date="2026-08-01 09:00:00")
+        self._move(self.depot, self.customers, 1,
+                   date="2026-09-04 11:00:00", sale_date="2026-08-14")
+
+        line = self._statement("2026-08-01", "2026-08-31").line_ids
+        self.assertEqual(line.date_sold, fields.Date.to_date("2026-08-14"))
+
+    def test_no_day_is_reported_when_a_row_covers_several(self):
+        """One aggregate row, three sales, three days: any single date on it
+        would be a lie, so it stays blank.
+        """
+        stock = self.warehouse.lot_stock_id
+        self._move(stock, self.depot, 5, date="2026-08-01 09:00:00")
+        self._move(self.depot, self.customers, 1, sale_date="2026-08-14",
+                   date="2026-09-04 11:00:00")
+        self._move(self.depot, self.customers, 1, sale_date="2026-08-19",
+                   date="2026-09-04 11:00:00")
+
+        line = self._statement("2026-08-01", "2026-08-31").line_ids
+        self.assertEqual(line.qty_sold, 2)
+        self.assertFalse(line.date_sold)
+
+    def test_the_move_line_date_still_applies_without_a_reported_one(self):
+        """Nothing reported, nothing changed: the validation date decides."""
+        stock = self.warehouse.lot_stock_id
+        self._move(stock, self.depot, 5, date="2026-08-05 09:00:00")
+        move = self._move(self.depot, self.customers, 1, date="2026-08-12 09:00:00")
+        self.assertFalse(move.move_line_ids.mb_depot_sale_date)
+
+        line = self._statement("2026-08-01", "2026-08-31").line_ids
+        self.assertEqual(line.qty_sold, 1)
+        self.assertEqual(line.date_sold, fields.Date.to_date("2026-08-12"))
+
+    def test_the_transfer_carries_the_date_down_to_its_lines(self):
+        """Setting it once on the transfer is the ordinary case; it only shows
+        back on the transfer when the lines agree.
+        """
+        stock = self.warehouse.lot_stock_id
+        other = self.env["product.product"].create({
+            "name": "Test mug", "type": "consu", "is_storable": True,
+            "list_price": 40.0,
+        })
+        self._move(stock, self.depot, 5, date="2026-08-01 09:00:00")
+        self.env["stock.quant"]._update_available_quantity(other, self.depot, 5)
+
+        picking = self.env["stock.picking"].create({
+            "picking_type_id": self.warehouse.out_type_id.id,
+            "location_id": self.depot.id,
+            "location_dest_id": self.customers.id,
+            "move_ids": [
+                fields.Command.create({
+                    "product_id": product.id,
+                    "product_uom_qty": 1,
+                    "location_id": self.depot.id,
+                    "location_dest_id": self.customers.id,
+                })
+                for product in (self.product, other)
+            ],
+        })
+        picking.action_confirm()
+        picking.action_assign()
+        picking.move_ids.picked = True
+        picking.button_validate()
+        self.assertEqual(len(picking.move_line_ids), 2)
+
+        picking.mb_depot_sale_date = "2026-08-15"
+        self.assertEqual(
+            set(picking.move_line_ids.mapped("mb_depot_sale_date")),
+            {fields.Date.to_date("2026-08-15")})
+        self.assertEqual(picking.mb_depot_sale_date,
+                         fields.Date.to_date("2026-08-15"))
+
+        picking.move_line_ids[0].mb_depot_sale_date = "2026-08-16"
+        self.assertFalse(
+            picking.mb_depot_sale_date,
+            "lines that disagree leave the transfer with no single date to show")
 
     def test_a_depot_must_be_internal(self):
         from odoo.exceptions import ValidationError

@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
@@ -49,18 +47,22 @@ class MbDepotStatement(models.TransientModel):
             if statement.date_to < statement.date_from:
                 raise UserError(_("The period ends before it starts."))
 
-    def _bounds(self):
-        """Half-open [from, to) in UTC, which is how stock.move.line.date is stored.
+    def _effective_date(self, move_line):
+        """The day a movement happened as far as the depositary is concerned.
 
-        A move stamped late in the evening of the last day of the month belongs
-        to that month for the depositary even if UTC has already rolled over;
-        that discrepancy is at most a few hours and is accepted here rather than
-        pretending to a precision the reported sale dates do not have.
+        The reported sale date when there is one, otherwise the move line's own
+        date - which is when the transfer was validated here. A gallery that
+        reports March's sales in April would otherwise put every one of them in
+        April, leaving March closing too high and April opening disagreeing with
+        the paper the gallery signed.
+
+        The fallback takes the UTC day of move_line.date. A move stamped late in
+        the evening of the last day of the month belongs to that month for the
+        depositary even if UTC has already rolled over; that discrepancy is at
+        most a few hours and is accepted here rather than pretending to a
+        precision the reported sale dates do not have.
         """
-        self.ensure_one()
-        dt_from = fields.Datetime.to_datetime(self.date_from)
-        dt_to = fields.Datetime.to_datetime(self.date_to) + timedelta(days=1)
-        return dt_from, dt_to
+        return move_line.mb_depot_sale_date or move_line.date.date()
 
     def _crossing_moves(self):
         """Done move lines entering and leaving the depot.
@@ -109,13 +111,16 @@ class MbDepotStatement(models.TransientModel):
     def action_compute(self):
         self.ensure_one()
         self.line_ids.unlink()
-        dt_from, dt_to = self._bounds()
         incoming, outgoing = self._crossing_moves()
 
         rows = {}
+        sale_days = {}
+
+        def key_of(move_line):
+            return (move_line.product_id.id, move_line.lot_id.id)
 
         def row(move_line):
-            key = (move_line.product_id.id, move_line.lot_id.id)
+            key = key_of(move_line)
             if key not in rows:
                 rows[key] = {
                     "statement_id": self.id,
@@ -127,15 +132,17 @@ class MbDepotStatement(models.TransientModel):
             return rows[key]
 
         for ml in incoming:
-            if ml.date >= dt_to:
+            when = self._effective_date(ml)
+            if when > self.date_to:
                 continue
-            target = "qty_opening" if ml.date < dt_from else "qty_placed"
+            target = "qty_opening" if when < self.date_from else "qty_placed"
             row(ml)[target] += ml.quantity
 
         for ml in outgoing:
-            if ml.date >= dt_to:
+            when = self._effective_date(ml)
+            if when > self.date_to:
                 continue
-            if ml.date < dt_from:
+            if when < self.date_from:
                 row(ml)["qty_opening"] -= ml.quantity
                 continue
             # Sold and returned are both moves out of the depot. The destination
@@ -147,8 +154,18 @@ class MbDepotStatement(models.TransientModel):
                 gross, net = self._values(ml)
                 values["amount_gross"] += gross
                 values["amount_net"] += net
+                sale_days.setdefault(key_of(ml), set()).add(when)
             else:
                 row(ml)["qty_returned"] += ml.quantity
+
+        for key, values in rows.items():
+            # One row is one piece per serial, so a sold row normally has exactly
+            # one day. An untracked product sold three times in the period has
+            # three, and no single date is true of the row - blank rather than
+            # pick one. Splitting the row per day instead would make its closing
+            # balance meaningless.
+            days = sale_days.get(key, ())
+            values["date_sold"] = next(iter(days)) if len(days) == 1 else False
 
         self.env["mb.depot.statement.line"].create(list(rows.values()))
         return {
@@ -177,6 +194,11 @@ class MbDepotStatementLine(models.TransientModel):
     lot_id = fields.Many2one(comodel_name="stock.lot", string="Serial")
     lot_name = fields.Char(related="lot_id.name", store=True)
     currency_id = fields.Many2one(related="statement_id.currency_id")
+
+    date_sold = fields.Date(
+        "Sold on",
+        help="The day the piece sold, as reported by the depositary. Blank when "
+             "the row covers sales on more than one day.")
 
     qty_opening = fields.Float("Opening", digits="Product Unit of Measure")
     qty_placed = fields.Float("Placed", digits="Product Unit of Measure")
