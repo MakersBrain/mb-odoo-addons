@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Seed a practical starting taxonomy, then leave it under the artisan's
+         control. Product categories carry inventory and accounting policy;
+         designs and collections remain product tags. -->
+    <data noupdate="1">
+        <record id="categ_finished_ceramics" model="product.category">
+            <field name="name">Finished ceramics</field>
+            <field name="parent_id" ref="product.product_category_goods"/>
+        </record>
+
+        <record id="categ_tableware" model="product.category">
+            <field name="name">Tableware</field>
+            <field name="parent_id" ref="categ_finished_ceramics"/>
+        </record>
+        <record id="categ_drinkware" model="product.category">
+            <field name="name">Drinkware</field>
+            <field name="parent_id" ref="categ_finished_ceramics"/>
+        </record>
+        <record id="categ_vases" model="product.category">
+            <field name="name">Vases and vessels</field>
+            <field name="parent_id" ref="categ_finished_ceramics"/>
+        </record>
+        <record id="categ_planters" model="product.category">
+            <field name="name">Planters</field>
+            <field name="parent_id" ref="categ_finished_ceramics"/>
+        </record>
+        <record id="categ_decorative" model="product.category">
+            <field name="name">Decorative and sculptural</field>
+            <field name="parent_id" ref="categ_finished_ceramics"/>
+        </record>
+        <record id="categ_tiles" model="product.category">
+            <field name="name">Tiles and architectural ceramics</field>
+            <field name="parent_id" ref="categ_finished_ceramics"/>
+        </record>
+        <record id="categ_jewellery" model="product.category">
+            <field name="name">Jewellery and accessories</field>
+            <field name="parent_id" ref="categ_finished_ceramics"/>
+        </record>
+    </data>
+</odoo>

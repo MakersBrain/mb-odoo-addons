@@ -44,3 +44,21 @@ class TestFoodContact(TransactionCase):
         })
         self.assertFalse(self.mug.mb_label_food_warning)
 
+    def test_finished_ceramics_taxonomy_is_seeded(self):
+        root = self.env.ref("mb_workshop_base.categ_finished_ceramics")
+        children = {
+            self.env.ref(xmlid).name
+            for xmlid in (
+                "mb_workshop_base.categ_tableware",
+                "mb_workshop_base.categ_drinkware",
+                "mb_workshop_base.categ_vases",
+                "mb_workshop_base.categ_planters",
+                "mb_workshop_base.categ_decorative",
+                "mb_workshop_base.categ_tiles",
+                "mb_workshop_base.categ_jewellery",
+            )
+        }
+
+        self.assertEqual(root.parent_id, self.env.ref("product.product_category_goods"))
+        self.assertEqual(len(children), 7)
+        self.assertTrue(root.child_id)

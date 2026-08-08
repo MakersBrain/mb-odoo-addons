@@ -56,7 +56,7 @@ unattended runs on - a kiln fires overnight, and on the workshop's own calendar
 Odoo would fragment a fourteen-hour firing across three days. `mb.kiln` in
 `mb_ceramics_firing` puts every kiln work centre on it.
 """,
-    "version": "19.0.1.3.1",
+    "version": "19.0.1.4.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
@@ -74,6 +74,7 @@ Odoo would fragment a fourteen-hour firing across three days. `mb.kiln` in
     "data": [
         "security/ir.model.access.csv",
         "data/mb_material_categories.xml",
+        "data/mb_finished_product_categories.xml",
         "data/mb_workcenter_data.xml",
         "views/mb_migration_test_views.xml",
         "views/product_template_views.xml",
