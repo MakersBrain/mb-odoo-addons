@@ -151,7 +151,7 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 				)
 			else:
 				wizard.readiness_html = Markup("<div class='alert alert-success mb-0'><strong>%s</strong></div>") % _(
-					"Identity, tax regime, and payment details are ready for Factur-X."
+					"Ready. Click Save and validate below to apply this setup to the company."
 				)
 
 	def _validate_identifiers(self):
@@ -193,6 +193,22 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 			bank_account = self.env["res.partner.bank"].create(values)
 		return bank_account
 
+	def _prepare_french_chart(self, company):
+		self.ensure_one()
+		if company.chart_template == "fr":
+			return company
+		if self.env["account.move.line"].sudo().search_count([
+			("company_id", "=", company.id),
+		]):
+			raise ValidationError(_(
+				"The French chart of accounts cannot replace an accounting localization "
+				"after journal items exist. Ask an Accounting Administrator to migrate it."
+			))
+		self.env["account.chart.template"].sudo().try_loading(
+			"fr", company=company, install_demo=False,
+		)
+		return self.env["res.company"].browse(company.id)
+
 	def action_apply(self):
 		self.ensure_one()
 		company = self.company_id
@@ -215,10 +231,13 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 			"zip": self.zip,
 			"city": self.city,
 			"country_id": self.country_id.id,
+			"account_fiscal_country_id": self.country_id.id,
 			"email": self.email,
 			"phone": self.phone,
 			"vat": _compact(self.vat) or False,
 		})
+		company.invalidate_recordset(["country_id", "account_fiscal_country_id"])
+		company = self._prepare_french_chart(company)
 		self._save_bank_account()
 		if self.tax_regime in ("franchise", "vat"):
 			company._l10n_fr_micro_switch(

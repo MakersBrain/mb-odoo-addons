@@ -88,6 +88,19 @@ class TestControlBridge(TransactionCase):
         self.assertFalse(parameters.get_param("auth_signup.reset_password"))
         self.assertEqual(parameters.get_param("auth_signup.invitation_scope"), "b2b")
 
+    def test_new_workshop_bootstraps_french_accounting(self):
+        company = self.env["res.company"].sudo().create({"name": "French workshop"})
+
+        company._mb_bootstrap_french_accounting()
+
+        self.assertEqual(company.country_id, self.env.ref("base.fr"))
+        self.assertEqual(company.account_fiscal_country_id, self.env.ref("base.fr"))
+        self.assertEqual(company.chart_template, "fr")
+        self.assertTrue(self.env["account.tax"].sudo().search_count([
+            ("company_id", "=", company.id),
+            ("country_id", "=", self.env.ref("base.fr").id),
+        ]))
+
     def test_same_epoch_cannot_change_authority(self):
         self.Users.mb_reconcile_membership(self.membership())
         with self.assertRaises(ValidationError):

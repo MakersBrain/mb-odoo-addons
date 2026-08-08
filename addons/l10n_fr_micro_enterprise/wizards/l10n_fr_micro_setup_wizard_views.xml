@@ -55,7 +55,7 @@
 		<field name="name">French EI Setup</field>
 		<field name="res_model">l10n.fr.micro.setup.wizard</field>
 		<field name="view_mode">form</field>
-		<field name="target">current</field>
+		<field name="target">new</field>
 	</record>
 
 	<menuitem id="menu_l10n_fr_micro_setup_wizard"

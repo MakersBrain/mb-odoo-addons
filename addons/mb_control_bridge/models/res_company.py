@@ -34,6 +34,7 @@ class ResCompany(models.Model):
 
     def mb_bootstrap_tenant(self, payload):
         self.ensure_one()
+        new_workshop = not self.mb_control_workshop_id
         workshop_id = str(payload.get("workshop_id", "")).lower()
         client_id = str(payload.get("oidc_client_id", "")).strip()
         issuer = str(payload.get("oidc_issuer", "")).rstrip("/")
@@ -69,9 +70,32 @@ class ResCompany(models.Model):
             provider.write(values)
         else:
             provider = provider_model.create(values)
+        if new_workshop:
+            self._mb_bootstrap_french_accounting()
         self.mb_control_workshop_id = workshop_id
         self._mb_configure_login_policy(provider)
         return {"applied": True, "workshop_id": workshop_id, "provider_id": provider.id}
+
+    def _mb_bootstrap_french_accounting(self):
+        """Give a newly provisioned workshop a usable French chart immediately."""
+        self.ensure_one()
+        france = self.env.ref("base.fr")
+        self.write({
+            "country_id": france.id,
+            "account_fiscal_country_id": france.id,
+        })
+        self.invalidate_recordset(["country_id", "account_fiscal_country_id"])
+        if self.chart_template == "fr":
+            return
+        if self.env["account.move.line"].sudo().search_count([
+            ("company_id", "=", self.id),
+        ]):
+            raise ValidationError(
+                "French accounting cannot be initialized after journal items exist."
+            )
+        self.env["account.chart.template"].sudo().try_loading(
+            "fr", company=self, install_demo=False
+        )
 
     def _mb_configure_login_policy(self, provider):
         self.ensure_one()

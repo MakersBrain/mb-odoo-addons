@@ -49,6 +49,12 @@ class TestEiSetupWizard(TransactionCase):
 		self.assertEqual(self.company.l10n_fr_micro_ape_code, "32.99Z")
 		self.assertFalse(self.company.vat)
 		self.assertEqual(self.company.l10n_fr_micro_tax_regime, "franchise")
+		self.assertEqual(self.company.chart_template, "fr")
+		self.assertEqual(self.company.account_fiscal_country_id, self.env.ref("base.fr"))
+		self.assertEqual(
+			self.company.l10n_fr_micro_purchase_tax_id.type_tax_use,
+			"purchase",
+		)
 		self.assertEqual(
 			self.company.l10n_fr_micro_tax_switch_date,
 			fields.Date.to_date("2025-06-01"),
