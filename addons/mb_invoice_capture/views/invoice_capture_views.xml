@@ -20,7 +20,17 @@
         <field name="name">mb.invoice.capture.form</field>
         <field name="model">mb.invoice.capture</field>
         <field name="arch" type="xml">
-            <form create="0" delete="0" edit="0">
+            <form create="0" delete="0">
+                <header>
+                    <button name="action_create_reviewed_bill" type="object"
+                            string="Create draft bill" class="btn-primary"
+                            invisible="status != 'review' or move_id"/>
+                    <button name="action_open_bill" type="object"
+                            string="Review draft bill" class="btn-primary"
+                            invisible="not move_id"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="received,review,draft_bill"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" type="object" name="action_open_bill"
@@ -35,7 +45,6 @@
                             <field name="external_document_id"/>
                             <field name="revision"/>
                             <field name="previous_revision_id"/>
-                            <field name="status"/>
                             <field name="review_reason" invisible="not review_reason"/>
                         </group>
                         <group>
@@ -46,6 +55,33 @@
                             <field name="received_at"/>
                         </group>
                     </group>
+                    <group string="Invoice review">
+                        <group string="Supplier">
+                            <field name="supplier_name"/>
+                            <field name="supplier_vat"/>
+                        </group>
+                        <group string="Invoice">
+                            <field name="invoice_number"/>
+                            <field name="invoice_date_display" string="Invoice date"/>
+                            <field name="due_date_display" string="Due date"/>
+                            <field name="currency_code" string="Currency"/>
+                        </group>
+                    </group>
+                    <group string="Accounting confirmation" invisible="move_id">
+                        <group>
+                            <field name="review_supplier_id"
+                                   placeholder="Select or confirm the supplier"/>
+                        </group>
+                        <group>
+                            <field name="review_expense_account_id"/>
+                            <field name="review_tax_id"/>
+                        </group>
+                    </group>
+                    <group string="Extracted totals">
+                        <field name="untaxed_amount_display" string="Untaxed"/>
+                        <field name="tax_amount_display" string="Tax"/>
+                        <field name="total_amount_display" string="Total"/>
+                    </group>
                     <group string="Source and audit">
                         <field name="source_attachment_id"/>
                         <field name="content_digest"/>
@@ -53,11 +89,19 @@
                         <field name="company_id" groups="base.group_multi_company"/>
                     </group>
                     <notebook>
-                        <page string="Normalized invoice">
-                            <field name="normalized_payload" widget="json"/>
+                        <page string="Invoice lines">
+                            <field name="invoice_lines_summary" widget="html" nolabel="1"/>
                         </page>
                         <page string="Field confidence">
-                            <field name="field_confidence" widget="json"/>
+                            <field name="confidence_summary" widget="html" nolabel="1"/>
+                        </page>
+                        <page string="Technical data">
+                            <group string="Normalized payload">
+                                <field name="normalized_payload" widget="json" nolabel="1"/>
+                            </group>
+                            <group string="Raw confidence payload">
+                                <field name="field_confidence" widget="json" nolabel="1"/>
+                            </group>
                         </page>
                     </notebook>
                 </sheet>

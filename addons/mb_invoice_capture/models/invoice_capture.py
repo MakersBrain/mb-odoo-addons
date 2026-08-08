@@ -3,8 +3,10 @@ import binascii
 import re
 from decimal import Decimal, InvalidOperation
 
+from markupsafe import Markup, escape
+
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 
 HEX_64_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -76,7 +78,152 @@ class InvoiceCapture(models.Model):
     page_count = fields.Integer(readonly=True)
     normalized_payload = fields.Json(required=True, readonly=True)
     field_confidence = fields.Json(readonly=True)
+    review_supplier_id = fields.Many2one(
+        "res.partner",
+        string="Confirmed supplier",
+        domain="[('company_id', 'in', [False, company_id])]",
+        check_company=True,
+        tracking=True,
+    )
+    review_expense_account_id = fields.Many2one(
+        "account.account",
+        string="Expense account",
+        domain="[('account_type', 'in', ('expense', 'expense_depreciation', 'expense_direct_cost'))]",
+        check_company=True,
+        tracking=True,
+    )
+    review_tax_id = fields.Many2one(
+        "account.tax",
+        string="Purchase tax",
+        domain="[('type_tax_use', '=', 'purchase')]",
+        check_company=True,
+        tracking=True,
+    )
+    supplier_name = fields.Char(compute="_compute_review_fields")
+    supplier_vat = fields.Char(compute="_compute_review_fields")
+    invoice_number = fields.Char(compute="_compute_review_fields")
+    invoice_date_display = fields.Char(compute="_compute_review_fields")
+    due_date_display = fields.Char(compute="_compute_review_fields")
+    currency_code = fields.Char(compute="_compute_review_fields")
+    untaxed_amount_display = fields.Char(compute="_compute_review_fields")
+    tax_amount_display = fields.Char(compute="_compute_review_fields")
+    total_amount_display = fields.Char(compute="_compute_review_fields")
+    invoice_lines_summary = fields.Html(
+        compute="_compute_review_fields", sanitize=True
+    )
+    confidence_summary = fields.Html(
+        compute="_compute_review_fields", sanitize=True
+    )
     received_at = fields.Datetime(required=True, default=fields.Datetime.now, readonly=True)
+
+    @api.depends("normalized_payload", "field_confidence")
+    def _compute_review_fields(self):
+        confidence_labels = {
+            "CustomerAddress": _("Customer address"),
+            "CustomerName": _("Customer name"),
+            "DueDate": _("Due date"),
+            "InvoiceDate": _("Invoice date"),
+            "InvoiceId": _("Invoice number"),
+            "InvoiceTotal": _("Total"),
+            "Items": _("Line items"),
+            "SubTotal": _("Untaxed amount"),
+            "TotalTax": _("Tax amount"),
+            "VendorAddress": _("Supplier address"),
+            "VendorName": _("Supplier name"),
+            "VendorTaxId": _("Supplier VAT"),
+        }
+        for capture in self:
+            invoice = capture.normalized_payload or {}
+            capture.supplier_name = invoice.get("supplier_name") or False
+            capture.supplier_vat = invoice.get("supplier_vat") or False
+            capture.invoice_number = invoice.get("invoice_number") or False
+            capture.invoice_date_display = invoice.get("invoice_date") or False
+            capture.due_date_display = invoice.get("due_date") or False
+            capture.currency_code = invoice.get("currency") or False
+            capture.untaxed_amount_display = self._amount_display(
+                invoice.get("untaxed_amount"), invoice.get("currency")
+            )
+            capture.tax_amount_display = self._amount_display(
+                invoice.get("tax_amount"), invoice.get("currency")
+            )
+            capture.total_amount_display = self._amount_display(
+                invoice.get("total_amount"), invoice.get("currency")
+            )
+            capture.invoice_lines_summary = self._lines_html(invoice.get("lines"))
+            capture.confidence_summary = self._confidence_html(
+                capture.field_confidence, confidence_labels
+            )
+
+    @api.model
+    def _amount_display(self, amount, currency):
+        if amount is None:
+            return False
+        return f"{amount} {currency or ''}".strip()
+
+    @api.model
+    def _lines_html(self, lines):
+        if not isinstance(lines, list) or not lines:
+            return Markup("<p class='text-muted'>%s</p>") % escape(_("No line items extracted."))
+        rows = []
+        for position, line in enumerate(lines, start=1):
+            if not isinstance(line, dict):
+                continue
+            rows.append(Markup("""
+                <tr>
+                    <td>%s</td><td>%s</td><td class="text-end">%s</td>
+                    <td class="text-end">%s</td><td class="text-end">%s</td>
+                </tr>
+            """) % (
+                position,
+                escape(line.get("description") or _("Invoice line")),
+                escape(line.get("quantity") if line.get("quantity") is not None else ""),
+                escape(line.get("unit_price") if line.get("unit_price") is not None else ""),
+                escape(line.get("tax_rate") if line.get("tax_rate") is not None else ""),
+            ))
+        return Markup("""
+            <div class="table-responsive"><table class="table table-sm table-hover mb-0">
+                <thead><tr><th>#</th><th>%s</th><th class="text-end">%s</th>
+                <th class="text-end">%s</th><th class="text-end">%s</th></tr></thead>
+                <tbody>%s</tbody>
+            </table></div>
+        """) % (
+            escape(_("Description")), escape(_("Quantity")),
+            escape(_("Unit price")), escape(_("Tax rate")), Markup(" ").join(rows),
+        )
+
+    @api.model
+    def _confidence_html(self, confidence, labels):
+        if not isinstance(confidence, dict) or not confidence:
+            return Markup("<p class='text-muted'>%s</p>") % escape(_("No confidence scores supplied."))
+        rows = []
+        for key, score in sorted(confidence.items()):
+            try:
+                percentage = float(score) * 100
+            except (TypeError, ValueError):
+                value = _("Not available")
+                badge = "text-bg-secondary"
+            else:
+                value = f"{percentage:.1f}%"
+                badge = (
+                    "text-bg-success" if percentage >= 85
+                    else "text-bg-warning" if percentage >= 75
+                    else "text-bg-danger"
+                )
+            fallback_label = re.sub(r"(?<!^)(?=[A-Z])", " ", key).replace("_", " ").capitalize()
+            label = labels.get(key, fallback_label)
+            rows.append(Markup("""
+                <tr><td>%s</td><td class="text-end">
+                    <span class="badge %s">%s</span>
+                </td></tr>
+            """) % (escape(label), badge, escape(value)))
+        return Markup("""
+            <table class="table table-sm table-hover mb-0">
+                <thead><tr><th>%s</th><th class="text-end">%s</th></tr></thead>
+                <tbody>%s</tbody>
+            </table>
+        """) % (
+            escape(_("Extracted field")), escape(_("Confidence")), Markup(" ").join(rows),
+        )
 
     _document_revision_unique = models.Constraint(
         "UNIQUE(company_id, external_document_id, content_digest)",
@@ -143,7 +290,7 @@ class InvoiceCapture(models.Model):
     @api.model
     def _match_supplier(self, invoice, company):
         candidates = self.env["res.partner"].search([
-            ("supplier_rank", ">", 0),
+            ("active", "=", True),
             "|", ("company_id", "=", False), ("company_id", "=", company.id),
         ])
         vat = _normalized_identifier(invoice.get("supplier_vat"))
@@ -370,3 +517,74 @@ class InvoiceCapture(models.Model):
             "view_mode": "form",
             "target": "current",
         }
+
+    def action_create_reviewed_bill(self):
+        self.ensure_one()
+        if self.move_id:
+            return self.action_open_bill()
+        if self.status != "review":
+            raise UserError(_("Only an invoice awaiting review can create a reviewed bill."))
+        invoice = self.normalized_payload or {}
+        supplier = self.review_supplier_id
+        if not supplier:
+            matched = self._match_supplier(invoice, self.company_id)
+            if isinstance(matched, tuple):
+                self.review_reason = matched[1]
+                return {"type": "ir.actions.client", "tag": "reload"}
+            supplier = matched
+            self.review_supplier_id = supplier
+        if not self.review_expense_account_id:
+            self.review_reason = _("Select an expense account, then create the draft bill again.")
+            return {"type": "ir.actions.client", "tag": "reload"}
+        tax_amount = _decimal(invoice.get("tax_amount"), "tax_amount")
+        company = self.company_id
+        if (
+            not self.review_tax_id
+            and "l10n_fr_micro_tax_regime" in company._fields
+            and company.l10n_fr_micro_tax_regime == "franchise"
+            and company.l10n_fr_micro_purchase_tax_id
+        ):
+            self.review_tax_id = company.l10n_fr_micro_purchase_tax_id
+        if tax_amount and not self.review_tax_id:
+            self.review_reason = _("Select the purchase tax, then create the draft bill again.")
+            return {"type": "ir.actions.client", "tag": "reload"}
+        currency = self._currency(invoice.get("currency"))
+        if not currency:
+            self.review_reason = _("The extracted currency is not active in Odoo.")
+            return {"type": "ir.actions.client", "tag": "reload"}
+        untaxed = _decimal(invoice.get("untaxed_amount"), "untaxed_amount")
+        gross_franchise_purchase = bool(
+            self.review_tax_id
+            and "l10n_fr_micro_franchise_tax" in self.review_tax_id._fields
+            and self.review_tax_id.l10n_fr_micro_franchise_tax
+            and self.review_tax_id.type_tax_use == "purchase"
+        )
+        line_amount = (
+            _decimal(invoice.get("total_amount"), "total_amount")
+            if gross_franchise_purchase else untaxed
+        )
+        move = self.env["account.move"].with_company(self.company_id).create({
+            "move_type": "in_invoice",
+            "company_id": self.company_id.id,
+            "partner_id": supplier.id,
+            "currency_id": currency.id,
+            "invoice_date": invoice.get("invoice_date") or fields.Date.context_today(self),
+            "invoice_date_due": invoice.get("due_date") or False,
+            "ref": invoice.get("invoice_number") or False,
+            "invoice_line_ids": [(0, 0, {
+                "name": _("Captured invoice %(number)s", number=invoice.get("invoice_number") or ""),
+                "quantity": 1,
+                "price_unit": float(line_amount),
+                "account_id": self.review_expense_account_id.id,
+                "tax_ids": [(6, 0, self.review_tax_id.ids)],
+            })],
+        })
+        self.write({
+            "move_id": move.id,
+            "status": "review",
+            "review_reason": _(
+                "Draft bill created from the reviewed header totals. Verify its supplier, "
+                "tax and line details before posting."
+            ),
+        })
+        return self.action_open_bill()

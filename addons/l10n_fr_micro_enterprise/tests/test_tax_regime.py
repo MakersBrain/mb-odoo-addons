@@ -38,6 +38,7 @@ class TestMicroEnterpriseTaxRegime(TransactionCase):
 		self.company._l10n_fr_micro_prepare_tax_setup()
 		goods_tax = self.company.l10n_fr_micro_goods_tax_id
 		service_tax = self.company.l10n_fr_micro_service_tax_id
+		purchase_tax = self.company.l10n_fr_micro_purchase_tax_id
 		position = self.company.l10n_fr_micro_fiscal_position_id
 		self.assertEqual(goods_tax.amount, 0)
 		self.assertEqual(goods_tax.ubl_cii_tax_category_code, "E")
@@ -46,14 +47,18 @@ class TestMicroEnterpriseTaxRegime(TransactionCase):
 		self.assertEqual(goods_tax.original_tax_ids, self.goods_20)
 		self.assertEqual(service_tax.original_tax_ids, self.service_10)
 		self.assertNotIn(self.non_vat_tax, goods_tax.original_tax_ids)
+		self.assertEqual(purchase_tax.type_tax_use, "purchase")
+		self.assertEqual(purchase_tax.amount, 0)
+		self.assertTrue(purchase_tax.l10n_fr_micro_franchise_tax)
 		self.assertEqual(position.tax_ids, goods_tax | service_tax)
 		self.assertFalse(position.auto_apply)
 
-		ids_before = (goods_tax.id, service_tax.id, position.id)
+		ids_before = (goods_tax.id, service_tax.id, purchase_tax.id, position.id)
 		self.company._l10n_fr_micro_prepare_tax_setup()
 		self.assertEqual(ids_before, (
 			self.company.l10n_fr_micro_goods_tax_id.id,
 			self.company.l10n_fr_micro_service_tax_id.id,
+			self.company.l10n_fr_micro_purchase_tax_id.id,
 			self.company.l10n_fr_micro_fiscal_position_id.id,
 		))
 

@@ -48,6 +48,10 @@ class ResCompany(models.Model):
 		"account.tax", string="Franchise tax — services", readonly=True, copy=False,
 		check_company=True,
 	)
+	l10n_fr_micro_purchase_tax_id = fields.Many2one(
+		"account.tax", string="Franchise tax — purchases", readonly=True, copy=False,
+		check_company=True,
+	)
 	l10n_fr_micro_fiscal_position_id = fields.Many2one(
 		"account.fiscal.position", string="Franchise fiscal position",
 		readonly=True, copy=False, check_company=True,
@@ -133,6 +137,34 @@ class ResCompany(models.Model):
 			tax = tax_model.create(values)
 		return tax
 
+	def _l10n_fr_micro_prepare_purchase_tax(self, country, tax_group):
+		self.ensure_one()
+		tax_model = self.env["account.tax"].with_company(self).with_context(active_test=False)
+		tax = tax_model.search([
+			("company_id", "=", self.id),
+			("l10n_fr_micro_franchise_tax", "=", True),
+			("type_tax_use", "=", "purchase"),
+		], limit=1)
+		values = {
+			"name": _("TVA non déductible — franchise en base (achats)"),
+			"invoice_label": _("TVA non déductible — franchise en base"),
+			"description": _("TVA fournisseur incluse dans la charge"),
+			"company_id": self.id,
+			"country_id": country.id,
+			"tax_group_id": tax_group.id,
+			"type_tax_use": "purchase",
+			"tax_scope": False,
+			"amount_type": "percent",
+			"amount": 0,
+			"active": True,
+			"l10n_fr_micro_franchise_tax": True,
+		}
+		if tax:
+			tax.write(values)
+		else:
+			tax = tax_model.create(values)
+		return tax
+
 	def _l10n_fr_micro_prepare_tax_setup(self):
 		self._l10n_fr_micro_check_manager()
 		for company in self:
@@ -140,6 +172,7 @@ class ResCompany(models.Model):
 			tax_group = company._l10n_fr_micro_prepare_tax_group(country)
 			goods_tax = company._l10n_fr_micro_prepare_one_tax("consu", country, tax_group)
 			service_tax = company._l10n_fr_micro_prepare_one_tax("service", country, tax_group)
+			purchase_tax = company._l10n_fr_micro_prepare_purchase_tax(country, tax_group)
 			position_model = self.env["account.fiscal.position"].with_company(company).with_context(active_test=False)
 			position = position_model.search([
 				("company_id", "=", company.id),
@@ -165,6 +198,7 @@ class ResCompany(models.Model):
 				"l10n_fr_micro_tax_group_id": tax_group.id,
 				"l10n_fr_micro_goods_tax_id": goods_tax.id,
 				"l10n_fr_micro_service_tax_id": service_tax.id,
+				"l10n_fr_micro_purchase_tax_id": purchase_tax.id,
 				"l10n_fr_micro_fiscal_position_id": position.id,
 			})
 		return True

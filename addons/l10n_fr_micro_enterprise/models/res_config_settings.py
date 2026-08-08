@@ -13,6 +13,9 @@ class ResConfigSettings(models.TransientModel):
 	l10n_fr_micro_service_tax_id = fields.Many2one(
 		related="company_id.l10n_fr_micro_service_tax_id", readonly=True,
 	)
+	l10n_fr_micro_purchase_tax_id = fields.Many2one(
+		related="company_id.l10n_fr_micro_purchase_tax_id", readonly=True,
+	)
 	l10n_fr_micro_fiscal_position_id = fields.Many2one(
 		related="company_id.l10n_fr_micro_fiscal_position_id", readonly=True,
 	)

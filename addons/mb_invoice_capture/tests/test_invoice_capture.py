@@ -107,6 +107,40 @@ class TestInvoiceCapture(TransactionCase):
         self.assertIsNone(result["bill_id"])
         self.assertEqual(self.env["res.partner"].search_count([]), count)
 
+    def test_customer_contact_can_be_matched_as_first_supplier_invoice(self):
+        self.partner.supplier_rank = 0
+        self.partner.customer_rank = 1
+
+        result = self.Capture.ingest(self.payload())
+
+        self.assertEqual(result["status"], "draft_bill")
+        self.assertEqual(self.Capture.browse(result["capture_id"]).move_id.partner_id, self.partner)
+
+    def test_review_can_create_editable_draft_after_supplier_is_selected(self):
+        invoice = dict(
+            self.payload()["invoice"],
+            supplier_name="New Supplier",
+            supplier_vat="FR00000000000",
+        )
+        result = self.Capture.ingest(self.payload(invoice=invoice))
+        capture = self.Capture.browse(result["capture_id"])
+        supplier = self.env["res.partner"].create({
+            "name": "New Supplier",
+            "vat": "FR00000000000",
+            "is_company": True,
+        })
+        capture.write({
+            "review_supplier_id": supplier.id,
+            "review_expense_account_id": self.expense_account.id,
+        })
+
+        action = capture.action_create_reviewed_bill()
+
+        self.assertEqual(action["res_id"], capture.move_id.id)
+        self.assertEqual(capture.move_id.partner_id, supplier)
+        self.assertEqual(capture.move_id.state, "draft")
+        self.assertEqual(capture.status, "review")
+
     def test_bad_totals_are_reviewed_without_a_bill(self):
         invoice = dict(self.payload()["invoice"], total_amount="99.00")
         result = self.Capture.ingest(self.payload(invoice=invoice))
@@ -127,3 +161,14 @@ class TestInvoiceCapture(TransactionCase):
 
         with self.assertRaises(ValidationError):
             self.Capture.ingest(self.payload(workshop_id=str(uuid.uuid4())))
+
+    def test_review_fields_present_invoice_and_confidence(self):
+        result = self.Capture.ingest(self.payload())
+        capture = self.Capture.browse(result["capture_id"])
+
+        self.assertEqual(capture.supplier_name, "Clay Supplier")
+        self.assertEqual(capture.invoice_number, "INV-2026-0042")
+        self.assertEqual(capture.total_amount_display, f"10.00 {self.company.currency_id.name}")
+        self.assertIn("Clay", str(capture.invoice_lines_summary))
+        self.assertIn("Supplier vat", str(capture.confidence_summary))
+        self.assertIn("99.0%", str(capture.confidence_summary))
