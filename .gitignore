@@ -10,6 +10,8 @@
 backups/
 *.dump
 *.sql
+!control-plane/migrations/
+!control-plane/migrations/*.sql
 *.tar.gz
 
 # Vendored OCA repositories. Upstream code, pinned and reproducible from
