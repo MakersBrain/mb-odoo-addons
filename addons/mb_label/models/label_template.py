@@ -281,7 +281,9 @@ class MbLabelTemplate(models.Model):
         ], order="name, id", limit=500)
         return {
             "products": [{
-                "id": product.id, "name": product.display_name,
+                "id": product.id,
+                "name": product.with_context(
+                    mb_show_product_selector_price=True).display_name,
             } for product in products],
             "lots": [{
                 "id": lot.id, "name": lot.name, "product_id": lot.product_id.id,

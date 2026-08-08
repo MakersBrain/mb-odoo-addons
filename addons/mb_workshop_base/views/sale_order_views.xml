@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_product_selector_price" model="ir.ui.view">
+        <field name="name">sale.order.form.product.selector.price</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="attributes">
+                <attribute name="context">{
+                    'default_uom_id': product_uom_id,
+                    'partner_id': parent.partner_id,
+                    'mb_show_sale_selector_price': True,
+                    'mb_sale_pricelist_id': parent.pricelist_id,
+                    'mb_sale_currency_id': parent.currency_id,
+                }</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_id']" position="attributes">
+                <attribute name="context">{
+                    'default_lst_price': price_unit,
+                    'default_uom_id': product_uom_id,
+                    'partner_id': parent.partner_id,
+                    'mb_show_sale_selector_price': True,
+                    'mb_sale_pricelist_id': parent.pricelist_id,
+                    'mb_sale_currency_id': parent.currency_id,
+                }</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_template_id']" position="attributes">
+                <attribute name="context">{
+                    'default_list_price': price_unit,
+                    'default_uom_id': product_uom_id,
+                    'partner_id': parent.partner_id,
+                    'mb_show_sale_selector_price': True,
+                    'mb_sale_pricelist_id': parent.pricelist_id,
+                    'mb_sale_currency_id': parent.currency_id,
+                }</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

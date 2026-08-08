@@ -56,7 +56,7 @@ unattended runs on - a kiln fires overnight, and on the workshop's own calendar
 Odoo would fragment a fourteen-hour firing across three days. `mb.kiln` in
 `mb_ceramics_firing` puts every kiln work centre on it.
 """,
-    "version": "19.0.1.2.0",
+    "version": "19.0.1.3.1",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
@@ -66,6 +66,10 @@ Odoo would fragment a fourteen-hour firing across three days. `mb.kiln` in
         # The compliance gate runs when a manufacturing order is marked done, and
         # the glaze whose migration test is checked is a consumed component.
         "mrp",
+        # Quotations show their active pricelist price in product selectors.
+        "sale",
+        # The generic product autocomplete is extended for every backend form.
+        "web",
     ],
     "data": [
         "security/ir.model.access.csv",
@@ -73,9 +77,15 @@ Odoo would fragment a fourteen-hour firing across three days. `mb.kiln` in
         "data/mb_workcenter_data.xml",
         "views/mb_migration_test_views.xml",
         "views/product_template_views.xml",
+        "views/sale_order_views.xml",
         "views/stock_lot_views.xml",
         "views/mb_workshop_menus.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "mb_workshop_base/static/src/product_selector_price.js",
+        ],
+    },
     "installable": True,
     "application": False,
     "auto_install": False,

@@ -32,7 +32,7 @@ TAGS ?= /mb_workshop_base,/mb_label,/mb_label_pos,/mb_ceramics_firing,/mb_kiln_b
 /l10n_fr_micro_enterprise
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade \
+.PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \
         test check lint format oca reset-poc
 
 help: ## Show available targets
@@ -46,6 +46,7 @@ bootstrap: ## Prepare a clean checkout: .env, oca/, images, database, addons
 	@echo "waiting for Odoo to answer /web/health..."
 	@until [ "$$(docker inspect -f '{{.State.Health.Status}}' makersbrain-odoo-web 2>/dev/null)" = healthy ]; do sleep 2; done
 	@$(MAKE) --no-print-directory install
+	@$(MAKE) --no-print-directory configure-ui
 	@echo
 	@echo "Odoo is on http://localhost:$${ODOO_PORT:-8169}, database $(DB_NAME)."
 	@echo "Log in as admin/admin, then: make logs"
@@ -88,6 +89,10 @@ install: ## Install MODULES on DB_NAME, creating the database if needed
 
 upgrade: ## Upgrade MODULES on DB_NAME, running any migration scripts
 	$(ODOO) -d $(DB_NAME) -u $(MODULES) --stop-after-init --log-level=warn
+
+configure-ui: ## Apply the streamlined artisan app-switcher layout
+	$(ODOO) shell -d $(DB_NAME) --no-http --log-level=warn \
+		< scripts/configure_app_visibility.py
 
 test: ## Install MODULES on a fresh disposable database and run their tests
 	@$(MAKE) --no-print-directory reset-poc
