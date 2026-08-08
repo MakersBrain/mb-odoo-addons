@@ -7,7 +7,7 @@ It retains immutable source revisions and confidence provenance, matches only
 existing accounting master data, reconciles totals and creates draft supplier
 bills. It never stores Paperless or Azure credentials and never posts or pays.
 """,
-    "version": "19.0.1.3.0",
+    "version": "19.0.1.4.0",
     "license": "LGPL-3",
     "category": "Accounting/Accounting",
     "author": "Makersbrain",

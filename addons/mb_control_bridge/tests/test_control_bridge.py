@@ -106,6 +106,13 @@ class TestControlBridge(TransactionCase):
         with self.assertRaises(ValidationError):
             self.Users.mb_reconcile_membership(self.membership(role="owner"))
 
+    def test_owner_can_create_inventory_products(self):
+        self.Users.mb_reconcile_membership(self.membership(role="owner"))
+        user = self.Users.search([("mb_control_user_id", "=", self.user_id)])
+
+        self.assertTrue(user.has_group("product.group_product_manager"))
+        self.assertIsNone(self.env["product.template"].with_user(user).check_access("create"))
+
     def test_new_epoch_replaces_only_managed_groups_and_can_revoke(self):
         self.Users.mb_reconcile_membership(self.membership())
         user = self.Users.search([("mb_control_user_id", "=", self.user_id)])

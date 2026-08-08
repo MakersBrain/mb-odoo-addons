@@ -36,6 +36,7 @@ class TestInvoiceCapture(TransactionCase):
         payload = {
             "workshop_id": self.workshop_id,
             "external_document_id": "paperless:42",
+            "source_document_url": "https://docs-clay.example.test/documents/42/details",
             "content_digest": hashlib.sha256(self.source).hexdigest(),
             "source_filename": "supplier-invoice.pdf",
             "source_mimetype": "application/pdf",
@@ -79,6 +80,16 @@ class TestInvoiceCapture(TransactionCase):
         self.assertEqual(capture.move_id.partner_id, self.partner)
         self.assertEqual(capture.move_id.amount_total, 10.0)
         self.assertTrue(capture.source_attachment_id)
+        bill_attachment = self.env["ir.attachment"].sudo().search([
+            ("res_model", "=", "account.move"),
+            ("res_id", "=", capture.move_id.id),
+            ("checksum", "=", capture.source_attachment_id.checksum),
+        ])
+        self.assertEqual(len(bill_attachment), 1)
+        self.assertIn(
+            "paperless:42",
+            " ".join(str(body) for body in capture.move_id.message_ids.mapped("body")),
+        )
         self.assertEqual(self.Capture.search_count([
             ("external_document_id", "=", "paperless:42")
         ]), 1)

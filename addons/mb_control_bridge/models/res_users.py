@@ -26,6 +26,7 @@ ROLE_GROUPS = {
     },
     "studio_manager": {
         "base.group_user",
+        "product.group_product_manager",
         "sales_team.group_sale_manager",
         "stock.group_stock_manager",
         "mrp.group_mrp_manager",
@@ -35,6 +36,7 @@ ROLE_GROUPS = {
     },
     "owner": {
         "base.group_user",
+        "product.group_product_manager",
         "sales_team.group_sale_manager",
         "stock.group_stock_manager",
         "mrp.group_mrp_manager",

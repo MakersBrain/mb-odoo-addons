@@ -84,6 +84,8 @@
                     </group>
                     <group string="Source and audit">
                         <field name="source_attachment_id"/>
+                        <field name="source_document_url" widget="url"
+                               invisible="not source_document_url"/>
                         <field name="content_digest"/>
                         <field name="extraction_operation_id"/>
                         <field name="company_id" groups="base.group_multi_company"/>

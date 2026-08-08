@@ -2,6 +2,7 @@ import base64
 import binascii
 import re
 from decimal import Decimal, InvalidOperation
+from urllib.parse import urlparse
 
 from markupsafe import Markup, escape
 
@@ -43,6 +44,7 @@ class InvoiceCapture(models.Model):
         default=lambda self: self.env.company,
     )
     external_document_id = fields.Char(required=True, index=True, readonly=True)
+    source_document_url = fields.Char(string="Paperless document", readonly=True)
     content_digest = fields.Char(required=True, readonly=True)
     revision = fields.Integer(required=True, readonly=True, default=1)
     previous_revision_id = fields.Many2one(
@@ -265,6 +267,11 @@ class InvoiceCapture(models.Model):
             raise ValidationError("page_count must be a positive integer")
         normalized = payload.get("invoice")
         confidence = payload.get("field_confidence", {})
+        source_url = str(payload.get("source_document_url") or "").strip()
+        if source_url:
+            parsed_url = urlparse(source_url)
+            if parsed_url.scheme != "https" or not parsed_url.netloc or len(source_url) > 2048:
+                raise ValidationError("source_document_url must be an absolute HTTPS URL")
         if not isinstance(normalized, dict):
             raise ValidationError("invoice must be an object")
         if not isinstance(confidence, dict):
@@ -430,6 +437,7 @@ class InvoiceCapture(models.Model):
         if move.state != "draft":
             move.unlink()
             return self.env["account.move"], "Invoice capture may create draft bills only."
+        capture._link_source_to_bill(move)
         return move, None
 
     @api.model
@@ -453,6 +461,7 @@ class InvoiceCapture(models.Model):
         capture = self.create({
             "company_id": company.id,
             "external_document_id": external_id,
+            "source_document_url": payload.get("source_document_url") or False,
             "content_digest": digest,
             "revision": previous.revision + 1 if previous else 1,
             "previous_revision_id": previous.id or False,
@@ -576,6 +585,7 @@ class InvoiceCapture(models.Model):
             "ref": invoice.get("invoice_number") or False,
             "invoice_line_ids": line_commands,
         })
+        self._link_source_to_bill(move)
         self.write({
             "move_id": move.id,
             "status": "review",
@@ -585,6 +595,39 @@ class InvoiceCapture(models.Model):
             ),
         })
         return self.action_open_bill()
+
+    def _link_source_to_bill(self, move):
+        self.ensure_one()
+        if not self.source_attachment_id or not move:
+            return self.env["ir.attachment"]
+        attachment_model = self.env["ir.attachment"].sudo()
+        attachment = attachment_model.search([
+            ("res_model", "=", "account.move"),
+            ("res_id", "=", move.id),
+            ("checksum", "=", self.source_attachment_id.checksum),
+        ], limit=1)
+        if attachment:
+            return attachment
+        attachment = self.source_attachment_id.sudo().copy({
+            "name": self.source_filename,
+            "res_model": "account.move",
+            "res_id": move.id,
+            "description": _(
+                "Original source from %(reference)s",
+                reference=self.external_document_id,
+            ),
+        })
+        reference = escape(self.external_document_id)
+        if self.source_document_url:
+            body = Markup("<p>%s <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">%s</a></p>") % (
+                escape(_("Source document:")),
+                escape(self.source_document_url),
+                reference,
+            )
+        else:
+            body = Markup("<p>%s %s</p>") % (escape(_("Source document:")), reference)
+        move.message_post(body=body, attachment_ids=attachment.ids)
+        return attachment
 
     def _prepare_reviewed_lines(self, invoice, target_amount, account, tax):
         self.ensure_one()
