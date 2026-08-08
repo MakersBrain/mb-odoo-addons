@@ -27,15 +27,19 @@ class PosPaymentMethod(models.Model):
 
     sumup_affiliate_key = fields.Char(
         string="SumUp Affiliate Key",
-        help="From Developer settings in the SumUp dashboard. It identifies "
-             "the application allowed to start a payment, and on iOS it is "
-             "tied to the bundle identifier declared beside it.",
+        help="From Developer settings in the SumUp dashboard. The key allows "
+             "a list of application identifiers, and the POS runs in a "
+             "browser rather than in an application of yours, so that list "
+             "has to include the browser: on iOS the SumUp app reports the "
+             "caller as com.sumup.appswitch, whatever the URL says. Add it to "
+             "the key beside your own identifier.",
         copy=False,
     )
     sumup_app_id = fields.Char(
         string="SumUp App ID",
-        help="The application identifier registered with the affiliate key. "
-             "Android requires it; iOS ignores it.",
+        help="Sent as the app-id parameter, which only Android reads. iOS "
+             "takes no such parameter and derives the caller itself - see the "
+             "affiliate key above. Use an identifier registered on the key.",
         copy=False,
     )
     sumup_payment_provider_id = fields.Many2one(

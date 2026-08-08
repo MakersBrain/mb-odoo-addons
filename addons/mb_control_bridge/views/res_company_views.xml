@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_company_form_control_plane" model="ir.ui.view">
+        <field name="name">res.company.form.control.plane</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="MakersBrain control plane" groups="base.group_system">
+                    <field name="mb_control_workshop_id"/>
+                    <field name="mb_entitlement_version"/>
+                    <field name="mb_entitlement_plan"/>
+                    <field name="mb_entitlement_status"/>
+                    <field name="mb_entitlement_expires_at"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

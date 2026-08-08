@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_mb_invoice_capture_list" model="ir.ui.view">
+        <field name="name">mb.invoice.capture.list</field>
+        <field name="model">mb.invoice.capture</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0" edit="0">
+                <field name="received_at"/>
+                <field name="external_document_id"/>
+                <field name="revision"/>
+                <field name="extraction_provider"/>
+                <field name="status"/>
+                <field name="move_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mb_invoice_capture_form" model="ir.ui.view">
+        <field name="name">mb.invoice.capture.form</field>
+        <field name="model">mb.invoice.capture</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0" edit="0">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_open_bill"
+                                icon="fa-file-text-o" invisible="not move_id">
+                            <field name="move_id" widget="statinfo" string="Draft bill"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Needs review" bg_color="text-bg-warning"
+                            invisible="status != 'review'"/>
+                    <group>
+                        <group>
+                            <field name="external_document_id"/>
+                            <field name="revision"/>
+                            <field name="previous_revision_id"/>
+                            <field name="status"/>
+                            <field name="review_reason" invisible="not review_reason"/>
+                        </group>
+                        <group>
+                            <field name="extraction_provider"/>
+                            <field name="extraction_model"/>
+                            <field name="extraction_model_version"/>
+                            <field name="page_count"/>
+                            <field name="received_at"/>
+                        </group>
+                    </group>
+                    <group string="Source and audit">
+                        <field name="source_attachment_id"/>
+                        <field name="content_digest"/>
+                        <field name="extraction_operation_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                    <notebook>
+                        <page string="Normalized invoice">
+                            <field name="normalized_payload" widget="json"/>
+                        </page>
+                        <page string="Field confidence">
+                            <field name="field_confidence" widget="json"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_mb_invoice_capture" model="ir.actions.act_window">
+        <field name="name">Captured supplier invoices</field>
+        <field name="res_model">mb.invoice.capture</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_needs_review': 1}</field>
+    </record>
+
+    <record id="view_mb_invoice_capture_search" model="ir.ui.view">
+        <field name="name">mb.invoice.capture.search</field>
+        <field name="model">mb.invoice.capture</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="external_document_id"/>
+                <field name="move_id"/>
+                <filter name="needs_review" string="Needs review" domain="[('status', '=', 'review')]"/>
+            </search>
+        </field>
+    </record>
+
+    <menuitem id="menu_mb_invoice_capture" name="Captured invoices"
+              parent="account.menu_finance_payables" action="action_mb_invoice_capture"
+              groups="account.group_account_invoice,account.group_account_manager"
+              sequence="35"/>
+</odoo>

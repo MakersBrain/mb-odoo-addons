@@ -40,6 +40,15 @@ so rather than appearing to refund.
 **Constraints inherited from the platform.** Android or iOS, in Safari or
 Chrome. The native Odoo mobile app has no URL handling and cannot come back
 from the SumUp app, and a desktop browser has no SumUp app to open.
+
+**The affiliate key has to allow the browser.** SumUp binds a key to a list of
+application identifiers, and the two platforms establish that identity
+differently: Android reads the `app-id` this module sends, while the iOS URL
+scheme has no such parameter at all and the SumUp app derives the caller
+itself. Called from a browser it reports `com.sumup.appswitch`, so that
+identifier belongs on the key next to your own - otherwise iOS opens the SumUp
+app and it fails at the reader with a server error, which reads like a
+connectivity fault and is not one.
 """,
     "version": "19.0.1.0.0",
     "license": "LGPL-3",

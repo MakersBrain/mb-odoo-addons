@@ -15,8 +15,8 @@ DISPOSABLE_DB ?= mb_scratch
 # itself, but writing it down means `make install` on an empty database is one
 # command and the reader can see the four trees from SPEC.md.
 MODULES := mb_workshop_base,mb_label,mb_label_pos,mb_ceramics_firing,mb_kiln_bridge,\
-mb_catalogue_sync,mb_depot,mb_payment_sumup,mb_pos_sumup,mb_account_payment_sumup,\
-l10n_fr_micro_enterprise
+mb_catalogue_sync,mb_control_bridge,mb_invoice_capture,mb_depot,mb_payment_sumup,\
+mb_pos_sumup,mb_account_payment_sumup,l10n_fr_micro_enterprise
 
 # Which tests run. `--test-enable` alone would also run the tests of every
 # dependency Odoo pulls in — all of mail, stock, account and point_of_sale —
@@ -28,8 +28,8 @@ l10n_fr_micro_enterprise
 # Down to one class:   make test TAGS=/mb_label:TestLabel
 # Or one method:       make test TAGS=/mb_label:TestLabel.test_qr_collision
 TAGS ?= /mb_workshop_base,/mb_label,/mb_label_pos,/mb_ceramics_firing,/mb_kiln_bridge,\
-/mb_catalogue_sync,/mb_depot,/mb_payment_sumup,/mb_pos_sumup,/mb_account_payment_sumup,\
-/l10n_fr_micro_enterprise
+/mb_catalogue_sync,/mb_control_bridge,/mb_invoice_capture,/mb_depot,/mb_payment_sumup,\
+/mb_pos_sumup,/mb_account_payment_sumup,/l10n_fr_micro_enterprise
 
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \

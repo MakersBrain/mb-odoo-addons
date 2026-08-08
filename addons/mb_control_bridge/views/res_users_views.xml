@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_users_form_control_plane" model="ir.ui.view">
+        <field name="name">res.users.form.control.plane</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="MakersBrain identity" groups="base.group_system">
+                    <field name="mb_control_user_id"/>
+                    <field name="mb_rauthy_subject"/>
+                    <field name="mb_control_role"/>
+                    <field name="mb_control_membership_epoch"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
