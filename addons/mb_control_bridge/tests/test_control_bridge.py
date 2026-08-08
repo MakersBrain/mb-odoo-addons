@@ -152,3 +152,13 @@ class TestControlBridge(TransactionCase):
         self.assertTrue(receipts.for_replay("membership:test", "membership.reconcile", "abc"))
         with self.assertRaises(ValidationError):
             receipts.for_replay("membership:test", "membership.reconcile", "def")
+
+    def test_module_catalog_rejects_arbitrary_odoo_modules(self):
+        self.company.mb_control_workshop_id = self.workshop_id
+
+        with self.assertRaises(ValidationError):
+            self.company.mb_enable_module_bundle({
+                "workshop_id": self.workshop_id,
+                "module_key": "system",
+                "modules": ["base"],
+            })

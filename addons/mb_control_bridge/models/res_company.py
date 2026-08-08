@@ -8,6 +8,14 @@ UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 )
 ENTITLEMENT_STATUSES = {"provisioning", "trial", "active", "past_due", "restricted", "suspended"}
+MODULE_BUNDLES = {
+    "catalogue": ("mb_catalogue_sync",),
+    "firings": ("mb_ceramics_firing",),
+    "kiln-connectivity": ("mb_kiln_bridge",),
+    "labels": ("mb_label", "mb_label_pos"),
+    "depot": ("mb_depot",),
+    "sumup": ("mb_payment_sumup", "mb_account_payment_sumup", "mb_pos_sumup"),
+}
 
 
 class ResCompany(models.Model):
@@ -107,6 +115,30 @@ class ResCompany(models.Model):
         parameters.set_param("mb_control.oidc_provider_id", provider.id)
         parameters.set_param("auth_signup.reset_password", False)
         parameters.set_param("auth_signup.invitation_scope", "b2b")
+
+    def mb_enable_module_bundle(self, payload):
+        self.ensure_one()
+        workshop_id = str(payload.get("workshop_id", "")).lower()
+        module_key = str(payload.get("module_key", ""))
+        modules = payload.get("modules")
+        if workshop_id != self.mb_control_workshop_id:
+            raise ValidationError("module bundle belongs to another workshop")
+        expected = MODULE_BUNDLES.get(module_key)
+        if expected is None or not isinstance(modules, list) or tuple(modules) != expected:
+            raise ValidationError("unsupported module bundle")
+        records = self.env["ir.module.module"].sudo().search([
+            ("name", "in", list(expected)),
+        ])
+        if set(records.mapped("name")) != set(expected):
+            raise ValidationError("a supported module is unavailable in this release")
+        pending = records.filtered(lambda module: module.state not in ("installed", "to upgrade"))
+        if pending:
+            pending.button_immediate_install()
+        return {
+            "applied": bool(pending),
+            "module_key": module_key,
+            "modules": list(expected),
+        }
 
     def mb_apply_entitlement(self, payload):
         self.ensure_one()

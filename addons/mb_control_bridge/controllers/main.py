@@ -135,3 +135,31 @@ class ControlPlaneBridge(http.Controller):
             if not isinstance(error, (HTTPException, ValidationError)):
                 _logger.exception("entitlement application failed")
             return _json_error(error)
+
+    @http.route(
+        "/mb_control/v1/modules/enable",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
+    def enable_modules(self):
+        try:
+            authenticate_control_request()
+            body = json_body()
+            operation_key = body.pop("operation_key", None)
+            if not operation_key:
+                raise BadRequest("operation_key is required")
+            digest = payload_digest(body)
+            receipts = request.env["mb.control.operation.receipt"].sudo()
+            existing = receipts.for_replay(operation_key, "module.enable", digest)
+            if existing:
+                return request.make_json_response(existing.response)
+            result = request.env.company.sudo().mb_enable_module_bundle(body)
+            receipts.record(operation_key, "module.enable", digest, result)
+            return request.make_json_response(result)
+        except Exception as error:
+            if not isinstance(error, (HTTPException, ValidationError)):
+                _logger.exception("module enable failed")
+            return _json_error(error)
