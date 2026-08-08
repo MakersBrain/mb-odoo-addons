@@ -563,6 +563,9 @@ class InvoiceCapture(models.Model):
             _decimal(invoice.get("total_amount"), "total_amount")
             if gross_franchise_purchase else untaxed
         )
+        line_commands = self._prepare_reviewed_lines(
+            invoice, line_amount, self.review_expense_account_id, self.review_tax_id,
+        )
         move = self.env["account.move"].with_company(self.company_id).create({
             "move_type": "in_invoice",
             "company_id": self.company_id.id,
@@ -571,13 +574,7 @@ class InvoiceCapture(models.Model):
             "invoice_date": invoice.get("invoice_date") or fields.Date.context_today(self),
             "invoice_date_due": invoice.get("due_date") or False,
             "ref": invoice.get("invoice_number") or False,
-            "invoice_line_ids": [(0, 0, {
-                "name": _("Captured invoice %(number)s", number=invoice.get("invoice_number") or ""),
-                "quantity": 1,
-                "price_unit": float(line_amount),
-                "account_id": self.review_expense_account_id.id,
-                "tax_ids": [(6, 0, self.review_tax_id.ids)],
-            })],
+            "invoice_line_ids": line_commands,
         })
         self.write({
             "move_id": move.id,
@@ -588,3 +585,51 @@ class InvoiceCapture(models.Model):
             ),
         })
         return self.action_open_bill()
+
+    def _prepare_reviewed_lines(self, invoice, target_amount, account, tax):
+        self.ensure_one()
+        source_lines = invoice.get("lines")
+        parsed = []
+        if isinstance(source_lines, list):
+            for position, line in enumerate(source_lines, start=1):
+                if not isinstance(line, dict):
+                    continue
+                description = str(line.get("description") or "").strip()
+                try:
+                    quantity = _decimal(line.get("quantity"), f"line {position} quantity")
+                    unit_price = _decimal(line.get("unit_price"), f"line {position} unit_price")
+                except ValidationError:
+                    continue
+                if description and quantity > 0 and unit_price >= 0:
+                    parsed.append([description, quantity, unit_price])
+        if not parsed:
+            return [(0, 0, {
+                "name": _("Captured invoice %(number)s", number=invoice.get("invoice_number") or ""),
+                "quantity": 1,
+                "price_unit": float(target_amount),
+                "account_id": account.id,
+                "tax_ids": [(6, 0, tax.ids)],
+            })]
+
+        extracted_untaxed = _decimal(invoice.get("untaxed_amount"), "untaxed_amount")
+        raw_total = sum((quantity * unit_price for _, quantity, unit_price in parsed), Decimal(0))
+        if extracted_untaxed > 0 and raw_total > 0:
+            for scale in (Decimal(10), Decimal(100), Decimal(1000)):
+                scaled_total = raw_total / (scale * scale)
+                if abs(scaled_total - extracted_untaxed) <= max(
+                    Decimal("0.02"), extracted_untaxed * Decimal("0.001")
+                ):
+                    parsed = [
+                        [description, quantity / scale, unit_price / scale]
+                        for description, quantity, unit_price in parsed
+                    ]
+                    raw_total = scaled_total
+                    break
+        multiplier = target_amount / raw_total if raw_total else Decimal(1)
+        return [(0, 0, {
+            "name": description,
+            "quantity": float(quantity),
+            "price_unit": float(unit_price * multiplier),
+            "account_id": account.id,
+            "tax_ids": [(6, 0, tax.ids)],
+        }) for description, quantity, unit_price in parsed]

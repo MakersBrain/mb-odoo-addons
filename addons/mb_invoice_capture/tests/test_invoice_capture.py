@@ -140,6 +140,27 @@ class TestInvoiceCapture(TransactionCase):
         self.assertEqual(capture.move_id.partner_id, supplier)
         self.assertEqual(capture.move_id.state, "draft")
         self.assertEqual(capture.status, "review")
+        self.assertEqual(capture.move_id.invoice_line_ids.mapped("name"), ["Clay"])
+
+    def test_review_repairs_french_milli_scaled_extracted_lines(self):
+        invoice = dict(self.payload()["invoice"], lines=[
+            {"description": "Stoneware", "quantity": "12500", "unit_price": "1170"},
+            {"description": "Glaze", "quantity": "1000", "unit_price": "39165"},
+        ], untaxed_amount="53.79", tax_amount="0.00", total_amount="53.79")
+        result = self.Capture.ingest(self.payload(invoice=invoice))
+        capture = self.Capture.browse(result["capture_id"])
+        capture.write({
+            "review_supplier_id": self.partner.id,
+            "review_expense_account_id": self.expense_account.id,
+        })
+
+        capture.action_create_reviewed_bill()
+
+        lines = capture.move_id.invoice_line_ids
+        self.assertEqual(lines.mapped("name"), ["Stoneware", "Glaze"])
+        self.assertEqual(lines[0].quantity, 12.5)
+        self.assertEqual(lines[1].quantity, 1.0)
+        self.assertEqual(capture.move_id.amount_total, 53.79)
 
     def test_bad_totals_are_reviewed_without_a_bill(self):
         invoice = dict(self.payload()["invoice"], total_amount="99.00")
