@@ -3,6 +3,8 @@ import uuid
 from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
 
+from ..controllers.login import should_redirect_to_makersbrain
+
 
 @tagged("post_install", "-at_install")
 class TestControlBridge(TransactionCase):
@@ -41,6 +43,50 @@ class TestControlBridge(TransactionCase):
         self.assertEqual(user.mb_rauthy_subject, self.subject)
         self.assertEqual(user.mb_control_role, "artisan")
         self.assertIn(self.env.ref("point_of_sale.group_pos_user"), user.group_ids)
+
+    def test_normal_login_redirects_but_break_glass_and_errors_do_not(self):
+        self.assertTrue(should_redirect_to_makersbrain("GET", False, {}))
+        self.assertFalse(
+            should_redirect_to_makersbrain("GET", False, {"local": "1"})
+        )
+        self.assertFalse(
+            should_redirect_to_makersbrain("GET", False, {"oauth_error": "2"})
+        )
+        self.assertFalse(should_redirect_to_makersbrain("POST", False, {}))
+        self.assertFalse(should_redirect_to_makersbrain("GET", True, {}))
+
+    def test_login_policy_keeps_only_makersbrain_and_disables_password_reset(self):
+        if "auth.oauth.provider" not in self.env:
+            self.skipTest("optional auth_oauth module is not installed")
+        providers = self.env["auth.oauth.provider"].sudo()
+        other = providers.create({
+            "name": "Other",
+            "client_id": "other-client",
+            "enabled": True,
+            "auth_endpoint": "https://other.example.test/authorize",
+            "body": "Log in with Other",
+            "scope": "openid",
+            "validation_endpoint": "https://other.example.test/userinfo",
+        })
+        makersbrain = providers.create({
+            "name": "MakersBrain",
+            "client_id": "makersbrain-test-client",
+            "enabled": True,
+            "auth_endpoint": "https://auth.example.test/authorize",
+            "body": "Log in with MakersBrain",
+            "scope": "openid profile email",
+            "validation_endpoint": "https://auth.example.test/userinfo",
+        })
+        self.company._mb_configure_login_policy(makersbrain)
+        parameters = self.env["ir.config_parameter"].sudo()
+
+        self.assertFalse(other.enabled)
+        self.assertEqual(
+            int(parameters.get_param("mb_control.oidc_provider_id")),
+            makersbrain.id,
+        )
+        self.assertFalse(parameters.get_param("auth_signup.reset_password"))
+        self.assertEqual(parameters.get_param("auth_signup.invitation_scope"), "b2b")
 
     def test_same_epoch_cannot_change_authority(self):
         self.Users.mb_reconcile_membership(self.membership())

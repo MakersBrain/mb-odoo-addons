@@ -70,10 +70,19 @@ class ResCompany(models.Model):
         else:
             provider = provider_model.create(values)
         self.mb_control_workshop_id = workshop_id
-        self.env["ir.config_parameter"].sudo().set_param(
-            "mb_control.oidc_provider_id", provider.id
-        )
+        self._mb_configure_login_policy(provider)
         return {"applied": True, "workshop_id": workshop_id, "provider_id": provider.id}
+
+    def _mb_configure_login_policy(self, provider):
+        self.ensure_one()
+        self.env["auth.oauth.provider"].sudo().search([
+            ("enabled", "=", True),
+            ("id", "!=", provider.id),
+        ]).write({"enabled": False})
+        parameters = self.env["ir.config_parameter"].sudo()
+        parameters.set_param("mb_control.oidc_provider_id", provider.id)
+        parameters.set_param("auth_signup.reset_password", False)
+        parameters.set_param("auth_signup.invitation_scope", "b2b")
 
     def mb_apply_entitlement(self, payload):
         self.ensure_one()
