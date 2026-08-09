@@ -33,7 +33,13 @@ This module adds what Odoo and OCA do not have:
   quants rather than drift from them;
 * a bon de dépôt for the placement transfer. stock_picking_report_valued cannot
   serve here: every value on it comes from move_id.sale_line_id, and a placement
-  is an internal transfer with no sale line, so it renders blank.
+  is an internal transfer with no sale line, so it renders blank;
+* the product catalog on a placement transfer. product.catalog.mixin is opt-in
+  per model and stock.picking does not take it, on the reasoning that a picking
+  is generated from a source document rather than typed - which a placement,
+  starting from nothing and naming a lot of individual pieces, is not;
+* a depot on the sale order, so the product picker offers only what the
+  depositary is actually holding and unreserved.
 
 The commission itself is a pricelist, not code: under achat-revente sur vente
 the gallery buys at list minus its percentage at the moment it sells. For that
@@ -47,7 +53,7 @@ sale_order_global_stock_route. That is deliberately not a dependency: it is
 AGPL-3 and this module is LGPL-3. Without it the route is still created and can
 be set on the order line by hand.
 """,
-    "version": "19.0.1.1.0",
+    "version": "19.0.1.3.1",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
@@ -62,6 +68,7 @@ be set on the order line by hand.
         "views/stock_location_views.xml",
         "views/stock_quant_views.xml",
         "views/stock_picking_views.xml",
+        "views/sale_order_views.xml",
         "wizards/mb_depot_create_views.xml",
         "wizards/mb_depot_statement_views.xml",
         "report/mb_depot_reports.xml",

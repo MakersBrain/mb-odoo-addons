@@ -3,72 +3,176 @@
 
   <template id="report_bon_depot_document">
     <t t-call="web.external_layout">
+      <t t-set="depot" t-value="doc.depot_location_id"/>
+      <t t-set="partner" t-value="depot.depot_partner_id"/>
+      <t t-set="currency" t-value="doc.company_id.currency_id"/>
+      <t t-set="lines" t-value="doc.move_line_ids.filtered(lambda l: l.quantity)"/>
+      <t t-set="total" t-value="sum(l.product_id.list_price * l.quantity for l in lines)"/>
       <div class="page">
-        <h2>
-          <t t-if="doc.is_depot_placement">Bon de dépôt</t>
-          <t t-else="">Bon de reprise</t>
-          <span t-field="doc.name"/>
-        </h2>
-        <div class="row mb-4">
-          <div class="col-6">
-            <strong>Dépositaire</strong><br/>
-            <span t-field="doc.depot_location_id.depot_partner_id"/><br/>
-            <span t-field="doc.depot_location_id.complete_name"/>
+
+        <div class="d-flex justify-content-between align-items-end border-bottom pb-2 mb-4">
+          <div>
+            <h2 class="mb-0">
+              <t t-if="doc.is_depot_placement">Bon de dépôt</t>
+              <t t-else="">Bon de reprise</t>
+            </h2>
+            <span class="text-muted">Dépôt-vente</span>
           </div>
-          <div class="col-6">
-            <strong>Date</strong><br/>
-            <span t-field="doc.date_done"/>
+          <div class="text-end">
+            <div class="fs-4 fw-bold"><span t-field="doc.name"/></div>
+            <div class="text-muted">
+              <span t-field="doc.date_done" t-options='{"widget": "date"}'/>
+              <t t-if="not doc.date_done">
+                <span t-field="doc.scheduled_date" t-options='{"widget": "date"}'/>
+                <span> (prévu)</span>
+              </t>
+            </div>
           </div>
         </div>
 
-        <table class="table table-sm">
+        <div class="row mb-4">
+          <div class="col-6">
+            <div class="text-muted text-uppercase small fw-bold mb-1">Déposant</div>
+            <div class="fw-bold"><span t-field="doc.company_id.partner_id.name"/></div>
+            <div t-field="doc.company_id.partner_id"
+                 t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": true}'/>
+          </div>
+          <div class="col-6">
+            <div class="text-muted text-uppercase small fw-bold mb-1">Dépositaire</div>
+            <div class="fw-bold"><span t-field="partner.name"/></div>
+            <div t-if="partner" t-field="depot.depot_partner_id"
+                 t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": true}'/>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-4">
+            <div class="text-muted small">Lieu de dépôt</div>
+            <div><span t-field="depot.complete_name"/></div>
+          </div>
+          <div class="col-4">
+            <div class="text-muted small">Commission</div>
+            <div>
+              <t t-if="depot.depot_commission">
+                <span t-out="'%g' % depot.depot_commission"/><span> %</span>
+              </t>
+              <t t-else="">—</t>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="text-muted small">Pièces</div>
+            <div><span t-out="int(sum(lines.mapped('quantity')))"/></div>
+          </div>
+        </div>
+
+        <table class="table table-sm o_main_table" style="table-layout:fixed; width:99%;">
           <thead>
             <tr>
-              <th>Pièce</th>
-              <th>N° de série</th>
-              <th class="text-end">Qté</th>
-              <th class="text-end">Prix public</th>
+              <th class="text-start" style="width:5%;">#</th>
+              <th class="text-start" style="width:33%;">Pièce</th>
+              <th class="text-start" style="width:20%;">N° de série</th>
+              <th class="text-end" style="width:12%;">Qté</th>
+              <th class="text-end" style="width:15%;">Prix public</th>
+              <th class="text-end" style="width:15%;">Total</th>
             </tr>
           </thead>
           <tbody>
-            <tr t-foreach="doc.move_line_ids" t-as="ml">
-              <td><span t-field="ml.product_id"/></td>
-              <td><span t-field="ml.lot_id.name"/></td>
-              <td class="text-end"><span t-field="ml.quantity"/></td>
+            <tr t-foreach="lines" t-as="ml">
+              <td class="text-start text-muted"><span t-out="ml_index + 1"/></td>
+              <td class="text-start">
+                <span t-field="ml.product_id.display_name"/>
+              </td>
+              <td class="text-start">
+                <span t-field="ml.lot_id.name"/>
+                <t t-if="not ml.lot_id"><span class="text-muted">—</span></t>
+              </td>
+              <!-- nowrap: the quantity and its unit wrapping onto two lines is
+                   what pushes a long placement onto a second page. -->
+              <td class="text-end" style="white-space:nowrap;">
+                <span t-field="ml.quantity"/>
+                <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
+              </td>
               <td class="text-end">
-                <span t-esc="ml.product_id.list_price"
-                      t-options='{"widget": "monetary", "display_currency": doc.company_id.currency_id}'/>
+                <span t-out="ml.product_id.list_price"
+                      t-options='{"widget": "monetary", "display_currency": currency}'/>
+              </td>
+              <td class="text-end">
+                <span t-out="ml.product_id.list_price * ml.quantity"
+                      t-options='{"widget": "monetary", "display_currency": currency}'/>
               </td>
             </tr>
           </tbody>
         </table>
 
-        <div class="row justify-content-end">
-          <div class="col-4">
-            <table class="table table-sm">
-              <tr class="border-black">
+        <div class="row justify-content-end mb-4">
+          <div class="col-5">
+            <table class="table table-sm" style="width:99%;">
+              <tr class="border-black o_total">
                 <td><strong>Total prix public</strong></td>
                 <td class="text-end">
                   <strong>
-                    <span t-esc="sum(ml.product_id.list_price * ml.quantity for ml in doc.move_line_ids)"
-                          t-options='{"widget": "monetary", "display_currency": doc.company_id.currency_id}'/>
+                    <span t-out="total"
+                          t-options='{"widget": "monetary", "display_currency": currency}'/>
                   </strong>
+                </td>
+              </tr>
+              <tr t-if="depot.depot_commission">
+                <td class="text-muted">Commission dépositaire (<span t-out="'%g' % depot.depot_commission"/> %)</td>
+                <td class="text-end text-muted">
+                  <span t-out="total * depot.depot_commission / 100.0"
+                        t-options='{"widget": "monetary", "display_currency": currency}'/>
+                </td>
+              </tr>
+              <tr t-if="depot.depot_commission">
+                <td class="text-muted">Net déposant si vente intégrale</td>
+                <td class="text-end text-muted">
+                  <span t-out="total * (100.0 - depot.depot_commission) / 100.0"
+                        t-options='{"widget": "monetary", "display_currency": currency}'/>
                 </td>
               </tr>
             </table>
           </div>
         </div>
 
-        <p class="text-muted mt-4">
-          Pièces confiées en dépôt-vente. Elles restent la propriété du déposant
-          jusqu'à leur vente. Le total ci-dessus est indicatif et ne constitue
-          pas une facture.
-        </p>
-
-        <div class="row mt-5">
-          <div class="col-6">Le déposant<br/><br/><br/>_______________________</div>
-          <div class="col-6">Le dépositaire<br/><br/><br/>_______________________</div>
+        <!-- The terms and the signatures are one block: a bon whose signature
+             lines land on a page of their own, away from what was signed for,
+             is not worth handing to a gallery. -->
+        <div style="page-break-inside:avoid;">
+        <div class="border-top pt-2 mb-4">
+          <p class="text-muted small mb-0">
+            <t t-if="doc.is_depot_placement">
+              Pièces confiées en dépôt-vente. Elles restent la propriété du déposant
+              jusqu'à leur vente au public par le dépositaire, qui en assume la garde
+              et répond de leur perte ou détérioration. Le dépositaire relève les
+              ventes réalisées et les communique au déposant, qui facture chaque
+              pièce vendue au prix public diminué de la commission ci-dessus. Les
+              pièces invendues sont restituées sur demande. Le total ci-dessus est
+              indicatif et ne constitue pas une facture.
+            </t>
+            <t t-else="">
+              Pièces reprises du dépôt et restituées au déposant. Le présent bon
+              solde la garde de ces pièces par le dépositaire. Le total ci-dessus est
+              indicatif et ne constitue pas une facture.
+            </t>
+          </p>
         </div>
+
+        <div class="row mt-4">
+          <div class="col-6">
+            <div class="text-muted text-uppercase small fw-bold">Le déposant</div>
+            <div class="text-muted small">Nom, date et signature</div>
+            <div style="height:70px;"/>
+            <div class="border-top"/>
+          </div>
+          <div class="col-6">
+            <div class="text-muted text-uppercase small fw-bold">Le dépositaire</div>
+            <div class="text-muted small">Nom, date et signature, précédés de « Lu et approuvé »</div>
+            <div style="height:70px;"/>
+            <div class="border-top"/>
+          </div>
+        </div>
+        </div>
+
       </div>
     </t>
   </template>

@@ -6,6 +6,18 @@
     <field name="model">stock.picking</field>
     <field name="inherit_id" ref="stock.view_picking_form"/>
     <field name="arch" type="xml">
+      <!-- Depot placements only. The control button's invisible is evaluated
+           against the parent record's context, so `parent.` resolves here the
+           way it does on a column. -->
+      <xpath expr="//field[@name='move_ids']/list/control" position="inside">
+        <button string="Catalogue"
+                name="action_add_from_catalog_depot"
+                type="object"
+                class="px-4 btn-link"
+                context="{'order_id': parent.id}"
+                invisible="not parent.is_depot_placement"/>
+      </xpath>
+
       <field name="date_done" position="after">
         <field name="depot_location_id" invisible="1"/>
         <field name="is_depot_placement" invisible="1"/>

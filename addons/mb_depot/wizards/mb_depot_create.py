@@ -73,73 +73,119 @@ class MbDepotCreate(models.TransientModel):
         if implied:
             group_user.sudo().write({"implied_ids": implied})
 
-    def action_create(self):
-        self.ensure_one()
-        if self.commission < 0 or self.commission >= 100:
-            raise UserError(_("A commission must be between 0 and 100 percent."))
+    def _ensure_location(self):
+        """The depot location, adopting one that is already there.
 
-        self._enable_features()
+        A depot made by hand - a location flagged is_depot, or one already
+        pointing at this depositary - is the ordinary case when this module
+        arrives after the shelf does. Adopting it rather than refusing keeps the
+        stock that is already standing at the gallery where it is; creating a
+        second location beside it would strand that stock outside every
+        statement.
+        """
         Location = self.env["stock.location"]
-        root = self._depot_root()
-
-        existing = Location.search([
-            ("depot_partner_id", "=", self.partner_id.id), ("is_depot", "=", True),
+        location = Location.search([
+            ("is_depot", "=", True), ("depot_partner_id", "=", self.partner_id.id),
         ], limit=1)
-        if existing:
-            raise UserError(_(
-                "%(partner)s already has the depot %(location)s.",
-                partner=self.partner_id.display_name,
-                location=existing.complete_name,
-            ))
-
-        location = Location.create({
+        if location:
+            location.depot_commission = self.commission
+            return location
+        return Location.create({
             "name": self.partner_id.name,
             "usage": "internal",
-            "location_id": root.id,
+            "location_id": self._depot_root().id,
             "company_id": self.env.company.id,
             "is_depot": True,
             "depot_partner_id": self.partner_id.id,
             "depot_commission": self.commission,
         })
 
-        # One route per depot, selected on the quotation, rather than a
-        # warehouse per depot. Same sourcing, none of the picking-type and
-        # sequence sprawl a warehouse brings with it.
-        route = self.env["stock.route"].create({
-            "name": _("Dépôt-vente: %s", self.partner_id.name),
-            "sale_selectable": True,
-            "product_selectable": False,
-            "company_id": self.env.company.id,
-            "sequence": 20,
-        })
-        self.env["stock.rule"].create({
-            "name": _("%s → Customer", self.partner_id.name),
-            "route_id": route.id,
-            "action": "pull",
-            "location_src_id": location.id,
-            "location_dest_id": self.env.ref("stock.stock_location_customers").id,
-            "picking_type_id": self.warehouse_id.out_type_id.id,
-            "procure_method": "make_to_stock",
-            "warehouse_id": self.warehouse_id.id,
-            "company_id": self.env.company.id,
-        })
+    def _ensure_route(self, location):
+        """One route per depot, selected on the quotation, rather than a
+        warehouse per depot. Same sourcing, none of the picking-type and
+        sequence sprawl a warehouse brings with it.
+        """
+        route = location.depot_route_id
+        if not route:
+            route = self.env["stock.route"].create({
+                "name": _("Dépôt-vente: %s", self.partner_id.name),
+                "sale_selectable": True,
+                "product_selectable": False,
+                "company_id": self.env.company.id,
+                "sequence": 20,
+            })
 
-        # compute_price must be 'percentage': under 'formula' the percentage is
-        # folded into the unit price and the invoice shows a quietly cheaper
-        # piece instead of the commission. See _show_discount() in
-        # sale/models/product_pricelist_item.py.
-        pricelist = self.env["product.pricelist"].create({
-            "name": _("%(partner)s (-%(pct)s%%)",
-                      partner=self.partner_id.name,
-                      pct=("%g" % self.commission)),
-            "currency_id": self.env.company.currency_id.id,
-            "company_id": self.env.company.id,
-            "item_ids": [fields.Command.create({
-                "applied_on": "3_global",
-                "compute_price": "percentage",
-                "percent_price": self.commission,
-            })],
-        })
+        # Matched on the pair of locations, not on the name: the rule is what
+        # makes the route source from this depot, and a second one pointing at
+        # the same pair would have the procurement pick between duplicates.
+        rule = self.env["stock.rule"].search([
+            ("route_id", "=", route.id),
+            ("location_src_id", "=", location.id),
+            ("location_dest_id", "=", self.env.ref("stock.stock_location_customers").id),
+        ], limit=1)
+        if not rule:
+            self.env["stock.rule"].create({
+                "name": _("%s → Customer", self.partner_id.name),
+                "route_id": route.id,
+                "action": "pull",
+                "location_src_id": location.id,
+                "location_dest_id": self.env.ref("stock.stock_location_customers").id,
+                "picking_type_id": self.warehouse_id.out_type_id.id,
+                "procure_method": "make_to_stock",
+                "warehouse_id": self.warehouse_id.id,
+                "company_id": self.env.company.id,
+            })
+        return route
+
+    def _ensure_pricelist(self, location):
+        """compute_price must be 'percentage': under 'formula' the percentage is
+        folded into the unit price and the invoice shows a quietly cheaper piece
+        instead of the commission. See _show_discount() in
+        sale/models/product_pricelist_item.py.
+        """
+        name = _("%(partner)s (-%(pct)s%%)",
+                 partner=self.partner_id.name, pct=("%g" % self.commission))
+        item_values = {
+            "applied_on": "3_global",
+            "compute_price": "percentage",
+            "percent_price": self.commission,
+        }
+        pricelist = location.depot_pricelist_id
+        if pricelist:
+            # Re-running with a renegotiated percentage is the reason to run it
+            # again at all, so the existing global item is moved rather than
+            # left beside a new one that would not deterministically win.
+            item = pricelist.item_ids.filtered(
+                lambda i: i.applied_on == "3_global")[:1]
+            if item:
+                item.write(item_values)
+            else:
+                pricelist.write({"item_ids": [fields.Command.create(item_values)]})
+            pricelist.name = name
+        else:
+            pricelist = self.env["product.pricelist"].create({
+                "name": name,
+                "currency_id": self.env.company.currency_id.id,
+                "company_id": self.env.company.id,
+                "item_ids": [fields.Command.create(item_values)],
+            })
+        return pricelist
+
+    def action_create(self):
+        self.ensure_one()
+        if self.commission < 0 or self.commission >= 100:
+            raise UserError(_("A commission must be between 0 and 100 percent."))
+
+        self._enable_features()
+
+        # Idempotent on purpose: the set of things a depot needs has to agree
+        # with itself, and a depot that predates this module - or one whose
+        # commission has been renegotiated - is completed by running this again
+        # rather than by hand.
+        location = self._ensure_location()
+        route = self._ensure_route(location)
+        pricelist = self._ensure_pricelist(location)
+
         if self.assign_pricelist:
             self.partner_id.property_product_pricelist = pricelist
 

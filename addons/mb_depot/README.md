@@ -42,7 +42,48 @@ depot: same sourcing, none of the picking-type and sequence sprawl.
 | `mb.depot.create` | Creates a depot — location, route, pull rule, commission pricelist — in one action, because that set repeats per gallery and has to agree with itself |
 | `mb.depot.statement` | Opening, placed, sold, returned, closing over a period, per piece, with retail / commission / net |
 | `stock.quant` views | Live stock per depot with a days-held column and ageing filters |
+| `stock.picking` | The product catalog, on placements only |
+| `sale.order` | The depot being sold from, and the pieces it holds |
 | Bon de dépôt | Placement document for the gallery to sign |
+
+## The catalog on a placement
+
+Odoo puts no catalog on a transfer. `product.catalog.mixin` is opt-in per model
+and `stock.picking` does not take it — the reasoning being that a picking is
+generated from a source document rather than typed, so there is nothing to pick
+from a grid. A placement is the case that breaks that reasoning: it starts from
+nothing and names a lot of individual pieces.
+
+`mrp.production` is the shape followed here rather than `sale.order`. Its
+components are the same thing a placement is — a price-less list of
+`stock.move` records — and the method they both lean on,
+`stock.move._get_product_catalog_lines_data`, already lives in `stock`.
+
+The catalog quotes **prix public**, not cost: the bon de dépôt and the statement
+both value a placement at list price, so `standard_price` on the cards would
+contradict the paper the gallery signs. The on-hand badge counts the transfer's
+**source location** rather than the company, because what matters when loading a
+van is what is at the atelier, not what exists somewhere.
+
+The button is on the moves list and appears only when the destination is a
+depot. Being on a one2many's `<control>` it is called on `stock.move`, not on
+the picking, so it takes the same detour through `order_id` in the context that
+mrp takes for its components.
+
+## Selling from a depot
+
+`sale.order.mb_depot_id` fills in from the customer when that customer is a
+depositary, matched on the commercial partner so an order addressed to a person
+inside the gallery still finds it. With it set, the line's product domain gains
+the depot's pieces and the order's route is pointed at the depot.
+
+The pieces offered are on hand **minus reserved**. A unique piece offered on two
+orders is a piece that cannot be delivered twice; once a confirmed order has
+reserved it, it drops off the picker on its own.
+
+The domain is added to the standard clauses rather than replacing them, so
+`sale_ok` and the company check still apply and an ordinary customer sees
+exactly what they saw before.
 
 Menus land under Inventory > Dépôt-vente.
 
