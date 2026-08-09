@@ -212,31 +212,28 @@ for name, category in CONFIG["stock_children"]:
     ensure(name, AT_STOCK, category=category)
 
 # --- dépôts ------------------------------------------------------------------
-depots_root = by_complete_name(CONFIG["depots_root"])
-if not depots_root:
-    print("DEPOT skipped - no", CONFIG["depots_root"], "view location")
+# A depot is a warehouse now, not a location under a "Dépôts" root: being its own
+# warehouse is what keeps an ordinary delivery from reserving a piece standing in
+# a gallery, and what makes every warehouse-scoped figure in Odoo count the
+# gallery's shelf. Creating one takes a commission and a pricelist as well, so
+# this reports rather than invents - run Inventory > Dépôt-vente > Nouveau dépôt.
+Warehouse = env["stock.warehouse"]
+if "is_depot" not in Warehouse._fields:
+    print("DEPOT skipped - mb_depot not installed")
 else:
     for name in CONFIG["depots"]:
-        stray = Location.with_context(active_test=False).search(
-            [("name", "=", name), ("location_id", "=", False)], limit=1)
-        if stray:
-            if not DRY_RUN:
-                stray.write({{"location_id": depots_root.id,
-                             "storage_category_id": categories["FINISHED"].id}})
-            print("DEPOT reparented", name, "-> under", CONFIG["depots_root"])
+        depot = Warehouse.search([("is_depot", "=", True), ("name", "=", name)], limit=1)
+        if depot:
+            print("DEPOT ok", depot.name, "(%s)" % depot.code,
+                  "commission", depot.depot_commission)
         else:
-            ensure(name, depots_root, category="FINISHED")
+            print("DEPOT missing", name, "- create it with the New depot wizard")
 
-    # A depot is more than a location: mb_depot needs the partner and route set
-    # before a quotation can source from it. Report, do not invent.
-    for location in depots_root.child_ids:
-        if "is_depot" not in location._fields:
-            break
-        missing = [f for f in ("is_depot", "depot_partner_id", "depot_route_id")
-                   if not location[f]]
-        if missing:
-            print("DEPOT incomplete", location.complete_name,
-                  "missing", ",".join(missing))
+    stray = Location.with_context(active_test=False).search(
+        [("name", "in", CONFIG["depots"]), ("warehouse_id", "=", False)])
+    for location in stray:
+        print("DEPOT stray location", location.complete_name,
+              "- outside every warehouse, so nothing counts its stock")
 
 if not DRY_RUN:
     env.cr.commit()

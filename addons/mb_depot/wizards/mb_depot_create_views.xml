@@ -7,14 +7,15 @@
     <field name="arch" type="xml">
       <form string="New depot">
         <p class="text-muted">
-          Creates the internal location, the route that sources sales from it,
-          and the commission pricelist. Pieces placed there stay on your books
-          until the depositary reports them sold.
+          Creates the depot's warehouse and its commission pricelist. Pieces
+          placed there stay on your books until the depositary reports them
+          sold, and a sale is made by putting this depot in the Warehouse field
+          of the quotation.
         </p>
         <group>
           <field name="partner_id"/>
+          <field name="code"/>
           <field name="commission"/>
-          <field name="warehouse_id"/>
           <field name="assign_pricelist"/>
         </group>
         <footer>

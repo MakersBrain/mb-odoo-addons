@@ -14,15 +14,15 @@ class StockPicking(models.Model):
     _name = "stock.picking"
     _inherit = ["stock.picking", "product.catalog.mixin"]
 
-    depot_location_id = fields.Many2one(
-        comodel_name="stock.location",
+    depot_warehouse_id = fields.Many2one(
+        comodel_name="stock.warehouse",
         string="Depot",
-        compute="_compute_depot_location_id",
+        compute="_compute_depot_warehouse_id",
         store=True,
         help="Set when this transfer places pieces at a depot or brings them back.",
     )
     is_depot_placement = fields.Boolean(
-        compute="_compute_depot_location_id",
+        compute="_compute_depot_warehouse_id",
         store=True,
     )
     mb_depot_sale_date = fields.Date(
@@ -47,17 +47,20 @@ class StockPicking(models.Model):
         for picking in self:
             picking.move_line_ids.mb_depot_sale_date = picking.mb_depot_sale_date
 
-    @api.depends("location_id.is_depot", "location_dest_id.is_depot")
-    def _compute_depot_location_id(self):
+    @api.depends("location_id.warehouse_id.is_depot",
+                 "location_dest_id.warehouse_id.is_depot")
+    def _compute_depot_warehouse_id(self):
         for picking in self:
-            if picking.location_dest_id.is_depot:
-                picking.depot_location_id = picking.location_dest_id
+            destination = picking.location_dest_id.warehouse_id
+            source = picking.location_id.warehouse_id
+            if destination.is_depot:
+                picking.depot_warehouse_id = destination
                 picking.is_depot_placement = True
-            elif picking.location_id.is_depot:
-                picking.depot_location_id = picking.location_id
+            elif source.is_depot:
+                picking.depot_warehouse_id = source
                 picking.is_depot_placement = False
             else:
-                picking.depot_location_id = False
+                picking.depot_warehouse_id = False
                 picking.is_depot_placement = False
 
     # -------------------------------------------------------------------------

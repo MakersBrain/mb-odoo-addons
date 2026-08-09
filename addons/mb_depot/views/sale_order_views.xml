@@ -7,41 +7,30 @@
     <field name="inherit_id" ref="sale.view_order_form"/>
     <field name="arch" type="xml">
 
-      <field name="pricelist_id" position="after">
-        <field name="mb_depot_id" readonly="state in ['sale', 'cancel']"/>
-      </field>
-
       <!-- The domains below read these off the row, so both have to be in the
-           list even though neither is ever shown. -->
+           list even though neither is ever shown. There is no depot field of
+           our own on the order any more: a depot is a warehouse, so Odoo's own
+           Warehouse field is what selects one, and selecting it is what sources
+           the delivery from the gallery. -->
       <xpath expr="//field[@name='order_line']/list/field[@name='product_template_id']"
              position="before">
-        <field name="mb_depot_id" column_invisible="True"/>
+        <field name="mb_is_depot_order" column_invisible="True"/>
         <field name="mb_depot_product_ids" column_invisible="True"/>
       </xpath>
 
       <!-- Restricting the picker rather than warning after the fact: a piece
            that is not at the gallery cannot be sold by the gallery, and the
-           standard clauses are kept because replacing the domain drops them. -->
+           standard clauses are kept because replacing the domain drops them.
+           On Hand and Forecasted need no help here - they are warehouse-scoped
+           and the warehouse is now the depot. -->
       <xpath expr="//field[@name='order_line']/list/field[@name='product_template_id']"
              position="attributes">
-        <attribute name="domain">[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)] + (mb_depot_id and [('product_variant_ids', 'in', mb_depot_product_ids)] or [])</attribute>
+        <attribute name="domain">[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)] + (mb_is_depot_order and [('product_variant_ids', 'in', mb_depot_product_ids)] or [])</attribute>
       </xpath>
 
       <xpath expr="//field[@name='order_line']/list/field[@name='product_id']"
              position="attributes">
-        <attribute name="domain">[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)] + (mb_depot_id and [('id', 'in', mb_depot_product_ids)] or [])</attribute>
-        <attribute name="context">{'default_lst_price': price_unit, 'default_uom_id': product_uom_id, 'partner_id': parent.partner_id, 'location': mb_depot_id}</attribute>
-      </xpath>
-
-      <!-- On Hand and Forecasted are computed per warehouse, and a depot sits
-           outside WH on purpose - that is what stops an ordinary delivery
-           reserving a piece standing in a gallery. The consequence is that the
-           columns read 0 for every piece that is actually there. Naming the
-           location in the context is what makes them count the shelf the sale
-           is being made from. -->
-      <xpath expr="//field[@name='order_line']/list/field[@name='product_template_id']"
-             position="attributes">
-        <attribute name="context">{'default_list_price': price_unit, 'default_uom_id': product_uom_id, 'partner_id': parent.partner_id, 'location': mb_depot_id}</attribute>
+        <attribute name="domain">[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)] + (mb_is_depot_order and [('id', 'in', mb_depot_product_ids)] or [])</attribute>
       </xpath>
 
     </field>

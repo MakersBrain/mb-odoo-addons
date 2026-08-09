@@ -7,19 +7,20 @@ direction - vendor-owned stock sitting in your warehouse - and OCA has nothing
 either, so the location-based model below is not a workaround, it is the model
 everyone builds.
 
-A depot is an *internal* location owned by us and physically held by a gallery.
-Internal keeps unsold pieces on our balance sheet with no revenue recognised,
-which is the legal situation of dépôt-vente; delivering to the customer location
-instead would derecognise the stock with no counterpart revenue. The depots sit
-in their own root tree rather than under a warehouse, so an ordinary delivery
-never reserves a piece that is standing on a shelf in Nantes.
+A depot is a *warehouse* owned by us and physically held by a gallery. Its stock
+location is internal, which keeps unsold pieces on our balance sheet with no
+revenue recognised - the legal situation of dépôt-vente; delivering to the
+customer location instead would derecognise the stock with no counterpart
+revenue. Being a warehouse of its own is what keeps an ordinary delivery from
+reserving a piece standing on a shelf in Nantes, and what makes every
+warehouse-scoped figure in Odoo - on hand, forecast, the availability widget -
+count the gallery's shelf instead of reading zero.
 
 This module adds what Odoo and OCA do not have:
 
-* a depot flag on the location, carrying the gallery, its commission and the
-  route that sources sales from it;
-* a wizard that creates a depot - location, route, pull rule and commission
-  pricelist - in one action, because that set repeats per gallery;
+* a depot flag on the warehouse, carrying the gallery and its commission;
+* a wizard that creates a depot - warehouse and commission pricelist - in one
+  action, because that pair repeats per gallery and has to agree with itself;
 * live stock per depot with an ageing column, so a piece that has sat unsold
   for four months is visible;
 * a reported sale date on the move line, because a gallery reports last month's
@@ -38,8 +39,9 @@ This module adds what Odoo and OCA do not have:
   per model and stock.picking does not take it, on the reasoning that a picking
   is generated from a source document rather than typed - which a placement,
   starting from nothing and naming a lot of individual pieces, is not;
-* a depot on the sale order, so the product picker offers only what the
-  depositary is actually holding and unreserved.
+* the depositary's own warehouse defaulted onto their sale orders, and the
+  product picker there limited to what they are actually holding and
+  unreserved.
 
 The commission itself is a pricelist, not code: under achat-revente sur vente
 the gallery buys at list minus its percentage at the moment it sells. For that
@@ -48,12 +50,10 @@ unit price, the pricelist item must be compute_price='percentage' AND the
 Discounts feature must be enabled - see sale/models/product_pricelist_item.py,
 _show_discount(). The wizard sets both.
 
-Selecting the depot route on a quotation needs OCA's
-sale_order_global_stock_route. That is deliberately not a dependency: it is
-AGPL-3 and this module is LGPL-3. Without it the route is still created and can
-be set on the order line by hand.
+Sourcing needs no third-party module: a sale from a depot is a sale from that
+warehouse, which is Odoo's own Warehouse field on the quotation.
 """,
-    "version": "19.0.1.3.1",
+    "version": "19.0.2.0.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
@@ -65,7 +65,7 @@ be set on the order line by hand.
     ],
     "data": [
         "security/ir.model.access.csv",
-        "views/stock_location_views.xml",
+        "views/stock_warehouse_views.xml",
         "views/stock_quant_views.xml",
         "views/stock_picking_views.xml",
         "views/sale_order_views.xml",

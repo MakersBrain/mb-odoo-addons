@@ -7,7 +7,7 @@ class MbDepotStatement(models.TransientModel):
     _description = "Dépôt-vente statement"
 
     depot_id = fields.Many2one(
-        comodel_name="stock.location",
+        comodel_name="stock.warehouse",
         string="Depot",
         required=True,
         domain=[("is_depot", "=", True)],
@@ -67,13 +67,17 @@ class MbDepotStatement(models.TransientModel):
     def _crossing_moves(self):
         """Done move lines entering and leaving the depot.
 
+        Scoped on the warehouse's view location rather than its stock location:
+        anything Odoo ever puts inside a warehouse hangs off the view, so a
+        movement is only counted when it genuinely crosses the gallery's door.
+
         Moves with both ends inside the depot are excluded on purpose: shuffling
         a piece between two shelves of the same gallery is not a movement of the
         statement.
         """
         self.ensure_one()
         MoveLine = self.env["stock.move.line"]
-        depot = self.depot_id.id
+        depot = self.depot_id.view_location_id.id
         incoming = MoveLine.search([
             "&",
             ("state", "=", "done"),

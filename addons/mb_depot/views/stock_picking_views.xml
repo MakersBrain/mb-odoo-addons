@@ -19,12 +19,12 @@
       </xpath>
 
       <field name="date_done" position="after">
-        <field name="depot_location_id" invisible="1"/>
+        <field name="depot_warehouse_id" invisible="1"/>
         <field name="is_depot_placement" invisible="1"/>
         <!-- Editable on a done transfer on purpose: the depositary reports the
              sale after the fact, which is the whole point of the field. -->
         <field name="mb_depot_sale_date"
-               invisible="not depot_location_id or is_depot_placement"/>
+               invisible="not depot_warehouse_id or is_depot_placement"/>
       </field>
     </field>
   </record>

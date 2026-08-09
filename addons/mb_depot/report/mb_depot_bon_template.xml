@@ -3,7 +3,7 @@
 
   <template id="report_bon_depot_document">
     <t t-call="web.external_layout">
-      <t t-set="depot" t-value="doc.depot_location_id"/>
+      <t t-set="depot" t-value="doc.depot_warehouse_id"/>
       <t t-set="partner" t-value="depot.depot_partner_id"/>
       <t t-set="currency" t-value="doc.company_id.currency_id"/>
       <t t-set="lines" t-value="doc.move_line_ids.filtered(lambda l: l.quantity)"/>
@@ -48,7 +48,7 @@
         <div class="row mb-4">
           <div class="col-4">
             <div class="text-muted small">Lieu de dépôt</div>
-            <div><span t-field="depot.complete_name"/></div>
+            <div><span t-field="depot.name"/></div>
           </div>
           <div class="col-4">
             <div class="text-muted small">Commission</div>

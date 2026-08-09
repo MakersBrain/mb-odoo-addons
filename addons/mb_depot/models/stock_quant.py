@@ -5,7 +5,7 @@ class StockQuant(models.Model):
     _inherit = "stock.quant"
 
     depot_partner_id = fields.Many2one(
-        related="location_id.depot_partner_id",
+        related="location_id.warehouse_id.depot_partner_id",
         string="Depositary",
         store=True,
     )

@@ -9,7 +9,7 @@
           <div class="col-6">
             <strong>Dépositaire</strong><br/>
             <span t-field="doc.partner_id"/><br/>
-            <span t-field="doc.depot_id.complete_name"/>
+            <span t-field="doc.depot_id.name"/>
           </div>
           <div class="col-6">
             <strong>Période</strong><br/>

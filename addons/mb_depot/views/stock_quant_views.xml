@@ -52,7 +52,7 @@
     <field name="name">Stock en dépôt</field>
     <field name="res_model">stock.quant</field>
     <field name="view_mode">list</field>
-    <field name="domain">[('location_id.is_depot', '=', True)]</field>
+    <field name="domain">[('location_id.warehouse_id.is_depot', '=', True)]</field>
     <field name="context">{'search_default_group_depot': 1}</field>
     <field name="view_id" ref="view_depot_quant_list"/>
     <field name="search_view_id" ref="view_depot_quant_search"/>

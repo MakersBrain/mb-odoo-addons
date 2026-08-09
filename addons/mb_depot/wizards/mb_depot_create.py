@@ -1,4 +1,6 @@
-from odoo import _, fields, models
+import re
+
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 # Setting a group here rather than through res.config.settings is deliberate. A
@@ -8,10 +10,10 @@ from odoo.exceptions import UserError
 # group_product_pricelist comes out falsy. Implied groups are the surgical
 # equivalent with no side effects.
 REQUIRED_FEATURES = [
-    "stock.group_stock_multi_locations",   # depot locations at all
-    "stock.group_adv_location",            # the route that sources from them
-    "product.group_product_pricelist",     # the commission
-    "sale.group_discount_per_so_line",     # shown as a discount, not a lower price
+    "stock.group_stock_multi_locations",     # locations inside the depot at all
+    "stock.group_stock_multi_warehouses",    # ...and the Warehouse field that picks one
+    "product.group_product_pricelist",       # the commission
+    "sale.group_discount_per_so_line",       # shown as a discount, not a lower price
 ]
 
 
@@ -25,43 +27,52 @@ class MbDepotCreate(models.TransientModel):
         required=True,
         domain=[("is_company", "=", True)],
     )
+    code = fields.Char(
+        string="Short name",
+        size=5,
+        compute="_compute_code",
+        store=True,
+        readonly=False,
+        required=True,
+        # Required and stored, so it has to exist before the INSERT rather than
+        # after it.
+        precompute=True,
+        help="Prefixes the depot's transfer references. Five characters, Odoo's "
+             "limit, and unique across warehouses.",
+    )
     commission = fields.Float(
         string="Commission (%)",
         default=40.0,
         digits="Discount",
         required=True,
     )
-    warehouse_id = fields.Many2one(
-        comodel_name="stock.warehouse",
-        string="Sourced from",
-        required=True,
-        default=lambda self: self.env["stock.warehouse"].search(
-            [("company_id", "=", self.env.company.id)], limit=1),
-        help="The warehouse whose delivery operation type ships the sales made "
-             "from this depot.",
-    )
     assign_pricelist = fields.Boolean(
         string="Assign the pricelist to the depositary",
         default=True,
     )
 
-    def _depot_root(self):
-        """The parentless view location the depots hang from.
+    @api.depends("partner_id")
+    def _compute_code(self):
+        for wizard in self:
+            wizard.code = wizard._suggest_code(wizard.partner_id.name or "")
 
-        Not under the warehouse: internal keeps depot stock on our books, but
-        being outside WH keeps an ordinary delivery from reserving a piece that
-        is physically in a gallery, since those source from WH/Stock and its
-        children. Odoo 19 has no "Physical Locations" root any more - WH is
-        itself a parentless view location - so the depots get their own.
+    @api.model
+    def _suggest_code(self, name):
+        """Five letters from the depositary's name, then digits until it is free.
+
+        Odoo caps stock.warehouse.code at five characters and every transfer
+        reference in the depot carries it, so it is worth it being recognisable
+        rather than generated.
         """
-        root = self.env["stock.location"].search(
-            [("name", "=", "Dépôts"), ("location_id", "=", False),
-             ("usage", "=", "view")], limit=1)
-        if not root:
-            root = self.env["stock.location"].create({
-                "name": "Dépôts", "usage": "view", "location_id": False,
-            })
-        return root
+        letters = re.sub(r"[^A-Za-z0-9]", "", name).upper()[:5]
+        if not letters:
+            return False
+        Warehouse = self.env["stock.warehouse"].with_context(active_test=False)
+        candidate, suffix = letters, 0
+        while Warehouse.search_count([("code", "=", candidate)]):
+            suffix += 1
+            candidate = "%s%d" % (letters[:5 - len(str(suffix))], suffix)
+        return candidate
 
     def _enable_features(self):
         group_user = self.env.ref("base.group_user")
@@ -73,71 +84,41 @@ class MbDepotCreate(models.TransientModel):
         if implied:
             group_user.sudo().write({"implied_ids": implied})
 
-    def _ensure_location(self):
-        """The depot location, adopting one that is already there.
+    def _ensure_warehouse(self):
+        """The depot's warehouse, adopting one that is already there.
 
-        A depot made by hand - a location flagged is_depot, or one already
-        pointing at this depositary - is the ordinary case when this module
-        arrives after the shelf does. Adopting it rather than refusing keeps the
-        stock that is already standing at the gallery where it is; creating a
-        second location beside it would strand that stock outside every
-        statement.
+        One step in and out: a gallery has a shelf, not a receiving bay, and
+        multi-step would split one sale into two moves the statement would have
+        to learn to ignore.
         """
-        Location = self.env["stock.location"]
-        location = Location.search([
+        Warehouse = self.env["stock.warehouse"]
+        warehouse = Warehouse.search([
             ("is_depot", "=", True), ("depot_partner_id", "=", self.partner_id.id),
         ], limit=1)
-        if location:
-            location.depot_commission = self.commission
-            return location
-        return Location.create({
+        if warehouse:
+            warehouse.depot_commission = self.commission
+            return warehouse
+        # partner_id is deliberately left at the company's own address rather
+        # than set to the depositary. stock.warehouse._update_partner_data()
+        # rewrites its partner's property_stock_customer to the inter-warehouse
+        # transit location, on the reasoning that a warehouse's partner is
+        # another site of ours. A depositary is not: it is the customer we
+        # invoice, and pointing its customer location at transit makes every
+        # sale to it fail with "no rule to replenish in Inter-warehouse
+        # transit". The depositary is carried by depot_partner_id, which has no
+        # such side effect.
+        return Warehouse.create({
             "name": self.partner_id.name,
-            "usage": "internal",
-            "location_id": self._depot_root().id,
+            "code": self.code,
             "company_id": self.env.company.id,
+            "reception_steps": "one_step",
+            "delivery_steps": "ship_only",
             "is_depot": True,
             "depot_partner_id": self.partner_id.id,
             "depot_commission": self.commission,
         })
 
-    def _ensure_route(self, location):
-        """One route per depot, selected on the quotation, rather than a
-        warehouse per depot. Same sourcing, none of the picking-type and
-        sequence sprawl a warehouse brings with it.
-        """
-        route = location.depot_route_id
-        if not route:
-            route = self.env["stock.route"].create({
-                "name": _("Dépôt-vente: %s", self.partner_id.name),
-                "sale_selectable": True,
-                "product_selectable": False,
-                "company_id": self.env.company.id,
-                "sequence": 20,
-            })
-
-        # Matched on the pair of locations, not on the name: the rule is what
-        # makes the route source from this depot, and a second one pointing at
-        # the same pair would have the procurement pick between duplicates.
-        rule = self.env["stock.rule"].search([
-            ("route_id", "=", route.id),
-            ("location_src_id", "=", location.id),
-            ("location_dest_id", "=", self.env.ref("stock.stock_location_customers").id),
-        ], limit=1)
-        if not rule:
-            self.env["stock.rule"].create({
-                "name": _("%s → Customer", self.partner_id.name),
-                "route_id": route.id,
-                "action": "pull",
-                "location_src_id": location.id,
-                "location_dest_id": self.env.ref("stock.stock_location_customers").id,
-                "picking_type_id": self.warehouse_id.out_type_id.id,
-                "procure_method": "make_to_stock",
-                "warehouse_id": self.warehouse_id.id,
-                "company_id": self.env.company.id,
-            })
-        return route
-
-    def _ensure_pricelist(self, location):
+    def _ensure_pricelist(self, warehouse):
         """compute_price must be 'percentage': under 'formula' the percentage is
         folded into the unit price and the invoice shows a quietly cheaper piece
         instead of the commission. See _show_discount() in
@@ -150,7 +131,7 @@ class MbDepotCreate(models.TransientModel):
             "compute_price": "percentage",
             "percent_price": self.commission,
         }
-        pricelist = location.depot_pricelist_id
+        pricelist = warehouse.depot_pricelist_id
         if pricelist:
             # Re-running with a renegotiated percentage is the reason to run it
             # again at all, so the existing global item is moved rather than
@@ -179,25 +160,20 @@ class MbDepotCreate(models.TransientModel):
         self._enable_features()
 
         # Idempotent on purpose: the set of things a depot needs has to agree
-        # with itself, and a depot that predates this module - or one whose
-        # commission has been renegotiated - is completed by running this again
-        # rather than by hand.
-        location = self._ensure_location()
-        route = self._ensure_route(location)
-        pricelist = self._ensure_pricelist(location)
+        # with itself, and a depot whose commission has been renegotiated is
+        # brought up to date by running this again rather than by hand.
+        warehouse = self._ensure_warehouse()
+        pricelist = self._ensure_pricelist(warehouse)
 
         if self.assign_pricelist:
             self.partner_id.property_product_pricelist = pricelist
 
-        location.write({
-            "depot_route_id": route.id,
-            "depot_pricelist_id": pricelist.id,
-        })
+        warehouse.depot_pricelist_id = pricelist
 
         return {
             "type": "ir.actions.act_window",
-            "res_model": "stock.location",
-            "res_id": location.id,
+            "res_model": "stock.warehouse",
+            "res_id": warehouse.id,
             "view_mode": "form",
             "target": "current",
         }

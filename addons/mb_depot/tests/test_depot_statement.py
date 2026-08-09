@@ -20,11 +20,13 @@ class TestDepotStatement(TransactionCase):
         wizard = cls.env["mb.depot.create"].create({
             "partner_id": cls.gallery.id,
             "commission": 40.0,
-            "warehouse_id": cls.warehouse.id,
         })
         wizard.action_create()
-        cls.depot = cls.env["stock.location"].search([
+        cls.depot_warehouse = cls.env["stock.warehouse"].search([
             ("depot_partner_id", "=", cls.gallery.id), ("is_depot", "=", True)])
+        # The statement is warehouse-scoped; the moves below still need the one
+        # location the pieces actually stand in.
+        cls.depot = cls.depot_warehouse.lot_stock_id
 
         cls.product = cls.env["product.product"].create({
             "name": "Test bowl", "type": "consu", "is_storable": True,
@@ -64,7 +66,7 @@ class TestDepotStatement(TransactionCase):
 
     def _statement(self, date_from, date_to):
         statement = self.env["mb.depot.statement"].create({
-            "depot_id": self.depot.id,
+            "depot_id": self.depot_warehouse.id,
             "date_from": date_from,
             "date_to": date_to,
         })
@@ -72,15 +74,17 @@ class TestDepotStatement(TransactionCase):
         return statement
 
     def test_depot_is_created_consistently(self):
-        self.assertTrue(self.depot.is_depot)
+        depot = self.depot_warehouse
+        self.assertTrue(depot.is_depot)
         self.assertEqual(self.depot.usage, "internal",
                          "a depot must stay internal or the stock leaves our books")
-        self.assertFalse(self.depot.warehouse_id,
-                         "a depot outside WH cannot be reserved by an ordinary delivery")
-        rule = self.depot.depot_route_id.rule_ids
-        self.assertEqual(rule.location_src_id, self.depot)
-        self.assertEqual(rule.location_dest_id, self.customers)
-        item = self.depot.depot_pricelist_id.item_ids
+        self.assertEqual(self.depot.warehouse_id, depot,
+                         "the pieces stand in the depot's own warehouse, which is "
+                         "what keeps an ordinary delivery from reserving them")
+        self.assertEqual(depot.reception_steps, "one_step")
+        self.assertEqual(depot.delivery_steps, "ship_only",
+                         "multi-step would split one sale into two moves")
+        item = depot.depot_pricelist_id.item_ids
         self.assertEqual(
             item.compute_price, "percentage",
             "under 'formula' the commission is folded into the unit price and "
@@ -280,7 +284,11 @@ class TestDepotStatement(TransactionCase):
             picking.mb_depot_sale_date,
             "lines that disagree leave the transfer with no single date to show")
 
-    def test_a_depot_must_be_internal(self):
+    def test_a_depot_receives_and_delivers_in_one_step(self):
+        """Multi-step would put a receiving bay and a packing table inside the
+        depositary's shop, and split one reported sale into two moves whose
+        first leg leaves the depot for a sibling location.
+        """
         from odoo.exceptions import ValidationError
         with self.assertRaises(ValidationError):
-            self.depot.usage = "view"
+            self.depot_warehouse.delivery_steps = "pick_ship"

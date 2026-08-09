@@ -4,9 +4,8 @@ from odoo.tests import TransactionCase, tagged
 
 @tagged("post_install", "-at_install")
 class TestDepotSale(TransactionCase):
-    """Completing a depot that already exists, and selling only what is on the
-    depositary's shelf. Both decide what can be sold and at what price, so both
-    are pinned here.
+    """Creating a depot and selling only what is on the depositary's shelf.
+    Both decide what can be sold and at what price, so both are pinned here.
     """
 
     @classmethod
@@ -31,8 +30,11 @@ class TestDepotSale(TransactionCase):
         return self.env["mb.depot.create"].create(dict({
             "partner_id": self.gallery.id,
             "commission": commission,
-            "warehouse_id": self.warehouse.id,
         }, **values))
+
+    def _depot(self):
+        return self.env["stock.warehouse"].search([
+            ("is_depot", "=", True), ("depot_partner_id", "=", self.gallery.id)])
 
     def _place(self, product, qty, location):
         move = self.env["stock.move"].create({
@@ -51,43 +53,71 @@ class TestDepotSale(TransactionCase):
         move.picked = True
         move._action_done()
 
-    def test_a_depot_made_by_hand_is_completed_not_duplicated(self):
-        """The ordinary case when this module arrives after the shelf does. A
-        second location beside the first would strand the stock already at the
-        gallery outside every statement.
-        """
-        by_hand = self.env["stock.location"].create({
-            "name": "Galerie Sale Test", "usage": "internal",
-            "location_id": self.stock.location_id.id,
-            "is_depot": True, "depot_partner_id": self.gallery.id,
-            "depot_commission": 5.0,
-        })
-        self._place(self.held, 3, by_hand)
-
+    def test_a_depot_is_a_warehouse_with_its_own_stock(self):
         self._wizard(commission=40.0).action_create()
+        depot = self._depot()
+        self._place(self.held, 3, depot.lot_stock_id)
 
-        depots = self.env["stock.location"].search([
-            ("is_depot", "=", True), ("depot_partner_id", "=", self.gallery.id)])
-        self.assertEqual(depots, by_hand, "the existing depot is adopted")
-        self.assertEqual(by_hand.depot_commission, 40.0)
-        self.assertTrue(by_hand.depot_route_id, "the missing route is created")
-        self.assertEqual(by_hand.depot_route_id.rule_ids.location_src_id, by_hand)
-        self.assertEqual(by_hand.depot_pricelist_id.item_ids.percent_price, 40.0)
-        self.assertEqual(by_hand.depot_qty, 3, "the stock already there stays there")
+        self.assertTrue(depot.lot_stock_id, "a depot has a stock location of its own")
+        self.assertEqual(depot.lot_stock_id.usage, "internal",
+                         "or the pieces leave our balance sheet while unsold")
+        self.assertEqual(depot.depot_pricelist_id.item_ids.percent_price, 40.0)
+        self.assertEqual(depot.depot_qty, 3)
+        self.assertNotEqual(depot, self.warehouse,
+                            "the gallery's shelf is not the atelier's")
+
+    def test_creating_a_depot_leaves_the_depositary_sellable(self):
+        """stock.warehouse._update_partner_data() points its partner's customer
+        location at the inter-warehouse transit, which is right for another site
+        of ours and ruinous for the gallery we invoice: every sale to it would
+        fail with "no rule to replenish in Inter-warehouse transit". The depot
+        warehouse therefore keeps the company's own address.
+        """
+        before = self.gallery.property_stock_customer
+
+        self._wizard().action_create()
+
+        self.assertEqual(self.gallery.property_stock_customer, before)
+        self.assertNotEqual(
+            self.gallery.property_stock_customer,
+            self.env.company.internal_transit_location_id,
+            "a depositary is a customer, not another site of ours")
+        self.assertNotEqual(self._depot().partner_id, self.gallery)
+
+    def test_a_confirmed_depot_sale_ships_from_the_gallery(self):
+        """End to end, and the reason the warehouse is the whole mechanism: no
+        route, no pull rule, no third-party module.
+        """
+        self._wizard().action_create()
+        depot = self._depot()
+        self._place(self.held, 2, depot.lot_stock_id)
+
+        order = self.env["sale.order"].create({
+            "partner_id": self.gallery.id,
+            "order_line": [fields.Command.create({
+                "product_id": self.held.id, "product_uom_qty": 1})],
+        })
+        order.action_confirm()
+
+        picking = order.picking_ids
+        self.assertEqual(len(picking), 1)
+        self.assertEqual(picking.location_id, depot.lot_stock_id,
+                         "the piece ships from the gallery, not the atelier")
+        self.assertEqual(picking.location_dest_id.usage, "customer")
+        self.assertEqual(picking.move_ids.quantity, 1,
+                         "and it reserves, because the stock is really there")
 
     def test_rerunning_moves_the_commission_rather_than_stacking_it(self):
         """Renegotiating the percentage is the reason to run the wizard twice.
         A second global item beside the first would not deterministically win.
         """
         self._wizard(commission=40.0).action_create()
-        depot = self.env["stock.location"].search([
-            ("is_depot", "=", True), ("depot_partner_id", "=", self.gallery.id)])
-        route, pricelist = depot.depot_route_id, depot.depot_pricelist_id
+        depot = self._depot()
+        pricelist = depot.depot_pricelist_id
 
         self._wizard(commission=35.0).action_create()
 
-        self.assertEqual(depot.depot_route_id, route, "no second route")
-        self.assertEqual(len(route.rule_ids), 1, "no second pull rule")
+        self.assertEqual(self._depot(), depot, "no second warehouse")
         self.assertEqual(depot.depot_pricelist_id, pricelist, "no second pricelist")
         self.assertEqual(len(pricelist.item_ids), 1)
         self.assertEqual(pricelist.item_ids.percent_price, 35.0)
@@ -95,15 +125,14 @@ class TestDepotSale(TransactionCase):
 
     def test_an_order_to_a_depositary_offers_only_what_it_holds(self):
         self._wizard().action_create()
-        depot = self.env["stock.location"].search([
-            ("is_depot", "=", True), ("depot_partner_id", "=", self.gallery.id)])
-        self._place(self.held, 2, depot)
+        depot = self._depot()
+        self._place(self.held, 2, depot.lot_stock_id)
         self.env["stock.quant"]._update_available_quantity(
             self.at_home, self.stock, 5)
 
         order = self.env["sale.order"].create({"partner_id": self.gallery.id})
 
-        self.assertEqual(order.mb_depot_id, depot,
+        self.assertEqual(order.warehouse_id, depot,
                          "the depot follows from the customer")
         self.assertIn(self.held, order.mb_depot_product_ids)
         self.assertNotIn(self.at_home, order.mb_depot_product_ids,
@@ -114,9 +143,8 @@ class TestDepotSale(TransactionCase):
         is a piece that cannot be delivered twice.
         """
         self._wizard().action_create()
-        depot = self.env["stock.location"].search([
-            ("is_depot", "=", True), ("depot_partner_id", "=", self.gallery.id)])
-        self._place(self.held, 1, depot)
+        depot = self._depot()
+        self._place(self.held, 1, depot.lot_stock_id)
 
         order = self.env["sale.order"].create({"partner_id": self.gallery.id})
         self.assertIn(self.held, order.mb_depot_product_ids)
@@ -124,7 +152,7 @@ class TestDepotSale(TransactionCase):
         outgoing = self.env["stock.move"].create({
             "product_id": self.held.id,
             "product_uom_qty": 1,
-            "location_id": depot.id,
+            "location_id": depot.lot_stock_id.id,
             "location_dest_id": self.customers.id,
         })
         outgoing._action_confirm()
@@ -137,19 +165,21 @@ class TestDepotSale(TransactionCase):
     def test_an_ordinary_customer_restricts_nothing(self):
         walk_in = self.env["res.partner"].create({"name": "Walk-in"})
         order = self.env["sale.order"].create({"partner_id": walk_in.id})
-        self.assertFalse(order.mb_depot_id)
+        self.assertFalse(order.warehouse_id.is_depot)
         self.assertFalse(order.mb_depot_product_ids,
                          "with no depot the line domain adds no clause at all")
 
-    def test_availability_is_read_at_the_depot_not_the_warehouse(self):
-        """A depot is outside WH by design, so the warehouse-scoped quantities
-        sale_stock reads report nothing on hand for a piece that is standing on
-        the gallery's shelf.
+    def test_availability_is_read_at_the_depot(self):
+        """No override backs this any more.
+
+        sale_stock reads its three quantities with the order's warehouse in the
+        context, and the order's warehouse is the gallery - so the piece on the
+        gallery's shelf is the piece the widget counts. This test passed under a
+        patched _read_qties() before; it passes here on stock Odoo.
         """
         self._wizard().action_create()
-        depot = self.env["stock.location"].search([
-            ("is_depot", "=", True), ("depot_partner_id", "=", self.gallery.id)])
-        self._place(self.held, 2, depot)
+        depot = self._depot()
+        self._place(self.held, 2, depot.lot_stock_id)
 
         order = self.env["sale.order"].create({
             "partner_id": self.gallery.id,
@@ -175,6 +205,6 @@ class TestDepotSale(TransactionCase):
                 "product_id": self.at_home.id, "product_uom_qty": 1})],
         })
 
-        self.assertFalse(order.mb_depot_id)
+        self.assertFalse(order.warehouse_id.is_depot)
         self.assertEqual(order.order_line.qty_available_today, 7,
                          "an order with no depot still reads the warehouse")

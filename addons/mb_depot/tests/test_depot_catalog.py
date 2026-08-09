@@ -18,10 +18,10 @@ class TestDepotCatalog(TransactionCase):
         cls.env["mb.depot.create"].create({
             "partner_id": cls.gallery.id,
             "commission": 40.0,
-            "warehouse_id": cls.warehouse.id,
         }).action_create()
-        cls.depot = cls.env["stock.location"].search([
+        cls.depot_warehouse = cls.env["stock.warehouse"].search([
             ("is_depot", "=", True), ("depot_partner_id", "=", cls.gallery.id)])
+        cls.depot = cls.depot_warehouse.lot_stock_id
         cls.bowl = cls.env["product.product"].create({
             "name": "Catalog bowl", "type": "consu", "is_storable": True,
             "list_price": 120.0, "standard_price": 30.0,
@@ -29,8 +29,10 @@ class TestDepotCatalog(TransactionCase):
         cls.service = cls.env["product.product"].create({
             "name": "Firing service", "type": "service", "list_price": 50.0,
         })
-        cls.internal_type = cls.env["stock.picking.type"].search([
-            ("code", "=", "internal"), ("warehouse_id", "=", cls.warehouse.id)], limit=1)
+        # int_type_id rather than a search: the internal operation type is
+        # deactivated while multi-location is off, so a plain search finds
+        # nothing on a database where the wizard has only just switched it on.
+        cls.internal_type = cls.warehouse.int_type_id
 
     def _placement(self):
         return self.env["stock.picking"].create({

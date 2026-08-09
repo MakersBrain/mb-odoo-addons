@@ -4,46 +4,58 @@ Consignment stock held at galleries and shops, and the statement that settles it
 
 Odoo has no outbound consignment. Its built-in Consignment setting is the other
 direction — vendor-owned stock sitting in *your* warehouse — and a search of
-every OCA manifest turns up nothing either. The location-based model below is
-therefore not a workaround; it is what everyone builds.
+every OCA manifest turns up nothing either — `stock_customer_deposit` and
+`vendor_consignment_stock` both point the other way. The model below is therefore
+not a workaround; it is what everyone builds.
 
 ## The model
 
-A depot is an **internal location** we own and a gallery physically holds.
-
-Internal matters: unsold pieces stay on our balance sheet and no revenue is
-recognised until the gallery reports a sale, which is the legal situation of
-dépôt-vente. Delivering to the customer location instead would derecognise the
-stock with no counterpart revenue.
-
-Depots sit in **their own root tree**, not under a warehouse. Internal keeps them
-on the books; being outside `WH` keeps an ordinary delivery from reserving a
-piece that is standing on a shelf in Nantes, since deliveries source from
-`WH/Stock` and its children. Odoo 19 has no "Physical Locations" root any more —
-`WH` is itself a parentless view location — so the depots get their own.
+A depot is a **warehouse** we own and a gallery physically holds.
 
 ```
-Dépôts                 (view, no parent)
-└── Galerie Truc       (internal, is_depot)
+Galerie Truc           (stock.warehouse, is_depot)
+└── TRUC/Stock         (internal)
 ```
+
+Its stock location is internal, which matters: unsold pieces stay on our balance
+sheet and no revenue is recognised until the gallery reports a sale, which is the
+legal situation of dépôt-vente. Delivering to the customer location instead would
+derecognise the stock with no counterpart revenue.
+
+A warehouse rather than a bare location, and this was learned the expensive way.
+A depot used to be an internal location parked outside every warehouse, which
+bought exactly one thing — an ordinary delivery cannot reserve a piece standing
+in a gallery — and charged for it everywhere else, because Odoo answers "what is
+on hand and can I sell it" per warehouse nearly universally. That meant patching
+`_read_qties()` so the availability widget stopped claiming the piece could not
+be delivered, patching the product picker's context so On Hand stopped reading
+0.00, and building a route and pull rule per gallery to do what a warehouse does
+for free. A warehouse gives the reservation isolation *and* all of that back:
+deliveries source from their own warehouse's stock, so the atelier never touches
+the gallery's shelf.
+
+The cost is five picking types and sequences per gallery. That is the whole bill,
+and it is smaller than the one it replaced.
 
 The **commission is a pricelist, not code**. Under achat-revente sur vente the
 gallery buys at list minus its percentage at the moment it sells.
 
-Selling from a depot uses **one route per depot** rather than one warehouse per
-depot: same sourcing, none of the picking-type and sequence sprawl.
+A depot **receives and delivers in one step**, pinned by a constraint. Multi-step
+would put a receiving bay and a packing table inside someone else's shop, and
+split one reported sale into two moves whose first leg leaves the depot's stock
+location for a sibling.
 
 ## What is here
 
 | | |
 |---|---|
-| `stock.location` | `is_depot`, depositary, commission, route, pricelist, pieces held |
+| `stock.warehouse` | `is_depot`, depositary, commission, pricelist, pieces held |
 | `stock.move.line` | `mb_depot_sale_date` — the day the depositary reports the piece sold |
-| `mb.depot.create` | Creates a depot — location, route, pull rule, commission pricelist — in one action, because that set repeats per gallery and has to agree with itself |
+| `mb.depot.create` | Creates a depot — warehouse and commission pricelist — in one action, because that pair repeats per gallery and has to agree with itself |
 | `mb.depot.statement` | Opening, placed, sold, returned, closing over a period, per piece, with retail / commission / net |
 | `stock.quant` views | Live stock per depot with a days-held column and ageing filters |
 | `stock.picking` | The product catalog, on placements only |
-| `sale.order` | The depot being sold from, and the pieces it holds |
+| `sale.order` | The depositary's warehouse, and the pieces it holds |
 | Bon de dépôt | Placement document for the gallery to sign |
 
 ## The catalog on a placement
@@ -72,10 +84,14 @@ mrp takes for its components.
 
 ## Selling from a depot
 
-`sale.order.mb_depot_id` fills in from the customer when that customer is a
-depositary, matched on the commercial partner so an order addressed to a person
-inside the gallery still finds it. With it set, the line's product domain gains
-the depot's pieces and the order's route is pointed at the depot.
+Odoo's own **Warehouse** field on the quotation is the whole mechanism. It fills
+in from the customer when that customer is a depositary, matched on the
+commercial partner so an order addressed to a person inside the gallery still
+finds it, and it is what sources the delivery from the gallery. No route, no pull
+rule, and no `sale_order_global_stock_route`.
+
+On hand, forecast and the availability widget need no help either: they are
+warehouse-scoped and the warehouse is the depot.
 
 The pieces offered are on hand **minus reserved**. A unique piece offered on two
 orders is a piece that cannot be delivered twice; once a confirmed order has
@@ -88,6 +104,11 @@ exactly what they saw before.
 Menus land under Inventory > Dépôt-vente.
 
 ## The statement
+
+The period's movements are the move lines crossing the depot warehouse's **view
+location**, not its stock location: anything Odoo ever puts inside a warehouse
+hangs off the view, so scoping there means a movement counts only when it
+genuinely crosses the gallery's door.
 
 Sold and returned are **both outgoing moves**. What tells them apart is the
 destination: `usage == 'customer'` is a sale, anything else is a return.
@@ -150,11 +171,6 @@ falsy. This module writes implied groups on `base.group_user` instead.
 
 ## Not a dependency
 
-Selecting the depot route on a quotation needs OCA's
-`sale_order_global_stock_route`. That is deliberately not in `depends`: it is
-AGPL-3 and this module is LGPL-3. Without it the route is still created and can
-be set on the order line by hand.
-
 `stock_picking_report_valued` cannot serve as the bon de dépôt: every monetary
 field on it is related to or computed from `move_id.sale_line_id`, and a
 placement is an internal transfer with no sale line, so it renders blank. Hence
@@ -166,6 +182,6 @@ the report here.
 odoo -d <db> -u mb_depot --test-enable --test-tags /mb_depot --stop-after-init
 ```
 
-Fifteen tests, all on the statement arithmetic, the reported date that decides
+Thirty tests, on the statement arithmetic, the reported date that decides
 which period a movement falls in, and the consistency of a created depot — the
 parts that decide money.
