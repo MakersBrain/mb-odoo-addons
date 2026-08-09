@@ -64,6 +64,12 @@ class InvoiceCapture(models.Model):
     )
     review_reason = fields.Text(readonly=True, tracking=True)
     move_id = fields.Many2one("account.move", readonly=True, ondelete="restrict")
+    purchase_order_id = fields.Many2one(
+        "purchase.order", string="Purchase order", readonly=True, ondelete="restrict"
+    )
+    review_line_ids = fields.One2many(
+        "mb.invoice.capture.line", "capture_id", string="Product matching", copy=False
+    )
     source_attachment_id = fields.Many2one(
         "ir.attachment", readonly=True, ondelete="restrict"
     )
@@ -117,6 +123,122 @@ class InvoiceCapture(models.Model):
         compute="_compute_review_fields", sanitize=True
     )
     received_at = fields.Datetime(required=True, default=fields.Datetime.now, readonly=True)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        captures = super().create(vals_list)
+        captures._ensure_review_lines()
+        return captures
+
+    def _ensure_review_lines(self):
+        for capture in self.filtered(lambda record: not record.review_line_ids):
+            supplier = capture.review_supplier_id
+            if not supplier:
+                matched = capture._match_supplier(
+                    capture.normalized_payload or {}, capture.company_id
+                )
+                if not isinstance(matched, tuple):
+                    supplier = matched
+            values = capture._parsed_review_line_values(capture.normalized_payload or {})
+            for position, value in enumerate(values, start=1):
+                product, match_method = capture._match_product(
+                    value.get("product_code"), value.get("barcode"), supplier
+                )
+                self.env["mb.invoice.capture.line"].create({
+                    "capture_id": capture.id,
+                    "sequence": position * 10,
+                    "description": value["description"],
+                    "extracted_product_code": value.get("product_code") or False,
+                    "extracted_barcode": value.get("barcode") or False,
+                    "extracted_quantity": float(value["quantity"]),
+                    "extracted_unit_price": float(value["unit_price"]),
+                    "review_product_id": product.id or False,
+                    "review_uom_id": product.uom_id.id if product else False,
+                    "review_quantity": float(value["quantity"]),
+                    "review_unit_price": float(value["unit_price"]),
+                    "match_method": match_method,
+                })
+
+    def _parsed_review_line_values(self, invoice):
+        self.ensure_one()
+        source_lines = invoice.get("lines")
+        parsed = []
+        if isinstance(source_lines, list):
+            for position, line in enumerate(source_lines, start=1):
+                if not isinstance(line, dict):
+                    continue
+                description = str(line.get("description") or "").strip()
+                try:
+                    quantity = _decimal(line.get("quantity"), f"line {position} quantity")
+                    unit_price = _decimal(line.get("unit_price"), f"line {position} unit_price")
+                except ValidationError:
+                    continue
+                if description and quantity > 0 and unit_price >= 0:
+                    parsed.append({
+                        "description": description,
+                        "product_code": str(
+                            line.get("supplier_product_code")
+                            or line.get("product_default_code")
+                            or line.get("product_code")
+                            or ""
+                        ).strip(),
+                        "barcode": str(line.get("barcode") or "").strip(),
+                        "quantity": quantity,
+                        "unit_price": unit_price,
+                    })
+        extracted_untaxed = _decimal(invoice.get("untaxed_amount") or 0, "untaxed_amount")
+        raw_total = sum(
+            (line["quantity"] * line["unit_price"] for line in parsed), Decimal(0)
+        )
+        if extracted_untaxed > 0 and raw_total > 0:
+            for scale in (Decimal(10), Decimal(100), Decimal(1000)):
+                scaled_total = raw_total / (scale * scale)
+                if abs(scaled_total - extracted_untaxed) <= max(
+                    Decimal("0.02"), extracted_untaxed * Decimal("0.001")
+                ):
+                    for line in parsed:
+                        line["quantity"] /= scale
+                        line["unit_price"] /= scale
+                    break
+        return parsed
+
+    def _match_product(self, product_code, barcode, supplier):
+        self.ensure_one()
+        Product = self.env["product.product"].with_company(self.company_id)
+
+        def unique_product(domain):
+            products = Product.search([
+                ("active", "=", True),
+                ("purchase_ok", "=", True),
+                ("company_id", "in", [False, self.company_id.id]),
+                *domain,
+            ], limit=2)
+            return products if len(products) == 1 else Product
+
+        if product_code and supplier:
+            sellers = self.env["product.supplierinfo"].search([
+                ("partner_id", "child_of", supplier.commercial_partner_id.id),
+                ("product_code", "=", product_code),
+            ])
+            products = Product
+            for seller in sellers:
+                candidates = seller.product_id or seller.product_tmpl_id.product_variant_ids
+                products |= candidates.filtered(
+                    lambda product: product.active
+                    and product.purchase_ok
+                    and (not product.company_id or product.company_id == self.company_id)
+                )
+            if len(products) == 1:
+                return products, "supplier_code"
+        if barcode:
+            product = unique_product([("barcode", "=", barcode)])
+            if product:
+                return product, "barcode"
+        if product_code:
+            product = unique_product([("default_code", "=", product_code)])
+            if product:
+                return product, "internal_reference"
+        return Product, "unmatched"
 
     @api.depends("normalized_payload", "field_confidence")
     def _compute_review_fields(self):
@@ -527,6 +649,144 @@ class InvoiceCapture(models.Model):
             "target": "current",
         }
 
+    def action_open_purchase_order(self):
+        self.ensure_one()
+        if not self.purchase_order_id:
+            return False
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Purchase order"),
+            "res_model": "purchase.order",
+            "res_id": self.purchase_order_id.id,
+            "view_mode": "form",
+            "target": "current",
+        }
+
+    def action_retry_product_matching(self):
+        self.ensure_one()
+        if self.purchase_order_id:
+            raise UserError(_("Product matching is locked after creating the purchase order."))
+        self._ensure_review_lines()
+        supplier = self.review_supplier_id or self.move_id.partner_id
+        for line in self.review_line_ids.filtered(
+            lambda review_line: not review_line.review_product_id
+        ):
+            product, match_method = self._match_product(
+                line.extracted_product_code, line.extracted_barcode, supplier
+            )
+            if product:
+                line.write({
+                    "review_product_id": product.id,
+                    "review_uom_id": product.uom_id.id,
+                    "match_method": match_method,
+                })
+        return {"type": "ir.actions.client", "tag": "reload"}
+
+    def action_create_purchase_order(self):
+        self.ensure_one()
+        self.env.cr.execute(
+            "SELECT id FROM mb_invoice_capture WHERE id = %s FOR UPDATE", [self.id]
+        )
+        self.invalidate_recordset(["purchase_order_id"])
+        if self.purchase_order_id:
+            return self.action_open_purchase_order()
+        self._ensure_review_lines()
+        supplier = self.review_supplier_id or self.move_id.partner_id
+        if not supplier:
+            matched = self._match_supplier(self.normalized_payload or {}, self.company_id)
+            if isinstance(matched, tuple):
+                raise UserError(_("Select the supplier before creating a purchase order."))
+            supplier = matched
+            self.review_supplier_id = supplier
+        if not self.review_line_ids:
+            raise UserError(_("No valid extracted invoice lines are available to purchase."))
+        unmatched = self.review_line_ids.filtered(lambda line: not line.review_product_id)
+        if unmatched:
+            raise UserError(_(
+                "Match every invoice line to an existing product before creating the "
+                "purchase order."
+            ))
+        invalid = self.review_line_ids.filtered(
+            lambda line: line.review_quantity <= 0
+            or line.review_unit_price < 0
+            or not line.review_uom_id
+            or line.review_uom_id not in (
+                line.review_product_id.uom_id
+                | line.review_product_id.uom_ids
+                | line.review_product_id.seller_ids.product_uom_id
+            )
+        )
+        if invalid:
+            raise UserError(_(
+                "Every matched line needs a positive quantity, a non-negative price, and "
+                "a unit compatible with the product."
+            ))
+        bill_lines = self.move_id.invoice_line_ids.filtered(
+            lambda line: line.display_type == "product"
+        ) if self.move_id else self.env["account.move.line"]
+        if self.move_id and len(bill_lines) != len(self.review_line_ids):
+            raise UserError(_(
+                "The bill line count no longer matches the captured invoice. Reconcile the "
+                "bill lines before creating its purchase order."
+            ))
+        currency = self.move_id.currency_id or self._currency(
+            (self.normalized_payload or {}).get("currency")
+        )
+        if not currency:
+            raise UserError(_("The extracted currency is not active in Odoo."))
+        commands = []
+        for position, review_line in enumerate(self.review_line_ids.sorted("sequence")):
+            bill_line = bill_lines.sorted("sequence")[position] if bill_lines else False
+            quantity = bill_line.quantity if bill_line else review_line.review_quantity
+            price_unit = bill_line.price_unit if bill_line else review_line.review_unit_price
+            taxes = (
+                bill_line.tax_ids
+                if bill_line
+                else self.review_tax_id or review_line.review_product_id.supplier_taxes_id
+            ).filtered(lambda tax: tax.company_id == self.company_id)
+            commands.append((0, 0, {
+                "sequence": review_line.sequence,
+                "product_id": review_line.review_product_id.id,
+                "name": review_line.description,
+                "product_qty": quantity,
+                "product_uom_id": review_line.review_uom_id.id,
+                "price_unit": price_unit,
+                "tax_ids": [(6, 0, taxes.ids)],
+            }))
+        order = self.env["purchase.order"].with_company(self.company_id).create({
+            "company_id": self.company_id.id,
+            "partner_id": supplier.id,
+            "currency_id": currency.id,
+            "partner_ref": (self.normalized_payload or {}).get("invoice_number") or False,
+            "origin": self.external_document_id,
+            "order_line": commands,
+        })
+        if order.state not in ("draft", "sent"):
+            order.unlink()
+            raise UserError(_("Invoice capture may create draft purchase orders only."))
+        order_lines = order.order_line.filtered(lambda line: not line.display_type).sorted("sequence")
+        for position, review_line in enumerate(self.review_line_ids.sorted("sequence")):
+            review_line.purchase_line_id = order_lines[position]
+            if bill_lines:
+                bill_line = bill_lines.sorted("sequence")[position]
+                values = {"purchase_line_id": order_lines[position].id}
+                if self.move_id.state == "draft":
+                    values.update({
+                        "product_id": review_line.review_product_id.id,
+                        "product_uom_id": review_line.review_uom_id.id,
+                    })
+                bill_line.write(values)
+        self._link_source(order, _("Source invoice"))
+        self.purchase_order_id = order
+        order.message_post(body=Markup(
+            "<p>%s</p>"
+        ) % escape(_(
+            "This purchase order was reconstructed from a supplier invoice. Confirm it only "
+            "after reviewing the products and quantities; validate the receipt only after "
+            "physically receiving the goods."
+        )))
+        return self.action_open_purchase_order()
+
     def action_create_reviewed_bill(self):
         self.ensure_one()
         if self.move_id:
@@ -597,23 +857,27 @@ class InvoiceCapture(models.Model):
         return self.action_open_bill()
 
     def _link_source_to_bill(self, move):
+        return self._link_source(move, _("Original source"))
+
+    def _link_source(self, record, source_label):
         self.ensure_one()
-        if not self.source_attachment_id or not move:
+        if not self.source_attachment_id or not record:
             return self.env["ir.attachment"]
         attachment_model = self.env["ir.attachment"].sudo()
         attachment = attachment_model.search([
-            ("res_model", "=", "account.move"),
-            ("res_id", "=", move.id),
+            ("res_model", "=", record._name),
+            ("res_id", "=", record.id),
             ("checksum", "=", self.source_attachment_id.checksum),
         ], limit=1)
         if attachment:
             return attachment
         attachment = self.source_attachment_id.sudo().copy({
             "name": self.source_filename,
-            "res_model": "account.move",
-            "res_id": move.id,
+            "res_model": record._name,
+            "res_id": record.id,
             "description": _(
-                "Original source from %(reference)s",
+                "%(label)s from %(reference)s",
+                label=source_label,
                 reference=self.external_document_id,
             ),
         })
@@ -626,25 +890,17 @@ class InvoiceCapture(models.Model):
             )
         else:
             body = Markup("<p>%s %s</p>") % (escape(_("Source document:")), reference)
-        move.message_post(body=body, attachment_ids=attachment.ids)
+        record.message_post(body=body, attachment_ids=attachment.ids)
         return attachment
 
     def _prepare_reviewed_lines(self, invoice, target_amount, account, tax):
         self.ensure_one()
-        source_lines = invoice.get("lines")
-        parsed = []
-        if isinstance(source_lines, list):
-            for position, line in enumerate(source_lines, start=1):
-                if not isinstance(line, dict):
-                    continue
-                description = str(line.get("description") or "").strip()
-                try:
-                    quantity = _decimal(line.get("quantity"), f"line {position} quantity")
-                    unit_price = _decimal(line.get("unit_price"), f"line {position} unit_price")
-                except ValidationError:
-                    continue
-                if description and quantity > 0 and unit_price >= 0:
-                    parsed.append([description, quantity, unit_price])
+        self._ensure_review_lines()
+        parsed = [
+            [line.description, Decimal(str(line.review_quantity)), Decimal(str(line.review_unit_price)), line]
+            for line in self.review_line_ids.sorted("sequence")
+            if line.description and line.review_quantity > 0 and line.review_unit_price >= 0
+        ]
         if not parsed:
             return [(0, 0, {
                 "name": _("Captured invoice %(number)s", number=invoice.get("invoice_number") or ""),
@@ -654,25 +910,83 @@ class InvoiceCapture(models.Model):
                 "tax_ids": [(6, 0, tax.ids)],
             })]
 
-        extracted_untaxed = _decimal(invoice.get("untaxed_amount"), "untaxed_amount")
-        raw_total = sum((quantity * unit_price for _, quantity, unit_price in parsed), Decimal(0))
-        if extracted_untaxed > 0 and raw_total > 0:
-            for scale in (Decimal(10), Decimal(100), Decimal(1000)):
-                scaled_total = raw_total / (scale * scale)
-                if abs(scaled_total - extracted_untaxed) <= max(
-                    Decimal("0.02"), extracted_untaxed * Decimal("0.001")
-                ):
-                    parsed = [
-                        [description, quantity / scale, unit_price / scale]
-                        for description, quantity, unit_price in parsed
-                    ]
-                    raw_total = scaled_total
-                    break
+        raw_total = sum((quantity * unit_price for _, quantity, unit_price, _ in parsed), Decimal(0))
         multiplier = target_amount / raw_total if raw_total else Decimal(1)
         return [(0, 0, {
             "name": description,
             "quantity": float(quantity),
             "price_unit": float(unit_price * multiplier),
             "account_id": account.id,
+            "product_id": review_line.review_product_id.id or False,
+            "product_uom_id": review_line.review_uom_id.id or False,
             "tax_ids": [(6, 0, tax.ids)],
-        }) for description, quantity, unit_price in parsed]
+        }) for description, quantity, unit_price, review_line in parsed]
+
+
+class InvoiceCaptureLine(models.Model):
+    _name = "mb.invoice.capture.line"
+    _description = "Supplier invoice product matching line"
+    _order = "capture_id, sequence, id"
+
+    capture_id = fields.Many2one(
+        "mb.invoice.capture", required=True, ondelete="cascade", index=True
+    )
+    company_id = fields.Many2one(related="capture_id.company_id", store=True, index=True)
+    sequence = fields.Integer(required=True, default=10)
+    description = fields.Char(required=True)
+    extracted_product_code = fields.Char(readonly=True)
+    extracted_barcode = fields.Char(readonly=True)
+    extracted_quantity = fields.Float(readonly=True, digits="Product Unit")
+    extracted_unit_price = fields.Float(readonly=True, digits="Product Price")
+    review_product_id = fields.Many2one(
+        "product.product",
+        string="Matched product",
+        domain="[('purchase_ok', '=', True), ('company_id', 'in', [False, company_id])]",
+        check_company=True,
+    )
+    review_uom_id = fields.Many2one(
+        "uom.uom", string="Purchase unit", domain="[('id', 'in', allowed_uom_ids)]"
+    )
+    allowed_uom_ids = fields.Many2many(
+        "uom.uom", compute="_compute_allowed_uom_ids"
+    )
+    review_quantity = fields.Float(string="Purchase quantity", digits="Product Unit")
+    review_unit_price = fields.Float(string="Unit price", digits="Product Price")
+    match_method = fields.Selection([
+        ("supplier_code", "Supplier product code"),
+        ("barcode", "Barcode"),
+        ("internal_reference", "Internal reference"),
+        ("manual", "Manual"),
+        ("unmatched", "Not matched"),
+    ], required=True, default="unmatched", readonly=True)
+    is_storable = fields.Boolean(
+        related="review_product_id.is_storable", string="Tracks inventory"
+    )
+    purchase_line_id = fields.Many2one(
+        "purchase.order.line", readonly=True, ondelete="restrict"
+    )
+
+    _capture_sequence_unique = models.Constraint(
+        "UNIQUE(capture_id, sequence)",
+        "Each captured invoice line sequence must be unique.",
+    )
+
+    @api.onchange("review_product_id")
+    def _onchange_review_product_id(self):
+        for line in self:
+            if line.review_product_id:
+                line.review_uom_id = line.review_product_id.uom_id
+                if line._origin.review_product_id != line.review_product_id:
+                    line.match_method = "manual"
+            else:
+                line.review_uom_id = False
+                line.match_method = "unmatched"
+
+    @api.depends("review_product_id")
+    def _compute_allowed_uom_ids(self):
+        for line in self:
+            product = line.review_product_id
+            line.allowed_uom_ids = (
+                product.uom_id | product.uom_ids | product.seller_ids.product_uom_id
+                if product else self.env["uom.uom"]
+            )

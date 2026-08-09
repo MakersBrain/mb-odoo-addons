@@ -2,6 +2,7 @@ import base64
 import hashlib
 import uuid
 
+from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
 
@@ -204,3 +205,138 @@ class TestInvoiceCapture(TransactionCase):
         self.assertIn("Clay", str(capture.invoice_lines_summary))
         self.assertIn("Supplier vat", str(capture.confidence_summary))
         self.assertIn("99.0%", str(capture.confidence_summary))
+
+    def test_internal_reference_matches_product_and_creates_draft_purchase_order(self):
+        product = self.env["product.product"].create({
+            "name": "Tracked clay",
+            "default_code": "CLAY-12",
+            "purchase_ok": True,
+            "is_storable": True,
+        })
+        invoice = dict(self.payload()["invoice"], lines=[{
+            "description": "Tracked clay",
+            "product_default_code": "CLAY-12",
+            "quantity": "2",
+            "unit_price": "5.00",
+            "account_code": self.expense_account.with_company(self.company).code,
+        }])
+        result = self.Capture.ingest(self.payload(
+            external_document_id="paperless:purchase-order",
+            invoice=invoice,
+        ))
+        capture = self.Capture.browse(result["capture_id"])
+
+        self.assertEqual(capture.review_line_ids.review_product_id, product)
+        self.assertEqual(capture.review_line_ids.match_method, "internal_reference")
+        action = capture.action_create_purchase_order()
+
+        order = capture.purchase_order_id
+        self.assertEqual(action["res_id"], order.id)
+        self.assertEqual(order.state, "draft")
+        self.assertEqual(order.order_line.product_id, product)
+        self.assertEqual(order.order_line.product_qty, 2)
+        self.assertEqual(capture.move_id.invoice_line_ids.purchase_line_id, order.order_line)
+        self.assertFalse(order.picking_ids)
+        self.assertEqual(capture.action_create_purchase_order()["res_id"], order.id)
+
+        quantity_before = product.qty_available
+        order.button_confirm()
+        self.assertTrue(order.picking_ids)
+        self.assertEqual(product.qty_available, quantity_before)
+
+    def test_supplier_product_code_takes_precedence_for_matching(self):
+        product = self.env["product.product"].create({
+            "name": "Supplier glaze",
+            "default_code": "OUR-GLAZE",
+            "purchase_ok": True,
+            "is_storable": True,
+        })
+        self.env["product.supplierinfo"].create({
+            "partner_id": self.partner.id,
+            "product_tmpl_id": product.product_tmpl_id.id,
+            "product_id": product.id,
+            "product_code": "VENDOR-472",
+            "price": 10,
+        })
+        invoice = dict(self.payload()["invoice"], lines=[{
+            "description": "Supplier glaze",
+            "supplier_product_code": "VENDOR-472",
+            "quantity": "1",
+            "unit_price": "10.00",
+            "account_code": self.expense_account.with_company(self.company).code,
+        }])
+
+        result = self.Capture.ingest(self.payload(
+            external_document_id="paperless:supplier-code",
+            invoice=invoice,
+        ))
+        line = self.Capture.browse(result["capture_id"]).review_line_ids
+
+        self.assertEqual(line.review_product_id, product)
+        self.assertEqual(line.match_method, "supplier_code")
+
+    def test_unmatched_product_blocks_purchase_order(self):
+        result = self.Capture.ingest(self.payload(
+            external_document_id="paperless:unmatched-product",
+        ))
+        capture = self.Capture.browse(result["capture_id"])
+
+        self.assertFalse(capture.review_line_ids.review_product_id)
+        with self.assertRaises(UserError):
+            capture.action_create_purchase_order()
+        self.assertFalse(capture.purchase_order_id)
+
+    def test_matching_can_be_retried_after_product_creation(self):
+        invoice = dict(self.payload()["invoice"], lines=[{
+            "description": "Later product",
+            "product_default_code": "LATER-01",
+            "quantity": "2",
+            "unit_price": "5.00",
+            "account_code": self.expense_account.with_company(self.company).code,
+        }])
+        result = self.Capture.ingest(self.payload(
+            external_document_id="paperless:retry-match",
+            invoice=invoice,
+        ))
+        capture = self.Capture.browse(result["capture_id"])
+        self.assertFalse(capture.review_line_ids.review_product_id)
+        product = self.env["product.product"].create({
+            "name": "Later product",
+            "default_code": "LATER-01",
+            "purchase_ok": True,
+            "is_storable": True,
+        })
+
+        capture.action_retry_product_matching()
+
+        self.assertEqual(capture.review_line_ids.review_product_id, product)
+
+    def test_posted_bill_is_linked_without_creating_another_bill(self):
+        self.env["product.product"].create({
+            "name": "Posted bill clay",
+            "default_code": "POSTED-CLAY",
+            "purchase_ok": True,
+            "is_storable": True,
+        })
+        invoice = dict(self.payload()["invoice"], lines=[{
+            "description": "Posted bill clay",
+            "product_default_code": "POSTED-CLAY",
+            "quantity": "2",
+            "unit_price": "5.00",
+            "account_code": self.expense_account.with_company(self.company).code,
+        }])
+        result = self.Capture.ingest(self.payload(
+            external_document_id="paperless:posted-bill",
+            invoice=invoice,
+        ))
+        capture = self.Capture.browse(result["capture_id"])
+        bill = capture.move_id
+        bill.action_post()
+
+        capture.action_create_purchase_order()
+
+        self.assertEqual(bill.state, "posted")
+        self.assertEqual(bill.invoice_line_ids.purchase_line_id.order_id, capture.purchase_order_id)
+        self.assertEqual(self.env["account.move"].search_count([
+            ("id", "=", bill.id),
+        ]), 1)

@@ -66,6 +66,7 @@ ACCESS_HEADER = [
 KNOWN_EXTERNAL = {
     "account", "account_edi_ubl_cii", "account_payment", "base", "l10n_fr_account",
     "maintenance", "mail", "mrp", "payment", "point_of_sale", "product", "purchase",
+    "purchase_stock",
     "sale", "sale_stock", "stock", "uom", "web",
     # OCA, vendored and optional.
     "sale_order_global_stock_route", "stock_restrict_lot", "stock_picking_filter_lot",

@@ -28,6 +28,18 @@
                     <button name="action_open_bill" type="object"
                             string="Review draft bill" class="btn-primary"
                             invisible="not move_id"/>
+                    <button name="action_create_purchase_order" type="object"
+                            string="Create draft purchase order" class="btn-secondary"
+                            groups="account.group_account_manager"
+                            invisible="purchase_order_id"/>
+                    <button name="action_retry_product_matching" type="object"
+                            string="Retry product matching"
+                            groups="account.group_account_manager"
+                            invisible="purchase_order_id"/>
+                    <button name="action_open_purchase_order" type="object"
+                            string="Review purchase order" class="btn-secondary"
+                            groups="account.group_account_manager"
+                            invisible="not purchase_order_id"/>
                     <field name="status" widget="statusbar"
                            statusbar_visible="received,review,draft_bill"/>
                 </header>
@@ -36,6 +48,10 @@
                         <button class="oe_stat_button" type="object" name="action_open_bill"
                                 icon="fa-file-text-o" invisible="not move_id">
                             <field name="move_id" widget="statinfo" string="Draft bill"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_purchase_order"
+                                icon="fa-shopping-cart" invisible="not purchase_order_id">
+                            <field name="purchase_order_id" widget="statinfo" string="Purchase order"/>
                         </button>
                     </div>
                     <widget name="web_ribbon" title="Needs review" bg_color="text-bg-warning"
@@ -91,6 +107,28 @@
                         <field name="company_id" groups="base.group_multi_company"/>
                     </group>
                     <notebook>
+                        <page string="Product matching">
+                            <div class="alert alert-info" role="alert">
+                                Match each extracted line to an inventory product. Creating the
+                                purchase order does not confirm it and does not change stock;
+                                stock changes only when its receipt is validated.
+                            </div>
+                            <field name="review_line_ids" nolabel="1" readonly="purchase_order_id">
+                                <list create="0" delete="0" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="description"/>
+                                    <field name="extracted_product_code" optional="show"/>
+                                    <field name="review_product_id"/>
+                                    <field name="match_method"/>
+                                    <field name="review_quantity"/>
+                                    <field name="review_uom_id"/>
+                                    <field name="review_unit_price"/>
+                                    <field name="is_storable" optional="show"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="allowed_uom_ids" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Invoice lines">
                             <field name="invoice_lines_summary" widget="html" nolabel="1"/>
                         </page>
