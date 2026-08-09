@@ -9,11 +9,19 @@
       <xpath expr="//group" position="inside">
         <group string="Dépôt-vente">
           <field name="is_depot"/>
+          <field name="mb_depot_legal_structure" invisible="not is_depot"
+                 required="is_depot"/>
           <field name="depot_partner_id" invisible="not is_depot"
                  required="is_depot"/>
           <field name="depot_commission" invisible="not is_depot"/>
           <field name="depot_pricelist_id" invisible="not is_depot" readonly="1"/>
           <field name="depot_qty" invisible="not is_depot" readonly="1"/>
+          <field name="mb_depot_mandate_reviewed_through"
+                 invisible="mb_depot_legal_structure != 'mandate'"
+                 groups="account.group_account_manager"/>
+          <field name="mb_depot_mandate_review_note"
+                 invisible="mb_depot_legal_structure != 'mandate'"
+                 groups="account.group_account_manager"/>
         </group>
       </xpath>
     </field>

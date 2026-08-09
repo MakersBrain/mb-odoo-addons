@@ -35,6 +35,7 @@
 						<field name="tax_regime"/>
 						<field name="tax_effective_date"/>
 						<field name="vat" invisible="tax_regime != 'vat'"/>
+						<field name="bnc_enabled"/>
 						<field name="edi_mode" colspan="2"/>
 					</group>
 					<group string="Payment details" col="4">

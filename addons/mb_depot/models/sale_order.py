@@ -1,4 +1,5 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class SaleOrder(models.Model):
@@ -58,6 +59,19 @@ class SaleOrder(models.Model):
                 if quantity - reserved > 0
             ]
             order.mb_depot_product_ids = [fields.Command.set(available)]
+
+    def action_confirm(self):
+        mandate = self.filtered(
+            lambda order: order.warehouse_id.is_depot
+            and order.warehouse_id.mb_depot_legal_structure == "mandate"
+        )
+        if mandate:
+            raise UserError(_(
+                "The selected depot is a mandate. The purchase-resale sales "
+                "workflow cannot be used; invoice final customers at retail and "
+                "book the gallery commission as a vendor bill."
+            ))
+        return super().action_confirm()
 
 
 class SaleOrderLine(models.Model):

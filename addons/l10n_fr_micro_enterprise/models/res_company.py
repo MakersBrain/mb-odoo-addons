@@ -48,6 +48,17 @@ class ResCompany(models.Model):
 		"account.tax", string="Franchise tax — services", readonly=True, copy=False,
 		check_company=True,
 	)
+	l10n_fr_micro_bnc_enabled = fields.Boolean(
+		string="Enable a BNC turnover category", copy=False,
+	)
+	l10n_fr_micro_bnc_tax_id = fields.Many2one(
+		"account.tax", string="Franchise tax — BNC", readonly=True, copy=False,
+		check_company=True,
+	)
+	l10n_fr_micro_bnc_economic_tax_id = fields.Many2one(
+		"account.tax", string="Economic VAT tax — BNC", readonly=True, copy=False,
+		check_company=True,
+	)
 	l10n_fr_micro_purchase_tax_id = fields.Many2one(
 		"account.tax", string="Franchise tax — purchases", readonly=True, copy=False,
 		check_company=True,
@@ -74,9 +85,9 @@ class ResCompany(models.Model):
 			raise UserError(_("The micro-enterprise tax setup is only available for a French fiscal company."))
 		return country
 
-	def _l10n_fr_micro_source_taxes(self, scope):
+	def _l10n_fr_micro_source_taxes(self, scope, category):
 		self.ensure_one()
-		return self.env["account.tax"].with_context(active_test=False).search([
+		taxes = self.env["account.tax"].with_context(active_test=False).search([
 			("company_id", "=", self.id),
 			("type_tax_use", "=", "sale"),
 			("tax_scope", "=", scope),
@@ -84,6 +95,31 @@ class ResCompany(models.Model):
 			("ubl_cii_tax_category_code", "=", "S"),
 			("l10n_fr_micro_franchise_tax", "=", False),
 		])
+		matching = taxes.filtered(lambda tax: tax.l10n_fr_micro_urssaf_category == category)
+		unclassified = taxes.filtered(lambda tax: not tax.l10n_fr_micro_urssaf_category)
+		return matching if category == "bnc" else matching | unclassified
+
+	def _l10n_fr_micro_prepare_bnc_economic_tax(self):
+		self.ensure_one()
+		tax_model = self.env["account.tax"].with_company(self).with_context(active_test=False)
+		tax = tax_model.search([
+			("company_id", "=", self.id),
+			("type_tax_use", "=", "sale"),
+			("tax_scope", "=", "service"),
+			("l10n_fr_micro_franchise_tax", "=", False),
+			("l10n_fr_micro_urssaf_category", "=", "bnc"),
+		], limit=1)
+		if tax:
+			return tax
+		source = self._l10n_fr_micro_source_taxes("service", "bic_service")[:1]
+		if not source:
+			raise UserError(_("Prepare an ordinary French service VAT tax before enabling BNC."))
+		return source.copy(default={
+			"name": _("%(name)s — BNC", name=source.name),
+			"invoice_label": _("VAT — BNC service"),
+			"l10n_fr_micro_urssaf_category": "bnc",
+			"original_tax_ids": [Command.clear()],
+		})
 
 	def _l10n_fr_micro_prepare_tax_group(self, country):
 		self.ensure_one()
@@ -104,15 +140,32 @@ class ResCompany(models.Model):
 			group = group_model.create(values)
 		return group
 
-	def _l10n_fr_micro_prepare_one_tax(self, scope, country, tax_group):
+	def _l10n_fr_micro_prepare_one_tax(self, category, scope, country, tax_group):
 		self.ensure_one()
 		tax_model = self.env["account.tax"].with_company(self).with_context(active_test=False)
 		tax = tax_model.search([
 			("company_id", "=", self.id),
 			("l10n_fr_micro_franchise_tax", "=", True),
-			("tax_scope", "=", scope),
+			("l10n_fr_micro_urssaf_category", "=", category),
 		], limit=1)
-		label = _("TVA non applicable — franchise en base (%s)", _("goods") if scope == "consu" else _("services"))
+		if not tax and category != "bnc":
+			tax = tax_model.search([
+				("company_id", "=", self.id),
+				("l10n_fr_micro_franchise_tax", "=", True),
+				("type_tax_use", "=", "sale"),
+				("tax_scope", "=", scope),
+				("l10n_fr_micro_urssaf_category", "=", False),
+			], limit=1)
+		category_label = {
+			"bic_goods": _("goods"),
+			"bic_service": _("BIC services"),
+			"bnc": _("BNC"),
+		}[category]
+		label = _("TVA non applicable — franchise en base (%s)", category_label)
+		original_taxes = self._l10n_fr_micro_source_taxes(scope, category)
+		original_taxes.filtered(lambda source: not source.l10n_fr_micro_urssaf_category).write({
+			"l10n_fr_micro_urssaf_category": category,
+		})
 		values = {
 			"name": label,
 			"invoice_label": _("TVA non applicable — art. 293 B CGI"),
@@ -127,9 +180,12 @@ class ResCompany(models.Model):
 			"amount": 0,
 			"active": True,
 			"l10n_fr_micro_franchise_tax": True,
+			"l10n_fr_micro_urssaf_category": category,
+			"tax_exigibility": "on_payment",
+			"cash_basis_transition_account_id": self.account_cash_basis_base_account_id.id,
 			"ubl_cii_tax_category_code": "E",
 			"ubl_cii_tax_exemption_reason_code": "VATEX-FR-FRANCHISE",
-			"original_tax_ids": [Command.set(self._l10n_fr_micro_source_taxes(scope).ids)],
+			"original_tax_ids": [Command.set(original_taxes.ids)],
 		}
 		if tax:
 			tax.write(values)
@@ -169,9 +225,20 @@ class ResCompany(models.Model):
 		self._l10n_fr_micro_check_manager()
 		for company in self:
 			country = company._l10n_fr_micro_french_country()
+			company._l10n_fr_micro_prepare_cash_basis()
 			tax_group = company._l10n_fr_micro_prepare_tax_group(country)
-			goods_tax = company._l10n_fr_micro_prepare_one_tax("consu", country, tax_group)
-			service_tax = company._l10n_fr_micro_prepare_one_tax("service", country, tax_group)
+			goods_tax = company._l10n_fr_micro_prepare_one_tax("bic_goods", "consu", country, tax_group)
+			service_tax = company._l10n_fr_micro_prepare_one_tax("bic_service", "service", country, tax_group)
+			bnc_economic_tax = company._l10n_fr_micro_prepare_bnc_economic_tax() \
+				if company.l10n_fr_micro_bnc_enabled else self.env["account.tax"]
+			if bnc_economic_tax:
+				# Re-evaluate the BIC target after the BNC clone exists so the two
+				# same-rate service taxes cannot both map to the BIC exemption.
+				service_tax = company._l10n_fr_micro_prepare_one_tax(
+					"bic_service", "service", country, tax_group,
+				)
+			bnc_tax = company._l10n_fr_micro_prepare_one_tax("bnc", "service", country, tax_group) \
+				if bnc_economic_tax else self.env["account.tax"]
 			purchase_tax = company._l10n_fr_micro_prepare_purchase_tax(country, tax_group)
 			position_model = self.env["account.fiscal.position"].with_company(company).with_context(active_test=False)
 			position = position_model.search([
@@ -188,7 +255,7 @@ class ResCompany(models.Model):
 				"vat_required": False,
 				"note": LEGAL_NOTE,
 				"l10n_fr_micro_franchise_position": True,
-				"tax_ids": [Command.set((goods_tax | service_tax).ids)],
+				"tax_ids": [Command.set((goods_tax | service_tax | bnc_tax).ids)],
 			}
 			if position:
 				position.write(position_values)
@@ -198,10 +265,50 @@ class ResCompany(models.Model):
 				"l10n_fr_micro_tax_group_id": tax_group.id,
 				"l10n_fr_micro_goods_tax_id": goods_tax.id,
 				"l10n_fr_micro_service_tax_id": service_tax.id,
+				"l10n_fr_micro_bnc_tax_id": bnc_tax.id or False,
+				"l10n_fr_micro_bnc_economic_tax_id": bnc_economic_tax.id or False,
 				"l10n_fr_micro_purchase_tax_id": purchase_tax.id,
 				"l10n_fr_micro_fiscal_position_id": position.id,
 			})
 		return True
+
+	def _l10n_fr_micro_prepare_cash_basis(self):
+		self.ensure_one()
+		journal_model = self.env["account.journal"].with_company(self).with_context(active_test=False)
+		journal = self.tax_cash_basis_journal_id or journal_model.search([
+			("company_id", "=", self.id),
+			("code", "=", "CABA"),
+		], limit=1)
+		if not journal:
+			journal = journal_model.create({
+				"name": _("Micro-enterprise cash-basis recognition"),
+				"code": "CABA",
+				"type": "general",
+				"company_id": self.id,
+			})
+
+		account = self.account_cash_basis_base_account_id
+		if not account:
+			account_model = self.env["account.account"].with_company(self).with_context(active_test=False)
+			account = account_model.search([
+				("company_ids", "in", self.id),
+				("code", "=", "467CABA"),
+			], limit=1)
+			if not account:
+				account = account_model.create({
+					"name": _("Cash-basis base transition"),
+					"code": "467CABA",
+					"account_type": "asset_current",
+					"reconcile": True,
+					"company_ids": [Command.link(self.id)],
+				})
+		elif not account.reconcile:
+			account.reconcile = True
+		self.write({
+			"tax_exigibility": True,
+			"tax_cash_basis_journal_id": journal.id,
+			"account_cash_basis_base_account_id": account.id,
+		})
 
 	def _l10n_fr_micro_switch(self, regime, effective_date=None):
 		if regime not in ("franchise", "vat"):
@@ -239,8 +346,8 @@ class ResCompany(models.Model):
 			"type": "success", "sticky": True,
 		}}
 
-	def action_l10n_fr_micro_activate_vat(self):
-		self._l10n_fr_micro_switch("vat")
+	def action_l10n_fr_micro_activate_vat(self, effective_date=None):
+		self._l10n_fr_micro_switch("vat", effective_date=effective_date)
 		return {"type": "ir.actions.client", "tag": "display_notification", "params": {
 			"title": _("VAT-liable mode activated"),
 			"message": _("Automatic franchise mapping is disabled. Products keep their configured economic VAT taxes."),

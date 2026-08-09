@@ -20,6 +20,7 @@ class TestDepotStatement(TransactionCase):
         wizard = cls.env["mb.depot.create"].create({
             "partner_id": cls.gallery.id,
             "commission": 40.0,
+            "legal_structure": "resale",
         })
         wizard.action_create()
         cls.depot_warehouse = cls.env["stock.warehouse"].search([

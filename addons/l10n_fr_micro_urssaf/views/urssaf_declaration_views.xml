@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="view_urssaf_declaration_list" model="ir.ui.view">
+		<field name="name">l10n.fr.micro.urssaf.declaration.list</field>
+		<field name="model">l10n.fr.micro.urssaf.declaration</field>
+		<field name="arch" type="xml">
+			<list decoration-success="state == 'filed'" decoration-danger="blocking_anomaly">
+				<field name="name"/><field name="company_id" groups="base.group_multi_company"/><field name="periodicity"/><field name="due_date"/><field name="total_declared" sum="Total"/><field name="total_estimated" sum="Estimated"/><field name="blocking_anomaly"/><field name="state" widget="badge"/>
+			</list>
+		</field>
+	</record>
+	<record id="view_urssaf_declaration_form" model="ir.ui.view">
+		<field name="name">l10n.fr.micro.urssaf.declaration.form</field>
+		<field name="model">l10n.fr.micro.urssaf.declaration</field>
+		<field name="arch" type="xml">
+			<form>
+				<header>
+					<button name="action_compute" type="object" string="Compute / refresh" class="btn-primary" invisible="state != 'draft'"/>
+					<button name="action_file" type="object" string="Mark filed" class="btn-primary" groups="account.group_account_manager" invisible="state != 'draft'" confirm="Freeze this declaration as filed?"/>
+					<button name="action_print" type="object" string="Print filing aid"/>
+					<button name="action_reset_to_draft" type="object" string="Reset to draft" groups="account.group_account_manager" invisible="state != 'filed'" confirm="Reopen this filed declaration using the reason below?"/>
+					<field name="state" widget="statusbar"/>
+				</header>
+				<sheet>
+					<div class="oe_button_box" name="button_box"/>
+					<widget name="web_ribbon" title="Filed" bg_color="text-bg-success" invisible="state != 'filed'"/>
+					<h1><field name="name" readonly="1"/></h1>
+					<group>
+						<group><field name="company_id" groups="base.group_multi_company" readonly="state == 'filed'"/><field name="periodicity" readonly="state == 'filed'"/><field name="date_from" readonly="state == 'filed'"/><field name="date_to" readonly="state == 'filed'"/><field name="due_date"/></group>
+						<group><field name="total_declared"/><field name="total_estimated"/><field name="filed_at" invisible="state != 'filed'"/><field name="filed_by_id" invisible="state != 'filed'"/><field name="reset_reason" groups="account.group_account_manager" invisible="state != 'filed'" placeholder="Mandatory reason before reset"/></group>
+					</group>
+					<div class="alert alert-danger" role="alert" invisible="not blocking_anomaly"><field name="anomaly_text" nolabel="1"/></div>
+					<notebook>
+						<page string="Turnover boxes">
+							<field name="line_ids" readonly="state == 'filed'">
+								<list create="0" delete="0" editable="bottom"><field name="category" readonly="1"/><field name="current_turnover"/><field name="prior_period_adjustment"/><field name="manual_adjustment" groups="account.group_account_manager"/><field name="manual_adjustment_reason" groups="account.group_account_manager" optional="show"/><field name="declared_turnover"/><field name="cotisation_amount"/><field name="cfp_amount"/><field name="chamber_amount" optional="show"/><field name="liberatoire_amount" optional="show"/><field name="total_estimated"/></list>
+								<form><group><field name="category"/><field name="current_turnover"/><field name="prior_period_adjustment"/><field name="manual_adjustment" groups="account.group_account_manager"/><field name="manual_adjustment_reason" groups="account.group_account_manager"/><field name="computed_turnover"/><field name="declared_turnover"/><field name="rate_summary"/></group></form>
+							</field>
+						</page>
+						<page string="Receipt evidence">
+							<field name="source_ids" readonly="1"><list create="0" delete="0"><field name="recognition_date"/><field name="origin_move_id"/><field name="description"/><field name="category"/><field name="amount" sum="Total"/><field name="source_currency_id" optional="hide"/><field name="source_amount_currency" optional="hide"/><field name="exchange_rate" optional="hide"/><field name="is_prior_period"/><field name="receipt_method"/><field name="receipt_method_detail"/><field name="engine"/></list></field>
+						</page>
+						<page string="Thresholds"><group><field name="micro_ytd_global"/><field name="micro_ytd_services"/><field name="vat_ytd_global"/><field name="vat_ytd_services"/><field name="threshold_status" nolabel="1"/></group></page>
+					</notebook>
+				</sheet>
+				<chatter/>
+			</form>
+		</field>
+	</record>
+	<record id="action_urssaf_declarations" model="ir.actions.act_window">
+		<field name="name">URSSAF declarations</field><field name="res_model">l10n.fr.micro.urssaf.declaration</field><field name="view_mode">list,form</field>
+	</record>
+</odoo>

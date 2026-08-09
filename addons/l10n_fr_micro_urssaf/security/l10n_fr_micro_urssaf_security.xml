@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="rule_urssaf_declaration_company" model="ir.rule">
+		<field name="name">URSSAF declarations: active companies</field>
+		<field name="model_id" ref="model_l10n_fr_micro_urssaf_declaration"/>
+		<field name="domain_force">[('company_id', 'in', company_ids)]</field>
+	</record>
+	<record id="rule_urssaf_line_company" model="ir.rule">
+		<field name="name">URSSAF declaration lines: active companies</field>
+		<field name="model_id" ref="model_l10n_fr_micro_urssaf_declaration_line"/>
+		<field name="domain_force">[('company_id', 'in', company_ids)]</field>
+	</record>
+	<record id="rule_urssaf_source_company" model="ir.rule">
+		<field name="name">URSSAF sources: active companies</field>
+		<field name="model_id" ref="model_l10n_fr_micro_urssaf_declaration_source"/>
+		<field name="domain_force">[('company_id', 'in', company_ids)]</field>
+	</record>
+	<record id="rule_urssaf_annual_company" model="ir.rule">
+		<field name="name">URSSAF annual evidence: active companies</field>
+		<field name="model_id" ref="model_l10n_fr_micro_urssaf_annual"/>
+		<field name="domain_force">[('company_id', 'in', company_ids)]</field>
+	</record>
+</odoo>

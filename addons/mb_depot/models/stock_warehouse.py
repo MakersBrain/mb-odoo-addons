@@ -26,6 +26,26 @@ class StockWarehouse(models.Model):
              "warehouse, so unsold pieces stay on our balance sheet until the "
              "depositary reports a sale.",
     )
+    mb_depot_legal_structure = fields.Selection(
+        selection=[
+            ("resale", "Purchase-resale on sale"),
+            ("mandate", "Mandate — sale in our name"),
+        ],
+        string="Legal structure",
+        copy=False,
+        help="The signed contract controls who sells to the final customer and "
+             "therefore which gross turnover must be declared.",
+    )
+    mb_depot_mandate_reviewed_through = fields.Date(
+        string="Mandate accounting reviewed through",
+        copy=False,
+        help="Accounting Administrator attestation that retail customer invoices "
+             "and gallery commission bills have been reviewed through this date.",
+    )
+    mb_depot_mandate_review_note = fields.Text(
+        string="Mandate accounting review note",
+        copy=False,
+    )
     depot_partner_id = fields.Many2one(
         comodel_name="res.partner",
         string="Depositary",
@@ -81,3 +101,39 @@ class StockWarehouse(models.Model):
                     "table inside the depositary's shop.",
                     name=warehouse.display_name,
                 ))
+
+    @api.constrains("is_depot", "mb_depot_legal_structure")
+    def _check_depot_legal_structure(self):
+        for warehouse in self.filtered("is_depot"):
+            if not warehouse.mb_depot_legal_structure:
+                raise ValidationError(_(
+                    "Choose the signed legal structure for depot %(name)s.",
+                    name=warehouse.display_name,
+                ))
+
+    @api.constrains(
+        "mb_depot_legal_structure",
+        "mb_depot_mandate_reviewed_through",
+        "mb_depot_mandate_review_note",
+    )
+    def _check_mandate_review(self):
+        for warehouse in self:
+            if warehouse.mb_depot_mandate_reviewed_through and not (
+                warehouse.mb_depot_legal_structure == "mandate"
+                and warehouse.mb_depot_mandate_review_note
+            ):
+                raise ValidationError(_(
+                    "A mandate review date requires a mandate depot and a review note."
+                ))
+
+    def write(self, values):
+        review_fields = {
+            "mb_depot_mandate_reviewed_through",
+            "mb_depot_mandate_review_note",
+        }
+        if review_fields.intersection(values) and not self.env.is_superuser() \
+                and not self.env.user.has_group("account.group_account_manager"):
+            raise ValidationError(_(
+                "Only an Accounting Administrator can attest mandate accounting reviews."
+            ))
+        return super().write(values)

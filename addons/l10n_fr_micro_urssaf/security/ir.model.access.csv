@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_urssaf_declaration_user,URSSAF declaration user,model_l10n_fr_micro_urssaf_declaration,account.group_account_user,1,1,1,0
+access_urssaf_declaration_manager,URSSAF declaration manager,model_l10n_fr_micro_urssaf_declaration,account.group_account_manager,1,1,1,1
+access_urssaf_line_user,URSSAF line user,model_l10n_fr_micro_urssaf_declaration_line,account.group_account_user,1,1,1,1
+access_urssaf_line_manager,URSSAF line manager,model_l10n_fr_micro_urssaf_declaration_line,account.group_account_manager,1,1,1,1
+access_urssaf_source_user,URSSAF source user,model_l10n_fr_micro_urssaf_declaration_source,account.group_account_user,1,1,1,1
+access_urssaf_source_manager,URSSAF source manager,model_l10n_fr_micro_urssaf_declaration_source,account.group_account_manager,1,1,1,1
+access_urssaf_rate_user,URSSAF rate user,model_l10n_fr_micro_urssaf_rate,account.group_account_user,1,0,0,0
+access_urssaf_rate_manager,URSSAF rate manager,model_l10n_fr_micro_urssaf_rate,account.group_account_manager,1,1,1,1
+access_urssaf_acre_rule_user,URSSAF ACRE rule user,model_l10n_fr_micro_urssaf_acre_rule,account.group_account_user,1,0,0,0
+access_urssaf_acre_rule_manager,URSSAF ACRE rule manager,model_l10n_fr_micro_urssaf_acre_rule,account.group_account_manager,1,1,1,1
+access_urssaf_threshold_user,URSSAF threshold user,model_l10n_fr_micro_urssaf_threshold,account.group_account_user,1,0,0,0
+access_urssaf_threshold_manager,URSSAF threshold manager,model_l10n_fr_micro_urssaf_threshold,account.group_account_manager,1,1,1,1
+access_urssaf_annual_user,URSSAF annual user,model_l10n_fr_micro_urssaf_annual,account.group_account_user,1,1,0,0
+access_urssaf_annual_manager,URSSAF annual manager,model_l10n_fr_micro_urssaf_annual,account.group_account_manager,1,1,1,1
+access_urssaf_setup_manager,URSSAF setup wizard manager,model_l10n_fr_micro_urssaf_setup_wizard,account.group_account_manager,1,1,1,1

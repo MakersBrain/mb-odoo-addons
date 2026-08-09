@@ -13,6 +13,15 @@ class ResConfigSettings(models.TransientModel):
 	l10n_fr_micro_service_tax_id = fields.Many2one(
 		related="company_id.l10n_fr_micro_service_tax_id", readonly=True,
 	)
+	l10n_fr_micro_bnc_enabled = fields.Boolean(
+		related="company_id.l10n_fr_micro_bnc_enabled", readonly=False,
+	)
+	l10n_fr_micro_bnc_tax_id = fields.Many2one(
+		related="company_id.l10n_fr_micro_bnc_tax_id", readonly=True,
+	)
+	l10n_fr_micro_bnc_economic_tax_id = fields.Many2one(
+		related="company_id.l10n_fr_micro_bnc_economic_tax_id", readonly=True,
+	)
 	l10n_fr_micro_purchase_tax_id = fields.Many2one(
 		related="company_id.l10n_fr_micro_purchase_tax_id", readonly=True,
 	)
@@ -31,6 +40,6 @@ class ResConfigSettings(models.TransientModel):
 		self.ensure_one()
 		return self.company_id.action_l10n_fr_micro_activate_franchise()
 
-	def action_l10n_fr_micro_activate_vat(self):
+	def action_l10n_fr_micro_activate_vat(self, effective_date=None):
 		self.ensure_one()
-		return self.company_id.action_l10n_fr_micro_activate_vat()
+		return self.company_id.action_l10n_fr_micro_activate_vat(effective_date=effective_date)

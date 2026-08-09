@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="view_tax_form_urssaf_category" model="ir.ui.view">
+		<field name="name">account.tax.form.urssaf.category</field>
+		<field name="model">account.tax</field>
+		<field name="inherit_id" ref="account.view_tax_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//field[@name='tax_exigibility']" position="after">
+				<field name="l10n_fr_micro_urssaf_category" groups="account.group_account_manager"/>
+			</xpath>
+		</field>
+	</record>
+</odoo>

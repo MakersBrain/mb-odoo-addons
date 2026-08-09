@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="view_urssaf_rate_list" model="ir.ui.view">
+		<field name="name">l10n.fr.micro.urssaf.rate.list</field><field name="model">l10n.fr.micro.urssaf.rate</field>
+		<field name="arch" type="xml"><list><field name="date_from"/><field name="date_to"/><field name="levy"/><field name="category"/><field name="taxpayer_kind" optional="show"/><field name="chamber_kind" optional="show"/><field name="chamber_zone" optional="show"/><field name="rate"/></list></field>
+	</record>
+	<record id="view_urssaf_rate_form" model="ir.ui.view">
+		<field name="name">l10n.fr.micro.urssaf.rate.form</field><field name="model">l10n.fr.micro.urssaf.rate</field>
+		<field name="arch" type="xml"><form><sheet><group><field name="date_from"/><field name="date_to"/><field name="levy"/><field name="category"/><field name="taxpayer_kind" invisible="levy != 'cfp'"/><field name="chamber_kind" invisible="levy != 'chamber'"/><field name="chamber_zone" invisible="levy != 'chamber' or chamber_kind != 'cma'"/><field name="rate"/></group></sheet></form></field>
+	</record>
+	<record id="action_urssaf_rates" model="ir.actions.act_window"><field name="name">Dated levy rates</field><field name="res_model">l10n.fr.micro.urssaf.rate</field><field name="view_mode">list,form</field></record>
+
+	<record id="view_urssaf_acre_rule_list" model="ir.ui.view"><field name="name">l10n.fr.micro.urssaf.acre.rule.list</field><field name="model">l10n.fr.micro.urssaf.acre.rule</field><field name="arch" type="xml"><list><field name="creation_date_from"/><field name="creation_date_to"/><field name="payable_coefficient"/></list></field></record>
+	<record id="action_urssaf_acre_rules" model="ir.actions.act_window"><field name="name">ACRE rules</field><field name="res_model">l10n.fr.micro.urssaf.acre.rule</field><field name="view_mode">list,form</field></record>
+
+	<record id="view_urssaf_threshold_list" model="ir.ui.view"><field name="name">l10n.fr.micro.urssaf.threshold.list</field><field name="model">l10n.fr.micro.urssaf.threshold</field><field name="arch" type="xml"><list><field name="date_from"/><field name="date_to"/><field name="vat_global_base"/><field name="vat_global_major"/><field name="vat_service_base"/><field name="vat_service_major"/><field name="micro_global"/><field name="micro_service"/></list></field></record>
+	<record id="action_urssaf_thresholds" model="ir.actions.act_window"><field name="name">Threshold rules</field><field name="res_model">l10n.fr.micro.urssaf.threshold</field><field name="view_mode">list,form</field></record>
+
+	<record id="view_urssaf_annual_list" model="ir.ui.view"><field name="name">l10n.fr.micro.urssaf.annual.list</field><field name="model">l10n.fr.micro.urssaf.annual</field><field name="arch" type="xml"><list><field name="company_id" groups="base.group_multi_company"/><field name="year"/><field name="source"/><field name="urssaf_goods"/><field name="urssaf_services"/><field name="urssaf_total"/><field name="vat_global"/><field name="vat_services"/></list></field></record>
+	<record id="view_urssaf_annual_form" model="ir.ui.view"><field name="name">l10n.fr.micro.urssaf.annual.form</field><field name="model">l10n.fr.micro.urssaf.annual</field><field name="arch" type="xml"><form><header><button name="action_compute" type="object" string="Compute from filed evidence" class="btn-primary" invisible="source == 'manual'"/></header><sheet><group><field name="company_id" groups="base.group_multi_company"/><field name="year"/><field name="source"/><field name="manual_reason" invisible="source != 'manual'"/><field name="urssaf_goods"/><field name="urssaf_services"/><field name="urssaf_total"/><field name="vat_global"/><field name="vat_services"/></group></sheet></form></field></record>
+	<record id="action_urssaf_annual" model="ir.actions.act_window"><field name="name">Annual evidence</field><field name="res_model">l10n.fr.micro.urssaf.annual</field><field name="view_mode">list,form</field></record>
+</odoo>

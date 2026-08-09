@@ -18,6 +18,7 @@ class TestDepotCatalog(TransactionCase):
         cls.env["mb.depot.create"].create({
             "partner_id": cls.gallery.id,
             "commission": 40.0,
+            "legal_structure": "resale",
         }).action_create()
         cls.depot_warehouse = cls.env["stock.warehouse"].search([
             ("is_depot", "=", True), ("depot_partner_id", "=", cls.gallery.id)])

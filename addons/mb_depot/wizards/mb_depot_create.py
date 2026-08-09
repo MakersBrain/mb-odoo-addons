@@ -46,6 +46,15 @@ class MbDepotCreate(models.TransientModel):
         digits="Discount",
         required=True,
     )
+    legal_structure = fields.Selection(
+        selection=[
+            ("resale", "Purchase-resale on sale"),
+            ("mandate", "Mandate — sale in our name"),
+        ],
+        string="Signed legal structure",
+        required=True,
+        help="No default is safe: select what the signed gallery contract says.",
+    )
     assign_pricelist = fields.Boolean(
         string="Assign the pricelist to the depositary",
         default=True,
@@ -122,7 +131,10 @@ class MbDepotCreate(models.TransientModel):
             ("is_depot", "=", True), ("depot_partner_id", "=", self.partner_id.id),
         ], limit=1)
         if warehouse:
-            warehouse.depot_commission = self.commission
+            warehouse.write({
+                "depot_commission": self.commission,
+                "mb_depot_legal_structure": self.legal_structure,
+            })
             return warehouse
         # partner_id is deliberately left at the company's own address rather
         # than set to the depositary. stock.warehouse._update_partner_data()
@@ -140,6 +152,7 @@ class MbDepotCreate(models.TransientModel):
             "reception_steps": "one_step",
             "delivery_steps": "ship_only",
             "is_depot": True,
+            "mb_depot_legal_structure": self.legal_structure,
             "depot_partner_id": self.partner_id.id,
             "depot_commission": self.commission,
         })
@@ -189,6 +202,17 @@ class MbDepotCreate(models.TransientModel):
         # with itself, and a depot whose commission has been renegotiated is
         # brought up to date by running this again rather than by hand.
         warehouse = self._ensure_warehouse()
+
+        if self.legal_structure == "mandate":
+            warehouse.depot_pricelist_id = False
+            return {
+                "type": "ir.actions.act_window",
+                "res_model": "stock.warehouse",
+                "res_id": warehouse.id,
+                "view_mode": "form",
+                "target": "current",
+            }
+
         pricelist = self._ensure_pricelist(warehouse)
 
         if self.assign_pricelist:

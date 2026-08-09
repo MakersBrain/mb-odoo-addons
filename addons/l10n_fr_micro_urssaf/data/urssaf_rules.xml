@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<!-- Rates are percentages. Dated records intentionally keep law out of Python. -->
+	<record id="rate_2026_cot_goods" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">cotisation</field><field name="category">bic_goods</field><field name="rate">12.3</field>
+	</record>
+	<record id="rate_2026_cot_bic_service" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">cotisation</field><field name="category">bic_service</field><field name="rate">21.2</field>
+	</record>
+	<record id="rate_2026_cot_bnc" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">cotisation</field><field name="category">bnc</field><field name="rate">25.6</field>
+	</record>
+
+	<record id="rate_2026_cfp_artisan_goods" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">cfp</field><field name="category">bic_goods</field><field name="taxpayer_kind">artisan</field><field name="rate">0.3</field>
+	</record>
+	<record id="rate_2026_cfp_artisan_service" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">cfp</field><field name="category">bic_service</field><field name="taxpayer_kind">artisan</field><field name="rate">0.3</field>
+	</record>
+	<record id="rate_2026_cfp_merchant_goods" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">cfp</field><field name="category">bic_goods</field><field name="taxpayer_kind">merchant</field><field name="rate">0.1</field>
+	</record>
+	<record id="rate_2026_cfp_merchant_service" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">cfp</field><field name="category">bic_service</field><field name="taxpayer_kind">merchant</field><field name="rate">0.1</field>
+	</record>
+	<record id="rate_2026_cfp_liberal_bnc" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">cfp</field><field name="category">bnc</field><field name="taxpayer_kind">liberal</field><field name="rate">0.2</field>
+	</record>
+
+	<record id="rate_2026_vfl_goods" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">liberatoire</field><field name="category">bic_goods</field><field name="rate">1.0</field>
+	</record>
+	<record id="rate_2026_vfl_bic_service" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">liberatoire</field><field name="category">bic_service</field><field name="rate">1.7</field>
+	</record>
+	<record id="rate_2026_vfl_bnc" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">liberatoire</field><field name="category">bnc</field><field name="rate">2.2</field>
+	</record>
+
+	<!-- Consular chamber rates verified for 2026 against Service Public F37483. -->
+	<record id="rate_2026_cma_general_goods" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">chamber</field><field name="category">bic_goods</field><field name="chamber_kind">cma</field><field name="chamber_zone">general</field><field name="rate">0.22</field>
+	</record>
+	<record id="rate_2026_cma_general_service" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">chamber</field><field name="category">bic_service</field><field name="chamber_kind">cma</field><field name="chamber_zone">general</field><field name="rate">0.48</field>
+	</record>
+	<record id="rate_2026_cma_alsace_goods" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">chamber</field><field name="category">bic_goods</field><field name="chamber_kind">cma</field><field name="chamber_zone">alsace</field><field name="rate">0.29</field>
+	</record>
+	<record id="rate_2026_cma_alsace_service" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">chamber</field><field name="category">bic_service</field><field name="chamber_kind">cma</field><field name="chamber_zone">alsace</field><field name="rate">0.65</field>
+	</record>
+	<record id="rate_2026_cma_moselle_goods" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">chamber</field><field name="category">bic_goods</field><field name="chamber_kind">cma</field><field name="chamber_zone">moselle</field><field name="rate">0.37</field>
+	</record>
+	<record id="rate_2026_cma_moselle_service" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">chamber</field><field name="category">bic_service</field><field name="chamber_kind">cma</field><field name="chamber_zone">moselle</field><field name="rate">0.83</field>
+	</record>
+	<record id="rate_2026_cci_goods" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">chamber</field><field name="category">bic_goods</field><field name="chamber_kind">cci</field><field name="rate">0.015</field>
+	</record>
+	<record id="rate_2026_cci_service" model="l10n.fr.micro.urssaf.rate">
+		<field name="date_from">2026-01-01</field><field name="levy">chamber</field><field name="category">bic_service</field><field name="chamber_kind">cci</field><field name="rate">0.044</field>
+	</record>
+
+	<record id="acre_pre_july_2026" model="l10n.fr.micro.urssaf.acre.rule">
+		<field name="creation_date_from">2000-01-01</field><field name="creation_date_to">2026-06-30</field><field name="payable_coefficient">0.5</field>
+	</record>
+	<record id="acre_from_july_2026" model="l10n.fr.micro.urssaf.acre.rule">
+		<field name="creation_date_from">2026-07-01</field><field name="payable_coefficient">0.75</field>
+	</record>
+
+	<record id="threshold_2025_2027" model="l10n.fr.micro.urssaf.threshold">
+		<field name="date_from">2025-01-01</field><field name="date_to">2027-12-31</field>
+		<field name="vat_global_base">85000</field><field name="vat_global_major">93500</field>
+		<field name="vat_service_base">37500</field><field name="vat_service_major">41250</field>
+		<field name="micro_global">203100</field><field name="micro_service">83600</field>
+	</record>
+</odoo>

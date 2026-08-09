@@ -70,6 +70,7 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 		], required=True,
 	)
 	tax_effective_date = fields.Date(string="Regime effective from", required=True)
+	bnc_enabled = fields.Boolean(string="Enable a BNC turnover category")
 	edi_mode = fields.Selection(
 		selection=[("external_facturx", "Factur-X file for an external approved platform")],
 		required=True, readonly=True,
@@ -104,6 +105,7 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 			"bic": bank_account.bank_bic,
 			"tax_regime": company.l10n_fr_micro_tax_regime,
 			"tax_effective_date": company.l10n_fr_micro_tax_switch_date or fields.Date.context_today(self),
+			"bnc_enabled": company.l10n_fr_micro_bnc_enabled,
 			"edi_mode": company.l10n_fr_micro_edi_mode,
 		})
 		return values
@@ -225,6 +227,7 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 			"l10n_fr_micro_ape_code": (self.ape_code or "").upper(),
 			"l10n_fr_micro_activity_description": self.activity_description,
 			"l10n_fr_micro_edi_mode": self.edi_mode,
+			"l10n_fr_micro_bnc_enabled": self.bnc_enabled,
 			"company_registry": siret,
 			"street": self.street,
 			"street2": self.street2,

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="view_l10n_fr_micro_vat_switch_wizard_form" model="ir.ui.view">
+		<field name="name">l10n.fr.micro.vat.switch.wizard.form</field>
+		<field name="model">l10n.fr.micro.vat.switch.wizard</field>
+		<field name="arch" type="xml">
+			<form string="Activate VAT-liable mode">
+				<group><field name="company_id" groups="base.group_multi_company"/><field name="effective_date"/></group>
+				<div class="alert alert-warning" role="alert">This date must be the verified legal crossing date. Existing documents are not rewritten.</div>
+				<footer><button name="action_apply" type="object" string="Activate VAT liable" class="btn-primary"/><button string="Cancel" special="cancel" class="btn-secondary"/></footer>
+			</form>
+		</field>
+	</record>
+	<record id="action_l10n_fr_micro_vat_switch_wizard" model="ir.actions.act_window">
+		<field name="name">Activate VAT-liable mode</field><field name="res_model">l10n.fr.micro.vat.switch.wizard</field><field name="view_mode">form</field><field name="target">new</field>
+	</record>
+</odoo>

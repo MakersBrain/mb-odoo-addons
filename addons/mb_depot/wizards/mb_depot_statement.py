@@ -114,6 +114,12 @@ class MbDepotStatement(models.TransientModel):
 
     def action_compute(self):
         self.ensure_one()
+        if self.depot_id.mb_depot_legal_structure == "mandate":
+            raise UserError(_(
+                "This depot is a mandate. Its retail sales and commission must "
+                "be booked from the gallery report; the purchase-resale statement "
+                "would understate turnover."
+            ))
         self.line_ids.unlink()
         incoming, outgoing = self._crossing_moves()
 

@@ -104,3 +104,17 @@ class TestMicroEnterpriseTaxRegime(TransactionCase):
 		self.company._l10n_fr_micro_switch("franchise", effective_date=effective_date)
 		self.assertEqual(self.company.l10n_fr_micro_tax_regime, "franchise")
 		self.assertEqual(self.company.l10n_fr_micro_tax_switch_date, effective_date)
+
+	def test_bnc_has_distinct_economic_and_franchise_taxes(self):
+		self.company.l10n_fr_micro_bnc_enabled = True
+		self.company._l10n_fr_micro_prepare_tax_setup()
+		economic = self.company.l10n_fr_micro_bnc_economic_tax_id
+		franchise = self.company.l10n_fr_micro_bnc_tax_id
+		self.assertTrue(economic)
+		self.assertEqual(economic.amount, self.service_10.amount)
+		self.assertEqual(economic.l10n_fr_micro_urssaf_category, "bnc")
+		self.assertEqual(franchise.original_tax_ids, economic)
+		self.assertEqual(
+			self.company.l10n_fr_micro_fiscal_position_id.map_tax(economic),
+			franchise,
+		)

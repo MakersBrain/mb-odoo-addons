@@ -56,7 +56,7 @@ _show_discount(). The wizard sets both.
 Sourcing needs no third-party module: a sale from a depot is a sale from that
 warehouse, which is Odoo's own Warehouse field on the quotation.
 """,
-    "version": "19.0.2.1.0",
+    "version": "19.0.2.2.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
@@ -65,6 +65,7 @@ warehouse, which is Odoo's own Warehouse field on the quotation.
         # The commission is a pricelist and the statement values sold pieces
         # from the sale order line, so selling has to exist.
         "sale_stock",
+        "account",
     ],
     "data": [
         "security/ir.model.access.csv",

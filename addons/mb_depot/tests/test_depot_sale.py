@@ -1,4 +1,5 @@
 from odoo import fields
+from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
 
@@ -30,11 +31,30 @@ class TestDepotSale(TransactionCase):
         return self.env["mb.depot.create"].create(dict({
             "partner_id": self.gallery.id,
             "commission": commission,
+            "legal_structure": "resale",
         }, **values))
 
     def _depot(self):
         return self.env["stock.warehouse"].search([
             ("is_depot", "=", True), ("depot_partner_id", "=", self.gallery.id)])
+
+    def test_mandate_is_recorded_but_resale_order_is_blocked(self):
+        gallery = self.env["res.partner"].create({
+            "name": "Mandate gallery", "is_company": True,
+        })
+        self.env["mb.depot.create"].create({
+            "partner_id": gallery.id,
+            "commission": 40.0,
+            "legal_structure": "mandate",
+        }).action_create()
+        depot = self.env["stock.warehouse"].search([
+            ("is_depot", "=", True), ("depot_partner_id", "=", gallery.id),
+        ]).ensure_one()
+        self.assertEqual(depot.mb_depot_legal_structure, "mandate")
+        order = self.env["sale.order"].create({"partner_id": gallery.id})
+        self.assertEqual(order.warehouse_id, depot)
+        with self.assertRaises(UserError):
+            order.action_confirm()
 
     def _place(self, product, qty, location):
         move = self.env["stock.move"].create({
