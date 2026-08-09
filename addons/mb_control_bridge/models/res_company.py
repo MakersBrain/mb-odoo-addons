@@ -15,6 +15,7 @@ MODULE_BUNDLES = {
     "labels": ("mb_label", "mb_label_pos"),
     "depot": ("mb_depot",),
     "sumup": ("mb_payment_sumup", "mb_account_payment_sumup", "mb_pos_sumup"),
+    "invoice-capture": ("mb_invoice_capture",),
 }
 
 
