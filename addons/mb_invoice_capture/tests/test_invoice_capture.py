@@ -233,8 +233,10 @@ class TestInvoiceCapture(TransactionCase):
         order = capture.purchase_order_id
         self.assertEqual(action["res_id"], order.id)
         self.assertEqual(order.state, "draft")
+        self.assertEqual(order.date_order.date().isoformat(), "2026-08-01")
         self.assertEqual(order.order_line.product_id, product)
         self.assertEqual(order.order_line.product_qty, 2)
+        self.assertEqual(order.order_line.date_planned.date().isoformat(), "2026-08-01")
         self.assertEqual(capture.move_id.invoice_line_ids.purchase_line_id, order.order_line)
         self.assertFalse(order.picking_ids)
         self.assertEqual(capture.action_create_purchase_order()["res_id"], order.id)
@@ -242,6 +244,7 @@ class TestInvoiceCapture(TransactionCase):
         quantity_before = product.qty_available
         order.button_confirm()
         self.assertTrue(order.picking_ids)
+        self.assertEqual(order.picking_ids.scheduled_date.date().isoformat(), "2026-08-01")
         self.assertEqual(product.qty_available, quantity_before)
 
     def test_supplier_product_code_takes_precedence_for_matching(self):

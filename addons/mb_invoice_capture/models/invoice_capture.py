@@ -734,6 +734,12 @@ class InvoiceCapture(models.Model):
         )
         if not currency:
             raise UserError(_("The extracted currency is not active in Odoo."))
+        purchase_date = (
+            self.move_id.invoice_date
+            or fields.Date.to_date((self.normalized_payload or {}).get("invoice_date"))
+            or fields.Date.context_today(self)
+        )
+        purchase_datetime = fields.Datetime.to_datetime(purchase_date)
         commands = []
         for position, review_line in enumerate(self.review_line_ids.sorted("sequence")):
             bill_line = bill_lines.sorted("sequence")[position] if bill_lines else False
@@ -751,12 +757,14 @@ class InvoiceCapture(models.Model):
                 "product_qty": quantity,
                 "product_uom_id": review_line.review_uom_id.id,
                 "price_unit": price_unit,
+                "date_planned": purchase_datetime,
                 "tax_ids": [(6, 0, taxes.ids)],
             }))
         order = self.env["purchase.order"].with_company(self.company_id).create({
             "company_id": self.company_id.id,
             "partner_id": supplier.id,
             "currency_id": currency.id,
+            "date_order": purchase_datetime,
             "partner_ref": (self.normalized_payload or {}).get("invoice_number") or False,
             "origin": self.external_document_id,
             "order_line": commands,
