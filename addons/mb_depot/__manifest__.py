@@ -41,7 +41,10 @@ This module adds what Odoo and OCA do not have:
   starting from nothing and naming a lot of individual pieces, is not;
 * the depositary's own warehouse defaulted onto their sale orders, and the
   product picker there limited to what they are actually holding and
-  unreserved.
+  unreserved;
+* invoicing on delivered quantities as the default for new products, so the
+  transfer out of the depot is what gates the gallery's invoice rather than the
+  confirmation of an order.
 
 The commission itself is a pricelist, not code: under achat-revente sur vente
 the gallery buys at list minus its percentage at the moment it sells. For that
@@ -53,7 +56,7 @@ _show_discount(). The wizard sets both.
 Sourcing needs no third-party module: a sale from a depot is a sale from that
 warehouse, which is Odoo's own Warehouse field on the quotation.
 """,
-    "version": "19.0.2.0.0",
+    "version": "19.0.2.1.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",

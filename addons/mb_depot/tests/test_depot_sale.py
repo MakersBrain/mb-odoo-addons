@@ -107,6 +107,53 @@ class TestDepotSale(TransactionCase):
         self.assertEqual(picking.move_ids.quantity, 1,
                          "and it reserves, because the stock is really there")
 
+    def test_new_products_invoice_on_delivered_quantities(self):
+        """The stock movement out of the depot is what makes the sale real, so
+        it has to be what gates the invoice. On ordered quantities a gallery can
+        be billed at confirmation - before the movement, and before anything was
+        sold at all if the report turns out to be wrong.
+        """
+        self._wizard().action_create()
+
+        self.assertEqual(
+            self.env["ir.default"]._get("product.template", "invoice_policy"),
+            "delivery")
+        fresh = self.env["product.template"].create({"name": "A piece made later"})
+        self.assertEqual(fresh.invoice_policy, "delivery")
+
+    def test_a_depot_sale_cannot_be_invoiced_before_it_ships(self):
+        self._wizard().action_create()
+        depot = self._depot()
+        self._place(self.held, 1, depot.lot_stock_id)
+        self.held.invoice_policy = "delivery"
+
+        order = self.env["sale.order"].create({
+            "partner_id": self.gallery.id,
+            "order_line": [fields.Command.create({
+                "product_id": self.held.id, "product_uom_qty": 1})],
+        })
+        order.action_confirm()
+        self.assertEqual(order.invoice_status, "no",
+                         "nothing to invoice until the piece leaves the depot")
+
+        picking = order.picking_ids
+        picking.move_ids.quantity = 1
+        picking.move_ids.picked = True
+        picking.button_validate()
+
+        self.assertEqual(order.invoice_status, "to invoice")
+        self.assertEqual(order.order_line.qty_delivered, 1)
+
+    def test_an_existing_product_keeps_the_policy_it_had(self):
+        """A default, not a rewrite: the wizard has no business changing a
+        policy someone already chose.
+        """
+        self.at_home.invoice_policy = "order"
+
+        self._wizard().action_create()
+
+        self.assertEqual(self.at_home.invoice_policy, "order")
+
     def test_rerunning_moves_the_commission_rather_than_stacking_it(self):
         """Renegotiating the percentage is the reason to run the wizard twice.
         A second global item beside the first would not deterministically win.

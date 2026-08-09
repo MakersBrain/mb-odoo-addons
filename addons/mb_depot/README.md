@@ -40,6 +40,15 @@ and it is smaller than the one it replaced.
 The **commission is a pricelist, not code**. Under achat-revente sur vente the
 gallery buys at list minus its percentage at the moment it sells.
 
+New products default to **invoicing on delivered quantities**, set by the wizard.
+The piece is sold when the depositary says it is, and the transfer out of the
+depot is the record of that; on ordered quantities a gallery could be billed at
+confirmation — before the movement that triggers the invoice, and before anything
+was sold at all if the report turns out to be wrong. Note the reach:
+`invoice_policy` is a product field with no per-warehouse variant, so this is the
+default for every new product, not only consigned ones. Existing products are
+left alone — rewriting a policy someone chose is not the wizard's business.
+
 A depot **receives and delivers in one step**, pinned by a constraint. Multi-step
 would put a receiving bay and a packing table inside someone else's shop, and
 split one reported sale into two moves whose first leg leaves the depot's stock
@@ -182,6 +191,6 @@ the report here.
 odoo -d <db> -u mb_depot --test-enable --test-tags /mb_depot --stop-after-init
 ```
 
-Thirty tests, on the statement arithmetic, the reported date that decides
+Thirty-five tests, on the statement arithmetic, the reported date that decides
 which period a movement falls in, and the consistency of a created depot — the
 parts that decide money.

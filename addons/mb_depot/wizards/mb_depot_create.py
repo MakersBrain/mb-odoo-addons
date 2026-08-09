@@ -83,6 +83,32 @@ class MbDepotCreate(models.TransientModel):
                 implied.append(fields.Command.link(group.id))
         if implied:
             group_user.sudo().write({"implied_ids": implied})
+        self._default_to_invoicing_on_delivery()
+
+    def _default_to_invoicing_on_delivery(self):
+        """New products invoice on delivered quantities.
+
+        Under dépôt-vente the piece is sold when the depositary says it is, and
+        the transfer out of the depot is the record of that. Invoicing on
+        ordered quantities lets a gallery be billed the moment the order is
+        confirmed, which is before the movement that legally triggers the
+        invoice - and if the report turns out to be wrong, before anything was
+        sold at all. On delivered quantities the stock movement is the gate.
+
+        Note the reach: invoice_policy is a product field with no per-warehouse
+        variant, so this is the default for every new product, not only the ones
+        that go out on consignment. It is the right default for a workshop that
+        ships what it makes either way, and it stays a default - existing
+        products are left alone, because rewriting a policy someone chose is not
+        this wizard's business.
+
+        ir.default rather than res.config.settings, for the same reason the
+        groups above are implied rather than set: a settings record carries every
+        setting, and saving one archives every pricelist in the database when
+        group_product_pricelist resolves falsy.
+        """
+        self.env["ir.default"].sudo().set(
+            "product.template", "invoice_policy", "delivery")
 
     def _ensure_warehouse(self):
         """The depot's warehouse, adopting one that is already there.
