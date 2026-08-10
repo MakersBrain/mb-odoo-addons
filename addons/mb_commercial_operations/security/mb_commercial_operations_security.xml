@@ -87,4 +87,28 @@
     <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     <field name="groups" eval="[(4, ref('group_commercial_operations_user'))]"/>
   </record>
+  <record id="rule_commercial_plan_template_company" model="ir.rule">
+    <field name="name">Commercial planning templates by company</field>
+    <field name="model_id" ref="model_mb_commercial_plan_template"/>
+    <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    <field name="groups" eval="[(4, ref('group_commercial_operations_user'))]"/>
+  </record>
+  <record id="rule_commercial_plan_template_cost_company" model="ir.rule">
+    <field name="name">Commercial planning template costs by company</field>
+    <field name="model_id" ref="model_mb_commercial_plan_template_cost"/>
+    <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    <field name="groups" eval="[(4, ref('group_commercial_operations_user'))]"/>
+  </record>
+  <record id="rule_commercial_plan_template_product_company" model="ir.rule">
+    <field name="name">Commercial planning template products by company</field>
+    <field name="model_id" ref="model_mb_commercial_plan_template_product"/>
+    <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    <field name="groups" eval="[(4, ref('group_commercial_operations_user'))]"/>
+  </record>
+  <record id="rule_commercial_report_snapshot_company" model="ir.rule">
+    <field name="name">Commercial report snapshots by company</field>
+    <field name="model_id" ref="model_mb_commercial_report_snapshot"/>
+    <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    <field name="groups" eval="[(4, ref('group_commercial_operations_user'))]"/>
+  </record>
 </odoo>

@@ -32,6 +32,9 @@ class TestCommercialOperations(TransactionCase):
                 cls.env.ref("account.group_account_manager").id,
             ])],
         })
+        cls.employee = cls.env["hr.employee"].create({
+            "name": "Commercial test worker", "company_id": cls.company.id,
+        })
 
     def _operation(self, **values):
         start = fields.Datetime.now() + timedelta(days=30)
@@ -150,6 +153,241 @@ class TestCommercialOperations(TransactionCase):
         self.assertTrue(scenario.calculation_blocked)
         with self.assertRaises(ValidationError):
             scenario.action_approve()
+
+    def test_product_plan_aggregates_unrounded_levies_and_freezes_pdf(self):
+        operation = self._operation(profitability_required=True)
+        scenario = self.env["mb.commercial.profitability.scenario"].create({
+            "operation_id": operation.id,
+            "calculation_mode": "product_mix",
+            "line_ids": [fields.Command.create({
+                "product_id": self.product.id,
+                "expected_sold_qty": 10,
+                "sale_price_excluded_tax": 40.0,
+                "vat_rate": 20.0,
+                "channel_fee_rate": 2.5,
+                "turnover_levy_rate": 12.3,
+                "product_unit_cost": 10.0,
+                "other_variable_unit_cost": 1.0,
+                "cost_source": "product",
+                "cost_date": fields.Date.today(),
+            })],
+            "cost_line_ids": [fields.Command.create({
+                "operation_id": operation.id,
+                "name": "Stall",
+                "category": "venue",
+                "calculation": "fixed",
+                "quantity": 1,
+                "rate": 100,
+            })],
+        })
+        operation.primary_scenario_id = scenario
+        self.assertEqual(scenario.sales_revenue_excl_vat, 400)
+        self.assertEqual(scenario.customer_receipts_incl_vat, 480)
+        self.assertEqual(scenario.total_variable_cost, 169.2)
+        self.assertEqual(scenario.projected_margin, 130.8)
+        self.assertEqual(scenario.break_even_units, 5)
+
+        operation.action_approve()
+        snapshot = operation.report_snapshot_ids
+        self.assertEqual(len(snapshot), 1)
+        self.assertTrue(snapshot.attachment_id.datas)
+        self.assertEqual(snapshot.input_digest, snapshot.input_digest.lower())
+        with self.assertRaises(UserError):
+            snapshot.payload = {"forged": True}
+        with self.assertRaises(UserError):
+            snapshot.attachment_id.datas = b"forged"
+
+    def test_zero_product_cost_requires_explicit_assumption(self):
+        operation = self._operation(profitability_required=True)
+        scenario = self.env["mb.commercial.profitability.scenario"].create({
+            "operation_id": operation.id,
+            "line_ids": [fields.Command.create({
+                "product_id": self.product.id,
+                "expected_sold_qty": 2,
+                "sale_price_excluded_tax": 40,
+                "product_unit_cost": 0,
+                "cost_source": "planning",
+                "cost_date": fields.Date.today(),
+            })],
+        })
+        operation.primary_scenario_id = scenario
+        self.assertTrue(scenario.calculation_blocked)
+        scenario.line_ids.exclude_product_cost = True
+        self.assertFalse(scenario.calculation_blocked)
+        self.assertIn("exclude product cost", operation.planning_warning_summary.lower())
+
+    def test_average_basket_matches_equivalent_product_plan(self):
+        product_operation = self._operation(name="Product economics")
+        basket_operation = self._operation(name="Basket economics")
+        product_scenario = self.env["mb.commercial.profitability.scenario"].create({
+            "operation_id": product_operation.id,
+            "line_ids": [fields.Command.create({
+                "product_id": self.product.id, "expected_sold_qty": 10,
+                "sale_price_excluded_tax": 40, "vat_rate": 20,
+                "channel_fee_rate": 2.5, "turnover_levy_rate": 12.3,
+                "product_unit_cost": 10, "cost_source": "product",
+                "cost_date": fields.Date.today(),
+            })],
+        })
+        basket_scenario = self.env["mb.commercial.profitability.scenario"].create({
+            "operation_id": basket_operation.id, "calculation_mode": "average_basket",
+            "line_ids": [fields.Command.create({
+                "expected_sold_qty": 10, "sale_price_excluded_tax": 40,
+                "vat_rate": 20, "channel_fee_rate": 2.5,
+                "turnover_levy_rate": 12.3,
+                "product_cost_mode": "sales_percent", "product_cost_rate": 25,
+                "cost_source": "planning", "cost_date": fields.Date.today(),
+            })],
+        })
+        self.assertEqual(
+            basket_scenario.sales_revenue_excl_vat,
+            product_scenario.sales_revenue_excl_vat,
+        )
+        self.assertEqual(
+            basket_scenario.customer_receipts_incl_vat,
+            product_scenario.customer_receipts_incl_vat,
+        )
+        self.assertEqual(
+            basket_scenario.projected_contribution,
+            product_scenario.projected_contribution,
+        )
+
+    def test_new_operation_wizard_saves_one_authoritative_plan_only(self):
+        before_operations = self.env["mb.commercial.operation"].search_count([])
+        before_moves = self.env["account.move"].search_count([])
+        start = fields.Datetime.now() + timedelta(days=45)
+        wizard = self.env["mb.commercial.operation.plan.wizard"].create({
+            "name": "Winter ceramics fair", "operation_type": "market",
+            "company_id": self.company.id, "partner_id": self.partner.id,
+            "departure": start, "service_start": start + timedelta(hours=1),
+            "service_end": start + timedelta(hours=7),
+            "expected_return": start + timedelta(hours=8),
+            "scenario_name": "Expected sales",
+            "line_ids": [fields.Command.create({
+                "product_id": self.product.id, "desired_opening_qty": 20,
+                "expected_sold_qty": 10, "sale_price_excluded_tax": 40,
+                "product_unit_cost": 10,
+            })],
+            "cost_ids": [fields.Command.create({
+                "name": "Stand", "category": "venue", "calculation": "fixed",
+                "quantity": 1, "rate": 75,
+            })],
+        })
+        self.assertEqual(self.env["mb.commercial.operation"].search_count([]), before_operations)
+        self.assertEqual(wizard.preview_units, 10)
+        self.assertEqual(wizard.preview_sales_excl_vat, 400)
+        self.assertEqual(wizard.preview_fixed_cost, 75)
+        self.assertEqual(wizard.preview_projected_margin, 225)
+        self.assertFalse(wizard.preview_blocked)
+        action = wizard.action_save_draft()
+        operation = self.env["mb.commercial.operation"].browse(action["res_id"])
+        self.assertEqual(self.env["mb.commercial.operation"].search_count([]), before_operations + 1)
+        self.assertEqual(operation.primary_scenario_id.cost_line_ids.planned_amount, 75)
+        self.assertEqual(operation.stock_plan_line_ids.desired_opening_qty, 20)
+        self.assertEqual(
+            operation.primary_scenario_id.line_ids.source_stock_plan_line_id,
+            operation.stock_plan_line_ids,
+        )
+        self.assertEqual(self.env["account.move"].search_count([]), before_moves)
+
+    def test_planning_template_copies_time_travel_and_labour_assumptions(self):
+        template = self.env["mb.commercial.plan.template"].create({
+            "name": "Full market day",
+            "company_id": self.company.id,
+            "operation_type": "market",
+            "default_duration_hours": 9,
+            "default_setup_hours": 1,
+            "default_service_hours": 6,
+            "default_teardown_hours": 1,
+            "default_labour_hourly_cost": 20,
+            "default_travel_hourly_cost": 15,
+            "default_fuel_consumption_l_per_100km": 8,
+            "default_fuel_price_eur_per_l": 2,
+        })
+        start = fields.Datetime.now() + timedelta(days=20)
+        wizard = self.env["mb.commercial.operation.plan.wizard"].create({
+            "name": "Template preview", "company_id": self.company.id,
+            "partner_id": self.partner.id, "departure": start,
+            "service_start": start + timedelta(hours=2),
+        })
+        wizard.template_id = template
+        wizard._onchange_template_id()
+        self.assertEqual(wizard.setup_duration_hours, 1)
+        self.assertEqual(wizard.service_end, wizard.service_start + timedelta(hours=6))
+        self.assertEqual(wizard.teardown_duration_hours, 1)
+        self.assertEqual(wizard.driver_cost_eur_per_hour, 15)
+        self.assertEqual(wizard.fuel_consumption_l_per_100km, 8)
+        labour = wizard.cost_ids.filtered(lambda line: line.category == "labour")
+        self.assertEqual(labour.quantity, 9)
+        self.assertEqual(labour.rate, 20)
+
+    def test_new_operation_quote_stays_transient_until_explicit_save_and_accept(self):
+        connector = self.env["mb.tollquote.connector"].create({
+            "name": "Transient quote", "company_id": self.company.id,
+            "api_token": "secret",
+        })
+        start = fields.Datetime.now() + timedelta(days=60)
+        wizard = self.env["mb.commercial.operation.plan.wizard"].create({
+            "name": "Quoted market", "operation_type": "market",
+            "company_id": self.company.id, "partner_id": self.partner.id,
+            "departure": start, "expected_return": start + timedelta(hours=8),
+            "connector_id": connector.id,
+            "origin_latitude": 43.30, "origin_longitude": 3.50,
+            "destination_latitude": 43.55, "destination_longitude": 3.85,
+            "line_ids": [fields.Command.create({
+                "product_id": self.product.id, "expected_sold_qty": 10,
+                "sale_price_excluded_tax": 40, "product_unit_cost": 10,
+            })],
+        })
+        route = {"response": {"trip": {
+            "summary": {"length": 50, "time": 1800},
+            "legs": [{"shape": "encoded-polyline6"}],
+        }}}
+        quote = {
+            "api_version": "0.1.0", "reporting_currency": "EUR",
+            "totals": {"gross": {"value": "5.00", "currency": "EUR"}},
+        }
+        before = self.env["mb.travel.estimate"].search_count([])
+        with patch.object(
+            type(connector), "_request", autospec=True,
+            side_effect=[route, quote, route, quote],
+        ):
+            wizard.action_calculate_travel()
+        self.assertTrue(wizard.quote_calculated)
+        self.assertEqual(self.env["mb.travel.estimate"].search_count([]), before)
+        wizard.accept_quote = True
+        wizard.incomplete_quote_acknowledged = wizard.quote_incomplete
+        operation = self.env["mb.commercial.operation"].browse(
+            wizard.action_save_draft()["res_id"]
+        )
+        self.assertEqual(operation.travel_estimate_id.state, "accepted")
+        self.assertEqual(operation.travel_estimate_id.distance_km, 100)
+        travel_cost = operation.primary_scenario_id.cost_line_ids.filtered(
+            lambda line: line.category == "travel"
+        )
+        self.assertEqual(travel_cost.travel_estimate_id, operation.travel_estimate_id)
+        self.assertEqual(travel_cost.planned_amount, operation.travel_estimate_id.total_operating_cost)
+
+    def test_live_planning_and_outcome_reports_render_through_native_qweb(self):
+        operation = self._operation(name="Printable operation")
+        planning = self.env.ref(
+            "mb_commercial_operations.action_report_commercial_operation"
+        )
+        html, _kind = planning._render_qweb_html(planning.report_name, operation.ids)
+        self.assertIn(b"DRAFT / SIMULATION", html)
+        self.assertIn(b"Cost plan only", html)
+
+        operation.action_approve()
+        operation.action_done()
+        snapshot_count = len(operation.report_snapshot_ids)
+        operation.action_print_outcome_pack()
+        self.assertEqual(len(operation.report_snapshot_ids), snapshot_count)
+        outcome = self.env.ref(
+            "mb_commercial_operations.action_report_commercial_operation_outcome"
+        )
+        html, _kind = outcome._render_qweb_html(outcome.report_name, operation.ids)
+        self.assertIn(b"Outcome", html)
+        self.assertIn(b"operation-linked native evidence only", html)
 
     def test_overlapping_stock_targets_must_be_allocated(self):
         operation = self._operation()
@@ -342,17 +580,24 @@ class TestCommercialOperations(TransactionCase):
         self.assertIn("0.2.0", estimate.warning_text)
         self.assertEqual(estimate.provider_version, "0.2.0")
 
-    def test_profitability_report_reads_live_analytic_evidence(self):
+    def test_profitability_report_reads_only_operation_task_evidence(self):
         operation = self._operation(expected_revenue=200)
         self.env["account.analytic.line"].create({
             "name": "Market revenue",
             "account_id": operation.analytic_account_id.id,
+            "mb_commercial_operation_id": operation.id,
             "amount": 150,
         })
         self.env["account.analytic.line"].create({
             "name": "Market cost",
             "account_id": operation.analytic_account_id.id,
+            "mb_commercial_operation_id": operation.id,
             "amount": -40,
+        })
+        self.env["account.analytic.line"].create({
+            "name": "Other operation on shared project",
+            "account_id": operation.analytic_account_id.id,
+            "amount": 999,
         })
         report = self.env["mb.commercial.profitability.report"].search([
             ("operation_id", "=", operation.id),

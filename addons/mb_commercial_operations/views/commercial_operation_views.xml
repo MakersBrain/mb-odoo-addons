@@ -59,6 +59,14 @@
             <group>
               <field name="planned_start" readonly="state not in ('draft', 'quoted')"/>
               <field name="planned_end" readonly="state not in ('draft', 'quoted')"/>
+              <field name="expected_arrival" readonly="state not in ('draft', 'quoted')"/>
+              <field name="setup_duration_hours" readonly="state not in ('draft', 'quoted')"/>
+              <field name="service_start" readonly="state not in ('draft', 'quoted')"/>
+              <field name="service_end" readonly="state not in ('draft', 'quoted')"/>
+              <field name="teardown_duration_hours" readonly="state not in ('draft', 'quoted')"/>
+              <field name="expected_return" readonly="state not in ('draft', 'quoted')"/>
+              <field name="application_deadline" readonly="state not in ('draft', 'quoted')"/>
+              <field name="payment_deadline" readonly="state not in ('draft', 'quoted')"/>
               <field name="all_day" readonly="state not in ('draft', 'quoted')"/>
               <field name="stock_preparation_deadline" readonly="state not in ('draft', 'quoted')"/>
               <field name="actual_start" readonly="state not in ('in_progress', 'done')"/>
@@ -211,6 +219,6 @@
     <field name="res_model">mb.commercial.operation</field>
     <field name="view_mode">list,calendar,form</field>
     <field name="domain">[('operation_type', '=', 'market')]</field>
-    <field name="context">{'default_operation_type': 'market'}</field>
+    <field name="context">{'default_operation_type': 'market', 'default_profitability_required': True}</field>
   </record>
 </odoo>

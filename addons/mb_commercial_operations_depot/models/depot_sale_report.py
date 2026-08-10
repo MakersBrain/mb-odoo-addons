@@ -39,6 +39,8 @@ class MbDepotSaleReport(models.Model):
             ).sudo()
             if contract and contract.depot_warehouse_id != report.depot_warehouse_id:
                 raise ValidationError(_("The commercial contract does not belong to this depot."))
+            if contract and not report.commercial_contract_id:
+                report.commercial_contract_id = contract
         return result
 
     def _order_values(self, sold_at, lines):

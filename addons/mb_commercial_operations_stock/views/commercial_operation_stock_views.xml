@@ -3,7 +3,7 @@
   <record id="view_commercial_operation_form_stock" model="ir.ui.view">
     <field name="name">mb.commercial.operation.form.stock</field>
     <field name="model">mb.commercial.operation</field>
-    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_operation_form"/>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_operation_form_planning_report"/>
     <field name="arch" type="xml">
       <xpath expr="//header/field[@name='state']" position="before">
         <button name="action_check_stock_availability" type="object" string="Check Availability"
@@ -58,6 +58,16 @@
           <field name="stock_reconciliation_note" readonly="1" colspan="2"/>
         </group>
       </xpath>
+      <xpath expr="//group[@name='commercial_operation_readiness']" position="before">
+        <group string="Stock Readiness">
+          <field name="stock_required_qty"/>
+          <field name="stock_forecast_qty"/>
+          <field name="stock_shortage_qty"/>
+          <field name="stock_readiness" widget="badge"/>
+          <field name="has_supply_plan"/>
+          <field name="stock_reconciled"/>
+        </group>
+      </xpath>
     </field>
   </record>
 
@@ -105,4 +115,35 @@
       </form>
     </field>
   </record>
+  <record id="view_commercial_operation_plan_wizard_stock" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.plan.wizard.stock</field>
+    <field name="model">mb.commercial.operation.plan.wizard</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_planning_wizard_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='contract_id']" position="after">
+        <field name="source_warehouse_id"/>
+        <field name="source_location_id" domain="[('id', 'child_of', source_warehouse_id.view_location_id)]"/>
+        <field name="stock_preparation_deadline"/>
+      </xpath>
+      <xpath expr="//field[@name='line_ids']" position="before">
+        <button name="action_refresh_stock" type="object" string="Refresh Stock Availability" class="btn-secondary" invisible="calculation_mode != 'product_mix'"/>
+      </xpath>
+      <xpath expr="//field[@name='line_ids']/list/field[@name='expected_sold_qty']" position="after">
+        <field name="on_hand_now" optional="show"/>
+        <field name="reserved_now" optional="hide"/>
+        <field name="forecast_available" optional="show"/>
+        <field name="shortage_qty" optional="show"/>
+        <field name="readiness" widget="badge" optional="show"/>
+      </xpath>
+    </field>
+  </record>
+
+  <template id="report_commercial_operation_stock" inherit_id="mb_commercial_operations.report_commercial_operation">
+    <xpath expr="//div[@name='commercial_bridge_report_sections']" position="inside">
+      <h3>Stock execution and reconciliation</h3>
+      <p><strong>Source warehouse:</strong> <span t-field="operation.source_warehouse_id"/> · <strong>Preparation deadline:</strong> <span t-field="operation.stock_preparation_deadline"/> · <strong>Preparation transfer:</strong> <span t-field="operation.preparation_picking_id"/></p>
+      <table class="table table-sm table-bordered"><thead><tr><th>Product</th><th>On hand</th><th>Reserved</th><th>Forecast</th><th>Shortage</th><th>Supply</th></tr></thead><tbody><tr t-foreach="operation.stock_plan_line_ids" t-as="target"><td><span t-field="target.product_id"/></td><td><span t-field="target.on_hand_now"/></td><td><span t-field="target.reserved_now"/></td><td><span t-field="target.forecast_available"/></td><td><span t-field="target.shortage_qty"/></td><td><span t-field="target.supply_method"/> / <span t-field="target.readiness"/></td></tr></tbody></table>
+      <p><strong>Stock reconciliation:</strong> <span t-field="operation.stock_reconciliation_note"/></p>
+    </xpath>
+  </template>
 </odoo>

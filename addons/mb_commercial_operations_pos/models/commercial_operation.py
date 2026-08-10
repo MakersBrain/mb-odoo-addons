@@ -23,6 +23,20 @@ class MbCommercialOperation(models.Model):
     pos_documents_expected = fields.Boolean()
     pos_documents_complete = fields.Boolean(compute="_compute_pos_documents_complete")
 
+    def _get_operation_profitability_items(self):
+        self.ensure_one()
+        items = super()._get_operation_profitability_items()
+        for order in self.pos_order_ids.filtered(
+            lambda record: record.state not in ("cancel", "invoiced")
+        ):
+            items.append({
+                "model": order._name, "res_id": order.id, "component": "revenue",
+                "date": fields.Date.to_date(order.date_order),
+                "amount": order.amount_total - order.amount_tax,
+                "currency": order.currency_id,
+            })
+        return items
+
     @api.depends("pos_documents_expected", "pos_session_ids.state", "pos_order_ids.state")
     def _compute_pos_documents_complete(self):
         for operation in self:

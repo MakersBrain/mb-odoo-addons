@@ -9,6 +9,21 @@ class MbCommercialOperation(models.Model):
         "purchase.order", "mb_commercial_operation_id", string="Purchase Orders",
     )
 
+    def _get_operation_profitability_items(self):
+        self.ensure_one()
+        items = super()._get_operation_profitability_items()
+        for bill in self.purchase_order_ids.invoice_ids.filtered(
+            lambda move: move.state == "posted" and move.move_type in ("in_invoice", "in_refund")
+        ):
+            items.append({
+                "model": bill._name, "res_id": bill.id, "component": "cost",
+                "date": bill.date,
+                "amount": (-1 if bill.move_type == "in_refund" else 1)
+                          * abs(bill.amount_untaxed_signed),
+                "currency": self.currency_id,
+            })
+        return items
+
     def action_view_purchase_orders(self):
         self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id("purchase.purchase_rfq")

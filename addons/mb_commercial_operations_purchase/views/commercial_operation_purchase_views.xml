@@ -16,4 +16,7 @@
       </xpath>
     </field>
   </record>
+  <template id="report_commercial_operation_purchase" inherit_id="mb_commercial_operations.report_commercial_operation">
+    <xpath expr="//div[@name='commercial_bridge_report_sections']" position="inside"><h3>Purchase supply</h3><table class="table table-sm table-bordered"><thead><tr><th>RFQ / Purchase</th><th>Vendor</th><th>Deadline</th><th>Total</th><th>State</th></tr></thead><tbody><tr t-foreach="operation.purchase_order_ids" t-as="purchase"><td><span t-field="purchase.name"/></td><td><span t-field="purchase.partner_id"/></td><td><span t-field="purchase.date_planned"/></td><td><span t-field="purchase.amount_total"/></td><td><span t-field="purchase.state"/></td></tr></tbody></table></xpath>
+  </template>
 </odoo>

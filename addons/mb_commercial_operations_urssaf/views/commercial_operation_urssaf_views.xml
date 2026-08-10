@@ -15,4 +15,28 @@
       </xpath>
     </field>
   </record>
+  <record id="view_commercial_planning_wizard_form_urssaf" model="ir.ui.view">
+    <field name="name">mb.commercial.planning.wizard.form.urssaf</field>
+    <field name="model">mb.commercial.operation.plan.wizard</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_planning_wizard_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='line_ids']/list/field[@name='turnover_levy_rate']" position="after">
+        <field name="apply_urssaf_goods_rates"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_profitability_scenario_form_urssaf" model="ir.ui.view">
+    <field name="name">mb.commercial.profitability.scenario.form.urssaf</field>
+    <field name="model">mb.commercial.profitability.scenario</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_profitability_scenario_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='line_ids']/list/field[@name='turnover_levy_amount']" position="after">
+        <field name="urssaf_rate_date" optional="hide"/>
+        <field name="urssaf_acre_coefficient" optional="hide"/>
+      </xpath>
+    </field>
+  </record>
+  <template id="report_commercial_operation_urssaf" inherit_id="mb_commercial_operations.report_commercial_operation">
+    <xpath expr="//div[@name='commercial_bridge_report_sections']" position="inside"><h3>URSSAF planning estimate and legal recognition</h3><p>This is a dated planning estimate. Legal recognition remains in the URSSAF declaration workflow and, for consolidated depot invoices, follows payment.</p><table class="table table-sm table-bordered"><thead><tr><th>Product / basket</th><th>Date</th><th>Social contributions</th><th>ACRE coefficient</th><th>CFP</th><th>Chamber</th><th>VFL</th><th>Combined</th></tr></thead><tbody><tr t-foreach="operation.primary_scenario_id.line_ids" t-as="line"><td><span t-field="line.product_id"/></td><td><span t-field="line.urssaf_rate_date"/></td><td><span t-field="line.urssaf_cotisation_rate_id.rate" t-if="line.urssaf_cotisation_rate_id"/></td><td><span t-field="line.urssaf_acre_coefficient"/></td><td><span t-field="line.urssaf_cfp_rate_id.rate" t-if="line.urssaf_cfp_rate_id"/></td><td><span t-field="line.urssaf_chamber_rate_id.rate" t-if="line.urssaf_chamber_rate_id"/></td><td><span t-field="line.urssaf_liberatoire_rate_id.rate" t-if="line.urssaf_liberatoire_rate_id"/></td><td><span t-field="line.turnover_levy_rate"/>%</td></tr></tbody></table><p t-if="report_kind == 'outcome'"><strong>Recognition:</strong> <span t-field="operation.urssaf_recognition_status"/></p></xpath>
+  </template>
 </odoo>

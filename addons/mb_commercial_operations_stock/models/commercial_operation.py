@@ -42,6 +42,28 @@ class MbCommercialOperation(models.Model):
     stock_close_date = fields.Date(copy=False, readonly=True)
     stock_close_user_id = fields.Many2one("res.users", copy=False, readonly=True)
     has_supply_plan = fields.Boolean(compute="_compute_has_supply_plan")
+    stock_required_qty = fields.Float(compute="_compute_stock_overview")
+    stock_forecast_qty = fields.Float(compute="_compute_stock_overview")
+    stock_shortage_qty = fields.Float(compute="_compute_stock_overview")
+    stock_readiness = fields.Selection(
+        [("not_checked", "Not Checked"), ("shortage", "Shortage"), ("ready", "Ready")],
+        compute="_compute_stock_overview",
+    )
+
+    def _get_operation_profitability_items(self):
+        self.ensure_one()
+        items = super()._get_operation_profitability_items()
+        if not self.id:
+            return items
+        pickings = self.env["stock.picking"].search([
+            ("mb_commercial_operation_id", "=", self.id), ("state", "=", "done"),
+        ])
+        for line in pickings.move_ids.analytic_account_line_ids:
+            items.append({
+                "model": line._name, "res_id": line.id, "component": "cost",
+                "date": line.date, "amount": -line.amount, "currency": self.currency_id,
+            })
+        return items
 
     @api.depends("stock_plan_line_ids.supply_method")
     def _compute_has_supply_plan(self):
@@ -50,6 +72,26 @@ class MbCommercialOperation(models.Model):
                 method not in ("manual", "stock")
                 for method in operation.stock_plan_line_ids.mapped("supply_method")
             )
+
+    @api.depends(
+        "stock_plan_line_ids.required_qty", "stock_plan_line_ids.forecast_available",
+        "stock_plan_line_ids.shortage_qty",
+        "stock_plan_line_ids.availability_calculated_at",
+    )
+    def _compute_stock_overview(self):
+        for operation in self:
+            targets = operation.stock_plan_line_ids.filtered(
+                lambda line: line.target_type == "product"
+            )
+            operation.stock_required_qty = sum(targets.mapped("required_qty"))
+            operation.stock_forecast_qty = sum(targets.mapped("forecast_available"))
+            operation.stock_shortage_qty = sum(targets.mapped("shortage_qty"))
+            if not targets or not all(targets.mapped("availability_calculated_at")):
+                operation.stock_readiness = "not_checked"
+            elif operation.stock_shortage_qty:
+                operation.stock_readiness = "shortage"
+            else:
+                operation.stock_readiness = "ready"
 
     def write(self, vals):
         allocation_fields = {

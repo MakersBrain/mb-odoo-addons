@@ -13,6 +13,14 @@
         <field name="depot_warehouse_id" readonly="state not in ('draft', 'quoted')"
                invisible="operation_type not in ('depot_refill', 'depot_permanence')"/>
       </xpath>
+      <xpath expr="//field[@name='depot_warehouse_id']" position="after">
+        <field name="recovery_scope" readonly="state not in ('draft', 'quoted')"
+               invisible="operation_type not in ('depot_refill', 'depot_permanence')"/>
+        <field name="recovery_date_from" readonly="state not in ('draft', 'quoted')"
+               invisible="operation_type not in ('depot_refill', 'depot_permanence') or recovery_scope not in ('until_next_refill', 'contract_period')"/>
+        <field name="recovery_date_to" readonly="state not in ('draft', 'quoted')"
+               invisible="operation_type not in ('depot_refill', 'depot_permanence') or recovery_scope != 'contract_period'"/>
+      </xpath>
     </field>
   </record>
 
@@ -45,4 +53,17 @@
     <field name="domain">[('operation_type', '=', 'depot_permanence')]</field>
     <field name="context">{'default_operation_type': 'depot_permanence'}</field>
   </record>
+  <record id="view_commercial_operation_plan_wizard_depot" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.plan.wizard.depot</field>
+    <field name="model">mb.commercial.operation.plan.wizard</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_planning_wizard_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='contract_id']" position="after"><field name="depot_warehouse_id" invisible="operation_type not in ('depot_refill', 'depot_permanence')"/><field name="recovery_scope" invisible="operation_type not in ('depot_refill', 'depot_permanence')"/><field name="recovery_date_from" invisible="operation_type not in ('depot_refill', 'depot_permanence') or recovery_scope not in ('until_next_refill', 'contract_period')"/><field name="recovery_date_to" invisible="operation_type not in ('depot_refill', 'depot_permanence') or recovery_scope != 'contract_period'"/></xpath>
+    </field>
+  </record>
+  <record id="action_plan_depot_refill" model="ir.actions.act_window"><field name="name">Plan a Depot Refill</field><field name="res_model">mb.commercial.operation.plan.wizard</field><field name="view_mode">form</field><field name="target">new</field><field name="context">{'default_operation_type': 'depot_refill', 'default_recovery_scope': 'until_next_refill'}</field></record>
+  <record id="action_plan_depot_permanence" model="ir.actions.act_window"><field name="name">Plan a Depot Permanence</field><field name="res_model">mb.commercial.operation.plan.wizard</field><field name="view_mode">form</field><field name="target">new</field><field name="context">{'default_operation_type': 'depot_permanence', 'default_calculation_mode': 'average_basket'}</field></record>
+  <template id="report_commercial_operation_depot" inherit_id="mb_commercial_operations.report_commercial_operation">
+    <xpath expr="//div[@name='commercial_bridge_report_sections']" position="inside"><h3>Depot contract and recovery scope</h3><p><strong>Depot:</strong> <span t-field="operation.depot_warehouse_id"/> · <strong>Contract:</strong> <span t-field="operation.contract_id"/> · <strong>Recovery scope:</strong> <span t-field="operation.recovery_scope"/> · <strong>Window:</strong> <span t-field="operation.recovery_date_from"/> – <span t-field="operation.recovery_date_to"/></p><p t-if="report_kind == 'outcome' and operation.recovery_scope in ('until_next_refill', 'contract_period')"><strong>Contract sales in comparison window:</strong> <span t-field="operation.comparison_window_revenue"/>. This comparison is not included in operation-attributed actual revenue and is not revenue claimed to be caused by this visit.</p></xpath>
+  </template>
 </odoo>

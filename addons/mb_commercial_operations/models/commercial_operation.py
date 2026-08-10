@@ -75,6 +75,14 @@ class MbCommercialOperation(models.Model):
     all_day = fields.Boolean()
     actual_start = fields.Datetime(copy=False, tracking=True)
     actual_end = fields.Datetime(copy=False, tracking=True)
+    expected_arrival = fields.Datetime(tracking=True)
+    setup_duration_hours = fields.Float(tracking=True)
+    service_start = fields.Datetime(tracking=True)
+    service_end = fields.Datetime(tracking=True)
+    teardown_duration_hours = fields.Float(tracking=True)
+    expected_return = fields.Datetime(tracking=True)
+    application_deadline = fields.Datetime(tracking=True)
+    payment_deadline = fields.Datetime(tracking=True)
     planned_work_hours = fields.Float(compute="_compute_planned_hours", store=True)
     travel_estimate_id = fields.Many2one(
         "mb.travel.estimate", check_company=True, copy=False, ondelete="set null",
@@ -91,15 +99,81 @@ class MbCommercialOperation(models.Model):
     scenario_ids = fields.One2many(
         "mb.commercial.profitability.scenario", "operation_id",
     )
+    primary_scenario_id = fields.Many2one(
+        "mb.commercial.profitability.scenario", string="Primary Scenario",
+        check_company=True, copy=False, tracking=True,
+        domain="[('operation_id', '=', id), ('state', 'in', ('draft', 'approved'))]",
+    )
+    profitability_required = fields.Boolean(
+        default=False, tracking=True,
+        help="Enable for operations whose planning baseline must include break-even profitability.",
+    )
+    profitability_opt_out_reason = fields.Text(tracking=True)
+    planning_revision = fields.Integer(default=1, copy=False, readonly=True)
+    planning_approved_by_id = fields.Many2one("res.users", copy=False, readonly=True)
+    planning_approved_at = fields.Datetime(copy=False, readonly=True)
+    planning_warning_count = fields.Integer(compute="_compute_planning_warnings")
+    planning_blocking_warning_count = fields.Integer(compute="_compute_planning_warnings")
+    planning_warning_summary = fields.Text(compute="_compute_planning_warnings")
+    report_snapshot_ids = fields.One2many(
+        "mb.commercial.report.snapshot", "operation_id", string="Frozen Reports",
+    )
     planned_cost = fields.Monetary(compute="_compute_planned_profit", store=True)
     planned_margin = fields.Monetary(compute="_compute_planned_profit", store=True)
+    planning_units = fields.Float(
+        related="primary_scenario_id.planned_units", string="Planned Units / Baskets",
+    )
+    planning_sales_excl_vat = fields.Monetary(
+        related="primary_scenario_id.sales_revenue_excl_vat",
+        string="Planned Sales Excluding VAT",
+    )
+    planning_receipts_incl_vat = fields.Monetary(
+        related="primary_scenario_id.customer_receipts_incl_vat",
+        string="Planned Customer Receipts Including VAT",
+    )
+    planning_fixed_cost = fields.Monetary(
+        related="primary_scenario_id.fixed_event_cost", string="Known Fixed Cost",
+    )
+    planning_variable_cost = fields.Monetary(
+        related="primary_scenario_id.total_variable_cost",
+        string="Estimated Variable Cost",
+    )
+    planning_break_even_units = fields.Integer(
+        related="primary_scenario_id.break_even_units",
+        string="Break-even Units / Baskets",
+    )
+    planning_break_even_sales = fields.Monetary(
+        related="primary_scenario_id.break_even_sales_excl_vat",
+        string="Break-even Sales Excluding VAT",
+    )
+    planning_break_even_receipts = fields.Monetary(
+        related="primary_scenario_id.break_even_customer_receipts_incl_vat",
+        string="Break-even Receipts Including VAT",
+    )
+    accepted_travel_cost = fields.Monetary(
+        related="travel_estimate_id.total_operating_cost", string="Accepted Travel Cost",
+    )
+    accepted_travel_distance_km = fields.Float(
+        related="travel_estimate_id.distance_km", string="Travel Distance (km)",
+    )
+    accepted_travel_duration_hours = fields.Float(
+        related="travel_estimate_id.duration_hours", string="Travel Duration (hours)",
+    )
     actual_revenue = fields.Monetary(compute="_compute_actual_profit")
     actual_cost = fields.Monetary(compute="_compute_actual_profit")
     actual_margin = fields.Monetary(compute="_compute_actual_profit")
+    actual_work_hours = fields.Float(compute="_compute_actual_work_hours")
     account_move_ids = fields.Many2many(
         "account.move", "mb_commercial_operation_account_move_rel",
         "operation_id", "move_id", string="Accounting Documents", copy=False,
         check_company=True,
+    )
+    direct_account_move_ids = fields.One2many(
+        "account.move", "mb_commercial_operation_id", string="Direct Accounting Evidence",
+    )
+    analytic_evidence_ids = fields.One2many(
+        "account.analytic.line", "mb_commercial_operation_id",
+        string="Operation Analytic Evidence", copy=False,
     )
     documents_expected = fields.Boolean(default=False)
     documents_complete = fields.Boolean(compute="_compute_financial_status")
@@ -168,8 +242,12 @@ class MbCommercialOperation(models.Model):
         plan_fields = {
             "operation_type", "partner_id", "organizer_id", "contract_id",
             "project_id", "user_ids", "planned_start", "planned_end", "all_day",
+            "expected_arrival", "setup_duration_hours", "service_start", "service_end",
+            "teardown_duration_hours", "expected_return", "application_deadline",
+            "payment_deadline",
             "travel_estimate_id", "stock_preparation_deadline", "expected_visitors",
-            "expected_revenue",
+            "expected_revenue", "primary_scenario_id", "profitability_required",
+            "profitability_opt_out_reason",
         }
         if plan_fields.intersection(vals):
             locked = self.filtered(lambda operation: operation.state in LOCKED_OPERATION_STATES)
@@ -209,32 +287,254 @@ class MbCommercialOperation(models.Model):
             else:
                 operation.planned_work_hours = 0.0
 
-    @api.depends("expected_revenue", "cost_line_ids.planned_amount")
+    @api.depends(
+        "expected_revenue", "cost_line_ids.planned_amount", "primary_scenario_id",
+        "primary_scenario_id.sales_revenue_excl_vat",
+        "primary_scenario_id.fixed_event_cost",
+        "primary_scenario_id.projected_margin",
+    )
     def _compute_planned_profit(self):
         for operation in self:
-            operation.planned_cost = sum(operation.cost_line_ids.mapped("planned_amount"))
-            operation.planned_margin = operation.expected_revenue - operation.planned_cost
+            scenario = operation.primary_scenario_id
+            if scenario:
+                operation.planned_cost = scenario.fixed_event_cost + scenario.total_variable_cost
+                operation.planned_margin = scenario.projected_margin
+            else:
+                operation.planned_cost = sum(operation.cost_line_ids.filtered(
+                    lambda line: not line.scenario_id
+                ).mapped("planned_amount"))
+                operation.planned_margin = operation.expected_revenue - operation.planned_cost
 
-    @api.depends("analytic_account_id.line_ids.amount")
+    @api.depends(
+        "task_id.timesheet_ids.amount", "analytic_evidence_ids.amount",
+        "account_move_ids.line_ids.balance", "direct_account_move_ids.line_ids.balance",
+    )
     def _compute_actual_profit(self):
         for operation in self:
-            account = operation.analytic_account_id
-            if not account or not account.plan_id:
-                operation.actual_revenue = 0.0
-                operation.actual_cost = 0.0
-                operation.actual_margin = 0.0
-                continue
-            # Odoo 19's analytic account ``line_ids`` uses the contextual
-            # ``auto_account_id`` bridge to the dynamic column of its plan.
-            # Without the plan context the one2many is intentionally empty.
-            plan_column = account.plan_id._column_name()
-            lines = self.env["account.analytic.line"].search([
-                (plan_column, "=", account.id),
-            ])
-            amounts = lines.mapped("amount")
-            operation.actual_revenue = sum(amount for amount in amounts if amount > 0)
-            operation.actual_cost = -sum(amount for amount in amounts if amount < 0)
+            items = operation._get_operation_profitability_items()
+            seen = set()
+            revenue = cost = 0.0
+            for item in items:
+                key = (item["model"], item["res_id"], item["component"])
+                if key in seen:
+                    continue
+                seen.add(key)
+                amount = operation._profitability_amount_company_currency(item)
+                if item["component"] == "revenue":
+                    revenue += amount
+                else:
+                    cost += amount
+            operation.actual_revenue = operation.currency_id.round(revenue)
+            operation.actual_cost = operation.currency_id.round(cost)
             operation.actual_margin = operation.actual_revenue - operation.actual_cost
+
+    @api.depends("task_id.timesheet_ids.unit_amount", "actual_start", "actual_end")
+    def _compute_actual_work_hours(self):
+        for operation in self:
+            timesheet_hours = sum(operation.task_id.timesheet_ids.mapped("unit_amount"))
+            if timesheet_hours:
+                operation.actual_work_hours = timesheet_hours
+            elif operation.actual_start and operation.actual_end:
+                operation.actual_work_hours = max(
+                    0.0,
+                    (operation.actual_end - operation.actual_start).total_seconds() / 3600.0,
+                )
+            else:
+                operation.actual_work_hours = 0.0
+
+    def _profitability_amount_company_currency(self, item):
+        self.ensure_one()
+        currency = item.get("currency") or self.currency_id
+        amount = item.get("amount", 0.0)
+        if currency != self.currency_id:
+            amount = currency._convert(
+                amount, self.currency_id, self.company_id,
+                item.get("date") or fields.Date.context_today(self),
+            )
+        return amount
+
+    def _get_operation_profitability_items(self):
+        """Return normalized, operation-scoped native evidence.
+
+        Optional bridge addons extend this registry.  Never fall back to the
+        operation's whole analytic account: depot operations intentionally share
+        a long-lived project with their contract.
+        """
+        self.ensure_one()
+        items = []
+        for line in self.analytic_evidence_ids:
+            items.append({
+                "model": line._name, "res_id": line.id,
+                "component": "revenue" if line.amount > 0 else "cost",
+                "date": line.date,
+                "amount": line.amount if line.amount > 0 else -line.amount,
+                "currency": self.currency_id,
+            })
+        for line in self.task_id.timesheet_ids:
+            if line.mb_commercial_operation_id:
+                continue
+            if line.amount:
+                items.append({
+                    "model": line._name, "res_id": line.id,
+                    "component": "cost", "date": line.date,
+                    "amount": -line.amount, "currency": self.currency_id,
+                })
+        for move in (self.account_move_ids | self.direct_account_move_ids).filtered(
+            lambda record: record.state == "posted"
+        ):
+            revenue_move = move.move_type in ("out_invoice", "out_refund")
+            component = "revenue" if revenue_move else "cost"
+            sign = -1 if move.move_type in ("out_refund", "in_refund") else 1
+            items.append({
+                "model": move._name, "res_id": move.id, "component": component,
+                "date": move.date, "amount": sign * abs(move.amount_untaxed_signed),
+                "currency": self.currency_id,
+            })
+        return items
+
+    def _get_operation_profitability_report_items(self):
+        """Return the same deduplicated evidence used by the actual KPI totals."""
+        self.ensure_one()
+        rows = []
+        seen = set()
+        for item in self._get_operation_profitability_items():
+            key = (item["model"], item["res_id"], item["component"])
+            if key in seen:
+                continue
+            seen.add(key)
+            record = self.env[item["model"]].browse(item["res_id"]).exists()
+            rows.append({
+                "model": item["model"],
+                "res_id": item["res_id"],
+                "source": record.display_name if record else _("Deleted source"),
+                "component": item["component"],
+                "date": item.get("date"),
+                "amount": self.currency_id.round(
+                    self._profitability_amount_company_currency(item)
+                ),
+            })
+        return sorted(
+            rows,
+            key=lambda row: (str(row["date"] or ""), row["model"], row["res_id"]),
+        )
+
+    def _get_planning_warnings(self, scenario=None):
+        self.ensure_one()
+        scenario = scenario or self.primary_scenario_id
+        warnings = []
+        if self.profitability_required and not scenario:
+            warnings.append(("missing_primary_scenario", "blocking", _("Choose a primary profitability scenario.")))
+        if not self.profitability_required and self.profitability_opt_out_reason:
+            warnings.append(("cost_plan_only", "info", self.profitability_opt_out_reason))
+        if scenario and scenario.calculation_blocked:
+            warnings.append(("scenario_blocked", "blocking", scenario.calculation_note or _("The primary scenario is incomplete.")))
+        if scenario:
+            legacy_operation_cost = sum(self.cost_line_ids.filtered(
+                lambda line: not line.scenario_id
+            ).mapped("planned_amount"))
+            legacy_scenario_cost = (
+                scenario.accepted_travel_cost
+                + scenario.planned_work_hours * scenario.work_hourly_cost
+                + scenario.stall_rent + scenario.parking_cost
+                + scenario.accommodation_cost + scenario.other_fixed_cost
+            )
+            scenario_cost = sum(scenario.cost_line_ids.mapped("planned_amount"))
+            if (
+                scenario_cost and legacy_scenario_cost
+                and not self.currency_id.is_zero(scenario_cost - legacy_scenario_cost)
+            ) or (
+                scenario_cost and legacy_operation_cost
+                and not self.currency_id.is_zero(scenario_cost - legacy_operation_cost)
+            ) or (
+                not scenario_cost and legacy_scenario_cost and legacy_operation_cost
+                and not self.currency_id.is_zero(legacy_scenario_cost - legacy_operation_cost)
+            ):
+                warnings.append((
+                    "legacy_cost_reconciliation", "blocking",
+                    _("Legacy and scenario-owned fixed costs differ; review the baseline explicitly."),
+                ))
+        if scenario and scenario.line_ids.filtered("exclude_product_cost"):
+            warnings.append((
+                "product_cost_excluded", "warning",
+                _("One or more sales assumptions explicitly exclude product cost."),
+            ))
+        if scenario and scenario.line_ids.filtered(lambda line: line.cost_source == "proxy"):
+            warnings.append(("product_cost_proxy", "warning", _("A product cost uses a documented sale-price proxy.")))
+        old_date = fields.Date.subtract(fields.Date.context_today(self), days=90)
+        if scenario and scenario.line_ids.filtered(lambda line: line.cost_date and line.cost_date < old_date):
+            warnings.append(("product_cost_outdated", "warning", _("A product cost assumption is more than 90 days old.")))
+        if scenario and scenario.state == "draft" and scenario.line_ids.filtered(
+            lambda line: line.source_stock_plan_line_id and (
+                line.expected_sold_qty != line.source_stock_plan_line_id.expected_sold_qty
+                or line.sale_price_excluded_tax != line.source_stock_plan_line_id.expected_unit_price
+                or line.product_unit_cost != line.source_stock_plan_line_id.expected_unit_cost
+            )
+        ):
+            warnings.append(("stock_scenario_out_of_sync", "warning", _("Draft sales assumptions differ from their stock-plan snapshot.")))
+        if scenario and not scenario.calculation_blocked \
+                and scenario.break_even_units > scenario.planned_units:
+            warnings.append(("break_even_above_plan", "warning", _("Break-even exceeds planned units or baskets.")))
+        if self.expected_arrival and self.service_start and self.expected_arrival > self.service_start:
+            warnings.append(("arrival_after_service_start", "blocking", _("Expected arrival is after the service starts.")))
+        if self.application_deadline and self.application_deadline < fields.Datetime.now():
+            warnings.append(("application_deadline_overdue", "warning", _("The application deadline is overdue.")))
+        if self.activity_ids.filtered(
+            lambda activity: activity.date_deadline < fields.Date.context_today(self)
+        ):
+            warnings.append(("activity_overdue", "warning", _("One or more operation activities are overdue.")))
+        accepted = self.travel_estimate_id
+        if accepted and (accepted.state != "accepted" or accepted.incomplete and not accepted.incomplete_acknowledged):
+            warnings.append(("travel_not_accepted", "blocking", _("Accept or acknowledge the selected travel quote.")))
+        if scenario and scenario.travel_estimate_id and scenario.travel_estimate_id.state != "accepted":
+            warnings.append(("scenario_travel_not_accepted", "blocking", _("The scenario travel quote is not accepted.")))
+        if self.operation_type == "market" and not self.stock_plan_line_ids:
+            warnings.append(("missing_stock_targets", "warning", _("No stock targets are planned.")))
+        for line in self.stock_plan_line_ids.filtered(lambda target: target.blocking_note):
+            warnings.append(("stock_target_blocked", "blocking", line.blocking_note))
+        if self._get_user_conflict() and not self.conflict_acknowledged:
+            warnings.append((
+                "responsible_user_conflict", "blocking",
+                _("A responsible person is assigned to an overlapping operation."),
+            ))
+        if self.state in ("done", "financially_closed") and not self.documents_complete:
+            warnings.append(("actual_documents_incomplete", "warning", _("Actual accounting documents are incomplete.")))
+        if not self.env.context.get("mb_snapshot_creating") \
+                and self.state in ("approved", "scheduled", "in_progress", "done", "financially_closed") \
+                and not self.report_snapshot_ids.filtered(
+                    lambda snapshot: snapshot.report_kind == "planning" and snapshot.revision == self.planning_revision
+                ):
+            warnings.append(("approved_snapshot_missing", "blocking", _("The approved revision has no frozen planning report.")))
+        return warnings
+
+    @api.depends(
+        "primary_scenario_id", "primary_scenario_id.calculation_blocked",
+        "travel_estimate_id.state", "travel_estimate_id.incomplete",
+        "travel_estimate_id.incomplete_acknowledged", "stock_plan_line_ids.blocking_note",
+        "documents_complete", "state", "profitability_required",
+        "profitability_opt_out_reason", "expected_arrival", "service_start",
+        "user_ids", "planned_start", "planned_end", "conflict_acknowledged",
+        "application_deadline", "report_snapshot_ids.state", "report_snapshot_ids.revision",
+        "primary_scenario_id.line_ids.cost_source", "primary_scenario_id.line_ids.cost_date",
+        "primary_scenario_id.line_ids.exclude_product_cost",
+        "primary_scenario_id.line_ids.source_stock_plan_line_id",
+        "primary_scenario_id.line_ids.expected_sold_qty",
+        "primary_scenario_id.break_even_units", "primary_scenario_id.planned_units",
+        "activity_ids.date_deadline",
+        "cost_line_ids.planned_amount", "primary_scenario_id.cost_line_ids.planned_amount",
+        "primary_scenario_id.accepted_travel_cost", "primary_scenario_id.stall_rent",
+        "primary_scenario_id.other_fixed_cost",
+        "primary_scenario_id.travel_estimate_id.state",
+    )
+    def _compute_planning_warnings(self):
+        for operation in self:
+            warnings = operation._get_planning_warnings()
+            operation.planning_warning_count = len(warnings)
+            operation.planning_blocking_warning_count = len([
+                warning for warning in warnings if warning[1] == "blocking"
+            ])
+            operation.planning_warning_summary = "\n".join(
+                f"[{severity.upper()}] {message}" for _code, severity, message in warnings
+            )
 
     @api.depends("documents_expected", "account_move_ids.state", "account_move_ids.payment_state")
     def _compute_financial_status(self):
@@ -250,16 +550,22 @@ class MbCommercialOperation(models.Model):
                 and all(move.payment_state in settled_states for move in documents)
             )
 
+    def _get_user_conflict(self):
+        self.ensure_one()
+        if not self.user_ids:
+            return self.browse()
+        return self.search([
+            ("id", "!=", self.id),
+            ("company_id", "=", self.company_id.id),
+            ("state", "not in", ["cancelled", "financially_closed"]),
+            ("user_ids", "in", self.user_ids.ids),
+            ("planned_start", "<", self.planned_end),
+            ("planned_end", ">", self.planned_start),
+        ], limit=1)
+
     def _check_user_conflicts(self):
         for operation in self.filtered("user_ids"):
-            conflicts = self.search([
-                ("id", "!=", operation.id),
-                ("company_id", "=", operation.company_id.id),
-                ("state", "not in", ["cancelled", "financially_closed"]),
-                ("user_ids", "in", operation.user_ids.ids),
-                ("planned_start", "<", operation.planned_end),
-                ("planned_end", ">", operation.planned_start),
-            ], limit=1)
+            conflicts = operation._get_user_conflict()
             if conflicts and not operation.conflict_acknowledged:
                 raise ValidationError(_(
                     "%(operation)s overlaps %(conflict)s for an assigned person. "
@@ -333,12 +639,18 @@ class MbCommercialOperation(models.Model):
         for operation in self:
             if operation.state not in ("draft", "quoted"):
                 raise UserError(_("Only draft or costed operations can be approved."))
-            accepted = operation.travel_estimate_id
-            if accepted and (accepted.state != "accepted" or accepted.incomplete and not accepted.incomplete_acknowledged):
-                raise ValidationError(_(
-                    "Accept the travel estimate and acknowledge incomplete pricing before approval."
-                ))
-            operation.state = "approved"
+            blocking = [warning[2] for warning in operation._get_planning_warnings() if warning[1] == "blocking"]
+            if blocking:
+                raise ValidationError("\n".join(blocking))
+            scenario = operation.primary_scenario_id
+            if scenario and scenario.state == "draft":
+                scenario._approve_as_primary()
+            operation.with_context(mb_approve_baseline=True).write({
+                "state": "approved",
+                "planning_approved_by_id": self.env.user.id,
+                "planning_approved_at": fields.Datetime.now(),
+            })
+            operation.with_context(mb_snapshot_creating=True)._create_report_snapshot("planning")
         return True
 
     def action_schedule(self):
@@ -390,11 +702,23 @@ class MbCommercialOperation(models.Model):
         for operation in self:
             if operation.state not in ("approved", "scheduled", "done", "financially_closed"):
                 raise UserError(_("This operation is not in a reopenable state."))
+            previous_scenario = operation.primary_scenario_id
             operation.with_context(mb_reopen=True).write({
                 "state": "draft",
+                "planning_revision": operation.planning_revision + 1,
+                "planning_approved_by_id": False,
+                "planning_approved_at": False,
                 "financial_close_date": False,
                 "financial_close_user_id": False,
             })
+            if previous_scenario and previous_scenario.state != "draft":
+                revision_scenario = previous_scenario.copy({
+                    "name": _("Revision %(revision)s of %(name)s",
+                              revision=operation.planning_revision,
+                              name=previous_scenario.name),
+                    "state": "draft", "approved_by_id": False, "approved_at": False,
+                })
+                operation.write({"primary_scenario_id": revision_scenario.id})
             operation.project_id.active = True
             operation.message_post(body=_("Operation reopened by %(user)s.", user=self.env.user.display_name))
         return True
@@ -421,6 +745,10 @@ class MbCommercialCostLine(models.Model):
     sequence = fields.Integer(default=10)
     operation_id = fields.Many2one(
         "mb.commercial.operation", required=True, ondelete="cascade",
+        check_company=True, index=True,
+    )
+    scenario_id = fields.Many2one(
+        "mb.commercial.profitability.scenario", ondelete="cascade",
         check_company=True, index=True,
     )
     company_id = fields.Many2one(related="operation_id.company_id", store=True, index=True)
@@ -455,31 +783,65 @@ class MbCommercialCostLine(models.Model):
         "Cost quantities, rates, and percentages cannot be negative.",
     )
 
-    @api.depends("calculation", "quantity", "rate", "percentage", "operation_id.expected_revenue")
+    source_kind = fields.Selection([
+        ("manual", "Manual"), ("travel", "Travel Quote"),
+        ("contract", "Contract"), ("template", "Template"),
+        ("migration", "Legacy Migration"),
+    ], required=True, default="manual")
+    travel_estimate_id = fields.Many2one("mb.travel.estimate", check_company=True, ondelete="restrict")
+    assumption_date = fields.Date(default=fields.Date.context_today)
+    source_reference = fields.Char()
+    source_currency_id = fields.Many2one("res.currency")
+    source_amount = fields.Monetary(currency_field="source_currency_id")
+    conversion_rate = fields.Float(digits=(12, 6))
+    conversion_date = fields.Date()
+
+    @api.depends(
+        "calculation", "quantity", "rate", "percentage",
+        "operation_id.expected_revenue", "scenario_id.sales_revenue_excl_vat",
+    )
     def _compute_planned_amount(self):
         for line in self:
             if line.calculation == "revenue_percent":
-                amount = line.operation_id.expected_revenue * line.percentage / 100.0
+                revenue = line.scenario_id.sales_revenue_excl_vat or line.operation_id.expected_revenue
+                amount = revenue * line.percentage / 100.0
             else:
                 amount = line.quantity * line.rate
             line.planned_amount = line.currency_id.round(amount) if line.currency_id else amount
 
     @api.model_create_multi
     def create(self, vals_list):
+        scenarios = self.env["mb.commercial.profitability.scenario"].browse(
+            [vals.get("scenario_id") for vals in vals_list if vals.get("scenario_id")]
+        )
+        if not self.env.context.get("mb_planning_migration") and scenarios.filtered(
+            lambda scenario: scenario.state != "draft"
+        ):
+            raise UserError(_("Approved scenario costs are immutable; create a revision."))
+        for vals in vals_list:
+            scenario = self.env["mb.commercial.profitability.scenario"].browse(vals.get("scenario_id"))
+            if scenario:
+                vals.setdefault("operation_id", scenario.operation_id.id)
         operations = self.env["mb.commercial.operation"].browse(
             [vals.get("operation_id") for vals in vals_list if vals.get("operation_id")]
         )
-        if operations.filtered(lambda operation: operation.state not in ("draft", "quoted")):
+        if not self.env.context.get("mb_planning_migration") and operations.filtered(
+            lambda operation: operation.state not in ("draft", "quoted")
+        ):
             raise UserError(_("Reopen the operation before adding planned costs."))
         return super().create(vals_list)
 
     def write(self, vals):
+        if self.scenario_id.filtered(lambda scenario: scenario.state != "draft"):
+            raise UserError(_("Approved scenario costs are immutable; create a revision."))
         if self.operation_id.filtered(lambda operation: operation.state not in ("draft", "quoted")):
             raise UserError(_("Reopen the operation before changing its approved cost baseline."))
         return super().write(vals)
 
     @api.ondelete(at_uninstall=False)
     def _unlink_unlocked(self):
+        if self.scenario_id.filtered(lambda scenario: scenario.state != "draft"):
+            raise UserError(_("Approved scenario costs cannot be deleted."))
         if self.operation_id.filtered(lambda operation: operation.state not in ("draft", "quoted")):
             raise UserError(_("Approved cost lines cannot be deleted."))
 

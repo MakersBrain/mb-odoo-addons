@@ -1,7 +1,7 @@
 {
     "name": "Makersbrain Commercial Operations - Purchase",
     "summary": "Reviewed purchase supply for market stock shortages",
-    "version": "19.0.1.0.0",
+    "version": "19.0.2.0.0",
     "category": "Purchases/Purchases",
     "author": "Makersbrain",
     "license": "LGPL-3",

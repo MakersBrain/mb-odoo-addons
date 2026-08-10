@@ -22,17 +22,33 @@ class MbCommercialOperation(models.Model):
                 raise UserError(_("Reopen the approved operation before changing its vehicle."))
         return super().write(vals)
 
+    def _get_vehicle_conflict(self):
+        self.ensure_one()
+        if not self.vehicle_id:
+            return self.browse()
+        return self.search([
+            ("id", "!=", self.id),
+            ("company_id", "=", self.company_id.id),
+            ("vehicle_id", "=", self.vehicle_id.id),
+            ("state", "not in", ("cancelled", "financially_closed")),
+            ("planned_start", "<", self.planned_end),
+            ("planned_end", ">", self.planned_start),
+        ], limit=1)
+
+    def _get_planning_warnings(self, scenario=None):
+        self.ensure_one()
+        warnings = super()._get_planning_warnings(scenario)
+        if self._get_vehicle_conflict() and not self.vehicle_conflict_acknowledged:
+            warnings.append((
+                "vehicle_conflict", "blocking",
+                _("The selected vehicle is assigned to an overlapping operation."),
+            ))
+        return warnings
+
     def _check_user_conflicts(self):
         super()._check_user_conflicts()
         for operation in self.filtered("vehicle_id"):
-            conflict = self.search([
-                ("id", "!=", operation.id),
-                ("company_id", "=", operation.company_id.id),
-                ("vehicle_id", "=", operation.vehicle_id.id),
-                ("state", "not in", ("cancelled", "financially_closed")),
-                ("planned_start", "<", operation.planned_end),
-                ("planned_end", ">", operation.planned_start),
-            ], limit=1)
+            conflict = operation._get_vehicle_conflict()
             if conflict and not operation.vehicle_conflict_acknowledged:
                 raise ValidationError(_(
                     "Vehicle %(vehicle)s is already assigned to %(operation)s in this time window.",

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_planning_wizard_form" model="ir.ui.view">
+    <field name="name">mb.commercial.planning.wizard.form</field>
+    <field name="model">mb.commercial.operation.plan.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Complete Planning">
+        <sheet>
+          <group>
+            <group><field name="operation_id" readonly="1"/><field name="name"/><field name="operation_type"/><field name="company_id" groups="base.group_multi_company"/><field name="partner_id"/><field name="organizer_id"/><field name="contract_id"/><field name="user_ids" widget="many2many_avatar_user"/></group>
+            <group><field name="departure"/><field name="expected_arrival"/><field name="setup_duration_hours"/><field name="service_start"/><field name="service_end"/><field name="teardown_duration_hours"/><field name="expected_return"/><field name="application_deadline"/><field name="payment_deadline"/><field name="currency_id" invisible="1"/></group>
+          </group>
+          <group><field name="template_id" domain="[('company_id', '=', company_id)]"/><field name="scenario_name"/><field name="calculation_mode"/><field name="travel_estimate_id" domain="[('operation_id', '=', operation_id), ('state', '=', 'accepted')]"/></group>
+          <notebook>
+            <page string="Route Quote"><group><group><field name="connector_id"/><field name="origin_latitude"/><field name="origin_longitude"/><field name="destination_latitude"/><field name="destination_longitude"/><field name="round_trip"/><field name="vehicle_class"/><field name="payment_option"/></group><group><field name="fuel_consumption_l_per_100km"/><field name="fuel_price_eur_per_l"/><field name="driver_cost_eur_per_hour"/><button name="action_calculate_travel" type="object" string="Calculate TollQuote" class="btn-secondary"/><field name="quote_distance_km" invisible="not quote_calculated"/><field name="quote_duration_hours" invisible="not quote_calculated"/><field name="quote_toll_cost" invisible="not quote_calculated"/><field name="quote_fuel_cost" invisible="not quote_calculated"/><field name="quote_driver_cost" invisible="not quote_calculated"/><field name="quote_total_operating_cost" invisible="not quote_calculated"/><field name="quote_incomplete" invisible="not quote_calculated"/><field name="quote_warning_text" invisible="not quote_calculated"/><field name="accept_quote" invisible="not quote_calculated"/><field name="incomplete_quote_acknowledged" invisible="not quote_incomplete"/></group></group></page>
+            <page string="Products / Basket"><field name="line_ids"><list editable="bottom"><field name="product_id" optional="show"/><field name="desired_opening_qty" invisible="parent.calculation_mode != 'product_mix'"/><field name="safety_qty" invisible="parent.calculation_mode != 'product_mix'"/><field name="expected_sold_qty"/><field name="sale_price_excluded_tax"/><field name="vat_rate"/><field name="channel_fee_rate"/><field name="turnover_levy_rate"/><field name="product_cost_mode"/><field name="product_unit_cost" invisible="product_cost_mode != 'amount'"/><field name="product_cost_rate" invisible="product_cost_mode != 'sales_percent'"/><field name="other_variable_unit_cost"/><field name="exclude_product_cost"/><field name="currency_id" column_invisible="True"/></list></field></page>
+            <page string="Fixed Costs"><field name="cost_ids"><list editable="bottom"><field name="name"/><field name="category"/><field name="calculation"/><field name="quantity"/><field name="rate"/><field name="percentage" invisible="calculation != 'revenue_percent'"/><field name="source_kind"/><field name="currency_id" column_invisible="True"/></list></field></page>
+            <page string="Review">
+              <group>
+                <group string="Plan">
+                  <field name="preview_units"/>
+                  <field name="preview_sales_excl_vat"/>
+                  <field name="preview_receipts_incl_vat"/>
+                  <field name="preview_fixed_cost"/>
+                  <field name="preview_variable_cost"/>
+                  <field name="preview_contribution"/>
+                </group>
+                <group string="Break-even">
+                  <field name="preview_break_even_units"/>
+                  <field name="preview_break_even_sales"/>
+                  <field name="preview_break_even_receipts"/>
+                  <field name="preview_projected_margin"/>
+                  <field name="preview_blocked" invisible="1"/>
+                  <field name="preview_note" invisible="not preview_blocked"/>
+                </group>
+              </group>
+              <field name="warning_summary" readonly="1" nolabel="1"/>
+            </page>
+          </notebook>
+        </sheet>
+        <footer><button name="action_save_and_approve" type="object" string="Save &amp; Approve Baseline" class="btn-primary"/><button name="action_save_draft" type="object" string="Save Draft"/><button string="Cancel" special="cancel" class="btn-secondary"/></footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_commercial_plan_template_list" model="ir.ui.view"><field name="name">mb.commercial.plan.template.list</field><field name="model">mb.commercial.plan.template</field><field name="arch" type="xml"><list><field name="name"/><field name="operation_type"/><field name="calculation_mode"/><field name="default_duration_hours"/><field name="company_id" groups="base.group_multi_company"/></list></field></record>
+  <record id="view_commercial_plan_template_form" model="ir.ui.view"><field name="name">mb.commercial.plan.template.form</field><field name="model">mb.commercial.plan.template</field><field name="arch" type="xml"><form><sheet><group><group><field name="name"/><field name="operation_type"/><field name="calculation_mode"/><field name="company_id" groups="base.group_multi_company"/><field name="currency_id" invisible="1"/></group><group string="Time and Travel"><field name="default_duration_hours"/><field name="default_setup_hours"/><field name="default_service_hours"/><field name="default_teardown_hours"/><field name="default_labour_hourly_cost"/><field name="default_travel_hourly_cost"/><field name="default_fuel_consumption_l_per_100km"/><field name="default_fuel_price_eur_per_l"/><field name="warning_age_days"/></group></group><notebook><page string="Costs"><field name="cost_line_ids"><list editable="bottom"><field name="sequence" widget="handle"/><field name="name"/><field name="category"/><field name="calculation"/><field name="quantity"/><field name="rate"/><field name="percentage"/><field name="currency_id" column_invisible="True"/></list></field></page><page string="Products"><field name="product_line_ids"><list editable="bottom"><field name="sequence" widget="handle"/><field name="product_id"/><field name="expected_sold_qty"/><field name="desired_opening_qty"/><field name="safety_qty"/><field name="sale_price_excluded_tax"/><field name="product_unit_cost"/><field name="currency_id" column_invisible="True"/></list></field></page></notebook></sheet></form></field></record>
+  <record id="action_commercial_plan_templates" model="ir.actions.act_window"><field name="name">Planning Templates</field><field name="res_model">mb.commercial.plan.template</field><field name="view_mode">list,form</field></record>
+
+  <record id="view_commercial_report_snapshot_list" model="ir.ui.view"><field name="name">mb.commercial.report.snapshot.list</field><field name="model">mb.commercial.report.snapshot</field><field name="arch" type="xml"><list><field name="name"/><field name="operation_id"/><field name="report_kind"/><field name="revision"/><field name="generated_at"/><field name="generated_by_id"/><field name="state" widget="badge"/><field name="input_digest" optional="hide"/></list></field></record>
+  <record id="view_commercial_report_snapshot_form" model="ir.ui.view"><field name="name">mb.commercial.report.snapshot.form</field><field name="model">mb.commercial.report.snapshot</field><field name="arch" type="xml"><form create="0" delete="0"><header><button name="action_open_attachment" type="object" string="Download PDF" class="btn-primary" invisible="not attachment_id"/><button name="action_void" type="object" string="Void" groups="mb_commercial_operations.group_commercial_operations_manager" invisible="state == 'void'"/><field name="state" widget="statusbar"/></header><sheet><group><field name="name"/><field name="operation_id"/><field name="scenario_id"/><field name="report_kind"/><field name="revision"/><field name="generated_at"/><field name="generated_by_id"/><field name="input_digest"/><field name="pdf_digest"/><field name="attachment_id"/><field name="void_reason" readonly="state == 'void'"/><field name="company_id" groups="base.group_multi_company"/></group></sheet><chatter/></form></field></record>
+  <record id="action_commercial_report_snapshots" model="ir.actions.act_window"><field name="name">Frozen Planning Reports</field><field name="res_model">mb.commercial.report.snapshot</field><field name="view_mode">list,form</field></record>
+  <record id="action_new_commercial_plan" model="ir.actions.act_window"><field name="name">New Planned Operation</field><field name="res_model">mb.commercial.operation.plan.wizard</field><field name="view_mode">form</field><field name="target">new</field></record>
+  <record id="action_new_market_plan" model="ir.actions.act_window"><field name="name">Plan a Market</field><field name="res_model">mb.commercial.operation.plan.wizard</field><field name="view_mode">form</field><field name="target">new</field><field name="context">{'default_operation_type': 'market'}</field></record>
+
+  <record id="view_commercial_operation_form_planning_report" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.form.planning.report</field><field name="model">mb.commercial.operation</field><field name="inherit_id" ref="mb_commercial_operations.view_commercial_operation_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//header/button[@name='action_mark_costed']" position="before"><button name="action_complete_planning" type="object" string="Complete Planning" class="btn-primary" invisible="state not in ('draft', 'quoted')"/><button name="action_print_planning_pack" type="object" string="Planning Pack"/><button name="action_print_outcome_pack" type="object" string="Outcome Pack" invisible="state not in ('done', 'financially_closed')"/><button name="action_freeze_replacement_copy" type="object" string="Freeze Replacement Copy" groups="mb_commercial_operations.group_commercial_operations_manager" invisible="state not in ('approved', 'scheduled', 'in_progress', 'done', 'financially_closed')"/></xpath>
+      <xpath expr="//notebook/page[1]" position="before">
+        <page string="Overview">
+          <group>
+            <group string="Baseline">
+              <field name="primary_scenario_id" readonly="state not in ('draft', 'quoted')"/>
+              <field name="profitability_required" readonly="state not in ('draft', 'quoted')"/>
+              <field name="profitability_opt_out_reason" invisible="profitability_required" readonly="state not in ('draft', 'quoted')"/>
+              <field name="planning_revision"/>
+              <field name="planning_approved_by_id"/>
+              <field name="planning_approved_at"/>
+            </group>
+            <group string="Schedule and Travel">
+              <field name="planned_work_hours"/>
+              <field name="accepted_travel_distance_km"/>
+              <field name="accepted_travel_duration_hours"/>
+              <field name="accepted_travel_cost"/>
+            </group>
+          </group>
+          <group>
+            <group string="Planned Economics">
+              <field name="planning_units"/>
+              <field name="planning_sales_excl_vat"/>
+              <field name="planning_receipts_incl_vat"/>
+              <field name="planning_fixed_cost"/>
+              <field name="planning_variable_cost"/>
+              <field name="planned_margin"/>
+            </group>
+            <group string="Break-even and Actuals">
+              <field name="planning_break_even_units"/>
+              <field name="planning_break_even_sales"/>
+              <field name="planning_break_even_receipts"/>
+              <field name="actual_revenue"/>
+              <field name="actual_cost"/>
+              <field name="actual_margin"/>
+            </group>
+          </group>
+          <group name="commercial_operation_readiness" string="Readiness">
+            <field name="planning_warning_count"/>
+            <field name="planning_blocking_warning_count"/>
+          </group>
+          <field name="planning_warning_summary" nolabel="1" readonly="1"/>
+          <field name="report_snapshot_ids" readonly="1"><list><field name="name"/><field name="report_kind"/><field name="revision"/><field name="generated_at"/><field name="state" widget="badge"/></list></field>
+        </page>
+      </xpath>
+    </field>
+  </record>
+</odoo>

@@ -10,6 +10,10 @@
 
   <menuitem id="menu_commercial_operations" name="Operations"
             parent="menu_commercial_operations_root" sequence="10"/>
+  <menuitem id="menu_new_commercial_plan" name="New Planned Operation"
+            parent="menu_commercial_operations" action="action_new_commercial_plan" sequence="5"/>
+  <menuitem id="menu_new_market_plan" name="Plan a Market"
+            parent="menu_commercial_operations" action="action_new_market_plan" sequence="7"/>
   <menuitem id="menu_commercial_calendar" name="Planning Calendar"
             parent="menu_commercial_operations" action="action_commercial_calendar" sequence="10"/>
   <menuitem id="menu_commercial_markets" name="Markets &amp; Fairs"
@@ -32,6 +36,8 @@
             parent="menu_commercial_profitability" action="action_profitability_scenarios" sequence="10"/>
   <menuitem id="menu_commercial_profitability_report" name="Planned vs Actual"
             parent="menu_commercial_profitability" action="action_commercial_profitability_report" sequence="20"/>
+  <menuitem id="menu_commercial_report_snapshots" name="Frozen Reports"
+            parent="menu_commercial_profitability" action="action_commercial_report_snapshots" sequence="30"/>
 
   <menuitem id="menu_commercial_travel" name="Travel"
             parent="menu_commercial_operations_root" sequence="40"/>
@@ -43,5 +49,8 @@
             groups="mb_commercial_operations.group_commercial_operations_manager"/>
   <menuitem id="menu_commercial_tollquote_connectors" name="TollQuote Connectors"
             parent="menu_commercial_configuration" action="action_tollquote_connectors" sequence="10"
+            groups="mb_commercial_operations.group_commercial_operations_manager"/>
+  <menuitem id="menu_commercial_plan_templates" name="Planning Templates"
+            parent="menu_commercial_configuration" action="action_commercial_plan_templates" sequence="20"
             groups="mb_commercial_operations.group_commercial_operations_manager"/>
 </odoo>

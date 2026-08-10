@@ -21,4 +21,13 @@
       </xpath>
     </field>
   </record>
+  <record id="view_commercial_operation_plan_wizard_fleet" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.plan.wizard.fleet</field>
+    <field name="model">mb.commercial.operation.plan.wizard</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_planning_wizard_form"/>
+    <field name="arch" type="xml"><xpath expr="//field[@name='user_ids']" position="after"><field name="vehicle_id"/><field name="vehicle_conflict_acknowledged"/></xpath></field>
+  </record>
+  <template id="report_commercial_operation_fleet" inherit_id="mb_commercial_operations.report_commercial_operation">
+    <xpath expr="//div[@name='commercial_bridge_report_sections']" position="inside"><h3>Vehicle</h3><p><strong>Vehicle:</strong> <span t-field="operation.vehicle_id"/><t t-if="operation.vehicle_id"> · <strong>Consumption:</strong> <span t-field="operation.vehicle_id.mb_fuel_consumption_l_per_100km"/> L/100 km · <strong>Driver rate:</strong> <span t-field="operation.vehicle_id.mb_driver_cost_eur_per_hour"/></t></p></xpath>
+  </template>
 </odoo>

@@ -1,7 +1,7 @@
 {
     "name": "Makersbrain Commercial Operations - Expenses",
     "summary": "Expense evidence and analytic propagation for commercial operations",
-    "version": "19.0.1.0.0",
+    "version": "19.0.2.0.0",
     "category": "Human Resources/Expenses",
     "author": "Makersbrain",
     "license": "LGPL-3",

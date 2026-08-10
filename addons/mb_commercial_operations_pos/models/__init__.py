@@ -1,4 +1,3 @@
-from . import account_move
 from . import commercial_operation
 from . import pos_config
 from . import pos_order

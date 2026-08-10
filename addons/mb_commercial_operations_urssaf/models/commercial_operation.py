@@ -29,20 +29,13 @@ class MbCommercialOperation(models.Model):
                 operation.urssaf_source_ids = False
                 operation.urssaf_recognition_status = "not_applicable"
                 continue
-            account_key = str(account.id)
             candidates = source_model.search([
                 ("company_id", "=", operation.company_id.id),
             ])
             sources = candidates.filtered(
-                lambda source, current_operation=operation, key=account_key: (
+                lambda source, current_operation=operation: (
                     source.pos_order_id.mb_commercial_operation_id == current_operation
-                or any(
-                    any(
-                        key in distribution_key.split(",")
-                        for distribution_key in (line.analytic_distribution or {})
-                    )
-                    for line in source.origin_move_id.invoice_line_ids
-                )
+                    or source.origin_move_id.mb_commercial_operation_id == current_operation
                 )
             )
             operation.urssaf_source_ids = sources
@@ -52,11 +45,10 @@ class MbCommercialOperation(models.Model):
                     else "computed"
                 )
                 continue
-            plan_column = account.plan_id._column_name()
-            has_revenue = bool(self.env["account.analytic.line"].search_count([
-                (plan_column, "=", account.id),
-                ("amount", ">", 0),
-            ]))
+            has_revenue = any(
+                item["component"] == "revenue"
+                for item in operation._get_operation_profitability_items()
+            )
             operation.urssaf_recognition_status = (
                 "pending" if has_revenue else "not_applicable"
             )

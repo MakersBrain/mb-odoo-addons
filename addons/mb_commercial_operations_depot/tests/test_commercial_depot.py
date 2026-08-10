@@ -123,6 +123,32 @@ class TestCommercialDepot(TransactionCase):
         self.assertEqual(forecast.suggested_quantity, 3)
         self.assertIn(forecast.confidence, ("low", "forecast"))
 
+    def test_recovery_window_attributes_contract_sales_once_and_rejects_overlap(self):
+        self._place(2, fields.Datetime.now() - timedelta(days=5))
+        self._sale_report(quantity=1)
+        start = fields.Datetime.now() - timedelta(days=3)
+        end = fields.Datetime.now() + timedelta(days=3)
+        operation = self.env["mb.commercial.operation"].create({
+            "name": "Refill recovery", "operation_type": "depot_refill",
+            "partner_id": self.gallery.id, "contract_id": self.contract.id,
+            "depot_warehouse_id": self.depot.id,
+            "planned_start": start, "planned_end": start + timedelta(hours=2),
+            "recovery_scope": "contract_period",
+            "recovery_date_from": start, "recovery_date_to": end,
+        })
+        self.assertEqual(operation.actual_revenue, 0)
+        self.assertEqual(operation.comparison_window_revenue, 65)
+        with self.assertRaises(ValidationError):
+            self.env["mb.commercial.operation"].create({
+                "name": "Overlapping recovery", "operation_type": "depot_refill",
+                "partner_id": self.gallery.id, "contract_id": self.contract.id,
+                "depot_warehouse_id": self.depot.id,
+                "planned_start": start + timedelta(hours=3),
+                "planned_end": start + timedelta(hours=4),
+                "recovery_scope": "contract_period",
+                "recovery_date_from": start + timedelta(days=1),
+                "recovery_date_to": end + timedelta(days=1),
+            })
     def test_refill_operation_creates_native_transfer_to_depot(self):
         self._place(5, fields.Datetime.now() - timedelta(days=10))
         self._sale_report(quantity=2)

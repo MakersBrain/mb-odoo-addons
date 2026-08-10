@@ -30,14 +30,51 @@ class MbCommercialProfitabilityReport(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute(f"""
             CREATE VIEW {self._table} AS
-            WITH actual AS (
+            WITH scoped_items AS (
                 SELECT
-                    account_id,
-                    SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) AS revenue,
-                    -SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END) AS cost
-                FROM account_analytic_line
-                WHERE account_id IS NOT NULL
-                GROUP BY account_id
+                    line.mb_commercial_operation_id AS operation_id,
+                    CASE WHEN line.amount > 0 THEN line.amount ELSE 0 END AS revenue,
+                    CASE WHEN line.amount < 0 THEN -line.amount ELSE 0 END AS cost
+                FROM account_analytic_line line
+                WHERE line.mb_commercial_operation_id IS NOT NULL
+                UNION ALL
+                SELECT
+                    operation.id AS operation_id,
+                    CASE WHEN line.amount > 0 THEN line.amount ELSE 0 END AS revenue,
+                    CASE WHEN line.amount < 0 THEN -line.amount ELSE 0 END AS cost
+                FROM mb_commercial_operation operation
+                JOIN account_analytic_line line ON line.task_id = operation.task_id
+                WHERE line.mb_commercial_operation_id IS NULL
+                UNION ALL
+                SELECT
+                    move.mb_commercial_operation_id AS operation_id,
+                    CASE WHEN move.move_type = 'out_invoice'
+                         THEN ABS(move.amount_untaxed_signed)
+                         WHEN move.move_type = 'out_refund'
+                         THEN -ABS(move.amount_untaxed_signed) ELSE 0 END AS revenue,
+                    CASE WHEN move.move_type = 'in_invoice'
+                         THEN ABS(move.amount_untaxed_signed)
+                         WHEN move.move_type = 'in_refund'
+                         THEN -ABS(move.amount_untaxed_signed) ELSE 0 END AS cost
+                FROM account_move move
+                WHERE move.mb_commercial_operation_id IS NOT NULL AND move.state = 'posted'
+                UNION ALL
+                SELECT
+                    relation.operation_id,
+                    CASE WHEN move.move_type = 'out_invoice'
+                         THEN ABS(move.amount_untaxed_signed)
+                         WHEN move.move_type = 'out_refund'
+                         THEN -ABS(move.amount_untaxed_signed) ELSE 0 END AS revenue,
+                    CASE WHEN move.move_type = 'in_invoice'
+                         THEN ABS(move.amount_untaxed_signed)
+                         WHEN move.move_type = 'in_refund'
+                         THEN -ABS(move.amount_untaxed_signed) ELSE 0 END AS cost
+                FROM mb_commercial_operation_account_move_rel relation
+                JOIN account_move move ON move.id = relation.move_id AND move.state = 'posted'
+                WHERE move.mb_commercial_operation_id IS NULL
+            ), actual AS (
+                SELECT operation_id, SUM(revenue) AS revenue, SUM(cost) AS cost
+                FROM scoped_items GROUP BY operation_id
             )
             SELECT
                 operation.id,
@@ -48,18 +85,20 @@ class MbCommercialProfitabilityReport(models.Model):
                 operation.contract_id,
                 operation.planned_start::date AS operation_date,
                 date_trunc('month', operation.planned_start)::date AS month,
-                operation.expected_revenue AS planned_revenue,
+                COALESCE(scenario.sales_revenue_excl_vat, operation.expected_revenue) AS planned_revenue,
                 operation.planned_cost,
                 operation.planned_margin,
                 COALESCE(actual.revenue, 0) AS actual_revenue,
                 COALESCE(actual.cost, 0) AS actual_cost,
                 COALESCE(actual.revenue, 0) - COALESCE(actual.cost, 0) AS actual_margin,
-                COALESCE(actual.revenue, 0) - operation.expected_revenue AS revenue_variance,
+                COALESCE(actual.revenue, 0)
+                    - COALESCE(scenario.sales_revenue_excl_vat, operation.expected_revenue) AS revenue_variance,
                 COALESCE(actual.cost, 0) - operation.planned_cost AS cost_variance,
                 (COALESCE(actual.revenue, 0) - COALESCE(actual.cost, 0))
                     - operation.planned_margin AS margin_variance
             FROM mb_commercial_operation operation
             JOIN res_company company ON company.id = operation.company_id
-            JOIN project_project project ON project.id = operation.project_id
-            LEFT JOIN actual ON actual.account_id = project.account_id
+            LEFT JOIN mb_commercial_profitability_scenario scenario
+                ON scenario.id = operation.primary_scenario_id
+            LEFT JOIN actual ON actual.operation_id = operation.id
         """)

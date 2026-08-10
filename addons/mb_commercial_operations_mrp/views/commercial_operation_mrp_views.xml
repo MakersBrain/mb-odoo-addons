@@ -18,4 +18,7 @@
       </xpath>
     </field>
   </record>
+  <template id="report_commercial_operation_mrp" inherit_id="mb_commercial_operations.report_commercial_operation">
+    <xpath expr="//div[@name='commercial_bridge_report_sections']" position="inside"><h3>Manufacturing supply</h3><table class="table table-sm table-bordered"><thead><tr><th>Manufacturing order</th><th>Product</th><th>Quantity</th><th>Deadline</th><th>State</th><th>Components</th></tr></thead><tbody><tr t-foreach="operation.manufacturing_order_ids" t-as="production"><td><span t-field="production.name"/></td><td><span t-field="production.product_id"/></td><td><span t-field="production.product_qty"/></td><td><span t-field="production.date_deadline"/></td><td><span t-field="production.state"/></td><td><span t-field="production.components_availability_state"/></td></tr></tbody></table></xpath>
+  </template>
 </odoo>

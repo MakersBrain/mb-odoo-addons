@@ -7,6 +7,7 @@
       <list decoration-success="state == 'approved'" decoration-muted="state == 'superseded'">
         <field name="name"/>
         <field name="operation_id"/>
+        <field name="calculation_mode"/>
         <field name="route_cost_mode"/>
         <field name="accepted_travel_cost"/>
         <field name="fixed_event_cost"/>
@@ -27,7 +28,7 @@
     <field name="arch" type="xml">
       <form>
         <header>
-          <button name="action_approve" type="object" string="Approve Scenario" class="btn-primary" invisible="state != 'draft'"/>
+          <button name="action_approve" type="object" string="Approve Planning Baseline" class="btn-primary" invisible="state != 'draft'"/>
           <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
         </header>
         <sheet>
@@ -35,6 +36,7 @@
           <group>
             <group>
               <field name="operation_id" readonly="state != 'draft'"/>
+              <field name="calculation_mode" readonly="state != 'draft'"/>
               <field name="route_cost_mode" readonly="state != 'draft'"/>
               <field name="travel_estimate_id" readonly="1" invisible="route_cost_mode != 'provider_total'"/>
               <field name="manual_travel_total" invisible="route_cost_mode != 'manual'" readonly="state != 'draft'"/>
@@ -53,11 +55,18 @@
                 <list editable="bottom">
                   <field name="sequence" widget="handle"/>
                   <field name="product_id"/>
-                  <field name="mix_share" sum="100%"/>
+                  <field name="expected_sold_qty" sum="Total"/>
                   <field name="sale_price_excluded_tax"/>
+                  <field name="vat_rate"/>
+                  <field name="customer_price_incl_vat" readonly="1"/>
                   <field name="channel_fee_rate"/>
                   <field name="channel_fee_amount" readonly="1"/>
+                  <field name="turnover_levy_rate"/>
+                  <field name="turnover_levy_amount" readonly="1"/>
                   <field name="product_unit_cost"/>
+                  <field name="product_cost_mode"/>
+                  <field name="product_cost_rate" invisible="product_cost_mode != 'sales_percent'"/>
+                  <field name="exclude_product_cost"/>
                   <field name="other_variable_unit_cost"/>
                   <field name="net_unit_revenue" readonly="1"/>
                   <field name="unit_contribution" readonly="1"/>
@@ -65,6 +74,11 @@
                   <field name="cost_date"/>
                   <field name="currency_id" column_invisible="True"/>
                 </list>
+              </field>
+            </page>
+            <page string="Scenario Costs">
+              <field name="cost_line_ids" readonly="state != 'draft'">
+                <list editable="bottom"><field name="sequence" widget="handle"/><field name="name"/><field name="category"/><field name="calculation"/><field name="quantity"/><field name="rate"/><field name="percentage"/><field name="planned_amount" readonly="1" sum="Total"/><field name="source_kind"/><field name="source_reference" optional="hide"/><field name="assumption_date"/><field name="currency_id" column_invisible="True"/></list>
               </field>
             </page>
             <page string="Route Components" invisible="route_cost_mode != 'components'">
@@ -103,6 +117,12 @@
                 <field name="contribution_margin_ratio" widget="percentage" readonly="1"/>
                 <field name="break_even_units" readonly="1"/>
                 <field name="break_even_revenue" readonly="1"/>
+                <field name="sales_revenue_excl_vat" readonly="1"/>
+                <field name="customer_receipts_incl_vat" readonly="1"/>
+                <field name="total_variable_cost" readonly="1"/>
+                <field name="projected_margin" readonly="1"/>
+                <field name="break_even_sales_excl_vat" readonly="1"/>
+                <field name="break_even_customer_receipts_incl_vat" readonly="1"/>
               </group>
             </page>
           </notebook>

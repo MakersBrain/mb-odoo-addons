@@ -11,6 +11,19 @@ class MbCommercialOperation(models.Model):
     expenses_expected = fields.Boolean()
     expenses_complete = fields.Boolean(compute="_compute_expenses_complete")
 
+    def _get_operation_profitability_items(self):
+        self.ensure_one()
+        items = super()._get_operation_profitability_items()
+        for expense in self.expense_ids.filtered(
+            lambda record: record.state not in ("draft", "submitted", "refused")
+        ):
+            items.append({
+                "model": expense._name, "res_id": expense.id, "component": "cost",
+                "date": expense.date, "amount": expense.total_amount_currency,
+                "currency": expense.currency_id,
+            })
+        return items
+
     @api.depends("expenses_expected", "expense_ids.state")
     def _compute_expenses_complete(self):
         for operation in self:

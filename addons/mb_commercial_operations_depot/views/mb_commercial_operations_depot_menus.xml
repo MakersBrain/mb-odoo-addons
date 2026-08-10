@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <menuitem id="menu_plan_depot_refill" name="Plan a Refill" parent="mb_commercial_operations.menu_commercial_operations" action="action_plan_depot_refill" sequence="8"/>
+  <menuitem id="menu_plan_depot_permanence" name="Plan a Permanence" parent="mb_commercial_operations.menu_commercial_operations" action="action_plan_depot_permanence" sequence="9"/>
   <menuitem id="menu_commercial_depots" name="Depots"
             parent="mb_commercial_operations.menu_commercial_operations_root" sequence="25"/>
   <menuitem id="menu_commercial_depot_contracts" name="Depot Contracts"
