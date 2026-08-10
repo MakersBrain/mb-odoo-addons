@@ -1,5 +1,7 @@
 import uuid
+from unittest.mock import patch
 
+from odoo.addons.base.models.ir_module import IrModuleModule
 from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
 
@@ -162,3 +164,26 @@ class TestControlBridge(TransactionCase):
                 "module_key": "system",
                 "modules": ["base"],
             })
+
+    def test_module_enable_is_scheduled_without_immediate_registry_rebuild(self):
+        self.company.mb_control_workshop_id = self.workshop_id
+        module = self.env["ir.module.module"].sudo().search([
+            ("name", "=", "mb_ceramics_firing"),
+        ], limit=1)
+        self.assertEqual(module.state, "uninstalled")
+
+        with patch.object(
+            IrModuleModule, "button_install", autospec=True,
+        ) as button_install, patch.object(
+            IrModuleModule, "button_immediate_install", autospec=True,
+        ) as immediate_install:
+            result = self.company.mb_enable_module_bundle({
+                "workshop_id": self.workshop_id,
+                "module_key": "firings",
+                "modules": ["mb_ceramics_firing"],
+            })
+
+        button_install.assert_called_once()
+        immediate_install.assert_not_called()
+        self.assertTrue(result["applied"])
+        self.assertEqual(result["status"], "scheduled")

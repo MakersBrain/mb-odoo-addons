@@ -132,11 +132,25 @@ class ResCompany(models.Model):
         ])
         if set(records.mapped("name")) != set(expected):
             raise ValidationError("a supported module is unavailable in this release")
-        pending = records.filtered(lambda module: module.state not in ("installed", "to upgrade"))
+        invalid = records.filtered(
+            lambda module: module.state not in (
+                "uninstalled", "to install", "installed", "to upgrade",
+            )
+        )
+        if invalid:
+            raise ValidationError("a supported module cannot currently be enabled")
+        pending = records.filtered(lambda module: module.state == "uninstalled")
         if pending:
-            pending.button_immediate_install()
+            # Only schedule the native module operation here. Immediate module
+            # installation commits and rebuilds the registry in the middle of
+            # this HTTP request, before its idempotency receipt can be stored.
+            # The deployment worker applies ``to install`` modules through the
+            # normal Odoo CLI/registry lifecycle after this transaction commits.
+            pending.button_install()
+        scheduled = records.filtered(lambda module: module.state == "to install") | pending
         return {
             "applied": bool(pending),
+            "status": "scheduled" if scheduled else "installed",
             "module_key": module_key,
             "modules": list(expected),
         }
