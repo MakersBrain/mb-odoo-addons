@@ -486,7 +486,15 @@ class MbDepotSaleReport(models.Model):
                     "The reserved quantity or lot for %(product)s changed before validation.",
                     product=report_line.product_id.display_name,
                 ))
-        result = picking.with_context(skip_backorder=True, cancel_backorder=True).button_validate()
+        sold_on = self._company_local_date(order.mb_depot_effective_date)
+        result = picking.with_context(
+            skip_backorder=True,
+            cancel_backorder=True,
+            # Odoo 19's stock-account hook uses this date while `_action_done`
+            # creates the valuation journal entry. Backdating only `date_done`
+            # afterwards would leave accounting in today's period.
+            force_period_date=sold_on,
+        ).button_validate()
         if isinstance(result, dict):
             raise UserError(_("Delivery %s still requires an interactive validation choice.", picking.name))
         if picking.state != "done":

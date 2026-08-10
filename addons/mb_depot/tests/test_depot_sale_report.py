@@ -116,6 +116,26 @@ class TestDepotSaleReport(TransactionCase):
         self.assertEqual(picking.move_line_ids.mb_depot_sale_date, sold.date())
         self.assertEqual(order.invoice_status, "to invoice")
 
+    def test_historical_delivery_uses_native_stock_account_period_date(self):
+        now = fields.Datetime.now()
+        sold = now - timedelta(days=2)
+        self._place(when=now - timedelta(days=4))
+        report = self._report([{"sold_at": sold}], reference="DEPOT-ACCOUNT-DATE")
+        observed_period_dates = []
+        picking_model = type(self.env["stock.picking"])
+        original_validate = picking_model.button_validate
+
+        def capture_period_date(pickings):
+            observed_period_dates.append(
+                pickings.env.context.get("force_period_date")
+            )
+            return original_validate(pickings)
+
+        with patch.object(picking_model, "button_validate", capture_period_date):
+            report.action_process()
+
+        self.assertEqual(observed_period_dates, [sold.date()])
+
     def test_one_reference_with_two_dates_creates_two_deliveries(self):
         now = fields.Datetime.now()
         self._place(quantity=2, when=now - timedelta(days=5))
