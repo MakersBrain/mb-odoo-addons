@@ -252,6 +252,20 @@ class TestLabelVerticalSlice(TransactionCase):
         self.assertEqual(wizard.product_id, self.product)
         self.assertEqual(wizard.lot_id, self.lot)
 
+    def test_label_wizard_preview_escapes_product_name(self):
+        malicious_product = self.env["product.product"].create({
+            "name": '<img src=x onerror="alert(1)">',
+        })
+        wizard = self.env["mb.label.print.wizard"].create({
+            "product_tmpl_id": malicious_product.product_tmpl_id.id,
+            "product_id": malicious_product.id,
+            "template_id": self.template.id,
+            "company_id": self.env.company.id,
+        })
+
+        self.assertNotIn("<img", wizard.preview_html)
+        self.assertIn("&lt;img", wizard.preview_html)
+
     def test_editor_settings_and_parity_features_are_snapshotted(self):
         payload = self.template.save_editor_version(document(
             {

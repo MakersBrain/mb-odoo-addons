@@ -1,5 +1,7 @@
 import base64
 
+from markupsafe import Markup
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
@@ -21,7 +23,7 @@ class MbLabelPrintWizard(models.TransientModel):
         "res.company", required=True, default=lambda self: self.env.company)
     copies = fields.Integer(default=1, required=True)
     manual_values_json = fields.Json(string="Manual Values", default=dict)
-    preview_html = fields.Html(compute="_compute_preview_html", sanitize=False)
+    preview_html = fields.Html(compute="_compute_preview_html")
     preview_png = fields.Binary(compute="_compute_preview", readonly=True)
     preview_error = fields.Char(compute="_compute_preview", readonly=True)
 
@@ -65,14 +67,17 @@ class MbLabelPrintWizard(models.TransientModel):
     def _compute_preview_html(self):
         for wizard in self:
             if not wizard.template_id or not wizard.template_id.current_version_id or not wizard.product_id:
-                wizard.preview_html = "<p class='text-muted'>Choose a saved template and product.</p>"
+                wizard.preview_html = Markup(
+                    "<p class='text-muted'>Choose a saved template and product.</p>"
+                )
                 continue
-            wizard.preview_html = (
-                "<div class='alert alert-info mb-0'>%s × %s mm · %s · v%s</div>" % (
-                    wizard.template_id.width_mm, wizard.template_id.height_mm,
-                    wizard.product_id.display_name,
-                    wizard.template_id.current_version_id.number,
-                ))
+            wizard.preview_html = Markup(
+                "<div class='alert alert-info mb-0'>{} × {} mm · {} · v{}</div>"
+            ).format(
+                wizard.template_id.width_mm, wizard.template_id.height_mm,
+                wizard.product_id.display_name,
+                wizard.template_id.current_version_id.number,
+            )
 
     @api.depends("template_id", "product_id", "lot_id", "manual_values_json")
     def _compute_preview(self):
