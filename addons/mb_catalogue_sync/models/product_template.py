@@ -308,13 +308,14 @@ class ProductTemplate(models.Model):
                 offer.get("package_quantity"), offer.get("package_unit"))
             variant = self._mb_variant_for_pack(quantity, uom) if quantity else None
 
+            minimum_quantity = offer.get("min_order_quantity") or 0.0
             values = {
                 "partner_id": supplier.partner_id.id,
                 "product_tmpl_id": self.id,
                 "product_id": variant.id if variant else False,
                 "price": price,
                 "currency_id": currency.id,
-                "min_qty": offer.get("min_order_quantity") or 0.0,
+                "min_qty": minimum_quantity,
                 "delay": supplier.delay,
                 "product_uom_id": uom.id if uom else self.uom_id.id,
                 "product_code": offer.get("supplier_reference") or False,
@@ -324,6 +325,8 @@ class ProductTemplate(models.Model):
                 ("partner_id", "=", supplier.partner_id.id),
                 ("product_tmpl_id", "=", self.id),
                 ("product_id", "=", variant.id if variant else False),
+                ("company_id", "=", self.env.company.id),
+                ("min_qty", "=", minimum_quantity),
             ], limit=1)
             if existing:
                 existing.write(values)

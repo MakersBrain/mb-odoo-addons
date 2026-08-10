@@ -122,6 +122,25 @@ class TestCatalogueSync(TransactionCase):
             self.env["product.supplierinfo"].search_count(
                 [("product_tmpl_id", "=", first.id)]), 3)
 
+    def test_vendor_price_breaks_keep_distinct_native_quantity_tiers(self):
+        tiered_offer = dict(
+            PAYLOAD["offers"][0], min_order_quantity=12.0, price=24.0,
+        )
+        payload = dict(PAYLOAD, offers=[PAYLOAD["offers"][0], tiered_offer])
+        template, _created = self.template._mb_upsert_canonical(payload)
+
+        written, refused = template._mb_sync_supplier_offers(payload["offers"])
+        template._mb_sync_supplier_offers(payload["offers"])
+
+        tiers = self.env["product.supplierinfo"].search([
+            ("product_tmpl_id", "=", template.id),
+            ("partner_id", "=", self.ceradel.id),
+        ])
+        self.assertEqual(written, 2)
+        self.assertFalse(refused)
+        self.assertEqual(len(tiers), 2)
+        self.assertEqual(set(tiers.mapped("min_qty")), {0.0, 12.0})
+
     def test_the_same_jar_published_twice_is_one_variant(self):
         """472 ml and 473 ml are one 16 oz jar, and must not split the stock."""
         template, _created, _written, _refused = self._import()
