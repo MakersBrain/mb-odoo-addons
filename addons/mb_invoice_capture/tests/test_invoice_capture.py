@@ -2,6 +2,7 @@ import base64
 import hashlib
 import uuid
 
+from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
@@ -166,10 +167,21 @@ class TestInvoiceCapture(TransactionCase):
             "review_expense_account_id": self.expense_account.id,
         })
 
+        with self.assertRaisesRegex(UserError, "explicit freight"):
+            capture.action_create_reviewed_bill()
+        self.env["mb.invoice.capture.line"].sudo().create({
+            "capture_id": capture.id,
+            "sequence": 30,
+            "description": "Rounding adjustment",
+            "review_quantity": 0.5,
+            "review_unit_price": -0.01,
+        })
         capture.action_create_reviewed_bill()
 
         lines = capture.move_id.invoice_line_ids
-        self.assertEqual(lines.mapped("name"), ["Stoneware", "Glaze"])
+        self.assertEqual(
+            lines.mapped("name"), ["Stoneware", "Glaze", "Rounding adjustment"]
+        )
         self.assertEqual(lines[0].quantity, 12.5)
         self.assertEqual(lines[1].quantity, 1.0)
         self.assertEqual(capture.move_id.amount_total, 53.79)
@@ -343,3 +355,61 @@ class TestInvoiceCapture(TransactionCase):
         self.assertEqual(self.env["account.move"].search_count([
             ("id", "=", bill.id),
         ]), 1)
+
+    def test_accounting_manager_cannot_rewrite_source_evidence(self):
+        result = self.Capture.ingest(self.payload(
+            external_document_id="paperless:immutable",
+        ))
+        capture = self.Capture.browse(result["capture_id"])
+        manager = self.env["res.users"].create({
+            "name": "Capture evidence manager",
+            "login": "capture-evidence-manager",
+            "group_ids": [fields.Command.set(
+                self.env.ref("account.group_account_manager").ids
+            )],
+        })
+
+        with self.assertRaisesRegex(UserError, "cannot be edited"):
+            capture.with_user(manager).write({"content_digest": "0" * 64})
+        with self.assertRaisesRegex(UserError, "cannot be edited"):
+            capture.review_line_ids.with_user(manager).write({
+                "extracted_unit_price": 999.0,
+            })
+
+        capture.with_user(manager).write({
+            "review_expense_account_id": self.expense_account.id,
+        })
+        self.assertEqual(capture.review_expense_account_id, self.expense_account)
+
+    def test_reviewed_bill_requires_explicit_reconciliation_line(self):
+        invoice = dict(
+            self.payload()["invoice"],
+            untaxed_amount="12.00",
+            total_amount="12.00",
+        )
+        result = self.Capture.ingest(self.payload(
+            external_document_id="paperless:explicit-adjustment",
+            invoice=invoice,
+        ))
+        capture = self.Capture.browse(result["capture_id"])
+        capture.write({
+            "review_supplier_id": self.partner.id,
+            "review_expense_account_id": self.expense_account.id,
+        })
+
+        with self.assertRaisesRegex(UserError, "explicit freight"):
+            capture.action_create_reviewed_bill()
+
+        self.env["mb.invoice.capture.line"].sudo().create({
+            "capture_id": capture.id,
+            "sequence": 20,
+            "description": "Freight",
+            "review_quantity": 1.0,
+            "review_unit_price": 2.0,
+        })
+        capture.action_create_reviewed_bill()
+
+        prices = capture.move_id.invoice_line_ids.filtered(
+            lambda line: line.display_type == "product"
+        ).mapped("price_unit")
+        self.assertCountEqual(prices, [5.0, 2.0])

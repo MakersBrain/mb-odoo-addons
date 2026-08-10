@@ -8,7 +8,7 @@ existing accounting master data, reconciles totals, creates draft supplier
 bills, and reconstructs reviewable purchase orders for normal stock receipts.
 It never stores Paperless or Azure credentials, confirms receipts, posts, or pays.
 """,
-    "version": "19.0.1.5.1",
+    "version": "19.0.1.5.2",
     "license": "LGPL-3",
     "category": "Accounting/Accounting",
     "author": "Makersbrain",
