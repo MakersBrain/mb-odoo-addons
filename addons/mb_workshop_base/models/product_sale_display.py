@@ -1,4 +1,4 @@
-from odoo import api, models
+from odoo import api, fields, models
 from odoo.tools.misc import format_amount
 
 
@@ -11,14 +11,20 @@ def append_sale_selector_price(products):
 
     pricelist_id = products.env.context.get("mb_sale_pricelist_id")
     currency_id = products.env.context.get("mb_sale_currency_id")
+    uom_id = products.env.context.get("mb_sale_uom_id")
+    price_date = products.env.context.get("mb_sale_price_date")
     pricelist = products.env["product.pricelist"].browse(pricelist_id).exists()
     currency = products.env["res.currency"].browse(currency_id).exists()
+    uom = products.env["uom.uom"].browse(uom_id).exists()
+    if price_date:
+        price_date = fields.Datetime.to_datetime(price_date)
     if not currency:
         currency = pricelist.currency_id if pricelist else products.env.company.currency_id
 
     for product in products:
         price = (
-            pricelist._get_product_price(product, 1.0)
+            pricelist._get_product_price(
+                product, 1.0, uom=uom or None, date=price_date or None)
             if pricelist
             else product.list_price
         )
@@ -38,6 +44,8 @@ class ProductTemplate(models.Model):
         "mb_show_product_selector_price",
         "mb_sale_pricelist_id",
         "mb_sale_currency_id",
+        "mb_sale_uom_id",
+        "mb_sale_price_date",
     )
     def _compute_display_name(self):
         super()._compute_display_name()
@@ -59,6 +67,8 @@ class ProductProduct(models.Model):
         "mb_show_product_selector_price",
         "mb_sale_pricelist_id",
         "mb_sale_currency_id",
+        "mb_sale_uom_id",
+        "mb_sale_price_date",
     )
     def _compute_display_name(self):
         super()._compute_display_name()

@@ -19,6 +19,7 @@ class MbMigrationTest(models.Model):
     _name = "mb.migration.test"
     _description = "Lead and cadmium migration test (84/500/EEC)"
     _order = "test_date desc, id desc"
+    _check_company_auto = True
 
     lot_id = fields.Many2one(
         comodel_name="stock.lot",
@@ -26,6 +27,7 @@ class MbMigrationTest(models.Model):
         required=True,
         ondelete="restrict",
         index=True,
+        check_company=True,
     )
     product_id = fields.Many2one(
         related="lot_id.product_id", store=True, string="Material")
@@ -49,7 +51,8 @@ class MbMigrationTest(models.Model):
              "above, because the limits in force are the lab's to apply.",
     )
     report_ids = fields.Many2many(
-        comodel_name="ir.attachment", string="Laboratory report")
+        comodel_name="ir.attachment", string="Laboratory report", check_company=True)
     note = fields.Text()
     company_id = fields.Many2one(
-        comodel_name="res.company", default=lambda self: self.env.company)
+        comodel_name="res.company", required=True, index=True,
+        default=lambda self: self.env.company)
