@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_profitability_scenario_list" model="ir.ui.view">
+    <field name="name">mb.commercial.profitability.scenario.list</field>
+    <field name="model">mb.commercial.profitability.scenario</field>
+    <field name="arch" type="xml">
+      <list decoration-success="state == 'approved'" decoration-muted="state == 'superseded'">
+        <field name="name"/>
+        <field name="operation_id"/>
+        <field name="route_cost_mode"/>
+        <field name="accepted_travel_cost"/>
+        <field name="fixed_event_cost"/>
+        <field name="weighted_unit_revenue"/>
+        <field name="weighted_unit_contribution"/>
+        <field name="break_even_units"/>
+        <field name="break_even_revenue"/>
+        <field name="calculation_note"/>
+        <field name="state" widget="badge"/>
+        <field name="currency_id" column_invisible="True"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_profitability_scenario_form" model="ir.ui.view">
+    <field name="name">mb.commercial.profitability.scenario.form</field>
+    <field name="model">mb.commercial.profitability.scenario</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_approve" type="object" string="Approve Scenario" class="btn-primary" invisible="state != 'draft'"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
+        </header>
+        <sheet>
+          <div class="oe_title"><h1><field name="name" readonly="state != 'draft'"/></h1></div>
+          <group>
+            <group>
+              <field name="operation_id" readonly="state != 'draft'"/>
+              <field name="route_cost_mode" readonly="state != 'draft'"/>
+              <field name="travel_estimate_id" readonly="1" invisible="route_cost_mode != 'provider_total'"/>
+              <field name="manual_travel_total" invisible="route_cost_mode != 'manual'" readonly="state != 'draft'"/>
+            </group>
+            <group>
+              <field name="accepted_travel_cost" readonly="1"/>
+              <field name="fixed_event_cost" readonly="1"/>
+              <field name="calculation_blocked" readonly="1"/>
+              <field name="calculation_note" readonly="1"/>
+              <field name="currency_id" invisible="1"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Sales Mix">
+              <field name="line_ids" readonly="state != 'draft'">
+                <list editable="bottom">
+                  <field name="sequence" widget="handle"/>
+                  <field name="product_id"/>
+                  <field name="mix_share" sum="100%"/>
+                  <field name="sale_price_excluded_tax"/>
+                  <field name="channel_fee_rate"/>
+                  <field name="channel_fee_amount" readonly="1"/>
+                  <field name="product_unit_cost"/>
+                  <field name="other_variable_unit_cost"/>
+                  <field name="net_unit_revenue" readonly="1"/>
+                  <field name="unit_contribution" readonly="1"/>
+                  <field name="cost_source"/>
+                  <field name="cost_date"/>
+                  <field name="currency_id" column_invisible="True"/>
+                </list>
+              </field>
+            </page>
+            <page string="Route Components" invisible="route_cost_mode != 'components'">
+              <group>
+                <group>
+                  <field name="toll_cost" readonly="state != 'draft'"/>
+                  <field name="fuel_cost" readonly="state != 'draft'"/>
+                  <field name="planned_travel_hours" readonly="state != 'draft'"/>
+                  <field name="travel_hourly_cost" readonly="state != 'draft'"/>
+                </group>
+                <group>
+                  <field name="ferry_cost" readonly="state != 'draft'"/>
+                  <field name="zone_cost" readonly="state != 'draft'"/>
+                  <field name="other_route_cost" readonly="state != 'draft'"/>
+                </group>
+              </group>
+            </page>
+            <page string="Work &amp; Fixed Costs">
+              <group>
+                <group>
+                  <field name="planned_work_hours" readonly="state != 'draft'"/>
+                  <field name="work_hourly_cost" readonly="state != 'draft'"/>
+                  <field name="stall_rent" readonly="state != 'draft'"/>
+                </group>
+                <group>
+                  <field name="parking_cost" readonly="state != 'draft'"/>
+                  <field name="accommodation_cost" readonly="state != 'draft'"/>
+                  <field name="other_fixed_cost" readonly="state != 'draft'"/>
+                </group>
+              </group>
+            </page>
+            <page string="Break-even">
+              <group>
+                <field name="weighted_unit_revenue" readonly="1"/>
+                <field name="weighted_unit_contribution" readonly="1"/>
+                <field name="contribution_margin_ratio" widget="percentage" readonly="1"/>
+                <field name="break_even_units" readonly="1"/>
+                <field name="break_even_revenue" readonly="1"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_profitability_scenarios" model="ir.actions.act_window">
+    <field name="name">Break-even Scenarios</field>
+    <field name="res_model">mb.commercial.profitability.scenario</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>

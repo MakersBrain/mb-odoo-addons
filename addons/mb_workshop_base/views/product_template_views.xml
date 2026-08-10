@@ -8,6 +8,7 @@
             <xpath expr="//page[@name='general_information']//group" position="after">
                 <group string="Ceramics" name="mb_ceramics">
                     <field name="mb_clay_body_id" />
+                    <field name="mb_supplier_lot_required" />
                 </group>
                 <group string="Food contact" name="mb_food_contact">
                     <field name="mb_food_contact" />

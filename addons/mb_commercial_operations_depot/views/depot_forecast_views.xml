@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_depot_refill_forecast_list" model="ir.ui.view">
+    <field name="name">mb.depot.refill.forecast.list</field>
+    <field name="model">mb.depot.refill.forecast</field>
+    <field name="arch" type="xml">
+      <list decoration-danger="refill_due_date and refill_due_date &lt; snapshot_date"
+            decoration-warning="confidence in ('policy', 'low')">
+        <field name="snapshot_date"/>
+        <field name="depot_warehouse_id"/>
+        <field name="rule_id"/>
+        <field name="available_now"/>
+        <field name="sold_quantity"/>
+        <field name="exposed_days"/>
+        <field name="stockout_days"/>
+        <field name="average_daily_sales"/>
+        <field name="days_of_cover"/>
+        <field name="refill_due_date"/>
+        <field name="forecast_visit_date"/>
+        <field name="forecast_stock_on_visit"/>
+        <field name="suggested_quantity"/>
+        <field name="confidence" widget="badge"/>
+        <field name="stockout_biased" optional="show"/>
+        <field name="company_id" groups="base.group_multi_company"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_depot_refill_forecast_form" model="ir.ui.view">
+    <field name="name">mb.depot.refill.forecast.form</field>
+    <field name="model">mb.depot.refill.forecast</field>
+    <field name="arch" type="xml">
+      <form create="false" edit="false" delete="false">
+        <sheet>
+          <div class="oe_title"><h1><field name="rule_id"/></h1></div>
+          <group>
+            <group>
+              <field name="contract_id"/>
+              <field name="depot_warehouse_id"/>
+              <field name="snapshot_date"/>
+              <field name="calculated_at"/>
+              <field name="window_start"/>
+              <field name="window_end"/>
+            </group>
+            <group>
+              <field name="current_quantity"/>
+              <field name="reserved_quantity"/>
+              <field name="available_now"/>
+              <field name="sold_quantity"/>
+              <field name="returned_quantity"/>
+              <field name="exposed_days"/>
+              <field name="stockout_days"/>
+            </group>
+          </group>
+          <group string="Recommendation">
+            <field name="average_daily_sales"/>
+            <field name="forecast_visit_date"/>
+            <field name="forecast_stock_on_visit"/>
+            <field name="suggested_quantity"/>
+            <field name="days_of_cover"/>
+            <field name="refill_due_date"/>
+            <field name="confidence"/>
+            <field name="stockout_biased"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_depot_refill_forecasts" model="ir.actions.act_window">
+    <field name="name">Depot Refill Forecast</field>
+    <field name="res_model">mb.depot.refill.forecast</field>
+    <field name="view_mode">list,form,pivot,graph</field>
+  </record>
+
+  <record id="action_depot_assortment_rules" model="ir.actions.act_window">
+    <field name="name">Depot Assortment Rules</field>
+    <field name="res_model">mb.depot.assortment.rule</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="view_depot_assortment_rule_list" model="ir.ui.view">
+    <field name="name">mb.depot.assortment.rule.list</field>
+    <field name="model">mb.depot.assortment.rule</field>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="priority" widget="handle"/>
+        <field name="name"/>
+        <field name="contract_id"/>
+        <field name="depot_warehouse_id"/>
+        <field name="target_type"/>
+        <field name="product_id" invisible="target_type != 'product'"/>
+        <field name="category_id" invisible="target_type != 'bucket'"/>
+        <field name="minimum_quantity"/>
+        <field name="target_quantity"/>
+        <field name="demand_window_days"/>
+        <field name="active"/>
+      </list>
+    </field>
+  </record>
+</odoo>

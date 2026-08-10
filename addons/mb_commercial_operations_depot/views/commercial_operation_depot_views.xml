@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_operation_form_depot" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.form.depot</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="inherit_id" ref="mb_commercial_operations_stock.view_commercial_operation_form_stock"/>
+    <field name="arch" type="xml">
+      <xpath expr="//button[@name='action_prepare_market_stock']" position="after">
+        <button name="action_prepare_market_stock" type="object" string="Create Refill Transfer" class="btn-primary"
+                invisible="operation_type != 'depot_refill' or state not in ('approved', 'scheduled') or preparation_picking_id"/>
+      </xpath>
+      <xpath expr="//field[@name='source_warehouse_id']" position="before">
+        <field name="depot_warehouse_id" readonly="state not in ('draft', 'quoted')"
+               invisible="operation_type not in ('depot_refill', 'depot_permanence')"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_commercial_operation_search_depot" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.search.depot</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_operation_search"/>
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='market']" position="after">
+        <filter name="depot_refill" string="Depot Refills" domain="[('operation_type', '=', 'depot_refill')]"/>
+        <filter name="depot_permanence" string="Depot Permanence" domain="[('operation_type', '=', 'depot_permanence')]"/>
+      </xpath>
+      <xpath expr="//field[@name='partner_id']" position="after">
+        <field name="depot_warehouse_id"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="action_commercial_depot_refills" model="ir.actions.act_window">
+    <field name="name">Depot Refill Visits</field>
+    <field name="res_model">mb.commercial.operation</field>
+    <field name="view_mode">list,calendar,form</field>
+    <field name="domain">[('operation_type', '=', 'depot_refill')]</field>
+    <field name="context">{'default_operation_type': 'depot_refill'}</field>
+  </record>
+  <record id="action_commercial_depot_permanence" model="ir.actions.act_window">
+    <field name="name">Depot Permanence</field>
+    <field name="res_model">mb.commercial.operation</field>
+    <field name="view_mode">list,calendar,form</field>
+    <field name="domain">[('operation_type', '=', 'depot_permanence')]</field>
+    <field name="context">{'default_operation_type': 'depot_permanence'}</field>
+  </record>
+</odoo>

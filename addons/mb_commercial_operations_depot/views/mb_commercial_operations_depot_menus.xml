@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <menuitem id="menu_commercial_depots" name="Depots"
+            parent="mb_commercial_operations.menu_commercial_operations_root" sequence="25"/>
+  <menuitem id="menu_commercial_depot_contracts" name="Depot Contracts"
+            parent="menu_commercial_depots" action="mb_commercial_operations.action_commercial_contracts" sequence="10"/>
+  <menuitem id="menu_commercial_depot_forecast" name="Refill Forecast"
+            parent="menu_commercial_depots" action="action_depot_refill_forecasts" sequence="20"/>
+  <menuitem id="menu_commercial_depot_refills" name="Refill Visits"
+            parent="menu_commercial_depots" action="action_commercial_depot_refills" sequence="30"/>
+  <menuitem id="menu_commercial_depot_permanence" name="Permanence"
+            parent="menu_commercial_depots" action="action_commercial_depot_permanence" sequence="40"/>
+  <menuitem id="menu_commercial_depot_rules" name="Assortment Rules"
+            parent="mb_commercial_operations.menu_commercial_configuration" action="action_depot_assortment_rules" sequence="30"
+            groups="mb_commercial_operations.group_commercial_operations_manager"/>
+</odoo>

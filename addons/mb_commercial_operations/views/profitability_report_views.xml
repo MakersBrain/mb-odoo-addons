@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_profitability_report_list" model="ir.ui.view">
+    <field name="name">mb.commercial.profitability.report.list</field>
+    <field name="model">mb.commercial.profitability.report</field>
+    <field name="arch" type="xml">
+      <list create="0" edit="0" delete="0">
+        <field name="operation_id"/>
+        <field name="operation_type"/>
+        <field name="partner_id"/>
+        <field name="month"/>
+        <field name="planned_revenue" sum="Planned revenue"/>
+        <field name="actual_revenue" sum="Actual revenue"/>
+        <field name="revenue_variance" sum="Revenue variance"/>
+        <field name="planned_cost" sum="Planned cost"/>
+        <field name="actual_cost" sum="Actual cost"/>
+        <field name="cost_variance" sum="Cost variance"/>
+        <field name="planned_margin" sum="Planned margin"/>
+        <field name="actual_margin" sum="Actual margin"/>
+        <field name="margin_variance" sum="Margin variance"/>
+        <field name="state" widget="badge"/>
+        <field name="currency_id" column_invisible="True"/>
+        <field name="company_id" groups="base.group_multi_company"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_commercial_profitability_report_pivot" model="ir.ui.view">
+    <field name="name">mb.commercial.profitability.report.pivot</field>
+    <field name="model">mb.commercial.profitability.report</field>
+    <field name="arch" type="xml">
+      <pivot string="Planned versus Actual Profitability">
+        <field name="month" type="row" interval="month"/>
+        <field name="operation_type" type="row"/>
+        <field name="partner_id" type="col"/>
+        <field name="planned_revenue" type="measure"/>
+        <field name="actual_revenue" type="measure"/>
+        <field name="planned_cost" type="measure"/>
+        <field name="actual_cost" type="measure"/>
+        <field name="actual_margin" type="measure"/>
+        <field name="margin_variance" type="measure"/>
+      </pivot>
+    </field>
+  </record>
+
+  <record id="view_commercial_profitability_report_graph" model="ir.ui.view">
+    <field name="name">mb.commercial.profitability.report.graph</field>
+    <field name="model">mb.commercial.profitability.report</field>
+    <field name="arch" type="xml">
+      <graph string="Profitability by Month" type="bar">
+        <field name="month" interval="month"/>
+        <field name="planned_margin" type="measure"/>
+        <field name="actual_margin" type="measure"/>
+      </graph>
+    </field>
+  </record>
+
+  <record id="view_commercial_profitability_report_search" model="ir.ui.view">
+    <field name="name">mb.commercial.profitability.report.search</field>
+    <field name="model">mb.commercial.profitability.report</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="operation_id"/>
+        <field name="partner_id"/>
+        <field name="contract_id"/>
+        <filter name="markets" string="Markets" domain="[('operation_type', '=', 'market')]"/>
+        <filter name="closed" string="Financially Closed" domain="[('state', '=', 'financially_closed')]"/>
+        <separator/>
+        <filter name="group_month" string="Month" context="{'group_by': 'month:month'}"/>
+        <filter name="group_partner" string="Venue / Depot" context="{'group_by': 'partner_id'}"/>
+        <filter name="group_type" string="Type" context="{'group_by': 'operation_type'}"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="action_commercial_profitability_report" model="ir.actions.act_window">
+    <field name="name">Planned vs Actual</field>
+    <field name="res_model">mb.commercial.profitability.report</field>
+    <field name="view_mode">pivot,graph,list</field>
+    <field name="search_view_id" ref="view_commercial_profitability_report_search"/>
+  </record>
+</odoo>

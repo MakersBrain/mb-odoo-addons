@@ -18,6 +18,12 @@ class ProductTemplate(models.Model):
              "reason an article is tracked, and it is what brings 84/500/EEC "
              "migration limits and a declaration of compliance into scope.",
     )
+    mb_supplier_lot_required = fields.Boolean(
+        string="Supplier lot required",
+        help="Require this purchased material to retain the supplier's physical "
+             "batch in Odoo lot traceability. This is independent from whether a "
+             "finished article is intended for food contact.",
+    )
     mb_migration_limit_class = fields.Selection(
         selection=[
             ("cat1", "Non-fillable, or fillable with internal depth up to 25 mm"),
@@ -53,6 +59,11 @@ class ProductTemplate(models.Model):
         if self.mb_food_contact and self.tracking == "none":
             self.tracking = "lot"
 
+    @api.onchange("mb_supplier_lot_required")
+    def _onchange_mb_supplier_lot_required(self):
+        if self.mb_supplier_lot_required and self.tracking == "none":
+            self.tracking = "lot"
+
     @api.constrains("mb_food_contact", "tracking")
     def _check_food_contact_tracking(self):
         for template in self:
@@ -62,6 +73,16 @@ class ProductTemplate(models.Model):
                     "serial number. Article 17 of Regulation 1935/2004 requires "
                     "the business it was supplied to be identifiable, and an "
                     "untracked product cannot answer that.",
+                    template.display_name,
+                ))
+
+    @api.constrains("mb_supplier_lot_required", "tracking")
+    def _check_supplier_lot_tracking(self):
+        for template in self:
+            if template.mb_supplier_lot_required and template.tracking == "none":
+                raise ValidationError(_(
+                    "%s requires its supplier batch to be retained and must be "
+                    "tracked by lot or serial number.",
                     template.display_name,
                 ))
 

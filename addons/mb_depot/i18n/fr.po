@@ -97,8 +97,8 @@ msgstr "Dépôt-vente"
 #: model:ir.actions.act_window,name:mb_depot.action_mb_depot_statement
 #: model:ir.ui.menu,name:mb_depot.menu_depot_statement
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
-msgid "Depot Statement"
-msgstr "Relevé de dépôt"
+msgid "Inventory & Settlement Statement"
+msgstr "État des stocks et règlement"
 
 #. module: mb_depot
 #: model:ir.actions.act_window,name:mb_depot.action_depot

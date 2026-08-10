@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_inventory_capture_user,mb.inventory.capture user,model_mb_inventory_capture,stock.group_stock_user,1,1,1,0
+access_inventory_capture_manager,mb.inventory.capture manager,model_mb_inventory_capture,stock.group_stock_manager,1,1,1,1
+access_inventory_capture_asset_user,mb.inventory.capture.asset user,model_mb_inventory_capture_asset,stock.group_stock_user,1,0,0,0
+access_inventory_capture_asset_manager,mb.inventory.capture.asset manager,model_mb_inventory_capture_asset,stock.group_stock_manager,1,1,1,1
+access_inventory_capture_attempt_user,mb.inventory.capture.attempt user,model_mb_inventory_capture_attempt,stock.group_stock_user,1,0,0,0
+access_inventory_capture_candidate_user,mb.inventory.capture.candidate user,model_mb_inventory_capture_candidate,stock.group_stock_user,1,1,0,0
+access_inventory_capture_candidate_manager,mb.inventory.capture.candidate manager,model_mb_inventory_capture_candidate,stock.group_stock_manager,1,1,1,1
+access_product_identifier_user,mb.product.identifier user,model_mb_product_identifier,stock.group_stock_user,1,0,0,0
+access_product_identifier_manager,mb.product.identifier manager,model_mb_product_identifier,stock.group_stock_manager,1,1,1,0
+access_supplier_lot_migration_manager,mb.supplier.lot.migration manager,model_mb_supplier_lot_migration,stock.group_stock_manager,1,1,1,1

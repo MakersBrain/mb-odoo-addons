@@ -1,0 +1,26 @@
+{
+    "name": "Makersbrain Commercial Operations - Depot",
+    "summary": "Depot contracts, refill forecasts, rent, and profitability evidence",
+    "version": "19.0.1.0.1",
+    "category": "Inventory/Inventory",
+    "author": "Makersbrain",
+    "license": "LGPL-3",
+    "depends": [
+        "mb_commercial_operations_stock",
+        "mb_depot",
+        "project_stock_account",
+        "sale_project",
+    ],
+    "data": [
+        "security/mb_commercial_operations_depot_security.xml",
+        "security/ir.model.access.csv",
+        "data/ir_cron.xml",
+        "views/commercial_contract_depot_views.xml",
+        "views/commercial_operation_depot_views.xml",
+        "views/depot_forecast_views.xml",
+        "views/depot_sale_report_views.xml",
+        "views/mb_commercial_operations_depot_menus.xml",
+    ],
+    "installable": True,
+    "application": False,
+}

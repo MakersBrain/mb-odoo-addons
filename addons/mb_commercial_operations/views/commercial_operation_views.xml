@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_operation_list" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.list</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="arch" type="xml">
+      <list decoration-muted="state == 'cancelled'" decoration-success="state == 'financially_closed'">
+        <field name="name"/>
+        <field name="operation_type"/>
+        <field name="partner_id"/>
+        <field name="planned_start"/>
+        <field name="planned_end"/>
+        <field name="user_ids" widget="many2many_avatar_user"/>
+        <field name="planned_cost" sum="Planned cost"/>
+        <field name="expected_revenue" sum="Expected revenue"/>
+        <field name="planned_margin" sum="Planned margin"/>
+        <field name="state" widget="badge"/>
+        <field name="company_id" groups="base.group_multi_company"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_commercial_operation_form" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.form</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_mark_costed" type="object" string="Mark Costed" invisible="state != 'draft'"/>
+          <button name="action_approve" type="object" string="Approve" class="btn-primary" invisible="state not in ('draft', 'quoted')"/>
+          <button name="action_schedule" type="object" string="Schedule" class="btn-primary" invisible="state != 'approved'"/>
+          <button name="action_start" type="object" string="Start" class="btn-primary" invisible="state not in ('approved', 'scheduled')"/>
+          <button name="action_done" type="object" string="Complete" class="btn-primary" invisible="state not in ('approved', 'scheduled', 'in_progress')"/>
+          <button name="action_financial_close" type="object" string="Financial Close" class="btn-primary"
+                  groups="account.group_account_manager" invisible="state != 'done'"/>
+          <button name="action_reopen" type="object" string="Reopen"
+                  groups="mb_commercial_operations.group_commercial_operations_manager"
+                  invisible="state not in ('approved', 'scheduled', 'done', 'financially_closed')"/>
+          <button name="action_cancel" type="object" string="Cancel" invisible="state in ('done', 'financially_closed', 'cancelled')"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,quoted,approved,scheduled,in_progress,done,financially_closed"/>
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button class="oe_stat_button" type="object" name="action_view_travel_estimates" icon="fa-road">
+              <span>Travel Quotes</span>
+            </button>
+          </div>
+          <div class="oe_title"><label for="name"/><h1><field name="name"/></h1></div>
+          <group>
+            <group>
+              <field name="operation_type" readonly="state not in ('draft', 'quoted')"/>
+              <field name="partner_id" readonly="state not in ('draft', 'quoted')"/>
+              <field name="organizer_id" readonly="state not in ('draft', 'quoted')"/>
+              <field name="contract_id" readonly="state not in ('draft', 'quoted')"/>
+              <field name="company_id" groups="base.group_multi_company" readonly="state not in ('draft', 'quoted')"/>
+              <field name="user_ids" widget="many2many_avatar_user" readonly="state not in ('draft', 'quoted')"/>
+              <field name="conflict_acknowledged" invisible="state not in ('draft', 'quoted')"/>
+            </group>
+            <group>
+              <field name="planned_start" readonly="state not in ('draft', 'quoted')"/>
+              <field name="planned_end" readonly="state not in ('draft', 'quoted')"/>
+              <field name="all_day" readonly="state not in ('draft', 'quoted')"/>
+              <field name="stock_preparation_deadline" readonly="state not in ('draft', 'quoted')"/>
+              <field name="actual_start" readonly="state not in ('in_progress', 'done')"/>
+              <field name="actual_end" readonly="state != 'done'"/>
+              <field name="project_id" readonly="1"/>
+              <field name="task_id" readonly="1"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Plan">
+              <group>
+                <group>
+                  <field name="expected_visitors" readonly="state not in ('draft', 'quoted')"/>
+                  <field name="expected_revenue" readonly="state not in ('draft', 'quoted')"/>
+                  <field name="planned_work_hours" readonly="1"/>
+                  <field name="travel_estimate_id" readonly="state not in ('draft', 'quoted')"/>
+                </group>
+                <group>
+                  <field name="planned_cost" readonly="1"/>
+                  <field name="planned_margin" readonly="1"/>
+                  <field name="currency_id" invisible="1"/>
+                </group>
+              </group>
+              <field name="cost_line_ids" readonly="state not in ('draft', 'quoted')">
+                <list editable="bottom">
+                  <field name="sequence" widget="handle"/>
+                  <field name="name"/>
+                  <field name="category"/>
+                  <field name="calculation"/>
+                  <field name="quantity" invisible="calculation == 'revenue_percent'"/>
+                  <field name="rate" invisible="calculation == 'revenue_percent'"/>
+                  <field name="percentage" invisible="calculation != 'revenue_percent'"/>
+                  <field name="planned_amount" readonly="1" sum="Total"/>
+                  <field name="currency_id" column_invisible="True"/>
+                </list>
+              </field>
+            </page>
+            <page string="Stock Targets" invisible="operation_type != 'market'">
+              <field name="stock_plan_line_ids" readonly="state not in ('draft', 'quoted')">
+                <list editable="bottom">
+                  <field name="priority" widget="handle"/>
+                  <field name="target_type"/>
+                  <field name="product_id" invisible="target_type != 'product'"/>
+                  <field name="category_id" invisible="target_type != 'bucket'"/>
+                  <field name="price_min" invisible="target_type != 'bucket'"/>
+                  <field name="price_max" invisible="target_type != 'bucket'"/>
+                  <field name="desired_opening_qty"/>
+                  <field name="safety_qty"/>
+                  <field name="required_qty" readonly="1"/>
+                  <field name="expected_sold_qty"/>
+                  <field name="expected_unit_price"/>
+                  <field name="expected_unit_cost"/>
+                  <field name="bucket_line_id" invisible="target_type != 'product'"/>
+                  <field name="remaining_bucket_qty" readonly="1" invisible="target_type != 'bucket'"/>
+                  <field name="supply_method"/>
+                  <field name="readiness" widget="badge"/>
+                  <field name="currency_id" column_invisible="True"/>
+                </list>
+              </field>
+            </page>
+            <page string="Profitability Scenarios">
+              <field name="scenario_ids" context="{'default_operation_id': id}">
+                <list>
+                  <field name="name"/>
+                  <field name="state" widget="badge"/>
+                  <field name="fixed_event_cost"/>
+                  <field name="weighted_unit_contribution"/>
+                  <field name="break_even_units"/>
+                  <field name="break_even_revenue"/>
+                  <field name="calculation_note"/>
+                  <field name="currency_id" column_invisible="True"/>
+                </list>
+              </field>
+            </page>
+            <page string="Actuals">
+              <group>
+                <group>
+                  <field name="actual_revenue" readonly="1"/>
+                  <field name="actual_cost" readonly="1"/>
+                  <field name="actual_margin" readonly="1"/>
+                </group>
+                <group>
+                  <field name="documents_expected" readonly="state == 'financially_closed'"/>
+                  <field name="documents_complete" readonly="1"/>
+                  <field name="accounting_reconciled" readonly="1"/>
+                  <field name="financial_close_date" readonly="1"/>
+                  <field name="financial_close_user_id" readonly="1"/>
+                </group>
+              </group>
+              <field name="account_move_ids" readonly="state == 'financially_closed'"/>
+              <field name="close_note" readonly="state == 'financially_closed'"/>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_commercial_operation_calendar" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.calendar</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="arch" type="xml">
+      <calendar string="Commercial Planning" date_start="planned_start" date_stop="planned_end"
+                color="operation_type" all_day="all_day" mode="month" event_open_popup="true"
+                quick_create="true">
+        <field name="partner_id"/>
+        <field name="operation_type"/>
+        <field name="state"/>
+        <field name="user_ids" filters="1"/>
+      </calendar>
+    </field>
+  </record>
+
+  <record id="view_commercial_operation_search" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.search</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="name"/>
+        <field name="partner_id"/>
+        <field name="user_ids"/>
+        <filter name="market" string="Markets" domain="[('operation_type', '=', 'market')]"/>
+        <filter name="upcoming" string="Upcoming" domain="[('planned_start', '&gt;=', context_today()), ('state', 'not in', ('cancelled', 'financially_closed'))]"/>
+        <filter name="needs_close" string="Needs Financial Close" domain="[('state', '=', 'done')]"/>
+        <separator/>
+        <filter name="group_type" string="Type" context="{'group_by': 'operation_type'}"/>
+        <filter name="group_state" string="State" context="{'group_by': 'state'}"/>
+        <filter name="group_month" string="Month" context="{'group_by': 'planned_start:month'}"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="action_commercial_operations" model="ir.actions.act_window">
+    <field name="name">Commercial Operations</field>
+    <field name="res_model">mb.commercial.operation</field>
+    <field name="view_mode">list,calendar,form,pivot,graph</field>
+    <field name="search_view_id" ref="view_commercial_operation_search"/>
+  </record>
+
+  <record id="action_commercial_calendar" model="ir.actions.act_window">
+    <field name="name">Planning Calendar</field>
+    <field name="res_model">mb.commercial.operation</field>
+    <field name="view_mode">calendar,list,form</field>
+    <field name="search_view_id" ref="view_commercial_operation_search"/>
+  </record>
+
+  <record id="action_commercial_markets" model="ir.actions.act_window">
+    <field name="name">Markets &amp; Fairs</field>
+    <field name="res_model">mb.commercial.operation</field>
+    <field name="view_mode">list,calendar,form</field>
+    <field name="domain">[('operation_type', '=', 'market')]</field>
+    <field name="context">{'default_operation_type': 'market'}</field>
+  </record>
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_mrp_production_form_commercial_operation" model="ir.ui.view">
+    <field name="name">mrp.production.form.commercial.operation</field>
+    <field name="model">mrp.production</field>
+    <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//page[@name='miscellaneous']//field[@name='origin']" position="after">
+        <field name="mb_commercial_operation_id" readonly="state in ('done', 'cancel')"/>
+        <field name="mb_market_stock_plan_line_id" readonly="state in ('done', 'cancel')"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

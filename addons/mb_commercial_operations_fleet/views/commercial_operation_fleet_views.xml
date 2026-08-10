@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_operation_form_fleet" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.form.fleet</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_operation_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='user_ids']" position="after">
+        <field name="vehicle_id" readonly="state not in ('draft', 'quoted')"/>
+        <field name="vehicle_conflict_acknowledged" invisible="state not in ('draft', 'quoted')"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_commercial_contract_form_fleet" model="ir.ui.view">
+    <field name="name">mb.commercial.contract.form.fleet</field>
+    <field name="model">mb.commercial.contract</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_contract_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='origin_partner_id']" position="after">
+        <field name="default_vehicle_id"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

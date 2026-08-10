@@ -5,55 +5,56 @@
     <field name="name">mb.depot.statement.form</field>
     <field name="model">mb.depot.statement</field>
     <field name="arch" type="xml">
-      <form string="Depot Statement">
-        <group>
-          <group>
-            <field name="depot_id"/>
-            <field name="partner_id" readonly="1"/>
-          </group>
-          <group>
-            <field name="date_from"/>
-            <field name="date_to"/>
-            <field name="currency_id" invisible="1"/>
-          </group>
-        </group>
-        <button name="action_compute" type="object" string="Compute"
-                class="btn-secondary" icon="fa-refresh"/>
-        <field name="line_ids" readonly="1">
-          <list string="Statement" create="false">
-            <field name="product_id"/>
-            <field name="lot_name" string="Serial"/>
-            <field name="qty_opening" sum="Opening"/>
-            <field name="qty_placed" sum="Placed"/>
-            <field name="qty_sold" sum="Sold"/>
-            <field name="date_sold" string="Sold on"/>
-            <field name="qty_returned" sum="Returned"/>
-            <field name="qty_closing" sum="Closing" decoration-bf="1"/>
-            <field name="amount_gross" sum="Retail"/>
-            <field name="amount_commission" sum="Commission"/>
-            <field name="amount_net" sum="Due to us"/>
-            <field name="currency_id" column_invisible="1"/>
-          </list>
-        </field>
-        <group class="oe_subtotal_footer oe_right">
-          <field name="total_gross"/>
-          <field name="total_commission"/>
-          <field name="total_sold" class="oe_subtotal_footer_separator"/>
-        </group>
-        <footer>
+      <form string="Inventory &amp; Settlement Statement">
+        <header>
+          <button name="action_compute" type="object" string="Compute"
+                  class="btn-primary" icon="fa-refresh"/>
           <button name="action_print" type="object" string="Print"
-                  class="btn-primary"/>
-          <button special="cancel" string="Close" class="btn-secondary"/>
-        </footer>
+                  class="btn-secondary" invisible="not line_ids"/>
+        </header>
+        <sheet>
+          <group>
+            <group>
+              <field name="depot_id"/>
+              <field name="partner_id" readonly="1"/>
+            </group>
+            <group>
+              <field name="date_from"/>
+              <field name="date_to"/>
+              <field name="currency_id" invisible="1"/>
+            </group>
+          </group>
+          <field name="line_ids" readonly="1">
+            <list string="Statement" create="false">
+              <field name="product_id"/>
+              <field name="lot_name" string="Serial"/>
+              <field name="qty_opening" sum="Opening"/>
+              <field name="qty_placed" sum="Placed"/>
+              <field name="qty_sold" sum="Sold"/>
+              <field name="date_sold" string="Sold on"/>
+              <field name="qty_returned" sum="Returned"/>
+              <field name="qty_closing" sum="Closing" decoration-bf="1"/>
+              <field name="amount_gross" sum="Retail"/>
+              <field name="amount_commission" sum="Commission"/>
+              <field name="amount_net" sum="Due to us"/>
+              <field name="currency_id" column_invisible="1"/>
+            </list>
+          </field>
+          <group class="oe_subtotal_footer oe_right">
+            <field name="total_gross"/>
+            <field name="total_commission"/>
+            <field name="total_sold" class="oe_subtotal_footer_separator"/>
+          </group>
+        </sheet>
       </form>
     </field>
   </record>
 
   <record id="action_mb_depot_statement" model="ir.actions.act_window">
-    <field name="name">Depot Statement</field>
+    <field name="name">Inventory &amp; Settlement Statement</field>
     <field name="res_model">mb.depot.statement</field>
     <field name="view_mode">form</field>
-    <field name="target">new</field>
+    <field name="target">current</field>
   </record>
 
 </odoo>

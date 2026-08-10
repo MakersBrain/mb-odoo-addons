@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="rule_commercial_operation_pos_company" model="ir.rule">
+    <field name="name">POS market operations by company</field>
+    <field name="model_id" ref="mb_commercial_operations.model_mb_commercial_operation"/>
+    <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    <field name="groups" eval="[(4, ref('point_of_sale.group_pos_user'))]"/>
+  </record>
+</odoo>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_operation_form_stock" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.form.stock</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_operation_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//header/field[@name='state']" position="before">
+        <button name="action_check_stock_availability" type="object" string="Check Availability"
+                invisible="operation_type != 'market' or state not in ('draft', 'quoted', 'approved', 'scheduled')"/>
+        <button name="action_prepare_supply" type="object" string="Prepare Supply"
+                invisible="not has_supply_plan or state not in ('approved', 'scheduled')"/>
+        <button name="action_refresh_supply_status" type="object" string="Refresh Supply Status"
+                invisible="not has_supply_plan"/>
+        <button name="action_prepare_market_stock" type="object" string="Prepare Market Stock" class="btn-primary"
+                invisible="operation_type != 'market' or state not in ('approved', 'scheduled') or preparation_picking_id"/>
+        <button name="action_prepare_market_return" type="object" string="Prepare Return"
+                invisible="not preparation_picking_id or state not in ('in_progress', 'done')"/>
+        <button name="action_stock_close" type="object" string="Close Stock" class="btn-primary"
+                invisible="state not in ('done', 'financially_closed') or stock_closed"/>
+        <button name="action_reopen_stock" type="object" string="Reopen Stock"
+                groups="mb_commercial_operations.group_commercial_operations_manager"
+                invisible="not stock_closed"/>
+      </xpath>
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button class="oe_stat_button" type="object" name="action_view_stock_pickings" icon="fa-exchange"
+                invisible="not preparation_picking_id">
+          <field name="stock_discrepancy_count" widget="statinfo" string="Stock Differences"/>
+        </button>
+      </xpath>
+      <xpath expr="//field[@name='stock_preparation_deadline']" position="after">
+        <field name="has_supply_plan" invisible="1"/>
+        <field name="source_warehouse_id" readonly="state not in ('draft', 'quoted')"/>
+        <field name="source_location_id" readonly="state not in ('draft', 'quoted')"/>
+        <field name="market_location_id" readonly="1"/>
+      </xpath>
+      <xpath expr="//field[@name='stock_plan_line_ids']/list/field[@name='supply_method']" position="after">
+        <field name="on_hand_now" readonly="1" optional="show"/>
+        <field name="reserved_now" readonly="1" optional="show"/>
+        <field name="incoming_before_cutoff" readonly="1" optional="show"/>
+        <field name="outgoing_before_cutoff" readonly="1" optional="show"/>
+        <field name="forecast_available" readonly="1" optional="show"/>
+        <field name="shortage_qty" readonly="1" optional="show"/>
+        <field name="availability_calculated_at" readonly="1" optional="hide"/>
+      </xpath>
+      <xpath expr="//field[@name='account_move_ids']" position="after">
+        <group string="Stock Reconciliation">
+          <group>
+            <field name="preparation_picking_id" readonly="1"/>
+            <field name="return_picking_ids" readonly="1"/>
+          </group>
+          <group>
+            <field name="stock_reconciled" readonly="1"/>
+            <field name="stock_closed" readonly="1"/>
+            <field name="stock_close_date" readonly="1"/>
+            <field name="stock_close_user_id" readonly="1"/>
+          </group>
+          <field name="stock_reconciliation_note" readonly="1" colspan="2"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_market_stock_plan_line_form_stock" model="ir.ui.view">
+    <field name="name">mb.market.stock.plan.line.form.stock</field>
+    <field name="model">mb.market.stock.plan.line</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <group>
+              <field name="operation_id" readonly="1"/>
+              <field name="target_type"/>
+              <field name="product_id" invisible="target_type != 'product'"/>
+              <field name="category_id" invisible="target_type != 'bucket'"/>
+              <field name="desired_opening_qty"/>
+              <field name="safety_qty"/>
+              <field name="required_qty" readonly="1"/>
+              <field name="supply_method"/>
+            </group>
+            <group>
+              <field name="source_warehouse_id" readonly="1"/>
+              <field name="on_hand_now" readonly="1"/>
+              <field name="reserved_now" readonly="1"/>
+              <field name="incoming_before_cutoff" readonly="1"/>
+              <field name="outgoing_before_cutoff" readonly="1"/>
+              <field name="forecast_available" readonly="1"/>
+              <field name="shortage_qty" readonly="1"/>
+              <field name="availability_calculated_at" readonly="1"/>
+            </group>
+          </group>
+          <group string="Concrete Stock Selection">
+            <field name="stock_closed" invisible="1"/>
+            <field name="allocation_ids" readonly="stock_closed">
+              <list editable="bottom">
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="quantity"/>
+                <field name="company_id" column_invisible="True"/>
+              </list>
+            </field>
+          </group>
+          <field name="blocking_note"/>
+        </sheet>
+      </form>
+    </field>
+  </record>
+</odoo>

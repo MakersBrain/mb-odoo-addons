@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_operation_form_purchase" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.form.purchase</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="inherit_id" ref="mb_commercial_operations_stock.view_commercial_operation_form_stock"/>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button class="oe_stat_button" type="object" name="action_view_purchase_orders" icon="fa-shopping-basket"
+                invisible="not purchase_order_ids"><span>Purchases</span></button>
+      </xpath>
+      <xpath expr="//field[@name='stock_plan_line_ids']/list/field[@name='supply_method']" position="after">
+        <field name="purchase_product_id" optional="show" invisible="supply_method != 'purchase' or target_type != 'bucket'"/>
+        <field name="vendor_id" optional="show" invisible="supply_method != 'purchase'"/>
+        <field name="purchase_line_ids" widget="many2many_tags" optional="show" readonly="1" invisible="supply_method != 'purchase'"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

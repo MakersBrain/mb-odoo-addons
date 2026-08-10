@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_operation_form_mrp" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.form.mrp</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="inherit_id" ref="mb_commercial_operations_stock.view_commercial_operation_form_stock"/>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button class="oe_stat_button" type="object" name="action_view_manufacturing_orders" icon="fa-cogs"
+                invisible="not manufacturing_order_ids">
+          <span>Manufacturing</span>
+        </button>
+      </xpath>
+      <xpath expr="//field[@name='stock_plan_line_ids']/list/field[@name='supply_method']" position="after">
+        <field name="manufacturing_product_id" optional="show" invisible="supply_method != 'manufacture' or target_type != 'bucket'"/>
+        <field name="manufacturing_bom_id" optional="show" invisible="supply_method != 'manufacture'"/>
+        <field name="production_ids" widget="many2many_tags" optional="show" readonly="1" invisible="supply_method != 'manufacture'"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

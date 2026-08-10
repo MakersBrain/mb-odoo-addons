@@ -65,8 +65,10 @@ ACCESS_HEADER = [
 # than waved through.
 KNOWN_EXTERNAL = {
     "account", "account_edi_ubl_cii", "account_payment", "base", "l10n_fr_account",
-    "maintenance", "mail", "mrp", "payment", "point_of_sale", "product", "purchase",
-    "purchase_stock",
+    "fleet", "hr_expense", "hr_timesheet", "maintenance", "mail", "mrp", "mrp_account",
+    "payment", "point_of_sale", "product", "product_expiry", "project", "project_hr_expense", "project_mrp",
+    "project_purchase", "project_stock_account", "purchase", "purchase_stock",
+    "sale_management", "sale_project", "sale_timesheet", "stock_account",
     "sale", "sale_stock", "stock", "uom", "web",
     # OCA, vendored and optional.
     "sale_order_global_stock_route", "stock_restrict_lot", "stock_picking_filter_lot",

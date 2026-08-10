@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_operation_form_sale" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.form.sale</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_operation_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button class="oe_stat_button" type="object" name="action_view_sale_orders" icon="fa-shopping-cart">
+          <span>Sales Orders</span>
+        </button>
+        <button class="oe_stat_button" type="object" name="action_view_customer_invoices" icon="fa-file-text-o"
+                invisible="not customer_invoice_ids">
+          <span>Invoices</span>
+        </button>
+      </xpath>
+      <xpath expr="//field[@name='documents_expected']" position="after">
+        <field name="sales_documents_expected" readonly="state == 'financially_closed'"/>
+        <field name="sales_documents_complete" readonly="1"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

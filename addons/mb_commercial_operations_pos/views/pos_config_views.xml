@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="pos_config_view_form_commercial_operation" model="ir.ui.view">
+    <field name="name">pos.config.form.commercial.operation</field>
+    <field name="model">pos.config</field>
+    <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@id='title']" position="after">
+        <group string="Market Operation">
+          <field name="mb_commercial_operation_id" options="{'no_create': True}"/>
+          <field name="mb_regular_picking_type_id" readonly="1" invisible="not mb_commercial_operation_id"/>
+          <field name="mb_market_product_ids" widget="many2many_tags" readonly="1" invisible="not mb_commercial_operation_id"/>
+          <button name="action_configure_market_operation" type="object" string="Apply Market Stock Configuration"
+                  class="btn-primary" invisible="not mb_commercial_operation_id"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+</odoo>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_contract_list" model="ir.ui.view">
+    <field name="name">mb.commercial.contract.list</field>
+    <field name="model">mb.commercial.contract</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="partner_id"/>
+        <field name="date_start"/>
+        <field name="date_end"/>
+        <field name="monthly_fixed_rent"/>
+        <field name="currency_id" column_invisible="True"/>
+        <field name="project_id"/>
+        <field name="company_id" groups="base.group_multi_company"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_commercial_contract_form" model="ir.ui.view">
+    <field name="name">mb.commercial.contract.form</field>
+    <field name="model">mb.commercial.contract</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_generate_occurrences" type="object" string="Generate Occurrences"
+                  class="btn-primary" groups="mb_commercial_operations.group_commercial_operations_manager"/>
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button name="action_view_occurrences" type="object" class="oe_stat_button" icon="fa-calendar">
+              <span>Occurrences</span>
+            </button>
+          </div>
+          <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+          <field name="active" invisible="1"/>
+          <div class="oe_title"><label for="name"/><h1><field name="name"/></h1></div>
+          <group>
+            <group>
+              <field name="partner_id"/>
+              <field name="company_id" groups="base.group_multi_company"/>
+              <field name="project_id"/>
+              <field name="analytic_account_id" readonly="1"/>
+              <field name="origin_partner_id"/>
+            </group>
+            <group>
+              <field name="date_start"/>
+              <field name="date_end"/>
+              <field name="review_date"/>
+              <field name="notice_days"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Obligations">
+              <field name="obligation_ids" context="{'default_contract_id': id}">
+                <list editable="bottom">
+                  <field name="sequence" widget="handle"/>
+                  <field name="name"/>
+                  <field name="obligation_type"/>
+                  <field name="period_unit"/>
+                  <field name="required_occurrences"/>
+                  <field name="required_hours"/>
+                  <field name="duration_hours"/>
+                  <field name="preferred_weekday"/>
+                  <field name="start_hour" widget="float_time"/>
+                  <field name="date_start"/>
+                  <field name="date_end"/>
+                  <field name="horizon_months"/>
+                </list>
+              </field>
+            </page>
+            <page string="Rent">
+              <group>
+                <field name="monthly_fixed_rent"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="rent_billing_method"/>
+                <field name="rent_product_id" invisible="rent_billing_method != 'vendor_bill'"/>
+              </group>
+            </page>
+            <page string="Documents"><field name="attachment_ids" widget="many2many_binary"/></page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_commercial_contracts" model="ir.actions.act_window">
+    <field name="name">Commercial Contracts</field>
+    <field name="res_model">mb.commercial.contract</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="view_commercial_occurrence_list" model="ir.ui.view">
+    <field name="name">mb.commercial.obligation.occurrence.list</field>
+    <field name="model">mb.commercial.obligation.occurrence</field>
+    <field name="arch" type="xml">
+      <list decoration-muted="state == 'cancelled'" decoration-success="state == 'done'">
+        <field name="name"/>
+        <field name="contract_id"/>
+        <field name="planned_start"/>
+        <field name="planned_end"/>
+        <field name="state" widget="badge"/>
+        <field name="task_id"/>
+        <field name="actual_hours"/>
+        <field name="company_id" groups="base.group_multi_company"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_commercial_occurrence_form" model="ir.ui.view">
+    <field name="name">mb.commercial.obligation.occurrence.form</field>
+    <field name="model">mb.commercial.obligation.occurrence</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_approve" type="object" string="Approve &amp; Schedule" class="btn-primary" invisible="state != 'proposed'"/>
+          <button name="action_done" type="object" string="Complete" class="btn-primary" invisible="state != 'approved'"/>
+          <button name="action_cancel" type="object" string="Cancel" invisible="state in ('done', 'cancelled')"/>
+          <field name="state" widget="statusbar" statusbar_visible="proposed,approved,done"/>
+        </header>
+        <sheet>
+          <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+          <group>
+            <group>
+              <field name="contract_id" readonly="state != 'proposed'"/>
+              <field name="obligation_id" readonly="state != 'proposed'"/>
+              <field name="period_start" readonly="1"/>
+              <field name="sequence" readonly="1"/>
+            </group>
+            <group>
+              <field name="planned_start" readonly="state != 'proposed'"/>
+              <field name="planned_end" readonly="state != 'proposed'"/>
+              <field name="operation_id" readonly="1"/>
+              <field name="task_id" readonly="1"/>
+              <field name="actual_hours" readonly="1"/>
+              <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+            </group>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_commercial_occurrence_calendar" model="ir.ui.view">
+    <field name="name">mb.commercial.obligation.occurrence.calendar</field>
+    <field name="model">mb.commercial.obligation.occurrence</field>
+    <field name="arch" type="xml">
+      <calendar string="Obligation Calendar" date_start="planned_start" date_stop="planned_end"
+                color="obligation_id" mode="month" event_open_popup="true">
+        <field name="contract_id"/>
+        <field name="state"/>
+      </calendar>
+    </field>
+  </record>
+
+  <record id="action_commercial_occurrences" model="ir.actions.act_window">
+    <field name="name">Contract Occurrences</field>
+    <field name="res_model">mb.commercial.obligation.occurrence</field>
+    <field name="view_mode">list,calendar,form</field>
+  </record>
+
+  <record id="action_commercial_occurrence_calendar" model="ir.actions.act_window">
+    <field name="name">Obligation Calendar</field>
+    <field name="res_model">mb.commercial.obligation.occurrence</field>
+    <field name="view_mode">calendar,list,form</field>
+  </record>
+</odoo>

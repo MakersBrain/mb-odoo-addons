@@ -53,6 +53,13 @@ class MbCatalogueService(models.Model):
             self, "/v1/canonical-products", {"q": query, "limit": limit}
         )
 
+    def action_lookup_barcode(self, barcode, limit=10):
+        """Exact normalized barcode lookup; imports nothing."""
+        self.ensure_one()
+        return self.env["mb.catalogue.client"]._get(
+            self, "/v1/canonical-products", {"barcode": barcode, "limit": limit}
+        )
+
     # -- import ------------------------------------------------------------
 
     def action_import(self, canonical_ids):

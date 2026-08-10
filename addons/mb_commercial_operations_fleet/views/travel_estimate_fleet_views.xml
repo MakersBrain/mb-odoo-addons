@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_travel_estimate_form_fleet" model="ir.ui.view">
+    <field name="name">mb.travel.estimate.form.fleet</field>
+    <field name="model">mb.travel.estimate</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_travel_estimate_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='vehicle_class']" position="before">
+        <field name="vehicle_id" readonly="state in ('accepted', 'superseded')"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

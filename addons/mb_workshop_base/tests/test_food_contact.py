@@ -27,6 +27,17 @@ class TestFoodContact(TransactionCase):
         self.mug.write({"tracking": "serial"})
         self.assertEqual(self.mug.tracking, "serial")
 
+    def test_supplier_lot_requirement_is_distinct_and_requires_tracking(self):
+        material = self.env["product.template"].create({
+            "name": "Supplier glaze",
+            "is_storable": True,
+            "tracking": "lot",
+            "mb_supplier_lot_required": True,
+        })
+        self.assertFalse(material.mb_food_contact)
+        with self.assertRaises(ValidationError):
+            material.tracking = "none"
+
     def test_limit_class_refused_on_decorative_ware(self):
         """84/500/EEC does not reach an article not intended for food."""
         with self.assertRaises(ValidationError):

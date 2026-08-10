@@ -26,6 +26,7 @@ A module is listed here only if its code exists. Nothing below is planned work.
 - [Firing](#firing) — `mb_ceramics_firing`, `mb_ceramics_workflow`, `mb_kiln_bridge`
 - [Materials](#materials) — `mb_catalogue_sync`
 - [Consignment](#consignment) — `mb_depot`
+- [Commercial operations](#commercial-operations) — depot refills, markets, travel and profitability
 - [Payments](#payments) — `mb_payment_sumup`, `mb_pos_sumup`, `mb_account_payment_sumup`
 - [French tax regime](#french-tax-regime) — `l10n_fr_micro_enterprise`
 - [Environment](#environment)
@@ -58,6 +59,18 @@ payment
 
 l10n_fr_account, account_edi_ubl_cii
 └── l10n_fr_micro_enterprise ── franchise en base
+
+project, account, hr_timesheet
+└── mb_commercial_operations ── calendar, contracts, travel, break-even, profitability
+    ├── mb_commercial_operations_stock ── event stock and reconciliation
+    │   ├── mb_commercial_operations_depot ── refill forecasts, rent and depot evidence
+    │   ├── mb_commercial_operations_mrp ── reviewed manufacturing supply
+    │   ├── mb_commercial_operations_purchase ── reviewed purchase supply
+    │   ├── mb_commercial_operations_sale ── market sales, revenue and COGS
+    │   └── mb_commercial_operations_pos ── market POS sessions, revenue and COGS
+    ├── mb_commercial_operations_fleet ── vehicles and route assumptions
+    ├── mb_commercial_operations_expense ── operation expenses
+    └── mb_commercial_operations_urssaf ── read-only legal recognition status
 ```
 
 | Addon | Version | Owns | Live state |
@@ -646,6 +659,42 @@ EN16931 BT-30; **no VAT identifier is ever fabricated.**
 
 `post_init_hook`. 7 test methods across setup, regime switching and Factur-X
 export.
+
+## Commercial operations
+
+The `mb_commercial_operations` family is an optional application layer over
+Odoo 19's projects, tasks, analytic accounts, timesheets, accounting, stock,
+MRP, Purchase, Sales, POS, Expenses and Fleet models. One market occurrence or
+long-lived depot contract owns one project and analytic account; native source
+documents remain the evidence for actual revenue and cost.
+
+The base addon provides the planning calendar, six-month contractual occurrence
+generator, labour and travel plans, TollQuote quote revisions, break-even
+scenarios and a live planned-versus-actual pivot/graph/list report. TollQuote
+calls are explicit, host allow-listed, time-bounded and sanitized; incomplete,
+unpriced, unknown-currency or unvalidated API revisions cannot silently become
+zero-cost accepted quotes.
+
+Optional bridges keep their native boundaries:
+
+- Stock prepares and returns exact event stock through internal pickings, with
+  lot/serial reconciliation and no cost entry for the internal transfer.
+- Depot forecasts refill quantities from completed sale/exposure evidence,
+  creates reviewed refill work, prepares prorated draft rent bills, and carries
+  consolidated invoice revenue and outbound COGS to the depot project.
+- MRP and Purchase create idempotent reviewed draft supply documents; native
+  confirmation alone makes supply incoming.
+- Sales and POS source only free event stock and put revenue plus outbound COGS
+  on the event account exactly once. POS sessions snapshot the operation and
+  cannot be reconfigured while open.
+- Fleet, Expenses and the URSSAF bridge add vehicle conflicts, native expense
+  allocation and a read-only pending/draft-declaration/filed recognition status.
+
+Operational completion, stock reconciliation, document completeness, financial
+close, accounting reconciliation and URSSAF recognition are deliberately
+separate. Financial close locks operation-owned planning and links; later native
+payment, reconciliation, credit and legal-recognition events remain possible and
+continue to update their computed statuses.
 
 ## Environment
 

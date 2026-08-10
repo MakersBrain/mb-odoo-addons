@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_picking_form_commercial_operation" model="ir.ui.view">
+    <field name="name">stock.picking.form.commercial.operation</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='origin']" position="after">
+        <field name="mb_commercial_operation_id" readonly="state in ('done', 'cancel')"/>
+        <field name="mb_commercial_stock_role" readonly="state in ('done', 'cancel')"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

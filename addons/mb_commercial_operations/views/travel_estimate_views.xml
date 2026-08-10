@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_tollquote_connector_list" model="ir.ui.view">
+    <field name="name">mb.tollquote.connector.list</field>
+    <field name="model">mb.tollquote.connector</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="environment"/>
+        <field name="base_url"/>
+        <field name="timeout_seconds"/>
+        <field name="last_health_at"/>
+        <field name="last_health_status"/>
+        <field name="company_id" groups="base.group_multi_company"/>
+        <field name="active"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_tollquote_connector_form" model="ir.ui.view">
+    <field name="name">mb.tollquote.connector.form</field>
+    <field name="model">mb.tollquote.connector</field>
+    <field name="arch" type="xml">
+      <form>
+        <header><button name="action_check_health" type="object" string="Check Health" class="btn-primary"/></header>
+        <sheet>
+          <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+          <field name="active" invisible="1"/>
+          <div class="oe_title"><h1><field name="name"/></h1></div>
+          <group>
+            <group>
+              <field name="company_id" groups="base.group_multi_company"/>
+              <field name="environment"/>
+              <field name="base_url"/>
+              <field name="timeout_seconds"/>
+            </group>
+            <group>
+              <field name="api_token" password="True" groups="base.group_system"/>
+              <field name="last_health_at" readonly="1"/>
+              <field name="last_health_status" readonly="1"/>
+            </group>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_tollquote_connectors" model="ir.actions.act_window">
+    <field name="name">TollQuote Connectors</field>
+    <field name="res_model">mb.tollquote.connector</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="view_travel_estimate_list" model="ir.ui.view">
+    <field name="name">mb.travel.estimate.list</field>
+    <field name="model">mb.travel.estimate</field>
+    <field name="arch" type="xml">
+      <list decoration-warning="incomplete" decoration-muted="state == 'superseded'">
+        <field name="name"/>
+        <field name="operation_id"/>
+        <field name="departure_at"/>
+        <field name="round_trip"/>
+        <field name="distance_km"/>
+        <field name="duration_hours"/>
+        <field name="toll_cost"/>
+        <field name="fuel_cost"/>
+        <field name="driver_cost"/>
+        <field name="total_operating_cost"/>
+        <field name="incomplete"/>
+        <field name="state" widget="badge"/>
+        <field name="currency_id" column_invisible="True"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_travel_estimate_form" model="ir.ui.view">
+    <field name="name">mb.travel.estimate.form</field>
+    <field name="model">mb.travel.estimate</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_calculate" type="object" string="Calculate Route Cost" class="btn-primary"
+                  invisible="state == 'superseded'"/>
+          <button name="action_accept" type="object" string="Accept" class="btn-primary" invisible="state != 'quoted'"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,quoted,accepted"/>
+        </header>
+        <sheet>
+          <div class="oe_title"><h1><field name="name" readonly="state in ('accepted', 'superseded')"/></h1></div>
+          <group>
+            <group>
+              <field name="operation_id" readonly="state in ('accepted', 'superseded')"/>
+              <field name="company_id" groups="base.group_multi_company" readonly="state in ('accepted', 'superseded')"/>
+              <field name="connector_id" readonly="state in ('accepted', 'superseded')"/>
+              <field name="departure_at" readonly="state in ('accepted', 'superseded')"/>
+              <field name="round_trip" readonly="state in ('accepted', 'superseded')"/>
+              <field name="revision" readonly="1"/>
+              <field name="previous_revision_id" readonly="1" invisible="not previous_revision_id"/>
+            </group>
+            <group>
+              <field name="origin_partner_id" readonly="state in ('accepted', 'superseded')"/>
+              <field name="destination_partner_id" readonly="state in ('accepted', 'superseded')"/>
+              <label for="origin_latitude" string="Origin coordinates"/>
+              <div class="o_row"><field name="origin_latitude" readonly="state in ('accepted', 'superseded')"/><field name="origin_longitude" readonly="state in ('accepted', 'superseded')"/></div>
+              <label for="destination_latitude" string="Destination coordinates"/>
+              <div class="o_row"><field name="destination_latitude" readonly="state in ('accepted', 'superseded')"/><field name="destination_longitude" readonly="state in ('accepted', 'superseded')"/></div>
+            </group>
+          </group>
+          <notebook>
+            <page string="Assumptions">
+              <group>
+                <group><field name="vehicle_class"/><field name="payment_option"/></group>
+                <group>
+                  <field name="fuel_consumption_l_per_100km"/>
+                  <field name="fuel_price_eur_per_l"/>
+                  <field name="driver_cost_eur_per_hour"/>
+                </group>
+              </group>
+            </page>
+            <page string="Quote">
+              <group>
+                <group>
+                  <field name="distance_km" readonly="1"/>
+                  <field name="duration_hours" readonly="1"/>
+                  <field name="toll_cost" readonly="1"/>
+                  <field name="fuel_cost" readonly="1"/>
+                  <field name="driver_cost" readonly="1"/>
+                </group>
+                <group>
+                  <field name="ferry_cost" readonly="1"/>
+                  <field name="zone_cost" readonly="1"/>
+                  <field name="other_route_cost" readonly="1"/>
+                  <field name="total_operating_cost" readonly="1"/>
+                  <field name="currency_id" invisible="1"/>
+                </group>
+              </group>
+              <group string="Completeness">
+                <field name="incomplete" readonly="1"/>
+                <field name="incomplete_acknowledged" invisible="not incomplete" readonly="state in ('accepted', 'superseded')"/>
+                <field name="warning_text" readonly="1"/>
+                <field name="request_id" readonly="1"/>
+                <field name="calculated_at" readonly="1"/>
+                <field name="provider_version" readonly="1"/>
+                <field name="reporting_currency" readonly="1"/>
+              </group>
+            </page>
+            <page string="Audit Snapshots" groups="mb_commercial_operations.group_commercial_operations_manager">
+              <field name="request_snapshot" widget="json" readonly="1"/>
+              <field name="response_snapshot" widget="json" readonly="1"/>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_travel_estimates" model="ir.actions.act_window">
+    <field name="name">Travel Estimates</field>
+    <field name="res_model">mb.travel.estimate</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>

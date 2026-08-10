@@ -79,7 +79,7 @@
             groups="stock.group_stock_user"/>
 
   <menuitem id="menu_depot_statement"
-            name="Depot Statement"
+            name="Inventory &amp; Settlement Statement"
             parent="menu_depot_reporting"
             action="action_mb_depot_statement"
             sequence="10"

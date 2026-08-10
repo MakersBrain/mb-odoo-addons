@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_normal_form_inventory_identifiers" model="ir.ui.view">
+        <field name="name">product.product.form.inventory.identifiers</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="External identifiers" groups="stock.group_stock_user">
+                    <field name="mb_identifier_ids" context="{'default_product_id': id}">
+                        <list editable="bottom" create="1" delete="0">
+                            <field name="scheme"/>
+                            <field name="printed_value"/>
+                            <field name="normalized_value" readonly="1"/>
+                            <field name="source"/>
+                            <field name="verification_state"/>
+                            <field name="pack_identity" optional="hide"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

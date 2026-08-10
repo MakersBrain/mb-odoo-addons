@@ -13,10 +13,14 @@ DISPOSABLE_DB ?= mb_scratch
 
 # Every addon in this repository, in dependency order. Odoo resolves the order
 # itself, but writing it down means `make install` on an empty database is one
-# command and the reader can see the four trees from SPEC.md.
+# command and the reader can see the addon families from SPEC.md.
 MODULES := mb_workshop_base,mb_label,mb_label_pos,mb_ceramics_firing,mb_ceramics_workflow,mb_kiln_bridge,\
-mb_catalogue_sync,mb_control_bridge,mb_invoice_capture,mb_depot,mb_payment_sumup,\
+mb_catalogue_sync,mb_control_bridge,mb_invoice_capture,mb_inventory_capture,mb_inventory_capture_catalogue,mb_depot,mb_payment_sumup,\
 mb_pos_sumup,mb_account_payment_sumup,l10n_fr_micro_enterprise,l10n_fr_micro_urssaf
+MODULES := $(MODULES),mb_commercial_operations,mb_commercial_operations_stock,mb_commercial_operations_depot,\
+mb_commercial_operations_mrp,mb_commercial_operations_purchase,mb_commercial_operations_fleet,\
+mb_commercial_operations_expense,mb_commercial_operations_sale,mb_commercial_operations_pos,\
+mb_commercial_operations_urssaf
 empty :=
 space := $(empty) $(empty)
 MODULES_ARG := $(subst $(space),,$(MODULES))
@@ -31,8 +35,12 @@ MODULES_ARG := $(subst $(space),,$(MODULES))
 # Down to one class:   make test TAGS=/mb_label:TestLabel
 # Or one method:       make test TAGS=/mb_label:TestLabel.test_qr_collision
 TAGS ?= /mb_workshop_base,/mb_label,/mb_label_pos,/mb_ceramics_firing,/mb_ceramics_workflow,/mb_kiln_bridge,\
-/mb_catalogue_sync,/mb_control_bridge,/mb_invoice_capture,/mb_depot,/mb_payment_sumup,\
+/mb_catalogue_sync,/mb_control_bridge,/mb_invoice_capture,/mb_inventory_capture,/mb_inventory_capture_catalogue,/mb_depot,/mb_payment_sumup,\
 /mb_pos_sumup,/mb_account_payment_sumup,/l10n_fr_micro_enterprise,/l10n_fr_micro_urssaf
+TAGS := $(TAGS),/mb_commercial_operations,/mb_commercial_operations_stock,\
+/mb_commercial_operations_depot,/mb_commercial_operations_mrp,/mb_commercial_operations_purchase,\
+/mb_commercial_operations_fleet,/mb_commercial_operations_expense,/mb_commercial_operations_sale,\
+/mb_commercial_operations_pos
 
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \

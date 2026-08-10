@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_mb_inventory_capture" model="ir.sequence">
+        <field name="name">Inventory photo capture</field>
+        <field name="code">mb.inventory.capture</field>
+        <field name="prefix">CAP/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>
+

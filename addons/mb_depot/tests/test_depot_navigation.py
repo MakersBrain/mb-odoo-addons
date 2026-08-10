@@ -114,6 +114,16 @@ class TestDepotNavigation(TransactionCase):
             "mb_depot.view_mb_depot_sale_report_form"
         ))
 
+    def test_statement_is_a_full_page_reporting_action(self):
+        statement = self.env.ref("mb_depot.action_mb_depot_statement")
+        menu = self.env.ref("mb_depot.menu_depot_statement")
+
+        self.assertEqual(statement.target, "current")
+        self.assertEqual(
+            menu.parent_id,
+            self.env.ref("mb_depot.menu_depot_reporting"),
+        )
+
     def test_sale_orders_have_customer_depot_and_status_search_panel(self):
         view = self.env.ref("mb_depot.view_depot_sale_order_search")
         arch = view._get_combined_arch()

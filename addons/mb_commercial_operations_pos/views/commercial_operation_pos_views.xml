@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_commercial_operation_form_pos" model="ir.ui.view">
+    <field name="name">mb.commercial.operation.form.pos</field>
+    <field name="model">mb.commercial.operation</field>
+    <field name="inherit_id" ref="mb_commercial_operations.view_commercial_operation_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button class="oe_stat_button" type="object" name="action_view_pos_orders" icon="fa-shopping-cart"
+                invisible="operation_type != 'market'">
+          <field name="pos_order_ids" widget="statinfo" string="POS Orders"/>
+        </button>
+        <button class="oe_stat_button" type="object" name="action_view_pos_configs" icon="fa-credit-card"
+                invisible="operation_type != 'market'">
+          <span>POS Setup</span>
+        </button>
+      </xpath>
+      <xpath expr="//field[@name='account_move_ids']" position="before">
+        <group string="Point of Sale Closure">
+          <field name="pos_documents_expected" readonly="state == 'financially_closed'"/>
+          <field name="pos_documents_complete" readonly="1"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+</odoo>

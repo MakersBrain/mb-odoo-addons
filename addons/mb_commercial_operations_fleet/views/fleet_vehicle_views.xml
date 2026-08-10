@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="fleet_vehicle_view_form_commercial" model="ir.ui.view">
+    <field name="name">fleet.vehicle.form.commercial</field>
+    <field name="model">fleet.vehicle</field>
+    <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//sheet/notebook" position="inside">
+        <page string="Commercial Travel">
+          <group>
+            <field name="mb_tollquote_vehicle_class"/>
+            <field name="mb_tollquote_payment_option"/>
+            <field name="mb_fuel_consumption_l_per_100km"/>
+            <field name="mb_driver_cost_eur_per_hour"/>
+            <field name="mb_cost_per_km"/>
+            <field name="currency_id" invisible="1"/>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+</odoo>

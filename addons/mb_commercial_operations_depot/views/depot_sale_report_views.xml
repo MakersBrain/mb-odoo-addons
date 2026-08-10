@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_depot_sale_report_form_commercial" model="ir.ui.view">
+    <field name="name">mb.depot.sale.report.form.commercial</field>
+    <field name="model">mb.depot.sale.report</field>
+    <field name="inherit_id" ref="mb_depot.view_mb_depot_sale_report_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='depot_warehouse_id']" position="after">
+        <field name="commercial_contract_id" readonly="state != 'draft'"
+               groups="mb_commercial_operations.group_commercial_operations_user"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

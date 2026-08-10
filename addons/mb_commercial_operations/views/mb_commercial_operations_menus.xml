@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <menuitem id="menu_commercial_operations_root" name="Commercial Operations"
+            sequence="36" web_icon="mb_commercial_operations,static/description/icon.svg"
+            groups="mb_commercial_operations.group_commercial_operations_user"/>
+
+  <menuitem id="menu_commercial_dashboard" name="Dashboard"
+            parent="menu_commercial_operations_root" action="action_commercial_operations"
+            sequence="5"/>
+
+  <menuitem id="menu_commercial_operations" name="Operations"
+            parent="menu_commercial_operations_root" sequence="10"/>
+  <menuitem id="menu_commercial_calendar" name="Planning Calendar"
+            parent="menu_commercial_operations" action="action_commercial_calendar" sequence="10"/>
+  <menuitem id="menu_commercial_markets" name="Markets &amp; Fairs"
+            parent="menu_commercial_operations" action="action_commercial_markets" sequence="20"/>
+  <menuitem id="menu_commercial_all_operations" name="All Operations"
+            parent="menu_commercial_operations" action="action_commercial_operations" sequence="30"/>
+  <menuitem id="menu_commercial_obligation_calendar" name="Obligation Calendar"
+            parent="menu_commercial_operations" action="action_commercial_occurrence_calendar" sequence="40"/>
+
+  <menuitem id="menu_commercial_contracts" name="Contracts"
+            parent="menu_commercial_operations_root" sequence="20"/>
+  <menuitem id="menu_commercial_contract_list" name="Commercial Contracts"
+            parent="menu_commercial_contracts" action="action_commercial_contracts" sequence="10"/>
+  <menuitem id="menu_commercial_occurrences" name="Contract Occurrences"
+            parent="menu_commercial_contracts" action="action_commercial_occurrences" sequence="20"/>
+
+  <menuitem id="menu_commercial_profitability" name="Profitability"
+            parent="menu_commercial_operations_root" sequence="30"/>
+  <menuitem id="menu_commercial_scenarios" name="Break-even Scenarios"
+            parent="menu_commercial_profitability" action="action_profitability_scenarios" sequence="10"/>
+  <menuitem id="menu_commercial_profitability_report" name="Planned vs Actual"
+            parent="menu_commercial_profitability" action="action_commercial_profitability_report" sequence="20"/>
+
+  <menuitem id="menu_commercial_travel" name="Travel"
+            parent="menu_commercial_operations_root" sequence="40"/>
+  <menuitem id="menu_commercial_travel_estimates" name="Travel Estimates"
+            parent="menu_commercial_travel" action="action_travel_estimates" sequence="10"/>
+
+  <menuitem id="menu_commercial_configuration" name="Configuration"
+            parent="menu_commercial_operations_root" sequence="90"
+            groups="mb_commercial_operations.group_commercial_operations_manager"/>
+  <menuitem id="menu_commercial_tollquote_connectors" name="TollQuote Connectors"
+            parent="menu_commercial_configuration" action="action_tollquote_connectors" sequence="10"
+            groups="mb_commercial_operations.group_commercial_operations_manager"/>
+</odoo>

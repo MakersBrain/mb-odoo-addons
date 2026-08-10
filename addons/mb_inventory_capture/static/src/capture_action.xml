@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="mb_inventory_capture.CaptureAction">
+        <div class="o_mb_inventory_capture h-100 overflow-auto p-3">
+            <div class="mx-auto" style="max-width: 58rem">
+                <h2>Identify incoming product</h2>
+                <p class="text-muted">
+                    Photograph the product/front label, then add a lot-detail image if needed.
+                    Nothing changes inventory until the reviewed result is applied.
+                </p>
+                <div class="alert alert-info" role="status">
+                    Uploaded images are sanitized to remove metadata. If you request analysis,
+                    the sanitized images leave Odoo temporarily and are processed by your
+                    workshop's configured extraction provider.
+                </div>
+                <div class="d-flex gap-2 flex-wrap mb-3">
+                    <button class="btn btn-primary" t-on-click="startCamera"
+                            t-att-disabled="state.busy">Use camera</button>
+                    <button class="btn btn-secondary" t-on-click="() => fileInput.el.click()"
+                            t-att-disabled="state.busy">Upload image</button>
+                    <select class="form-select w-auto" t-model="state.role">
+                        <option value="front">Product/front</option>
+                        <option value="lot_detail">Lot detail</option>
+                    </select>
+                    <input t-ref="fileInput" type="file" class="d-none"
+                           accept="image/jpeg,image/png" capture="environment"
+                           t-on-change="onFileChange"/>
+                </div>
+                <div class="ratio ratio-4x3 bg-dark mb-3" t-att-class="{'d-none': !state.cameraActive}">
+                    <video t-ref="video" autoplay="autoplay" playsinline="playsinline" muted="muted"/>
+                </div>
+                <button t-if="state.cameraActive" class="btn btn-primary mb-3"
+                        t-on-click="takePhoto" t-att-disabled="state.busy">Take photo</button>
+                <div t-if="state.previewUrl" class="mb-3">
+                    <img t-att-src="state.previewUrl" class="img-fluid rounded"
+                         alt="Sanitized upload preview"/>
+                </div>
+                <div class="input-group mb-3">
+                    <input class="form-control" t-model="state.manualCode"
+                           placeholder="Enter an unreadable barcode or GS1 value"/>
+                    <button class="btn btn-outline-secondary" t-on-click="submitManualCode">
+                        Add code
+                    </button>
+                </div>
+                <ul t-if="state.decoded.length" class="list-group mb-3">
+                    <li t-foreach="state.decoded" t-as="code" t-key="code_index"
+                        class="list-group-item d-flex justify-content-between">
+                        <code t-esc="code.rawValue"/><span t-esc="code.format"/>
+                    </li>
+                </ul>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" t-on-click="analyzeImages"
+                            t-att-disabled="state.busy || !state.uploaded">Analyze images</button>
+                    <button class="btn btn-secondary" t-on-click="openReview"
+                            t-att-disabled="state.busy">Review manually</button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -71,7 +71,8 @@ class TestDepotStatement(TransactionCase):
             "date_from": date_from,
             "date_to": date_to,
         })
-        statement.action_compute()
+        action = statement.action_compute()
+        self.assertEqual(action["target"], "current")
         return statement
 
     def test_depot_is_created_consistently(self):
