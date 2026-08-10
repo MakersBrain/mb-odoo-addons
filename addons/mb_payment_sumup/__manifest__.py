@@ -30,11 +30,10 @@ named on the request, and that account has to be the one whose name is printed
 on the facture.
 
 Refunds go to `/v1.0/merchants/{code}/payments/{id}/refunds`, which SumUp
-acknowledges with an empty 200 and settles asynchronously. Odoo marks the refund
-done on the acknowledgement; a refund SumUp later rejects appears in their
-dashboard, not here.
+acknowledges before settlement. Odoo keeps the refund pending and polls the
+authoritative transaction events before marking it done.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.1.0",
     "license": "LGPL-3",
     "category": "Accounting/Payment Providers",
     "author": "Makersbrain",

@@ -9,6 +9,8 @@
             <field name="provider_reference" position="after">
                 <field name="sumup_transaction_id" invisible="provider_code != 'sumup'"/>
                 <field name="sumup_checkout_url" widget="url" invisible="provider_code != 'sumup'"/>
+                <field name="sumup_refund_target_amount"
+                       invisible="provider_code != 'sumup' or operation != 'refund'"/>
             </field>
         </field>
     </record>

@@ -75,6 +75,20 @@ class TestSumUp(SumUpCommon, PaymentHttpCommon):
 
         self.assertEqual(send_request.call_count, 1)
 
+    def test_deactivating_checkout_removes_its_payable_url(self):
+        tx = self._create_transaction(flow="redirect")
+        tx.provider_reference = self.checkout_data["id"]
+        tx.sumup_checkout_url = self.checkout_data["hosted_checkout_url"]
+
+        with patch(_SEND_REQUEST, return_value=dict(self.checkout_data, status="EXPIRED")) as req:
+            tx._sumup_deactivate_checkout()
+
+        self.assertEqual(req.call_args[0][:2], (
+            "DELETE", f"/v0.1/checkouts/{self.checkout_data['id']}"
+        ))
+        self.assertFalse(tx.sumup_checkout_url)
+        self.assertEqual(tx.state, "cancel")
+
     # === The payment data === #
 
     def test_reference_is_read_from_either_shape(self):
@@ -175,7 +189,33 @@ class TestSumUp(SumUpCommon, PaymentHttpCommon):
         )
         # Odoo holds refunds as negative amounts; SumUp only knows positive ones.
         self.assertEqual(send_request.call_args[1]["json"], {"amount": 100.0})
+        self.assertEqual(refund_tx.state, "pending")
+        self.assertEqual(refund_tx.sumup_refund_target_amount, 100.0)
+
+    def test_refund_is_done_only_after_sumup_reports_its_event(self):
+        tx = self._create_transaction("redirect", state="done")
+        tx.sumup_transaction_id = "tx_0001"
+        with patch(_SEND_REQUEST, return_value={}):
+            refund_tx = tx._refund(amount_to_refund=100.0)
+
+        with patch(_SEND_REQUEST, return_value={
+            "id": "tx_0001",
+            "events": [{"type": "REFUND", "status": "REFUNDED", "amount": 100.0}],
+        }):
+            refund_tx._sumup_poll_refund()
+
         self.assertEqual(refund_tx.state, "done")
+
+    def test_pending_refund_stays_pending_without_settlement_event(self):
+        tx = self._create_transaction("redirect", state="done")
+        tx.sumup_transaction_id = "tx_0001"
+        with patch(_SEND_REQUEST, return_value={}):
+            refund_tx = tx._refund(amount_to_refund=100.0)
+
+        with patch(_SEND_REQUEST, return_value={"id": "tx_0001", "events": []}):
+            refund_tx._sumup_poll_refund()
+
+        self.assertEqual(refund_tx.state, "pending")
 
     def test_refund_of_an_unpaid_checkout_is_refused(self):
         tx = self._create_transaction("redirect", state="done")

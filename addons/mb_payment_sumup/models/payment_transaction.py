@@ -27,6 +27,14 @@ class PaymentTransaction(models.Model):
         readonly=True,
         copy=False,
     )
+    sumup_refund_target_amount = fields.Monetary(
+        string="SumUp Refund Target",
+        currency_field="currency_id",
+        readonly=True,
+        copy=False,
+        help="Cumulative successful refund amount that SumUp must report "
+             "before this refund transaction may be completed.",
+    )
 
     # === BUSINESS METHODS - PAYMENT FLOW === #
 
@@ -62,8 +70,15 @@ class PaymentTransaction(models.Model):
         """
         self.ensure_one()
 
+        self.env.cr.execute(
+            "SELECT pg_advisory_xact_lock(%s, %s)",
+            [0x4D425054, self.id],
+        )
+        self.invalidate_recordset(["sumup_checkout_url", "state"])
         if self.sumup_checkout_url and self.state in ("draft", "pending"):
             return self.sumup_checkout_url
+
+        self._ensure_provider_is_not_disabled()
 
         payload = self._sumup_prepare_checkout_payload()
         try:
@@ -77,6 +92,19 @@ class PaymentTransaction(models.Model):
         self.provider_reference = checkout_data.get("id")
         self.sumup_checkout_url = checkout_data.get("hosted_checkout_url")
         return self.sumup_checkout_url or ""
+
+    def _sumup_deactivate_checkout(self):
+        """Deactivate a checkout before replacing its public link."""
+        self.ensure_one()
+        if self.provider_code != "sumup" or not self.provider_reference:
+            return
+        if self.state not in ("draft", "pending"):
+            raise UserError(_("A completed SumUp checkout cannot be replaced."))
+        self._send_api_request(
+            "DELETE", f"/v0.1/checkouts/{self.provider_reference}"
+        )
+        self.sumup_checkout_url = False
+        self._set_canceled(_("This SumUp checkout was replaced by a new payment link."))
 
     def _sumup_prepare_checkout_payload(self):
         """Create the payload of the checkout request from the transaction.
@@ -125,11 +153,19 @@ class PaymentTransaction(models.Model):
             # positive everywhere at SumUp.
             json={"amount": self.currency_id.round(-self.amount)},
         )
-        # SumUp acknowledges a refund with an empty 200 and settles it later,
-        # so there is no payment data to process and nothing further to wait
-        # for here. A refund they subsequently reject shows in their dashboard.
+        # An empty response acknowledges only the request.  Transactions are
+        # the authoritative SumUp record; the polling job completes this Odoo
+        # refund only after a successful refund event appears there.
         self.provider_reference = source_tx.provider_reference
-        self._set_done()
+        earlier_refunds = source_tx.child_transaction_ids.filtered(
+            lambda tx: tx != self
+            and tx.operation == "refund"
+            and tx.state in ("pending", "done")
+        )
+        self.sumup_refund_target_amount = self.currency_id.round(
+            sum(-tx.amount for tx in earlier_refunds) - self.amount
+        )
+        self._set_pending()
 
     # === BUSINESS METHODS - PAYMENT DATA === #
 
@@ -207,6 +243,36 @@ class PaymentTransaction(models.Model):
             return
         self._process("sumup", checkout_data)
 
+    def _sumup_poll_refund(self):
+        """Complete an acknowledged refund from SumUp's transaction events."""
+        self.ensure_one()
+        source_tx = self.source_transaction_id
+        if not source_tx.sumup_transaction_id:
+            return
+        try:
+            transaction_data = self._send_api_request(
+                "GET",
+                f"/v2.1/merchants/{self.provider_id._sumup_get_merchant_code()}/transactions",
+                params={"id": source_tx.sumup_transaction_id},
+            )
+        except (UserError, ValidationError):
+            _logger.warning("Unable to verify SumUp refund %s.", self.reference)
+            return
+
+        events = transaction_data.get("events") or transaction_data.get("transaction_events") or []
+        refunded_amount = self.currency_id.round(sum(
+            abs(float(event.get("amount") or 0.0))
+            for event in events
+            if (event.get("type") or event.get("event_type")) == "REFUND"
+            and event.get("status") in ("REFUNDED", "SUCCESSFUL")
+        ))
+        if self.currency_id.compare_amounts(
+            refunded_amount, self.sumup_refund_target_amount
+        ) >= 0:
+            self._set_done()
+        elif transaction_data.get("simple_status") == "REFUND_FAILED":
+            self._set_error(_("SumUp reported that the refund failed."))
+
     @api.model
     def _cron_poll_sumup_checkouts(self):
         """Settle checkouts nobody came back from.
@@ -228,3 +294,12 @@ class PaymentTransaction(models.Model):
         ], limit=200)
         for tx in transactions:
             tx._sumup_poll_checkout()
+
+        refunds = self.search([
+            ("provider_code", "=", "sumup"),
+            ("state", "=", "pending"),
+            ("operation", "=", "refund"),
+            ("source_transaction_id.sumup_transaction_id", "!=", False),
+        ], limit=200)
+        for tx in refunds:
+            tx._sumup_poll_refund()
