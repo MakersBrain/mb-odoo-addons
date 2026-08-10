@@ -4,8 +4,10 @@ from odoo.exceptions import UserError, ValidationError
 
 class MbFinishingSession(models.Model):
     _name = "mb.finishing.session"
+    _inherit = "mb.ceramics.session.mixin"
     _description = "Ceramics finishing session"
     _order = "date desc, id desc"
+    _check_company_auto = True
 
     name = fields.Char(required=True, copy=False, default=lambda self: _("New"))
     date = fields.Date(required=True, default=fields.Date.context_today)
@@ -13,11 +15,14 @@ class MbFinishingSession(models.Model):
         "stock.package",
         required=True,
         domain="[('package_type_id.package_use', '=', 'reusable')]",
+        check_company=True,
     )
     source_location_id = fields.Many2one(
-        "stock.location", required=True, domain=[("usage", "=", "internal")])
+        "stock.location", required=True, domain=[("usage", "=", "internal")],
+        check_company=True)
     finished_location_id = fields.Many2one(
-        "stock.location", required=True, domain=[("usage", "=", "internal")])
+        "stock.location", required=True, domain=[("usage", "=", "internal")],
+        check_company=True)
     line_ids = fields.One2many(
         "mb.finishing.session.line", "session_id", string="Selected blanks", copy=True)
     production_ids = fields.One2many(
@@ -28,7 +33,8 @@ class MbFinishingSession(models.Model):
         default="draft",
     )
     company_id = fields.Many2one(
-        "res.company", required=True, default=lambda self: self.env.company)
+        "res.company", required=True, index=True,
+        default=lambda self: self.env.company)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -52,20 +58,30 @@ class MbFinishingSession(models.Model):
 
 class MbFinishingSessionLine(models.Model):
     _name = "mb.finishing.session.line"
+    _inherit = "mb.ceramics.session.line.mixin"
     _description = "Finishing session selection"
     _order = "id"
+    _check_company_auto = True
 
     session_id = fields.Many2one(
-        "mb.finishing.session", required=True, ondelete="cascade")
+        "mb.finishing.session", required=True, ondelete="cascade",
+        check_company=True)
     blank_product_id = fields.Many2one(
-        "product.product", required=True, domain=[("is_storable", "=", True)])
+        "product.product", required=True, domain=[("is_storable", "=", True)],
+        check_company=True)
     blank_lot_id = fields.Many2one(
-        "stock.lot", required=True, domain="[('product_id', '=', blank_product_id)]")
+        "stock.lot", required=True, domain="[('product_id', '=', blank_product_id)]",
+        check_company=True)
     quantity = fields.Float(required=True, digits="Product Unit", default=1.0)
     finished_product_id = fields.Many2one(
-        "product.product", required=True, domain=[("is_storable", "=", True)])
-    bom_id = fields.Many2one("mrp.bom", required=True)
-    production_id = fields.Many2one("mrp.production", readonly=True, copy=False)
+        "product.product", required=True, domain=[("is_storable", "=", True)],
+        check_company=True)
+    bom_id = fields.Many2one("mrp.bom", required=True, check_company=True)
+    production_id = fields.Many2one(
+        "mrp.production", readonly=True, copy=False, check_company=True)
+    company_id = fields.Many2one(
+        related="session_id.company_id", store=True, required=True, index=True,
+        precompute=True)
 
     _positive_quantity = models.Constraint(
         "CHECK(quantity > 0)", "The selected blank quantity must be positive.")

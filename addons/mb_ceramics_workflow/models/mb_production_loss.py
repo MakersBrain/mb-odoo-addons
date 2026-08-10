@@ -6,22 +6,28 @@ class MbProductionLoss(models.Model):
     _name = "mb.production.loss"
     _description = "Ceramics production loss"
     _order = "date desc, id desc"
+    _check_company_auto = True
 
     production_id = fields.Many2one(
         "mrp.production", required=True, ondelete="restrict", index=True,
-        domain=[("mb_workflow_kind", "in", ("bisque", "glazing", "finishing"))])
+        domain=[("mb_workflow_kind", "in", ("bisque", "glazing", "finishing"))],
+        check_company=True)
     product_id = fields.Many2one(related="production_id.product_id", store=True)
     quantity = fields.Float(required=True, digits="Product Unit")
     operation_id = fields.Many2one(
-        "mrp.workorder", string="Operation", ondelete="restrict")
+        "mrp.workorder", string="Operation", ondelete="restrict",
+        check_company=True)
     reason = fields.Text(required=True)
     date = fields.Datetime(required=True, default=fields.Datetime.now, readonly=True)
     user_id = fields.Many2one(
         "res.users", required=True, default=lambda self: self.env.user, readonly=True)
-    board_id = fields.Many2one("stock.package", ondelete="restrict")
-    firing_id = fields.Many2one("mb.firing", ondelete="restrict")
+    board_id = fields.Many2one(
+        "stock.package", ondelete="restrict", check_company=True)
+    firing_id = fields.Many2one(
+        "mb.firing", ondelete="restrict", check_company=True)
     company_id = fields.Many2one(
-        related="production_id.company_id", store=True, index=True)
+        related="production_id.company_id", store=True, required=True, index=True,
+        precompute=True)
 
     _positive_quantity = models.Constraint(
         "CHECK(quantity > 0)", "A process-loss quantity must be positive.")

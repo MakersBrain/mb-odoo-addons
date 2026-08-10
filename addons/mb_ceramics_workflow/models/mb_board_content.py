@@ -7,6 +7,7 @@ class MbBoardContent(models.Model):
     _name = "mb.board.content"
     _description = "Ware board WIP content"
     _order = "state, date_loaded desc, id desc"
+    _check_company_auto = True
 
     board_id = fields.Many2one(
         "stock.package",
@@ -14,6 +15,7 @@ class MbBoardContent(models.Model):
         ondelete="restrict",
         index=True,
         domain="[('package_type_id.package_use', '=', 'reusable')]",
+        check_company=True,
     )
     production_id = fields.Many2one(
         "mrp.production",
@@ -21,12 +23,14 @@ class MbBoardContent(models.Model):
         ondelete="restrict",
         index=True,
         domain=[("mb_workflow_kind", "in", ("bisque", "glazing", "finishing"))],
+        check_company=True,
     )
     product_id = fields.Many2one(
         related="production_id.product_id", store=True, index=True)
     quantity = fields.Float(required=True, digits="Product Unit")
     current_workorder_id = fields.Many2one(
-        "mrp.workorder", string="Current operation", ondelete="restrict")
+        "mrp.workorder", string="Current operation", ondelete="restrict",
+        check_company=True)
     state = fields.Selection(
         [("current", "Current"), ("removed", "Removed")],
         required=True,
@@ -37,9 +41,11 @@ class MbBoardContent(models.Model):
         required=True, default=fields.Datetime.now, readonly=True)
     date_unloaded = fields.Datetime(readonly=True)
     previous_content_id = fields.Many2one(
-        "mb.board.content", readonly=True, ondelete="restrict")
+        "mb.board.content", readonly=True, ondelete="restrict",
+        check_company=True)
     company_id = fields.Many2one(
-        related="production_id.company_id", store=True, index=True)
+        related="production_id.company_id", store=True, required=True, index=True,
+        precompute=True)
 
     _positive_quantity = models.Constraint(
         "CHECK(quantity > 0)", "A board-content quantity must be positive.")

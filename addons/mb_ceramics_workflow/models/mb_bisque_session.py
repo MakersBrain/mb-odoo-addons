@@ -5,8 +5,10 @@ from odoo.tools.float_utils import float_compare
 
 class MbBisqueSession(models.Model):
     _name = "mb.bisque.session"
+    _inherit = "mb.ceramics.session.mixin"
     _description = "Ceramics bisque preparation session"
     _order = "date desc, id desc"
+    _check_company_auto = True
 
     name = fields.Char(required=True, copy=False, default=lambda self: _("New"))
     date = fields.Date(required=True, default=fields.Date.context_today)
@@ -14,15 +16,18 @@ class MbBisqueSession(models.Model):
         "stock.package",
         required=True,
         domain="[('package_type_id.package_use', '=', 'reusable')]",
+        check_company=True,
     )
     source_location_id = fields.Many2one(
-        "stock.location", required=True, domain=[("usage", "=", "internal")]
+        "stock.location", required=True, domain=[("usage", "=", "internal")],
+        check_company=True,
     )
     bisque_location_id = fields.Many2one(
         "stock.location",
         string="Accepted bisque location",
         required=True,
         domain=[("usage", "=", "internal")],
+        check_company=True,
     )
     line_ids = fields.One2many(
         "mb.bisque.session.line", "session_id", string="Selected green ware", copy=True
@@ -36,7 +41,8 @@ class MbBisqueSession(models.Model):
         default="draft",
     )
     company_id = fields.Many2one(
-        "res.company", required=True, default=lambda self: self.env.company
+        "res.company", required=True, index=True,
+        default=lambda self: self.env.company
     )
 
     @api.model_create_multi
@@ -84,19 +90,24 @@ class MbBisqueSession(models.Model):
 
 class MbBisqueSessionLine(models.Model):
     _name = "mb.bisque.session.line"
+    _inherit = "mb.ceramics.session.line.mixin"
     _description = "Bisque session selection"
     _order = "id"
+    _check_company_auto = True
 
     session_id = fields.Many2one(
-        "mb.bisque.session", required=True, ondelete="cascade"
+        "mb.bisque.session", required=True, ondelete="cascade",
+        check_company=True,
     )
     green_product_id = fields.Many2one(
         "product.product",
         required=True,
         domain="[('product_tmpl_id.mb_ceramics_stage', '=', 'green')]",
+        check_company=True,
     )
     green_lot_id = fields.Many2one(
-        "stock.lot", required=True, domain="[('product_id', '=', green_product_id)]"
+        "stock.lot", required=True, domain="[('product_id', '=', green_product_id)]",
+        check_company=True,
     )
     quantity = fields.Float(required=True, digits="Product Unit", default=1.0)
     available_quantity = fields.Float(
@@ -106,9 +117,14 @@ class MbBisqueSessionLine(models.Model):
         "product.product",
         required=True,
         domain="[('product_tmpl_id.mb_ceramics_stage', '=', 'bisque')]",
+        check_company=True,
     )
-    bom_id = fields.Many2one("mrp.bom", required=True)
-    production_id = fields.Many2one("mrp.production", readonly=True, copy=False)
+    bom_id = fields.Many2one("mrp.bom", required=True, check_company=True)
+    production_id = fields.Many2one(
+        "mrp.production", readonly=True, copy=False, check_company=True)
+    company_id = fields.Many2one(
+        related="session_id.company_id", store=True, required=True, index=True,
+        precompute=True)
 
     _positive_quantity = models.Constraint(
         "CHECK(quantity > 0)", "The selected green-ware quantity must be positive."

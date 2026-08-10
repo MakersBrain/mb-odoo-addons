@@ -1,4 +1,5 @@
-from odoo import fields, models
+from odoo import _, fields, models
+from odoo.exceptions import UserError
 
 
 class MrpProduction(models.Model):
@@ -15,19 +16,49 @@ class MrpProduction(models.Model):
         index=True,
     )
     mb_throwing_session_id = fields.Many2one(
-        "mb.throwing.session", copy=False, index=True, ondelete="set null")
+        "mb.throwing.session", copy=False, index=True, ondelete="set null",
+        check_company=True)
     mb_finishing_session_id = fields.Many2one(
-        "mb.finishing.session", copy=False, index=True, ondelete="set null")
+        "mb.finishing.session", copy=False, index=True, ondelete="set null",
+        check_company=True)
     mb_bisque_session_id = fields.Many2one(
-        "mb.bisque.session", copy=False, index=True, ondelete="set null")
+        "mb.bisque.session", copy=False, index=True, ondelete="set null",
+        check_company=True)
     mb_glazing_session_id = fields.Many2one(
-        "mb.glazing.session", copy=False, index=True, ondelete="set null")
+        "mb.glazing.session", copy=False, index=True, ondelete="set null",
+        check_company=True)
     mb_board_content_ids = fields.One2many(
         "mb.board.content", "production_id", string="Board history")
     mb_loss_ids = fields.One2many(
         "mb.production.loss", "production_id", string="Process losses")
     mb_inspected = fields.Boolean(copy=False, readonly=True)
     mb_bisque_inspected = fields.Boolean(copy=False, readonly=True)
+
+    def write(self, values):
+        session_fields = {
+            "mb_throwing_session_id",
+            "mb_finishing_session_id",
+            "mb_bisque_session_id",
+            "mb_glazing_session_id",
+        }
+        changed = session_fields & set(values)
+        if changed:
+            for production in self:
+                for field_name in changed:
+                    sessions = production[field_name]
+                    if values[field_name]:
+                        sessions |= self.env[
+                            self._fields[field_name].comodel_name
+                        ].browse(values[field_name])
+                    if any(
+                        session.state in session._mb_terminal_states
+                        for session in sessions
+                    ):
+                        raise UserError(_(
+                            "A manufacturing order cannot be moved into or out of a "
+                            "completed workshop session."
+                        ))
+        return super().write(values)
 
     def action_mb_inspect(self):
         self.ensure_one()

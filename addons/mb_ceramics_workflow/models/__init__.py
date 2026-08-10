@@ -1,3 +1,4 @@
+from . import session_lock
 from . import mb_board_content
 from . import mb_finishing_session
 from . import mb_bisque_session

@@ -600,28 +600,81 @@ class TestCeramicsWorkflow(TransactionCase):
         self.assertIn(self.clay_lot, bisque_lot.mb_related_lot_ids)
         self.assertIn(blank_lot, bisque_lot.mb_related_lot_ids)
 
-    def test_total_bisque_loss_creates_no_output_identity(self):
+    def test_total_bisque_loss_is_completed_then_scrapped(self):
         session, production, lots, _firing, action = self._produce_bisque(
             quantity=2, accepted=0, loss=2
         )
         self.assertEqual(session.state, "done")
         self.assertEqual(production.state, "done")
-        self.assertFalse(lots)
-        self.assertEqual(action["type"], "ir.actions.act_window_close")
-        self.assertEqual(production.mb_loss_ids.quantity, 2)
-        self.assertFalse(production.move_finished_ids.move_line_ids.lot_id)
-        self.assertFalse(self.env["stock.quant"].search([
+        self.assertTrue(lots)
+        scrap = self.env["stock.scrap"].search([
+            ("origin", "=", production.name),
             ("product_id", "=", self.bisque_product.id),
-            ("location_id", "=", self.bisque_stock.id),
-            ("quantity", ">", 0),
-        ]))
-        if "stock.valuation.layer" in self.env:
-            layers = self.env["stock.valuation.layer"].search([
-                ("stock_move_id", "in", production.move_finished_ids.ids),
-            ])
-            self.assertFalse(layers.filtered(
-                lambda layer: layer.quantity or layer.value
-            ))
+        ])
+        self.assertEqual(scrap.state, "done")
+        self.assertEqual(scrap.scrap_qty, 2)
+        self.assertEqual(
+            self.env["stock.quant"]._get_available_quantity(
+                self.bisque_product,
+                self.bisque_stock,
+                lot_id=lots,
+                strict=True,
+            ),
+            0,
+        )
+        self.assertEqual(action["type"], "ir.actions.act_window_close")
+
+    def test_recorded_throwing_session_and_lines_are_immutable(self):
+        session = self._throw(2)
+
+        with self.assertRaises(UserError):
+            session.write({"note": "rewritten evidence"})
+        with self.assertRaises(UserError):
+            session.line_ids.write({"quantity": 3})
+
+    def test_shared_firing_charges_one_physical_duration(self):
+        throwing = self._throw(4)
+        first_session, first = self._start_bisque(
+            throwing.line_ids.blank_lot_id, 1)
+        second_session, second = self._start_bisque(
+            throwing.line_ids.blank_lot_id, 1)
+        self._finish_until(first, self.bisque_only_fire_op)
+        self._finish_until(second, self.bisque_only_fire_op)
+        workorders = (
+            first.workorder_ids | second.workorder_ids
+        ).filtered(lambda order: order.operation_id == self.bisque_only_fire_op)
+        # The MOs remain marked as planned after their earlier work orders
+        # finish, so the public MO planning button correctly becomes a no-op.
+        # Replan the two ready kiln operations to model existing independent
+        # reservations before they are joined into one physical firing.
+        for workorder in workorders:
+            workorder._plan_workorder(replan=True)
+        self.assertEqual(len(workorders.mapped("leave_id")), 2)
+        firing = self.env["mb.firing"].create({
+            "kiln_id": self.kiln.id,
+            "program_id": self.bisque_program.id,
+            "kind": "bisque",
+        })
+
+        self.env["mb.firing.load"].create({
+            "firing_id": firing.id,
+            "workorder_ids": [Command.set(workorders.ids)],
+        }).action_load()
+
+        self.assertEqual(
+            sum(workorders.mapped("duration_expected")),
+            self.bisque_program._occupied_minutes(True),
+        )
+        self.assertEqual(
+            len(workorders.filtered(lambda order: order.duration_expected)), 1)
+        self.assertEqual(len(workorders.mapped("leave_id")), 1)
+        reservation = workorders.mapped("leave_id")
+        self.assertEqual(
+            (reservation.date_to - reservation.date_from).total_seconds() / 60,
+            self.bisque_program._occupied_minutes(True),
+        )
+        self.assertEqual(first_session.state, "progress")
+        self.assertEqual(second_session.state, "progress")
 
     def test_glazing_reserves_exact_multiple_glaze_lots(self):
         _bisque_session, bisque_mo, bisque_lot, _firing, _action = (
@@ -706,6 +759,14 @@ class TestCeramicsWorkflow(TransactionCase):
         )
         self.assertIn(bisque_mo, production.lot_producing_ids.mb_production_ids)
         self.assertIn(glaze_firing, production.lot_producing_ids.mb_firing_ids)
+        with self.assertRaises(UserError):
+            self.env["mb.glazing.material.allocation"].create({
+                "session_line_id": session.line_ids.id,
+                "product_id": self.glaze.id,
+                "lot_id": self.glaze_lot_a.id,
+                "quantity": 0.1,
+                "uom_id": self.glaze.uom_id.id,
+            })
 
     def test_glazing_allocation_mismatch_rolls_back(self):
         _session, _production, bisque_lot, _firing, _action = self._produce_bisque(

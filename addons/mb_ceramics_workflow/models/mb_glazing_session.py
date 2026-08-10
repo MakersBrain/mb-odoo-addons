@@ -5,8 +5,10 @@ from odoo.tools.float_utils import float_compare
 
 class MbGlazingSession(models.Model):
     _name = "mb.glazing.session"
+    _inherit = "mb.ceramics.session.mixin"
     _description = "Ceramics glazing session"
     _order = "date desc, id desc"
+    _check_company_auto = True
 
     name = fields.Char(required=True, copy=False, default=lambda self: _("New"))
     date = fields.Date(required=True, default=fields.Date.context_today)
@@ -14,21 +16,25 @@ class MbGlazingSession(models.Model):
         "stock.package",
         required=True,
         domain="[('package_type_id.package_use', '=', 'reusable')]",
+        check_company=True,
     )
     source_location_id = fields.Many2one(
         "stock.location",
         string="Bisque stock location",
         required=True,
         domain=[("usage", "=", "internal")],
+        check_company=True,
     )
     material_location_id = fields.Many2one(
         "stock.location",
         string="Glaze/material location",
         required=True,
         domain=[("usage", "=", "internal")],
+        check_company=True,
     )
     finished_location_id = fields.Many2one(
-        "stock.location", required=True, domain=[("usage", "=", "internal")]
+        "stock.location", required=True, domain=[("usage", "=", "internal")],
+        check_company=True,
     )
     line_ids = fields.One2many(
         "mb.glazing.session.line", "session_id", string="Selected bisque ware", copy=True
@@ -42,7 +48,8 @@ class MbGlazingSession(models.Model):
         default="draft",
     )
     company_id = fields.Many2one(
-        "res.company", required=True, default=lambda self: self.env.company
+        "res.company", required=True, index=True,
+        default=lambda self: self.env.company
     )
 
     @api.model_create_multi
@@ -61,7 +68,7 @@ class MbGlazingSession(models.Model):
         "finished_location_id",
         "company_id",
     )
-    def _check_company(self):
+    def _check_session_company(self):
         for session in self:
             records = (
                 session.board_id,
@@ -91,19 +98,24 @@ class MbGlazingSession(models.Model):
 
 class MbGlazingSessionLine(models.Model):
     _name = "mb.glazing.session.line"
+    _inherit = "mb.ceramics.session.line.mixin"
     _description = "Glazing session selection"
     _order = "id"
+    _check_company_auto = True
 
     session_id = fields.Many2one(
-        "mb.glazing.session", required=True, ondelete="cascade"
+        "mb.glazing.session", required=True, ondelete="cascade",
+        check_company=True,
     )
     bisque_product_id = fields.Many2one(
         "product.product",
         required=True,
         domain="[('product_tmpl_id.mb_ceramics_stage', '=', 'bisque')]",
+        check_company=True,
     )
     bisque_lot_id = fields.Many2one(
-        "stock.lot", required=True, domain="[('product_id', '=', bisque_product_id)]"
+        "stock.lot", required=True, domain="[('product_id', '=', bisque_product_id)]",
+        check_company=True,
     )
     quantity = fields.Float(required=True, digits="Product Unit", default=1.0)
     available_quantity = fields.Float(
@@ -113,15 +125,20 @@ class MbGlazingSessionLine(models.Model):
         "product.product",
         required=True,
         domain="[('product_tmpl_id.mb_ceramics_stage', '=', 'finished')]",
+        check_company=True,
     )
-    bom_id = fields.Many2one("mrp.bom", required=True)
+    bom_id = fields.Many2one("mrp.bom", required=True, check_company=True)
     allocation_ids = fields.One2many(
         "mb.glazing.material.allocation",
         "session_line_id",
         string="Tracked glaze and material lots",
         copy=True,
     )
-    production_id = fields.Many2one("mrp.production", readonly=True, copy=False)
+    production_id = fields.Many2one(
+        "mrp.production", readonly=True, copy=False, check_company=True)
+    company_id = fields.Many2one(
+        related="session_id.company_id", store=True, required=True, index=True,
+        precompute=True)
 
     _positive_quantity = models.Constraint(
         "CHECK(quantity > 0)", "The selected bisque quantity must be positive."

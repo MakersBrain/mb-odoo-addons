@@ -82,12 +82,13 @@ class MbBisqueInspection(models.TransientModel):
             if move.state != "done":
                 move.picked = True
 
-    def _create_output_lots(self):
+    def _create_output_lots(self, quantity=None):
         product = self.production_id.product_id
-        if not self.accepted_quantity:
+        quantity = self.accepted_quantity if quantity is None else quantity
+        if not quantity or product.tracking == "none":
             return self.env["stock.lot"]
-        count = 1 if product.tracking == "lot" else int(self.accepted_quantity)
-        if product.tracking == "serial" and self.accepted_quantity != count:
+        count = 1 if product.tracking == "lot" else int(quantity)
+        if product.tracking == "serial" and quantity != count:
             raise UserError("A serial-tracked bisque quantity must be a whole number.")
         return self.env["stock.lot"].create([{
             "name": self.env["ir.sequence"].next_by_code("mb.bisque.lot"),
@@ -96,27 +97,46 @@ class MbBisqueInspection(models.TransientModel):
         } for _index in range(count)])
 
     def _complete_total_loss(self):
-        """Close an MO with consumed inputs and deliberately no output move.
+        """Complete through public MRP, then scrap the entire failed output.
 
-        Odoo's normal completion helper interprets zero `qty_producing` as
-        "produce the remaining quantity" and generates an output lot. A total
-        kiln loss is the opposite, so post the exact raw consumption and a
-        zero-quantity finished move directly, then apply the same terminal MO
-        fields used by Odoo 19's `button_mark_done`.
+        This keeps Odoo's normal manufacturing valuation, genealogy and
+        terminal transitions intact. The failed ware is then removed with the
+        public stock.scrap workflow instead of reproducing private MRP state.
         """
         production = self.production_id
-        finished_moves = production.move_finished_ids
-        production._post_inventory(cancel_backorder=True)
-        finished_moves.filtered(lambda move: move.state == "cancel").write({
-            "state": "done",
-            "product_uom_qty": 0.0,
-        })
-        production.write({
-            "date_finished": fields.Datetime.now(),
-            "priority": "0",
-            "is_locked": True,
-            "state": "done",
-        })
+        lots = self._create_output_lots(production.product_qty)
+        production.lot_producing_ids = [fields.Command.set(lots.ids)]
+        production.qty_producing = production.product_qty
+        production.set_qty_producing()
+        production.with_context(
+            skip_backorder=True,
+            skip_consumption=True,
+            skip_redirection=True,
+        ).button_mark_done()
+        if production.state != "done":
+            raise UserError(
+                "The bisque order needs manual review before its loss can be scrapped."
+            )
+        if production.product_id.tracking == "serial":
+            quantities = [(lot, 1.0) for lot in lots]
+        else:
+            quantities = [(lots, production.product_qty)]
+        for lot, quantity in quantities:
+            scrap = self.env["stock.scrap"].create({
+                "company_id": production.company_id.id,
+                "origin": production.name,
+                "product_id": production.product_id.id,
+                "product_uom_id": production.product_uom_id.id,
+                "scrap_qty": quantity,
+                "lot_id": lot[:1].id,
+                "location_id": production.location_dest_id.id,
+            })
+            result = scrap.action_validate()
+            if result is not True:
+                raise UserError(
+                    "The manufactured loss is not available in the destination "
+                    "location for scrapping."
+                )
 
     def action_confirm(self):
         self.ensure_one()
