@@ -10,10 +10,15 @@ class MbFiring(models.Model):
     _description = "Kiln firing"
     _inherit = ["mail.thread"]
     _order = "date_start desc, id desc"
+    _check_company_auto = True
+
+    _INTERNAL_WRITE_TOKEN = object()
+    _TERMINAL_STATES = {"done", "cancel"}
 
     name = fields.Char(required=True, copy=False, default=lambda self: _("New"))
     kiln_id = fields.Many2one(
-        comodel_name="mb.kiln", required=True, tracking=True)
+        comodel_name="mb.kiln", required=True, tracking=True,
+        check_company=True)
     kind = fields.Selection(
         selection=[
             ("bisque", "Bisque"),
@@ -37,7 +42,8 @@ class MbFiring(models.Model):
         tracking=True,
     )
     company_id = fields.Many2one(
-        comodel_name="res.company", default=lambda self: self.env.company)
+        comodel_name="res.company", required=True, index=True,
+        default=lambda self: self.env.company)
 
     workorder_ids = fields.One2many(
         comodel_name="mrp.workorder",
@@ -55,6 +61,7 @@ class MbFiring(models.Model):
         comodel_name="stock.package",
         string="Boards loaded",
         domain="[('package_type_id.package_use', '=', 'reusable')]",
+        check_company=True,
         help="Ware boards and shelves. Scanned instead of the pieces, which "
              "cannot hold a label before firing.",
     )
@@ -85,6 +92,7 @@ class MbFiring(models.Model):
         string="Programme mapping",
         ondelete="set null",
         index=True,
+        check_company=True,
         help="The mapping `program_name` was matched to. Kept as a link and not "
              "only as the label, because it is what lets a programme say how "
              "long its own firings actually take.",
@@ -103,6 +111,7 @@ class MbFiring(models.Model):
         comodel_name="ir.attachment",
         string="Provider payload",
         copy=False,
+        check_company=True,
         help="Exactly what the provider returned, kept for diagnostics and "
              "for fields this model does not model yet. Measured at about "
              "82 KB per firing. Never contains a credential: the client sends "
@@ -112,6 +121,7 @@ class MbFiring(models.Model):
         comodel_name="ir.attachment",
         string="Firing curve",
         copy=False,
+        check_company=True,
         help="The full trace, as evidence. Roughly 1,400 points for a twelve "
              "hour firing, and never read point by point, so it is a file "
              "rather than a table.",
@@ -195,7 +205,7 @@ class MbFiring(models.Model):
             "raw": body.encode("utf-8"),
         })
         previous = self[field_name]
-        self[field_name] = attachment
+        self._mb_internal().write({field_name: attachment.id})
         if previous:
             previous.unlink()
         return attachment
@@ -236,12 +246,83 @@ class MbFiring(models.Model):
                     "mb.firing") or _("New")
         return super().create(vals_list)
 
+    def _mb_internal(self):
+        """Return a recordset whose write authority cannot be forged by RPC."""
+        return self.with_context(
+            mb_firing_write_token=self._INTERNAL_WRITE_TOKEN)
+
+    def _mb_apply_provider_values(self, values):
+        """Apply provider evidence, including refreshes of terminal firings."""
+        return self._mb_internal().write(values)
+
+    def write(self, values):
+        internal = (
+            self.env.context.get("mb_firing_write_token")
+            is self._INTERNAL_WRITE_TOKEN
+        )
+        if not internal and any(
+            firing.state in self._TERMINAL_STATES for firing in self
+        ):
+            raise UserError(_(
+                "A completed or cancelled firing is immutable. Record a new "
+                "firing or use the provider synchronisation path."
+            ))
+        result = super().write(values)
+        if "workorder_ids" in values:
+            self._mb_sync_group_duration()
+        return result
+
+    def unlink(self):
+        if any(firing.state in self._TERMINAL_STATES for firing in self):
+            raise UserError(_(
+                "A completed or cancelled firing cannot be deleted."
+            ))
+        return super().unlink()
+
+    def _mb_sync_group_duration(self):
+        """Charge one physical kiln occupation across a shared load.
+
+        Each manufacturing order still owns its native work order, but only
+        the first work order in the physical firing reserves and costs the
+        controller programme's duration. The remaining work orders are fellow
+        contents of that same load, not additional kiln cycles.
+        """
+        for firing in self:
+            workorders = firing.workorder_ids.sorted(
+                key=lambda order: (
+                    not bool(order.leave_id),
+                    order.date_start or fields.Datetime.now(),
+                    order.id,
+                )
+            )
+            if not workorders:
+                continue
+            lead = workorders[:1]
+            minutes = firing.program_id._occupied_minutes(
+                lead.operation_id.mb_kiln_occupies_cooling)
+            for workorder in workorders:
+                expected = minutes if workorder == lead else 0.0
+                if workorder.duration_expected != expected:
+                    workorder.with_context(
+                        bypass_duration_calculation=True
+                    ).write({"duration_expected": expected})
+            # If Odoo had already planned every MO separately, keep the lead
+            # reservation and remove the duplicates. The remaining WOs still
+            # belong to the firing, but they are contents of its physical slot
+            # rather than extra uses of the kiln.
+            if lead.leave_id:
+                lead.leave_id.write({
+                    "date_to": lead.leave_id.date_from + timedelta(minutes=minutes),
+                })
+                (workorders - lead).mapped("leave_id").unlink()
+
     def action_start(self):
         for firing in self:
             if firing.state != "draft":
                 raise UserError(_("Only a loading firing can be started."))
             firing._check_load_compatibility()
-            firing.write({"state": "firing", "date_start": fields.Datetime.now()})
+            firing._mb_internal().write({
+                "state": "firing", "date_start": fields.Datetime.now()})
         return True
 
     def action_finish(self):
@@ -252,7 +333,7 @@ class MbFiring(models.Model):
             cooling_end = False
             if firing.program_id:
                 cooling_end = ended + timedelta(hours=firing.program_id.cooling_hours)
-            firing.write({
+            firing._mb_internal().write({
                 "state": "cooling",
                 "date_end": ended,
                 "cooling_end": cooling_end,
@@ -283,7 +364,7 @@ class MbFiring(models.Model):
                     until=firing.cooling_end,
                 ))
             firing._finish_loaded_workorders()
-            firing.state = "done"
+            firing._mb_internal().write({"state": "done"})
         return self.mapped("carrier_ids")
 
     def action_force_unload(self):
@@ -299,5 +380,6 @@ class MbFiring(models.Model):
                     firing.name,
                 ))
             firing._finish_loaded_workorders()
-            firing.write({"cooling_interrupted": True, "state": "done"})
+            firing._mb_internal().write({
+                "cooling_interrupted": True, "state": "done"})
         return self.mapped("carrier_ids")

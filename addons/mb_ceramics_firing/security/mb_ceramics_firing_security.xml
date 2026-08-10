@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mb_kiln_company_rule" model="ir.rule">
+        <field name="name">Kilns: allowed companies</field>
+        <field name="model_id" ref="model_mb_kiln"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="mb_firing_company_rule" model="ir.rule">
+        <field name="name">Firings: allowed companies</field>
+        <field name="model_id" ref="model_mb_firing"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="mb_kiln_program_company_rule" model="ir.rule">
+        <field name="name">Kiln programmes: allowed companies</field>
+        <field name="model_id" ref="model_mb_kiln_program"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="mb_kiln_program_segment_company_rule" model="ir.rule">
+        <field name="name">Kiln programme segments: allowed companies</field>
+        <field name="model_id" ref="model_mb_kiln_program_segment"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

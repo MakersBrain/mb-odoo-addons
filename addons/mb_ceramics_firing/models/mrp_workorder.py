@@ -11,6 +11,7 @@ class MrpWorkorder(models.Model):
         index=True,
         copy=False,
         ondelete="set null",
+        check_company=True,
         help="The physical firing this operation happened in. A Many2one here "
              "and a One2many there is the whole many-to-many: one firing holds "
              "work orders from several manufacturing orders, and each work "
@@ -64,7 +65,26 @@ class MrpWorkorder(models.Model):
             raise ValidationError(_("Work can only be added while a firing is loading."))
         self._mb_validate_firing(firing)
         self.write({"mb_firing_id": firing.id})
+        firing._mb_sync_group_duration()
         return True
+
+    def write(self, values):
+        if "mb_firing_id" in values:
+            terminal = self.mapped("mb_firing_id").filtered(
+                lambda firing: firing.state in firing._TERMINAL_STATES)
+            if terminal:
+                raise ValidationError(_(
+                    "A work order cannot be removed from a completed firing."
+                ))
+        previous = self.mapped("mb_firing_id")
+        result = super().write(values)
+        if "mb_firing_id" in values:
+            (previous | self.mapped("mb_firing_id"))._mb_sync_group_duration()
+            for workorder in self.filtered(lambda order: not order.mb_firing_id):
+                workorder.with_context(bypass_duration_calculation=True).write({
+                    "duration_expected": workorder._get_duration_expected(),
+                })
+        return result
 
     @api.constrains("mb_firing_id", "workcenter_id", "operation_id")
     def _check_mb_firing_id(self):

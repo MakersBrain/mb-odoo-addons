@@ -20,10 +20,11 @@ class MbKilnProgramSegment(models.Model):
     _name = "mb.kiln.program.segment"
     _description = "Kiln programme segment"
     _order = "program_id, number"
+    _check_company_auto = True
 
     program_id = fields.Many2one(
         comodel_name="mb.kiln.program", required=True, ondelete="cascade",
-        index=True)
+        index=True, check_company=True)
     number = fields.Integer(
         required=True, default=1,
         help="Segment order, as the controller numbers it.")
@@ -56,7 +57,9 @@ class MbKilnProgramSegment(models.Model):
         help="Where this segment ends, measured from the start of the "
              "programme.")
 
-    company_id = fields.Many2one(related="program_id.company_id", store=True)
+    company_id = fields.Many2one(
+        related="program_id.company_id", store=True, required=True, index=True,
+        precompute=True)
 
     _program_segment_uniq = models.Constraint(
         "unique (program_id, number)",

@@ -30,19 +30,23 @@ class MbKiln(models.Model):
     _name = "mb.kiln"
     _description = "Kiln"
     _order = "name"
+    _check_company_auto = True
 
     name = fields.Char(required=True)
     active = fields.Boolean(default=True)
     company_id = fields.Many2one(
-        comodel_name="res.company", default=lambda self: self.env.company)
+        comodel_name="res.company", required=True, index=True,
+        default=lambda self: self.env.company)
 
     equipment_id = fields.Many2one(
         comodel_name="maintenance.equipment",
+        check_company=True,
         string="Equipment",
         help="Where servicing history and maintenance requests live.",
     )
     workcenter_id = fields.Many2one(
         comodel_name="mrp.workcenter",
+        check_company=True,
         string="Work centre",
         help="What routing operations point at, so a firing can be an operation "
              "on a bill of materials.",
@@ -137,6 +141,26 @@ class MbKiln(models.Model):
     )
 
     @api.model
+    def _continuous_calendar(self, company_id):
+        """Return the 24/7 calendar owned by the kiln's company."""
+        template = self.env.ref(
+            "mb_workshop_base.mb_calendar_continuous", raise_if_not_found=False)
+        company = self.env["res.company"].browse(company_id).exists()
+        if not template or not company:
+            return template
+        if template.company_id == company:
+            return template
+        calendar = self.env["resource.calendar"].with_company(company).search([
+            ("name", "=", template.name),
+            ("company_id", "=", company.id),
+        ], limit=1)
+        if not calendar:
+            calendar = template.with_company(company).copy({
+                "company_id": company.id,
+            })
+        return calendar
+
+    @api.model
     def _prepare_workcenter_values(self, values):
         """The work centre a new kiln gets, on the calendar a kiln needs.
 
@@ -145,13 +169,13 @@ class MbKiln(models.Model):
         calendar Odoo spreads one firing across three days and every date
         derived from it is wrong.
         """
-        calendar = self.env.ref(
-            "mb_workshop_base.mb_calendar_continuous", raise_if_not_found=False)
+        company_id = values.get("company_id") or self.env.company.id
+        calendar = self._continuous_calendar(company_id)
         tag = self.env.ref(
             "mb_workshop_base.mb_workcenter_tag_firing", raise_if_not_found=False)
         workcenter_values = {
             "name": values.get("name"),
-            "company_id": values.get("company_id") or self.env.company.id,
+            "company_id": company_id,
         }
         if calendar:
             workcenter_values["resource_calendar_id"] = calendar.id

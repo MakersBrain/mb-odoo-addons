@@ -55,9 +55,11 @@ class MbKilnProgram(models.Model):
     _name = "mb.kiln.program"
     _description = "Kiln programme"
     _order = "kiln_id, name"
+    _check_company_auto = True
 
     kiln_id = fields.Many2one(
-        comodel_name="mb.kiln", required=True, ondelete="cascade", index=True)
+        comodel_name="mb.kiln", required=True, ondelete="cascade", index=True,
+        check_company=True)
     name = fields.Char(
         required=True,
         help="The programme label exactly as the provider reports it, such as "
@@ -145,7 +147,8 @@ class MbKilnProgram(models.Model):
     )
 
     company_id = fields.Many2one(
-        related="kiln_id.company_id", store=True)
+        related="kiln_id.company_id", store=True, required=True, index=True,
+        precompute=True)
 
     _kiln_program_uniq = models.Constraint(
         "unique (kiln_id, name)",
@@ -187,6 +190,10 @@ class MbKilnProgram(models.Model):
             ).search([
                 ("mb_kiln_program_id", "in", self.ids),
             ])._apply_kiln_program()
+            self.env["mb.firing"].search([
+                ("program_id", "in", self.ids),
+                ("state", "in", ("draft", "firing", "cooling")),
+            ])._mb_sync_group_duration()
         return result
 
     def action_adopt_measured(self):

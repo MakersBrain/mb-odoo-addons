@@ -1,8 +1,8 @@
 from datetime import timedelta
 
-from odoo import fields
-from odoo.exceptions import UserError
-from odoo.tests.common import TransactionCase, tagged
+from odoo import Command, fields
+from odoo.exceptions import AccessError, UserError
+from odoo.tests.common import TransactionCase, new_test_user, tagged
 
 
 @tagged("post_install", "-at_install")
@@ -59,3 +59,34 @@ class TestFiring(TransactionCase):
         with self.assertRaises(Exception):
             self.env["mb.firing"].create(values)
             self.env.flush_all()
+
+    def test_completed_firing_is_immutable(self):
+        self.firing.write({"state": "cooling"})
+        self.firing.action_unload()
+
+        with self.assertRaises(UserError):
+            self.firing.write({"peak_temperature": 1230.0})
+        with self.assertRaises(UserError):
+            self.firing.unlink()
+
+    def test_company_boundary_is_enforced_by_relations_and_rules(self):
+        other_company = self.env["res.company"].create({"name": "Other workshop"})
+        other_kiln = self.env["mb.kiln"].with_company(other_company).create({
+            "name": "Other kiln",
+            "company_id": other_company.id,
+        })
+        with self.assertRaises(UserError):
+            self.env["mb.firing"].create({
+                "kiln_id": other_kiln.id,
+                "company_id": self.env.company.id,
+            })
+
+        user = new_test_user(
+            self.env,
+            login="single-company-potter",
+            groups="mrp.group_mrp_user",
+            company_id=self.env.company.id,
+            company_ids=[Command.set(self.env.company.ids)],
+        )
+        with self.assertRaises(AccessError):
+            other_kiln.with_user(user).read(["name"])

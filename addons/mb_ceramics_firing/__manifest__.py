@@ -87,7 +87,7 @@ the trace is evidence, so it is an attachment. Peak temperature is not only a
 schedule detail - an under-fired glaze is a less mature glaze, and lead release
 rises with immaturity.
 """,
-    "version": "19.0.2.0.1",
+    "version": "19.0.2.0.2",
     "license": "LGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "Makersbrain",
@@ -105,6 +105,7 @@ rises with immaturity.
     ],
     "data": [
         "security/ir.model.access.csv",
+        "security/mb_ceramics_firing_security.xml",
         "views/mb_kiln_views.xml",
         "views/mrp_routing_workcenter_views.xml",
         "views/mb_firing_views.xml",

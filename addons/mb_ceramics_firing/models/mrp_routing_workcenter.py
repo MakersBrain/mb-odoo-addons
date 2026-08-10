@@ -35,6 +35,7 @@ class MrpRoutingWorkcenter(models.Model):
         comodel_name="mb.kiln.program",
         string="Kiln programme",
         ondelete="restrict",
+        check_company=True,
         domain="[('kiln_id.workcenter_id', '=', workcenter_id)]",
         help="The controller schedule this operation fires. Choosing one takes "
              "the duration out of your hands and puts it on the programme, "
