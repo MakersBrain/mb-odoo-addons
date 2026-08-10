@@ -170,6 +170,9 @@ class TestControlBridge(TransactionCase):
         module = self.env["ir.module.module"].sudo().search([
             ("name", "=", "mb_ceramics_firing"),
         ], limit=1)
+        # Simulate the lifecycle state this endpoint handles. The addon may
+        # already be installed when the full repository suite runs.
+        module.write({"state": "uninstalled"})
         self.assertEqual(module.state, "uninstalled")
 
         with patch.object(
