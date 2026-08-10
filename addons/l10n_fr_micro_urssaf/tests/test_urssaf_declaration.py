@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+from types import SimpleNamespace
 
 from odoo import fields
 from odoo.exceptions import AccessError, UserError, ValidationError
@@ -19,6 +20,7 @@ class TestUrssafDeclaration(TransactionCase):
 			"account_fiscal_country_id": france.id,
 			"l10n_fr_micro_activity_start_date": date(2026, 3, 6),
 			"l10n_fr_micro_urssaf_tracking_start_date": date(2026, 3, 6),
+			"l10n_fr_micro_urssaf_tracking_start_confirmed": True,
 			"l10n_fr_micro_urssaf_periodicity": "monthly",
 			"l10n_fr_micro_accounting_responsible_id": cls.env.user.id,
 			"l10n_fr_micro_cfp_kind": "artisan",
@@ -101,6 +103,32 @@ class TestUrssafDeclaration(TransactionCase):
 		])
 		self.assertEqual(defaults["date_from"], date(2026, 3, 6))
 		self.assertEqual(defaults["date_to"], date(2026, 6, 30))
+
+	def test_compute_requires_explicit_tracking_boundary_confirmation(self):
+		self.company.write({
+			"l10n_fr_micro_urssaf_tracking_start_date": date(2026, 3, 6),
+			"l10n_fr_micro_urssaf_tracking_start_confirmed": False,
+		})
+		with self.assertRaisesRegex(UserError, "Confirm the URSSAF tracking boundary"):
+			self._declaration().action_compute()
+
+	def test_pos_timestamp_uses_company_timezone(self):
+		self.company.partner_id.tz = "Europe/Paris"
+		declaration_model = self.env["l10n.fr.micro.urssaf.declaration"]
+		self.assertEqual(
+			declaration_model._company_local_date(
+				self.company, datetime(2026, 3, 31, 22, 30),
+			),
+			date(2026, 4, 1),
+		)
+		order = SimpleNamespace(
+			company_id=self.company,
+			date_order=datetime(2026, 3, 30, 12, 0),
+			payment_ids=SimpleNamespace(mapped=lambda _field: [
+				datetime(2026, 3, 31, 20, 0), datetime(2026, 3, 31, 22, 30),
+			]),
+		)
+		self.assertEqual(declaration_model._pos_recognition_date(order), date(2026, 4, 1))
 
 	def test_filing_permanently_closes_depot_sale_dates(self):
 		declaration = self._declaration()
@@ -569,6 +597,7 @@ class TestUrssafDeclaration(TransactionCase):
 			"acre_granted": True,
 		})
 		wizard.action_apply()
+		self.assertTrue(self.company.l10n_fr_micro_urssaf_tracking_start_confirmed)
 		self.assertEqual(self.company.l10n_fr_micro_acre_coefficient, 0.75)
 		self.assertEqual(self.company.l10n_fr_micro_acre_to, date(2027, 6, 30))
 		self.assertEqual(self.company.l10n_fr_micro_urssaf_periodicity, "quarterly")

@@ -9,7 +9,8 @@
 				<group string="French micro-enterprise — URSSAF" groups="account.group_account_manager">
 					<group>
 						<field name="l10n_fr_micro_activity_start_date"/>
-						<field name="l10n_fr_micro_urssaf_tracking_start_date"/>
+						<field name="l10n_fr_micro_urssaf_tracking_start_date" readonly="1"/>
+						<field name="l10n_fr_micro_urssaf_tracking_start_confirmed" readonly="1"/>
 						<field name="l10n_fr_micro_urssaf_periodicity"/>
 						<field name="l10n_fr_micro_accounting_responsible_id"/>
 					</group>

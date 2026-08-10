@@ -22,6 +22,7 @@ class L10nFrMicroUrssafSetupWizard(models.TransientModel):
 			"l10n_fr_micro_urssaf_tracking_start_date": self.tracking_start_date,
 			"l10n_fr_micro_urssaf_periodicity": self.periodicity,
 			"l10n_fr_micro_accounting_responsible_id": self.accounting_responsible_id.id,
+			"l10n_fr_micro_urssaf_tracking_start_confirmed": True,
 		})
 		if self.acre_granted:
 			self.company_id.action_l10n_fr_micro_apply_acre_rule()

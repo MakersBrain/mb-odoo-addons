@@ -1,5 +1,3 @@
-from odoo import fields
-
 from . import models
 
 
@@ -17,7 +15,3 @@ def post_init_hook(env):
 			or latest_filed.date_to > company.l10n_fr_micro_depot_sale_closed_through
 		):
 			company._l10n_fr_micro_advance_depot_sale_horizon(latest_filed.date_to)
-		if not company.l10n_fr_micro_urssaf_tracking_start_date:
-			company.l10n_fr_micro_urssaf_tracking_start_date = env.context.get(
-				"l10n_fr_micro_urssaf_tracking_start_date"
-			) or fields.Date.context_today(company)

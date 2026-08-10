@@ -14,6 +14,11 @@ class ResCompany(models.Model):
 		string="URSSAF ledger tracking starts",
 		help="Receipts before this period boundary were filed outside Odoo and are not claimed.",
 	)
+	l10n_fr_micro_urssaf_tracking_start_confirmed = fields.Boolean(
+		string="URSSAF tracking boundary confirmed",
+		copy=False,
+		help="An Accounting Administrator explicitly confirmed the first receipt date covered by Odoo.",
+	)
 	l10n_fr_micro_urssaf_periodicity = fields.Selection(
 		selection=[("monthly", "Monthly"), ("quarterly", "Quarterly")],
 		string="URSSAF periodicity",
@@ -78,11 +83,16 @@ class ResCompany(models.Model):
 		"l10n_fr_micro_acre_coefficient", "l10n_fr_micro_cfp_kind",
 		"l10n_fr_micro_chamber_kind", "l10n_fr_micro_chamber_zone",
 		"l10n_fr_micro_accounting_responsible_id",
+		"l10n_fr_micro_urssaf_tracking_start_confirmed",
 		"l10n_fr_micro_depot_sale_closed_through",
 		"l10n_fr_micro_depot_sale_horizon_confirmed",
 	}
 
 	def write(self, values):
+		if "l10n_fr_micro_urssaf_tracking_start_date" in values \
+				and "l10n_fr_micro_urssaf_tracking_start_confirmed" not in values \
+				and not is_internal(self.env):
+			values["l10n_fr_micro_urssaf_tracking_start_confirmed"] = False
 		if "l10n_fr_micro_depot_sale_closed_through" in values:
 			self.env.cr.execute(
 				"SELECT id FROM res_company WHERE id = ANY(%s) ORDER BY id FOR UPDATE",

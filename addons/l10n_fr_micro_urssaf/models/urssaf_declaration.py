@@ -301,15 +301,52 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 		return events
 
 	@api.model
-	def _pos_events(self, company, date_from, date_to):
-		orders = self.env["pos.order"].sudo().search([
+	def _company_local_date(self, company, timestamp):
+		if not timestamp:
+			return False
+		timezone = company.partner_id.tz or "UTC"
+		return fields.Datetime.context_timestamp(
+			self.with_context(tz=timezone), fields.Datetime.to_datetime(timestamp),
+		).date()
+
+	@api.model
+	def _pos_recognition_date(self, order):
+		"""Recognize a POS ticket when its last payment completes the receipt."""
+		payment_dates = order.payment_ids.mapped("payment_date")
+		return self._company_local_date(
+			order.company_id, max(payment_dates) if payment_dates else order.date_order,
+		)
+
+	@api.model
+	def _pos_orders_in_period(self, company, date_from, date_to, states):
+		# Search a deliberately wider UTC window, then apply the company's timezone.
+		# The payment search also finds an order kept open longer than that window.
+		utc_from = datetime.combine(date_from - relativedelta(days=1), time.min)
+		utc_to = datetime.combine(date_to + relativedelta(days=1), time.max)
+		order_model = self.env["pos.order"].sudo()
+		orders = order_model.search([
 			("company_id", "=", company.id),
-			("state", "in", ("paid", "done")),
-			("session_id.move_id.date", ">=", date_from),
-			("session_id.move_id.date", "<=", date_to),
+			("state", "in", states),
+			("date_order", ">=", utc_from),
+			("date_order", "<=", utc_to),
 		])
+		payments = self.env["pos.payment"].sudo().search([
+			("company_id", "=", company.id),
+			("pos_order_id.state", "in", states),
+			("payment_date", ">=", utc_from),
+			("payment_date", "<=", utc_to),
+		])
+		orders |= payments.pos_order_id
+		return orders.filtered(
+			lambda order: date_from <= self._pos_recognition_date(order) <= date_to
+		)
+
+	@api.model
+	def _pos_events(self, company, date_from, date_to):
+		orders = self._pos_orders_in_period(company, date_from, date_to, ("paid", "done"))
 		events = []
 		for order in orders:
+			recognition_date = self._pos_recognition_date(order)
 			totals = defaultdict(float)
 			for line in order.lines:
 				categories = set(filter(None, line.tax_ids_after_fiscal_position.mapped(
@@ -321,7 +358,7 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 			for category, amount in totals.items():
 				events.append({
 					"event_key": f"pos:{order.id}:{category}",
-					"date": order.session_id.move_id.date,
+					"date": recognition_date,
 					"category": category,
 					"amount": company.currency_id.round(amount),
 					"source_currency_id": False,
@@ -594,16 +631,11 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 			for event in self._vat_goods_events_for_line(line):
 				if date_from <= event["date"] <= date_to:
 					events.append(event)
-		orders = self.env["pos.order"].sudo().search([
-			("company_id", "=", company.id),
-			("state", "in", ("paid", "done", "invoiced")),
-			("date_order", ">=", datetime.combine(date_from - relativedelta(days=1), time.min)),
-			("date_order", "<=", datetime.combine(date_to + relativedelta(days=1), time.max)),
-		])
+		orders = self._pos_orders_in_period(
+			company, date_from, date_to, ("paid", "done", "invoiced"),
+		)
 		for order in orders:
-			operation_date = fields.Datetime.context_timestamp(self, order.date_order).date()
-			if not date_from <= operation_date <= date_to:
-				continue
+			operation_date = self._pos_recognition_date(order)
 			for line in order.lines:
 				if "bic_goods" in line.tax_ids_after_fiscal_position.mapped("l10n_fr_micro_urssaf_category"):
 					events.append({
@@ -622,6 +654,8 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 			anomalies.append(_("Company activity start date is missing."))
 		if not company.l10n_fr_micro_urssaf_tracking_start_date:
 			anomalies.append(_("URSSAF tracking start date is missing."))
+		elif not company.l10n_fr_micro_urssaf_tracking_start_confirmed:
+			anomalies.append(_("The URSSAF tracking boundary has not been explicitly confirmed."))
 		if not company.l10n_fr_micro_accounting_responsible_id:
 			anomalies.append(_("URSSAF accounting responsible is missing."))
 		if not self.env["l10n.fr.micro.urssaf.threshold"].threshold_for(self.date_to):
@@ -656,26 +690,16 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 	def _pos_anomalies(self):
 		self.ensure_one()
 		anomalies = []
-		sessions = self.env["pos.session"].sudo().search([
-			("company_id", "=", self.company_id.id),
-			("move_id.date", ">=", self.date_from),
-			("move_id.date", "<=", self.date_to),
-			("move_id", "!=", False),
-		])
-		for session in sessions:
-			local_start = fields.Datetime.context_timestamp(self, session.start_at).date()
-			if local_start != session.move_id.date:
-				anomalies.append(_(
-					"POS session %(session)s opened on %(opened)s and posted takings on %(closed)s.",
-					session=session.name, opened=local_start, closed=session.move_id.date,
-				))
-			for order in session.order_ids.filtered(lambda item: item.state in ("paid", "done")):
-				for line in order.lines:
-					if not line.tax_ids_after_fiscal_position.mapped("l10n_fr_micro_urssaf_category"):
-						anomalies.append(_(
-							"POS ticket %(ticket)s / %(line)s has no URSSAF tax category.",
-							ticket=order.name, line=line.full_product_name,
-						))
+		orders = self._pos_orders_in_period(
+			self.company_id, self.date_from, self.date_to, ("paid", "done"),
+		)
+		for order in orders:
+			for line in order.lines:
+				if not line.tax_ids_after_fiscal_position.mapped("l10n_fr_micro_urssaf_category"):
+					anomalies.append(_(
+						"POS ticket %(ticket)s / %(line)s has no URSSAF tax category.",
+						ticket=order.name, line=line.full_product_name,
+					))
 		return anomalies
 
 	def _missing_vat_dates(self):
@@ -863,6 +887,12 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 		for declaration in self:
 			if declaration.state == "filed":
 				raise UserError(_("Reset the filed declaration before recomputing it."))
+			company = declaration.company_id
+			if not company.l10n_fr_micro_urssaf_tracking_start_date \
+					or not company.l10n_fr_micro_urssaf_tracking_start_confirmed:
+				raise UserError(_(
+					"Confirm the URSSAF tracking boundary with the setup wizard before computing declarations."
+				))
 			blockers = declaration._mandate_blockers()
 			if blockers:
 				raise UserError(_(
@@ -870,9 +900,7 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 					date=declaration.date_to,
 					depots=", ".join(blockers.mapped("display_name")),
 				))
-			tracking_start = declaration.company_id.l10n_fr_micro_urssaf_tracking_start_date
-			if not tracking_start:
-				tracking_start = declaration.date_from
+			tracking_start = company.l10n_fr_micro_urssaf_tracking_start_date
 			adjustments = {
 				line.category: (line.manual_adjustment, line.manual_adjustment_reason)
 				for line in declaration.line_ids
