@@ -7,19 +7,30 @@ from odoo.tests import tagged
 
 @tagged("post_install", "-at_install")
 class TestFacturXExport(AccountTestInvoicingCommon):
-	def test_franchise_invoice_without_product_tax_gets_exemption_and_mention(self):
+	def test_native_fiscal_position_maps_tax_and_posting_snapshots_mention(self):
 		company = self.company_data["company"]
 		company.write({
 			"country_id": self.env.ref("base.fr").id,
 			"account_fiscal_country_id": self.env.ref("base.fr").id,
 		})
 		company._l10n_fr_micro_switch("franchise", effective_date="2025-06-01")
+		economic_tax = self.env["account.tax"].search([
+			("company_id", "=", company.id),
+			("type_tax_use", "=", "sale"),
+			("amount", ">", 0),
+		], limit=1).copy({
+			"name": "Test VAT — goods",
+			"tax_scope": "consu",
+			"l10n_fr_micro_urssaf_category": "bic_goods",
+		})
+		company.l10n_fr_micro_goods_tax_id.original_tax_ids = [Command.set(economic_tax.ids)]
 		customer = self.env["res.partner"].create({
-			"name": "Customer without country",
+			"name": "French customer",
+			"country_id": self.env.ref("base.fr").id,
 		})
 		product = self.env["product.product"].create({
-			"name": "Imported taxless ceramic",
-			"taxes_id": [Command.clear()],
+			"name": "Taxed ceramic",
+			"taxes_id": [Command.set(economic_tax.ids)],
 		})
 		invoice = self.env["account.move"].create({
 			"company_id": company.id,
@@ -34,15 +45,40 @@ class TestFacturXExport(AccountTestInvoicingCommon):
 			})],
 		})
 
-		self.assertTrue(invoice.l10n_fr_micro_franchise_invoice)
+		self.assertFalse(invoice.l10n_fr_micro_franchise_invoice)
 		self.assertEqual(invoice.invoice_line_ids.tax_ids, company.l10n_fr_micro_goods_tax_id)
 		self.assertIn("293 B", invoice.taxes_legal_notes)
+		invoice.action_post()
+		self.assertTrue(invoice.l10n_fr_micro_franchise_invoice)
 
-		invoice.invoice_line_ids.tax_ids = [Command.clear()]
+		company._l10n_fr_micro_switch("vat")
+		self.assertTrue(invoice.l10n_fr_micro_franchise_invoice)
 		html, _html_type = self.env.ref("account.account_invoices")._render_qweb_html(
 			"account.report_invoice_with_payments", invoice.ids,
 		)
 		self.assertIn(b"TVA non applicable, article 293 B du CGI", html)
+
+	def test_posting_clears_stale_marker_without_franchise_tax_evidence(self):
+		company = self.company_data["company"]
+		company.write({
+			"country_id": self.env.ref("base.fr").id,
+			"account_fiscal_country_id": self.env.ref("base.fr").id,
+		})
+		invoice = self.env["account.move"].create({
+			"company_id": company.id,
+			"partner_id": self.partner_a.id,
+			"move_type": "out_invoice",
+			"journal_id": self.company_data["default_journal_sale"].id,
+			"l10n_fr_micro_franchise_invoice": True,
+			"invoice_line_ids": [Command.create({
+				"name": "Intentionally taxless sale",
+				"quantity": 1,
+				"price_unit": 100,
+				"tax_ids": [Command.clear()],
+			})],
+		})
+		invoice.action_post()
+		self.assertFalse(invoice.l10n_fr_micro_franchise_invoice)
 
 	def test_franchise_seller_can_export_with_registry_and_without_vat(self):
 		company = self.company_data["company"]

@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class AccountMove(models.Model):
@@ -11,29 +11,20 @@ class AccountMove(models.Model):
 		help="Snapshot used to preserve the legally required Article 293 B mention when the invoice is reprinted.",
 	)
 
-	@api.model
-	def _l10n_fr_micro_values_are_franchise_invoice(self, values):
-		if values.get("move_type") not in ("out_invoice", "out_refund", "out_receipt"):
+	def _l10n_fr_micro_is_franchise_invoice(self):
+		"""Derive the legal snapshot from the taxes actually posted on the invoice."""
+		self.ensure_one()
+		if not self.is_sale_document(include_receipts=True):
 			return False
-		company = self.env["res.company"].browse(values.get("company_id")) or self.env.company
-		if company.l10n_fr_micro_tax_regime != "franchise":
-			return False
-		invoice_date = fields.Date.to_date(values.get("invoice_date")) or fields.Date.context_today(company)
-		return not company.l10n_fr_micro_tax_switch_date or invoice_date >= company.l10n_fr_micro_tax_switch_date
-
-	@api.model_create_multi
-	def create(self, values_list):
-		for values in values_list:
-			if "l10n_fr_micro_franchise_invoice" not in values:
-				values["l10n_fr_micro_franchise_invoice"] = self._l10n_fr_micro_values_are_franchise_invoice(values)
-		return super().create(values_list)
+		invoice_taxes = self.invoice_line_ids.filtered(
+			lambda line: line.display_type == "product"
+		).tax_ids
+		return any(invoice_taxes.mapped("l10n_fr_micro_franchise_tax"))
 
 	def _post(self, soft=True):
-		for move in self.filtered(lambda candidate: candidate.state == "draft"):
-			if self._l10n_fr_micro_values_are_franchise_invoice({
-				"move_type": move.move_type,
-				"company_id": move.company_id.id,
-				"invoice_date": move.invoice_date,
-			}):
-				move.l10n_fr_micro_franchise_invoice = True
-		return super()._post(soft=soft)
+		posted = super()._post(soft=soft)
+		for move in posted.filtered(lambda candidate: candidate.state == "posted"):
+			# Write both outcomes. A draft may have been prepared under a different
+			# regime or date; only final posting evidence is legally relevant.
+			move.l10n_fr_micro_franchise_invoice = move._l10n_fr_micro_is_franchise_invoice()
+		return posted

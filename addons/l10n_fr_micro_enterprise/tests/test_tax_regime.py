@@ -34,6 +34,16 @@ class TestMicroEnterpriseTaxRegime(TransactionCase):
 			"type_tax_use": "sale", "tax_scope": "consu", "amount": 3,
 		})
 
+	def test_new_french_company_requires_explicit_opt_in(self):
+		company = self.env["res.company"].create({
+			"name": "French company without micro opt-in",
+			"country_id": self.env.ref("base.fr").id,
+			"account_fiscal_country_id": self.env.ref("base.fr").id,
+		})
+		self.assertEqual(company.l10n_fr_micro_tax_regime, "unchanged")
+		self.assertFalse(company.l10n_fr_micro_fiscal_position_id)
+		self.assertFalse(company.l10n_fr_micro_goods_tax_id)
+
 	def test_setup_is_idempotent_and_maps_only_standard_vat(self):
 		self.company._l10n_fr_micro_prepare_tax_setup()
 		goods_tax = self.company.l10n_fr_micro_goods_tax_id
