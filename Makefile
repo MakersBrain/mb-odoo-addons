@@ -14,9 +14,12 @@ DISPOSABLE_DB ?= mb_scratch
 # Every addon in this repository, in dependency order. Odoo resolves the order
 # itself, but writing it down means `make install` on an empty database is one
 # command and the reader can see the four trees from SPEC.md.
-MODULES := mb_workshop_base,mb_label,mb_label_pos,mb_ceramics_firing,mb_kiln_bridge,\
+MODULES := mb_workshop_base,mb_label,mb_label_pos,mb_ceramics_firing,mb_ceramics_workflow,mb_kiln_bridge,\
 mb_catalogue_sync,mb_control_bridge,mb_invoice_capture,mb_depot,mb_payment_sumup,\
 mb_pos_sumup,mb_account_payment_sumup,l10n_fr_micro_enterprise,l10n_fr_micro_urssaf
+empty :=
+space := $(empty) $(empty)
+MODULES_ARG := $(subst $(space),,$(MODULES))
 
 # Which tests run. `--test-enable` alone would also run the tests of every
 # dependency Odoo pulls in — all of mail, stock, account and point_of_sale —
@@ -27,7 +30,7 @@ mb_pos_sumup,mb_account_payment_sumup,l10n_fr_micro_enterprise,l10n_fr_micro_urs
 # Override to narrow:  make test TAGS=/mb_label
 # Down to one class:   make test TAGS=/mb_label:TestLabel
 # Or one method:       make test TAGS=/mb_label:TestLabel.test_qr_collision
-TAGS ?= /mb_workshop_base,/mb_label,/mb_label_pos,/mb_ceramics_firing,/mb_kiln_bridge,\
+TAGS ?= /mb_workshop_base,/mb_label,/mb_label_pos,/mb_ceramics_firing,/mb_ceramics_workflow,/mb_kiln_bridge,\
 /mb_catalogue_sync,/mb_control_bridge,/mb_invoice_capture,/mb_depot,/mb_payment_sumup,\
 /mb_pos_sumup,/mb_account_payment_sumup,/l10n_fr_micro_enterprise,/l10n_fr_micro_urssaf
 
@@ -85,10 +88,12 @@ install: ## Install MODULES on DB_NAME, creating the database if needed
 	@$(COMPOSE) exec -T db psql -U $${DB_USER:-odoo} -d postgres -tAc \
 		"select 1 from pg_database where datname='$(DB_NAME)'" | grep -q 1 || \
 		$(ODOO) db init $(DB_NAME)
-	$(ODOO) -d $(DB_NAME) -i $(MODULES) --stop-after-init --log-level=warn
+	$(ODOO) -d $(DB_NAME) -i $(MODULES_ARG) --stop-after-init \
+		--http-port=0 --gevent-port=0 --log-level=warn
 
 upgrade: ## Upgrade MODULES on DB_NAME, running any migration scripts
-	$(ODOO) -d $(DB_NAME) -u $(MODULES) --stop-after-init --log-level=warn
+	$(ODOO) -d $(DB_NAME) -u $(MODULES_ARG) --stop-after-init \
+		--http-port=0 --gevent-port=0 --log-level=warn
 
 configure-ui: ## Apply the streamlined artisan app-switcher layout
 	$(ODOO) shell -d $(DB_NAME) --no-http --log-level=warn \
@@ -96,9 +101,9 @@ configure-ui: ## Apply the streamlined artisan app-switcher layout
 
 test: ## Install MODULES on a fresh disposable database and run their tests
 	@$(MAKE) --no-print-directory reset-poc
-	$(ODOO) -d $(DISPOSABLE_DB) -i $(MODULES) \
-		--test-tags "$(strip $(TAGS))" \
-		--stop-after-init --log-level=test
+	$(ODOO) -d $(DISPOSABLE_DB) -i $(MODULES_ARG) \
+		--test-tags "$(subst $(space),,$(TAGS))" \
+		--stop-after-init --http-port=0 --gevent-port=0 --log-level=test
 
 check: lint ## Everything CI runs that needs no container
 	python3 tools/check_addons.py

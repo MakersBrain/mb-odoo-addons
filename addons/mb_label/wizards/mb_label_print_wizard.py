@@ -36,9 +36,11 @@ class MbLabelPrintWizard(models.TransientModel):
                 ("company_id", "=", self.env.company.id), ("active", "=", True)], limit=1)
         if template:
             values.setdefault("template_id", template.id)
-        template_id = values.get("product_tmpl_id")
-        if template_id and not values.get("product_id"):
-            product_template = self.env["product.template"].browse(template_id)
+        product_template_id = values.get("product_tmpl_id")
+        if product_template_id and not values.get("product_id"):
+            product_template = self.env["product.template"].browse(
+                product_template_id
+            )
             if len(product_template.product_variant_ids) == 1:
                 values["product_id"] = product_template.product_variant_id.id
         product_id = values.get("product_id")
@@ -49,8 +51,10 @@ class MbLabelPrintWizard(models.TransientModel):
     @api.onchange("product_tmpl_id")
     def _onchange_product_template(self):
         variants = self.product_tmpl_id.product_variant_ids
-        self.product_id = variants if len(variants) == 1 else False
-        self.lot_id = False
+        if self.product_id not in variants:
+            self.product_id = variants if len(variants) == 1 else False
+        if self.lot_id and self.lot_id.product_id != self.product_id:
+            self.lot_id = False
 
     @api.onchange("product_id")
     def _onchange_product(self):

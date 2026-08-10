@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mb_bisque_inspection_view_form" model="ir.ui.view">
+        <field name="name">mb.bisque.inspection.form</field>
+        <field name="model">mb.bisque.inspection</field>
+        <field name="arch" type="xml">
+            <form string="Inspect bisque firing">
+                <group>
+                    <field name="production_id" readonly="1" />
+                    <field name="selected_quantity" />
+                    <field name="destination_location_id" />
+                    <field name="accepted_quantity" />
+                    <field name="loss_quantity" />
+                    <field name="loss_reason" invisible="not loss_quantity" />
+                    <field name="loss_operation_id" />
+                    <field name="board_id" />
+                    <field name="firing_id" />
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Accept bisque stock"
+                            class="oe_highlight" />
+                    <button string="Cancel" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -27,6 +27,16 @@
 						<field name="l10n_fr_micro_acre_coefficient" invisible="not l10n_fr_micro_acre_granted"/>
 						<button name="action_l10n_fr_micro_apply_acre_rule" type="object" string="Derive ACRE dates and coefficient" class="btn-secondary"/>
 					</group>
+					<group string="Depot-sale closing horizon">
+						<field name="l10n_fr_micro_depot_sale_closed_through"
+						       readonly="l10n_fr_micro_depot_sale_horizon_confirmed"/>
+						<field name="l10n_fr_micro_depot_sale_horizon_confirmed" readonly="1"/>
+						<button name="action_l10n_fr_micro_confirm_depot_sale_horizon"
+						        type="object" string="Confirm permanent horizon"
+						        class="btn-primary"
+						        invisible="l10n_fr_micro_depot_sale_horizon_confirmed"
+						        confirm="After confirmation this horizon can only move forward. Previously closed dates will never become available to the depot-sale interface."/>
+					</group>
 				</group>
 			</xpath>
 		</field>

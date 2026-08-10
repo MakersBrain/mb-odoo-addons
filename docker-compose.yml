@@ -46,6 +46,16 @@ services:
       PORT: 5432
       USER: ${DB_USER:-odoo}
       PASSWORD: ${DB_PASSWORD:-odoo}
+      # Equivalent to --dev=reload: re-exec the server when a mounted .py file
+      # changes. Without it, `make upgrade` runs as a separate process and
+      # updates the database but not this worker's already-imported Python, so a
+      # view referring to a field added in the same change parses against a model
+      # that does not have it and the client dies with "field is undefined".
+      # It does not cover XML: a view or data change still needs `make upgrade`.
+      #
+      # An env var rather than a line in odoo.conf because dev_mode is declared
+      # file_exportable=False. Development only.
+      ODOO_DEV: ${ODOO_DEV:-reload}
     volumes:
       - odoo-data:/var/lib/odoo
       - ./config/odoo.conf:/etc/odoo/odoo.conf:ro

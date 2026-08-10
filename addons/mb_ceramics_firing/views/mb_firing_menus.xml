@@ -3,15 +3,15 @@
     <menuitem
         id="menu_mb_firing"
         name="Firings"
-        parent="mb_workshop_base.menu_mb_workshop_root"
+        parent="mb_workshop_base.menu_mb_ceramics_production"
         action="mb_firing_action"
-        sequence="30"
+        sequence="40"
     />
     <menuitem
         id="menu_mb_kiln"
         name="Kilns"
-        parent="mb_workshop_base.menu_mb_workshop_root"
+        parent="mb_workshop_base.menu_mb_ceramics_configuration"
         action="mb_kiln_action"
-        sequence="40"
+        sequence="10"
     />
 </odoo>

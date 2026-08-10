@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mb_bisque_session_view_list" model="ir.ui.view">
+        <field name="name">mb.bisque.session.list</field>
+        <field name="model">mb.bisque.session</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="date" />
+                <field name="board_id" />
+                <field name="source_location_id" />
+                <field name="bisque_location_id" />
+                <field name="state" widget="badge" />
+            </list>
+        </field>
+    </record>
+    <record id="mb_bisque_session_view_form" model="ir.ui.view">
+        <field name="name">mb.bisque.session.form</field>
+        <field name="model">mb.bisque.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Prepare bisque"
+                            class="oe_highlight" invisible="state != 'draft'" />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1" /></h1></div>
+                    <group>
+                        <group>
+                            <field name="date" />
+                            <field name="board_id" />
+                        </group>
+                        <group>
+                            <field name="source_location_id" />
+                            <field name="bisque_location_id" />
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="state != 'draft'">
+                        <list editable="bottom">
+                            <field name="green_product_id" />
+                            <field name="green_lot_id" />
+                            <field name="available_quantity" readonly="1" />
+                            <field name="quantity" />
+                            <field name="bisque_product_id" />
+                            <field name="bom_id" />
+                            <field name="production_id" readonly="1" />
+                        </list>
+                    </field>
+                    <field name="production_ids" readonly="1" />
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="mb_bisque_session_action" model="ir.actions.act_window">
+        <field name="name">Prepare Bisque</field>
+        <field name="res_model">mb.bisque.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

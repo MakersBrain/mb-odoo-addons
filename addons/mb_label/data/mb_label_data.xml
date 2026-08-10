@@ -32,5 +32,45 @@
         <value eval="[ref('template_product_40x30')]"/>
         <value eval="{'current_version_id': ref('template_product_40x30_v1')}"/>
     </function>
+
+    <!-- A batch label kept with a damp-box lot, ware box, or bisque batch.
+         Stage and quantity are manual bindings so the ceramics workflow can
+         prefill the exact physical context without teaching the generic label
+         renderer where a stock batch happens to be sitting. -->
+    <record id="template_wip_lot_30x20" model="mb.label.template">
+        <field name="name">WIP lot label 30 × 20 mm</field>
+        <field name="width_mm">30</field>
+        <field name="height_mm">20</field>
+        <field name="dpi">203</field>
+        <field name="printer_target">phomemo</field>
+    </record>
+    <record id="template_wip_lot_30x20_v1" model="mb.label.template.version">
+        <field name="template_id" ref="template_wip_lot_30x20"/>
+        <field name="number">1</field>
+        <field name="width_mm">30</field>
+        <field name="height_mm">20</field>
+        <field name="dpi">203</field>
+        <field name="printer_target">phomemo</field>
+        <field name="qr_payload_template">{{qr}}</field>
+        <field name="document_json" eval="{
+            'schema': 1,
+            'elements': [
+                {'id': 'stage', 'type': 'text', 'x': 1, 'y': 0.8, 'width': 17, 'height': 2.7, 'text': '{{manual.stage|default:WIP}}', 'font_size': 1.8, 'bold': True, 'z': 1},
+                {'id': 'name', 'type': 'text', 'x': 1, 'y': 3.8, 'width': 17, 'height': 4, 'text': '{{product.name}}', 'font_size': 2.1, 'bold': True, 'z': 2},
+                {'id': 'lot', 'type': 'text', 'x': 1, 'y': 8.2, 'width': 17, 'height': 3, 'text': '{{lot.name}}', 'font_size': 1.9, 'bold': True, 'z': 3},
+                {'id': 'quantity', 'type': 'text', 'x': 1, 'y': 11.6, 'width': 17, 'height': 2.7, 'text': 'Qty {{manual.quantity|default:—}}', 'font_size': 1.8, 'z': 4},
+                {'id': 'sku', 'type': 'text', 'x': 1, 'y': 15.3, 'width': 17, 'height': 2.4, 'text': '{{product.default_code}}', 'font_size': 1.5, 'z': 5},
+                {'id': 'qr', 'type': 'qr', 'x': 19, 'y': 1, 'width': 10, 'height': 10, 'data': '{{qr}}', 'quiet_zone': 0, 'z': 6}
+            ]
+        }"/>
+    </record>
+  </data>
+  <!-- This assignment intentionally runs on upgrades. Odoo creates new records
+       inside noupdate data, but does not replay functions in that block. -->
+  <data>
+      <function model="mb.label.template" name="write">
+          <value eval="[ref('template_wip_lot_30x20')]"/>
+          <value eval="{'current_version_id': ref('template_wip_lot_30x20_v1')}"/>
+      </function>
   </data>
 </odoo>

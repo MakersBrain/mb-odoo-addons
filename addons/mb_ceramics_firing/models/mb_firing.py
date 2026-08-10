@@ -1,7 +1,8 @@
 import json
+from datetime import timedelta
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class MbFiring(models.Model):
@@ -135,6 +136,45 @@ class MbFiring(models.Model):
         "A provider firing may only be imported once.",
     )
 
+    @api.constrains("kiln_id", "program_id", "kind", "company_id", "workorder_ids")
+    def _check_load_compatibility(self):
+        for firing in self:
+            if firing.kiln_id.company_id != firing.company_id:
+                raise ValidationError(_(
+                    "%(firing)s and kiln %(kiln)s must belong to the same company.",
+                    firing=firing.display_name,
+                    kiln=firing.kiln_id.display_name,
+                ))
+            if firing.program_id:
+                if firing.program_id.kiln_id != firing.kiln_id:
+                    raise ValidationError(_(
+                        "Programme %(program)s belongs to %(program_kiln)s, not %(kiln)s.",
+                        program=firing.program_id.display_name,
+                        program_kiln=firing.program_id.kiln_id.display_name,
+                        kiln=firing.kiln_id.display_name,
+                    ))
+                if firing.program_id.kind != firing.kind:
+                    raise ValidationError(_(
+                        "Programme %(program)s is for %(program_kind)s firing, not %(kind)s.",
+                        program=firing.program_id.display_name,
+                        program_kind=firing.program_id.kind,
+                        kind=firing.kind,
+                    ))
+                if (firing.kiln_id.max_temperature
+                        and firing.program_id.peak_temperature
+                        and firing.program_id.peak_temperature
+                        > firing.kiln_id.max_temperature):
+                    raise ValidationError(_(
+                        "Programme %(program)s peaks at %(peak)s C, above %(kiln)s's "
+                        "maximum of %(maximum)s C.",
+                        program=firing.program_id.display_name,
+                        peak=firing.program_id.peak_temperature,
+                        kiln=firing.kiln_id.display_name,
+                        maximum=firing.kiln_id.max_temperature,
+                    ))
+            for workorder in firing.workorder_ids:
+                workorder._mb_validate_firing(firing)
+
     def _replace_attachment(self, field_name, filename, document):
         """Write a JSON attachment and drop the one it supersedes.
 
@@ -197,14 +237,43 @@ class MbFiring(models.Model):
         return super().create(vals_list)
 
     def action_start(self):
-        self.write({"state": "firing", "date_start": fields.Datetime.now()})
+        for firing in self:
+            if firing.state != "draft":
+                raise UserError(_("Only a loading firing can be started."))
+            firing._check_load_compatibility()
+            firing.write({"state": "firing", "date_start": fields.Datetime.now()})
+        return True
 
     def action_finish(self):
-        self.write({"state": "cooling", "date_end": fields.Datetime.now()})
+        for firing in self:
+            if firing.state != "firing":
+                raise UserError(_("Only a firing in progress can enter cooling."))
+            ended = fields.Datetime.now()
+            cooling_end = False
+            if firing.program_id:
+                cooling_end = ended + timedelta(hours=firing.program_id.cooling_hours)
+            firing.write({
+                "state": "cooling",
+                "date_end": ended,
+                "cooling_end": cooling_end,
+            })
+        return True
+
+    def _finish_loaded_workorders(self):
+        """Finish this load once; never advance an unrelated later operation."""
+        for firing in self:
+            open_orders = firing.workorder_ids.filtered(
+                lambda order: order.state not in ("done", "cancel"))
+            if open_orders:
+                open_orders.button_finish()
 
     def action_unload(self):
         """Release the load for labelling, refusing while it is still hot."""
         for firing in self:
+            if firing.state == "done":
+                continue
+            if firing.state != "cooling":
+                raise UserError(_("Only a cooling firing can be unloaded."))
             if firing.cooling_end and firing.cooling_end > fields.Datetime.now():
                 raise UserError(_(
                     "%(name)s is cooling until %(until)s. Unloading now needs the "
@@ -213,16 +282,22 @@ class MbFiring(models.Model):
                     name=firing.name,
                     until=firing.cooling_end,
                 ))
+            firing._finish_loaded_workorders()
             firing.state = "done"
         return self.mapped("carrier_ids")
 
     def action_force_unload(self):
         """Unload before cooling has finished, on the record."""
         for firing in self:
+            if firing.state == "done":
+                continue
+            if firing.state != "cooling":
+                raise UserError(_("Only a cooling firing can be force-unloaded."))
             if not firing.interruption_reason:
                 raise UserError(_(
                     "Record why %s was opened early before forcing it.",
                     firing.name,
                 ))
+            firing._finish_loaded_workorders()
             firing.write({"cooling_interrupted": True, "state": "done"})
         return self.mapped("carrier_ids")

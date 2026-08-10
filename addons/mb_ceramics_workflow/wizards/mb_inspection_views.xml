@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mb_inspection_view_form" model="ir.ui.view">
+        <field name="name">mb.inspection.form</field>
+        <field name="model">mb.inspection</field>
+        <field name="arch" type="xml">
+            <form string="Unload and inspect">
+                <group>
+                    <field name="production_id" />
+                    <field name="selected_quantity" />
+                    <field name="accepted_quantity" />
+                    <field name="second_quantity" />
+                    <field name="second_product_id" invisible="not second_quantity" />
+                    <field name="seconds_location_id" required="second_quantity &gt; 0"
+                           invisible="not second_quantity" />
+                    <field name="loss_quantity" />
+                    <field name="loss_reason" required="loss_quantity &gt; 0"
+                           invisible="not loss_quantity" />
+                    <field name="loss_operation_id" invisible="not loss_quantity" />
+                    <field name="board_id" invisible="not loss_quantity" />
+                    <field name="firing_id" invisible="not loss_quantity" />
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Complete inspection"
+                            class="btn-primary" />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

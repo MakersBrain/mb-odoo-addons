@@ -107,6 +107,7 @@ class TestMeasuredDuration(TransactionCase):
         cls.program = cls.env["mb.kiln.program"].create({
             "kiln_id": cls.kiln.id,
             "name": "Programme 4",
+            "kind": "glaze",
             "firing_hours": 11.0,
         })
 

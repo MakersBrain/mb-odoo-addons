@@ -117,8 +117,8 @@
     <menuitem
         id="menu_mb_kiln_connection"
         name="Kiln connections"
-        parent="mb_workshop_base.menu_mb_workshop_root"
+        parent="mb_workshop_base.menu_mb_ceramics_configuration"
         action="mb_kiln_connection_action"
-        sequence="50"
+        sequence="20"
     />
 </odoo>

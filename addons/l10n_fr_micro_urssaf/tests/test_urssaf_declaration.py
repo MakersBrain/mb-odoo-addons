@@ -102,6 +102,153 @@ class TestUrssafDeclaration(TransactionCase):
 		self.assertEqual(defaults["date_from"], date(2026, 3, 6))
 		self.assertEqual(defaults["date_to"], date(2026, 6, 30))
 
+	def test_filing_permanently_closes_depot_sale_dates(self):
+		declaration = self._declaration()
+		declaration.action_file()
+		self.assertEqual(
+			self.company.l10n_fr_micro_depot_sale_closed_through,
+			date(2026, 6, 30),
+		)
+
+		declaration.reset_reason = "Correct the filed declaration"
+		declaration.action_reset_to_draft()
+		self.assertEqual(declaration.state, "draft")
+		self.assertEqual(
+			self.company.l10n_fr_micro_depot_sale_closed_through,
+			date(2026, 6, 30),
+			"reopening the declaration must not reopen depot-sale dates",
+		)
+		with self.assertRaisesRegex(ValidationError, "cannot be reduced"):
+			self.company.l10n_fr_micro_depot_sale_closed_through = date(2026, 5, 31)
+		self.company._l10n_fr_micro_advance_depot_sale_horizon(date(2026, 5, 31))
+		self.assertEqual(
+			self.company.l10n_fr_micro_depot_sale_closed_through,
+			date(2026, 6, 30),
+			"filing an older period must leave the later permanent horizon intact",
+		)
+
+	def test_filed_horizon_blocks_depot_report_even_after_reset(self):
+		declaration = self._declaration()
+		declaration.action_file()
+		declaration.reset_reason = "Accounting correction only"
+		declaration.action_reset_to_draft()
+		self.company.action_l10n_fr_micro_confirm_depot_sale_horizon()
+		gallery = self.env["res.partner"].create({
+			"name": "Closed-period gallery", "is_company": True,
+		})
+		self.env["mb.depot.create"].create({
+			"partner_id": gallery.id,
+			"commission": 40.0,
+			"legal_structure": "resale",
+		}).action_create()
+		depot = self.env["stock.warehouse"].search([
+			("is_depot", "=", True), ("depot_partner_id", "=", gallery.id),
+		]).ensure_one()
+		product = self.env["product.product"].create({
+			"name": "Late reported bowl", "type": "consu", "is_storable": True,
+			"invoice_policy": "delivery", "list_price": 100.0,
+		})
+		report = self.env["mb.depot.sale.report"].create({
+			"depot_warehouse_id": depot.id,
+			"external_reference": "CLOSED-URSSAF-001",
+			"line_ids": [fields.Command.create({
+				"sold_at": fields.Datetime.to_datetime("2026-06-15 12:00:00"),
+				"product_id": product.id,
+				"quantity": 1.0,
+				"reported_public_unit_price": 100.0,
+				"reported_commission_percentage": 40.0,
+			})],
+		})
+
+		with self.assertRaisesRegex(ValidationError, "permanently closed"):
+			report._validate_dates()
+		self.env.user.group_ids |= self.env.ref("mb_depot.group_depot_sale_manager")
+		for user in (self.env.user, self.env.ref("base.user_root")):
+			with self.assertRaisesRegex(ValidationError, "permanently closed"):
+				report.with_user(user).action_process()
+
+	def test_unconfirmed_migrated_horizon_blocks_depot_processing(self):
+		self.company.with_context(**internal_context()).write({
+			"l10n_fr_micro_depot_sale_horizon_confirmed": False,
+		})
+		report = self.env["mb.depot.sale.report"].new({"company_id": self.company.id})
+		with self.assertRaisesRegex(ValidationError, "must confirm"):
+			report._validate_closed_period_configuration()
+
+	def test_depot_invoice_is_urssaf_turnover_only_when_paid(self):
+		self.env.user.group_ids |= self.env.ref("mb_depot.group_depot_sale_manager")
+		self.company.action_l10n_fr_micro_confirm_depot_sale_horizon()
+		gallery = self.env["res.partner"].create({
+			"name": "Paid consolidated depot", "is_company": True,
+		})
+		self.env["mb.depot.create"].create({
+			"partner_id": gallery.id,
+			"commission": 40.0,
+			"legal_structure": "resale",
+		}).action_create()
+		depot = self.env["stock.warehouse"].search([
+			("is_depot", "=", True), ("depot_partner_id", "=", gallery.id),
+		]).ensure_one()
+		home = self.env["stock.warehouse"].search([
+			("company_id", "=", self.company.id), ("id", "!=", depot.id),
+		], limit=1)
+		product = self.env["product.product"].create({
+			"name": "Paid depot bowl", "type": "consu", "is_storable": True,
+			"invoice_policy": "delivery", "list_price": 100.0,
+			"taxes_id": [fields.Command.set(self.company.l10n_fr_micro_goods_tax_id.ids)],
+		})
+		placement = self.env["stock.move"].create({
+			"product_id": product.id,
+			"product_uom_qty": 1.0,
+			"location_id": home.lot_stock_id.id,
+			"location_dest_id": depot.lot_stock_id.id,
+		})
+		placement._action_confirm()
+		placement.move_line_ids = [fields.Command.create({
+			"product_id": product.id,
+			"location_id": home.lot_stock_id.id,
+			"location_dest_id": depot.lot_stock_id.id,
+			"quantity": 1.0,
+			"picked": True,
+		})]
+		placement.picked = True
+		placement._action_done()
+		placement.write({"date": fields.Datetime.to_datetime("2026-07-20 12:00:00")})
+		placement.move_line_ids.date = fields.Datetime.to_datetime("2026-07-20 12:00:00")
+		report = self.env["mb.depot.sale.report"].create({
+			"depot_warehouse_id": depot.id,
+			"external_reference": "PAYMENT-CABA-001",
+			"create_draft_invoice": True,
+			"line_ids": [fields.Command.create({
+				"sold_at": fields.Datetime.to_datetime("2026-08-01 12:00:00"),
+				"product_id": product.id,
+				"quantity": 1.0,
+				"reported_public_unit_price": 100.0,
+				"reported_commission_percentage": 40.0,
+			})],
+		})
+		report.action_process()
+		invoice = report.invoice_ids
+		invoice.action_post()
+		declaration = self.env["l10n.fr.micro.urssaf.declaration"].create({
+			"company_id": self.company.id,
+			"date_from": date(2026, 8, 1),
+			"date_to": date(2026, 8, 31),
+			"periodicity": "monthly",
+		})
+
+		declaration.action_compute()
+		self.assertEqual(declaration.total_declared, 0.0)
+		self._pay(invoice, invoice.amount_total, date(2026, 8, 9))
+		declaration.action_compute()
+
+		goods = declaration.line_ids.filtered(lambda line: line.category == "bic_goods")
+		self.assertEqual(goods.declared_turnover, 60.0)
+
+	def test_root_menu_is_available_to_accounting_managers(self):
+		menu = self.env.ref("l10n_fr_micro_urssaf.menu_urssaf_root")
+		self.assertIn(self.env.ref("account.group_account_manager"), menu.group_ids)
+
 	def test_recompute_preserves_reasoned_adjustment(self):
 		declaration = self._declaration()
 		declaration.action_compute()

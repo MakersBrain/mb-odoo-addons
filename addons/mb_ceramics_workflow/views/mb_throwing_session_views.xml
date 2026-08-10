@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mb_throwing_session_view_list" model="ir.ui.view">
+        <field name="name">mb.throwing.session.list</field>
+        <field name="model">mb.throwing.session</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="date" />
+                <field name="clay_product_id" />
+                <field name="clay_lot_id" />
+                <field name="damp_location_id" />
+                <field name="state" widget="badge" />
+            </list>
+        </field>
+    </record>
+    <record id="mb_throwing_session_view_form" model="ir.ui.view">
+        <field name="name">mb.throwing.session.form</field>
+        <field name="model">mb.throwing.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Record throwing"
+                            class="oe_highlight" invisible="state != 'draft'" />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1" /></h1></div>
+                    <group>
+                        <group>
+                            <field name="date" />
+                            <field name="clay_product_id" />
+                            <field name="clay_lot_id" />
+                        </group>
+                        <group>
+                            <field name="source_location_id" />
+                            <field name="damp_location_id" />
+                            <field name="board_id" />
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="state != 'draft'">
+                        <list editable="bottom">
+                            <field name="blank_product_id" />
+                            <field name="quantity" />
+                            <field name="clay_quantity" />
+                            <field name="bom_id" />
+                            <field name="blank_lot_id" readonly="1" />
+                            <field name="production_id" readonly="1" />
+                            <button name="action_print_wip_label" type="object"
+                                    string="Print label" icon="fa-tag"
+                                    invisible="not blank_lot_id" />
+                        </list>
+                    </field>
+                    <group><field name="note" /></group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="mb_throwing_session_action" model="ir.actions.act_window">
+        <field name="name">Throwing sessions</field>
+        <field name="res_model">mb.throwing.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

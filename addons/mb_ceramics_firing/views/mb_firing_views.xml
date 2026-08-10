@@ -50,6 +50,10 @@
                         <group string="Load">
                             <field name="kiln_id" />
                             <field name="kind" />
+                            <field
+                                name="program_id"
+                                domain="[('kiln_id', '=', kiln_id), ('kind', '=', kind)]"
+                            />
                         </group>
                         <group string="Schedule">
                             <field name="date_start" />

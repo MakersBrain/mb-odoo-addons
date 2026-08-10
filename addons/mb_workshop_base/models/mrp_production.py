@@ -49,7 +49,7 @@ class MrpProduction(models.Model):
         for production in self:
             if not production.product_id.mb_food_contact:
                 continue
-            if not production.lot_producing_ids:
+            if production.qty_producing and not production.lot_producing_ids:
                 raise UserError(_(
                     "%s produces a food-contact article and needs a lot number "
                     "before it can be marked done.",

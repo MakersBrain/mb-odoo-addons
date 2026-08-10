@@ -1,10 +1,10 @@
 # MakersBrain Odoo addon specification
 
-- Status: **describes what is built**, 7 August 2026
+- Status: **describes what is built**, 9 August 2026
 - Target: Odoo 19 Community, one PostgreSQL database per artisan
 - Licence: LGPL-3 throughout, deliberately (see [Licence boundary](#licence-boundary))
 
-This document specifies the eleven addons that exist in `addons/`. It is written
+This document specifies the addon suite in `addons/`. It is written
 from the code, the manifests and the installed state of the running database,
 not from intent.
 
@@ -23,7 +23,7 @@ A module is listed here only if its code exists. Nothing below is planned work.
 - [Cross-cutting rules](#cross-cutting-rules)
 - [Workshop foundation](#workshop-foundation) — `mb_workshop_base`
 - [Labels and piece identity](#labels-and-piece-identity) — `mb_label`, `mb_label_pos`
-- [Firing](#firing) — `mb_ceramics_firing`, `mb_kiln_bridge`
+- [Firing](#firing) — `mb_ceramics_firing`, `mb_ceramics_workflow`, `mb_kiln_bridge`
 - [Materials](#materials) — `mb_catalogue_sync`
 - [Consignment](#consignment) — `mb_depot`
 - [Payments](#payments) — `mb_payment_sumup`, `mb_pos_sumup`, `mb_account_payment_sumup`
@@ -44,6 +44,7 @@ stock, mrp
     ├── mb_label ─────────── web
     │   └── mb_label_pos ─── point_of_sale
     ├── mb_ceramics_firing ─ mrp, maintenance
+    │   ├── mb_ceramics_workflow ─ throwing, boards, inspection, genealogy
     │   └── mb_kiln_bridge ─ ROHDE myKiln connector
     └── mb_catalogue_sync ── product, purchase, uom
 
@@ -61,10 +62,11 @@ l10n_fr_account, account_edi_ubl_cii
 
 | Addon | Version | Owns | Live state |
 | --- | --- | --- | --- |
-| `mb_workshop_base` | 19.0.1.2.0 | Food-contact declaration, derived tracking, migration tests, seeded work centres, continuous calendar | installed |
+| `mb_workshop_base` | 19.0.1.4.1 | Food-contact declaration, derived tracking, migration tests, seeded work centres, continuous calendar | installed |
 | `mb_label` | 19.0.1.0.0 | Label templates and immutable versions, QR aliases, deterministic renderer, Owl editor, print jobs, BLE printer adapters | installed |
 | `mb_label_pos` | 19.0.1.0.0 | Bounded alias projection into POS, QR resolution, fall-through to native barcodes | installed |
-| `mb_ceramics_firing` | 19.0.1.3.0 | `mb.firing` as the kiln load, kiln records, controller programmes and segments, cooling hold, work-centre creation | installed |
+| `mb_ceramics_firing` | 19.0.2.0.0 | `mb.firing` as the kiln load, kiln records, controller programmes and segments, cooling hold, work-centre creation | installed |
+| `mb_ceramics_workflow` | 19.0.1.0.0 | Throwing and finishing sessions, WIP boards, kiln loading, inspection, losses and firing-aware traceability | installed |
 | `mb_kiln_bridge` | 19.0.1.2.0 | myKiln connection, read-only client, normalization, polling cron, programme derivation | installed |
 | `mb_catalogue_sync` | 19.0.1.3.0 | On-demand import of curated manufacturer identities and supplier offers | installed |
 | `mb_depot` | 19.0.1.0.0 | Depot locations, creation wizard, commission pricelist, ageing, statement, bon de dépôt | installed |

@@ -2,7 +2,7 @@
     "name": "Makersbrain Label Studio",
     "summary": "Design, version, render and print product and piece labels.",
     "description": "Versioned thermal-label design and product/lot printing.",
-    "version": "19.0.1.0.1",
+    "version": "19.0.1.1.1",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",

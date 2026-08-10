@@ -67,6 +67,21 @@ class TestLabelVerticalSlice(TransactionCase):
         self.assertAlmostEqual(float(page.mediabox.width) * 25.4 / 72, 40, places=2)
         self.assertAlmostEqual(float(page.mediabox.height) * 25.4 / 72, 30, places=2)
 
+    def test_wip_lot_template_renders_green_or_bisque_batch_at_30x20(self):
+        template = self.env.ref("mb_label.template_wip_lot_30x20")
+        self.assertEqual((template.width_mm, template.height_mm), (30, 20))
+        payload = self.env["mb.label.print.job"].create_rendered(
+            self.product.id,
+            self.lot.id,
+            template.id,
+            manual_values={"stage": "BISQUE", "quantity": "4"},
+        )
+        job = self.env["mb.label.print.job"].browse(payload["id"])
+        self.assertEqual(job.bindings_snapshot["manual.stage"], "BISQUE")
+        self.assertEqual(job.bindings_snapshot["manual.quantity"], "4")
+        image = Image.open(io.BytesIO(base64.b64decode(job.preview_png)))
+        self.assertEqual(image.size, (240, 160))
+
     def test_serial_label_mints_durable_alias(self):
         first = self.env["mb.label.print.job"].create_rendered(
             self.product.id, self.lot.id, self.template.id)
@@ -223,6 +238,19 @@ class TestLabelVerticalSlice(TransactionCase):
         self.assertEqual(create_lot["context"]["default_lot_id"], self.lot.id)
         print_lot = self.lot.action_mb_print_label()
         self.assertEqual(print_lot["context"]["default_lot_id"], self.lot.id)
+
+    def test_label_wizard_preserves_a_valid_preselected_lot_on_initial_onchange(self):
+        action = self.lot.action_mb_print_label()
+        wizard_model = self.env["mb.label.print.wizard"].with_context(
+            **action["context"]
+        )
+        defaults = wizard_model.default_get(list(wizard_model._fields))
+        wizard = wizard_model.new(defaults)
+
+        wizard._onchange_product_template()
+
+        self.assertEqual(wizard.product_id, self.product)
+        self.assertEqual(wizard.lot_id, self.lot)
 
     def test_editor_settings_and_parity_features_are_snapshotted(self):
         payload = self.template.save_editor_version(document(

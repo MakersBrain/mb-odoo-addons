@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem id="menu_mb_throwing_session" name="Record Throwing"
+              parent="mb_workshop_base.menu_mb_ceramics_production"
+              action="mb_throwing_session_action" sequence="10" />
+    <menuitem id="menu_mb_bisque_session" name="Prepare Bisque"
+              parent="mb_workshop_base.menu_mb_ceramics_production"
+              action="mb_bisque_session_action" sequence="20" />
+    <menuitem id="menu_mb_glazing_session" name="Start Glazing"
+              parent="mb_workshop_base.menu_mb_ceramics_production"
+              action="mb_glazing_session_action" sequence="30" />
+    <menuitem id="menu_mb_blank_stock" name="Blank Stock"
+              parent="mb_workshop_base.menu_mb_ceramics_stock_quality"
+              action="mb_blank_stock_action" sequence="10" />
+    <menuitem id="menu_mb_bisque_stock" name="Bisque Stock"
+              parent="mb_workshop_base.menu_mb_ceramics_stock_quality"
+              action="mb_bisque_stock_action" sequence="20" />
+    <menuitem id="menu_mb_board" name="Ware Boards"
+              parent="mb_workshop_base.menu_mb_ceramics_stock_quality"
+              action="mb_board_action" sequence="30" />
+    <menuitem id="menu_mb_production_loss" name="Production Losses"
+              parent="mb_workshop_base.menu_mb_ceramics_stock_quality"
+              action="mb_production_loss_action" sequence="40" />
+    <menuitem id="menu_mb_finishing_session" name="Legacy Finish Blanks"
+              parent="mb_workshop_base.menu_mb_ceramics_configuration"
+              action="mb_finishing_session_action" sequence="90" />
+</odoo>

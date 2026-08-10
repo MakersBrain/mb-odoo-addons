@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="mb_package_type_ware_board" model="stock.package.type">
+            <field name="name">Ware board</field>
+            <field name="package_use">reusable</field>
+        </record>
+        <record id="seq_mb_throwing_session" model="ir.sequence">
+            <field name="name">Throwing session</field>
+            <field name="code">mb.throwing.session</field>
+            <field name="prefix">THR/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False" />
+        </record>
+        <record id="seq_mb_finishing_session" model="ir.sequence">
+            <field name="name">Finishing session</field>
+            <field name="code">mb.finishing.session</field>
+            <field name="prefix">FIN/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False" />
+        </record>
+        <record id="seq_mb_blank_lot" model="ir.sequence">
+            <field name="name">Ceramics blank lot</field>
+            <field name="code">mb.blank.lot</field>
+            <field name="prefix">BLK/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False" />
+        </record>
+        <record id="seq_mb_finished_identity" model="ir.sequence">
+            <field name="name">Finished ceramics identity</field>
+            <field name="code">mb.finished.identity</field>
+            <field name="prefix">PIECE/%(year)s/</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False" />
+        </record>
+        <record id="seq_mb_bisque_session" model="ir.sequence">
+            <field name="name">Bisque session</field>
+            <field name="code">mb.bisque.session</field>
+            <field name="prefix">BIS/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False" />
+        </record>
+        <record id="seq_mb_bisque_lot" model="ir.sequence">
+            <field name="name">Bisque ware lot</field>
+            <field name="code">mb.bisque.lot</field>
+            <field name="prefix">BSQ/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False" />
+        </record>
+        <record id="seq_mb_glazing_session" model="ir.sequence">
+            <field name="name">Glazing session</field>
+            <field name="code">mb.glazing.session</field>
+            <field name="prefix">GLZ/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False" />
+        </record>
+    </data>
+</odoo>

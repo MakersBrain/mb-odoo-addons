@@ -958,6 +958,9 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 			declaration.action_compute()
 			if declaration.blocking_anomaly:
 				raise UserError(_("Resolve every declaration anomaly before filing."))
+			declaration.company_id._l10n_fr_micro_advance_depot_sale_horizon(
+				declaration.date_to
+			)
 			declaration.with_context(**internal_context()).write({
 				"state": "filed",
 				"filed_at": fields.Datetime.now(),

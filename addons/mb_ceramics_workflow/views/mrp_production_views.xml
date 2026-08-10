@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mrp_production_view_form_mb_ceramics_workflow" model="ir.ui.view">
+        <field name="name">mrp.production.form.mb.ceramics.workflow</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_mb_inspect" type="object" string="Unload and inspect"
+                        class="oe_highlight"
+                        invisible="mb_workflow_kind not in ('glazing', 'finishing') or state in ('done', 'cancel')" />
+                <button name="action_mb_inspect_bisque" type="object" string="Inspect bisque"
+                        class="oe_highlight"
+                        invisible="mb_workflow_kind != 'bisque' or state in ('done', 'cancel')" />
+                <button name="action_mb_print_wip_label" type="object" string="Print WIP label"
+                        invisible="mb_workflow_kind != 'bisque' or not mb_bisque_inspected" />
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Ceramics" invisible="not mb_workflow_kind">
+                    <group>
+                        <field name="mb_workflow_kind" />
+                        <field name="mb_throwing_session_id" />
+                        <field name="mb_finishing_session_id" />
+                        <field name="mb_bisque_session_id" />
+                        <field name="mb_glazing_session_id" />
+                        <field name="mb_inspected" />
+                        <field name="mb_bisque_inspected" />
+                    </group>
+                    <field name="mb_board_content_ids" readonly="1">
+                        <list>
+                            <field name="board_id" />
+                            <field name="quantity" />
+                            <field name="current_workorder_id" />
+                            <field name="state" />
+                        </list>
+                    </field>
+                    <field name="mb_loss_ids" readonly="1" />
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -3,6 +3,8 @@ from dateutil.relativedelta import relativedelta
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, ValidationError
 
+from .internal import internal_context, is_internal
+
 
 class ResCompany(models.Model):
 	_inherit = "res.company"
@@ -54,6 +56,19 @@ class ResCompany(models.Model):
 		"res.users", string="URSSAF accounting responsible",
 		domain=[("share", "=", False)],
 	)
+	l10n_fr_micro_depot_sale_closed_through = fields.Date(
+		string="Depot sales permanently closed through",
+		copy=False,
+		help="Monotonic horizon advanced whenever an URSSAF declaration is filed. "
+			"Depot reports cannot be backdated on or before this date, even if the "
+			"declaration is later reset to draft.",
+	)
+	l10n_fr_micro_depot_sale_horizon_confirmed = fields.Boolean(
+		string="Depot sale closing horizon confirmed",
+		copy=False,
+		help="Accounting has checked that the permanent horizon includes any "
+			"historical declarations that were filed and later reopened.",
+	)
 
 	_urssaf_configuration_fields = {
 		"l10n_fr_micro_activity_start_date", "l10n_fr_micro_urssaf_tracking_start_date",
@@ -63,14 +78,60 @@ class ResCompany(models.Model):
 		"l10n_fr_micro_acre_coefficient", "l10n_fr_micro_cfp_kind",
 		"l10n_fr_micro_chamber_kind", "l10n_fr_micro_chamber_zone",
 		"l10n_fr_micro_accounting_responsible_id",
+		"l10n_fr_micro_depot_sale_closed_through",
+		"l10n_fr_micro_depot_sale_horizon_confirmed",
 	}
 
 	def write(self, values):
+		if "l10n_fr_micro_depot_sale_closed_through" in values:
+			self.env.cr.execute(
+				"SELECT id FROM res_company WHERE id = ANY(%s) ORDER BY id FOR UPDATE",
+				[self.ids],
+			)
+			self.invalidate_recordset(["l10n_fr_micro_depot_sale_closed_through"])
+			new_horizon = fields.Date.to_date(
+				values["l10n_fr_micro_depot_sale_closed_through"]
+			) if values["l10n_fr_micro_depot_sale_closed_through"] else False
+			for company in self:
+				if company.l10n_fr_micro_depot_sale_closed_through and (
+					not new_horizon
+					or new_horizon < company.l10n_fr_micro_depot_sale_closed_through
+				):
+					raise ValidationError(_(
+						"The permanent URSSAF depot-sale horizon cannot be reduced."
+					))
 		if self._urssaf_configuration_fields.intersection(values) \
 				and not self.env.is_superuser() \
+				and not is_internal(self.env) \
 				and not self.env.user.has_group("account.group_account_manager"):
 			raise AccessError(_("Only an Accounting Administrator can change URSSAF configuration."))
 		return super().write(values)
+
+	def _l10n_fr_micro_advance_depot_sale_horizon(self, horizon):
+		"""Atomically advance the permanent horizon and never move it backwards."""
+		for company in self.sorted("id"):
+			company.env.cr.execute(
+				"SELECT id FROM res_company WHERE id = %s FOR UPDATE", [company.id]
+			)
+			company.invalidate_recordset([
+				"l10n_fr_micro_depot_sale_closed_through",
+			])
+			if not company.l10n_fr_micro_depot_sale_closed_through \
+					or horizon > company.l10n_fr_micro_depot_sale_closed_through:
+				company.with_context(**internal_context()).write({
+					"l10n_fr_micro_depot_sale_closed_through": horizon,
+				})
+		return True
+
+	def action_l10n_fr_micro_confirm_depot_sale_horizon(self):
+		if not self.env.user.has_group("account.group_account_manager"):
+			raise AccessError(_(
+				"Only an Accounting Administrator can confirm the depot-sale horizon."
+			))
+		self.with_context(**internal_context()).write({
+			"l10n_fr_micro_depot_sale_horizon_confirmed": True,
+		})
+		return True
 
 	@api.constrains(
 		"l10n_fr_micro_activity_start_date",

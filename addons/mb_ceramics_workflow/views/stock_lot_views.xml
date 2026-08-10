@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="stock_lot_form_mb_ceramics_workflow" model="ir.ui.view">
+        <field name="name">stock.lot.form.mb.ceramics.workflow</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <field name="mb_ceramics_stage" invisible="1" />
+                <button name="action_mb_ceramics_trace" type="object"
+                        class="oe_stat_button" icon="fa-fire">
+                    <field name="mb_firing_count" widget="statinfo" string="Ceramics trace" />
+                </button>
+                <button name="action_mb_print_wip_label" type="object"
+                        class="oe_stat_button" icon="fa-tag"
+                        invisible="mb_ceramics_stage not in ('green', 'bisque')">
+                    <div class="o_stat_info"><span class="o_stat_text">Print WIP label</span></div>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Ceramics trace">
+                    <group>
+                        <field name="mb_production_ids" widget="many2many_tags" />
+                        <field name="mb_firing_ids" widget="many2many_tags" />
+                        <field name="mb_board_ids" widget="many2many_tags" />
+                        <field name="mb_related_lot_ids" widget="many2many_tags" />
+                        <field name="mb_loss_ids" />
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="mb_blank_stock_action" model="ir.actions.act_window">
+        <field name="name">Blank Stock</field>
+        <field name="res_model">stock.quant</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('product_id.product_tmpl_id.mb_ceramics_stage', '=', 'green'), ('location_id.usage', '=', 'internal'), ('quantity', '!=', 0)]</field>
+        <field name="context">{'search_default_internal_loc': 1}</field>
+    </record>
+    <record id="mb_bisque_stock_action" model="ir.actions.act_window">
+        <field name="name">Bisque Stock</field>
+        <field name="res_model">stock.quant</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('product_id.product_tmpl_id.mb_ceramics_stage', '=', 'bisque'), ('location_id.usage', '=', 'internal'), ('quantity', '!=', 0)]</field>
+        <field name="context">{'search_default_internal_loc': 1}</field>
+    </record>
+</odoo>

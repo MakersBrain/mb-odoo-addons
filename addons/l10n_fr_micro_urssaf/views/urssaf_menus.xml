@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<menuitem id="menu_urssaf_root" name="Micro-enterprise" sequence="65" groups="account.group_account_user"/>
+	<menuitem id="menu_urssaf_root" name="Micro-enterprise" sequence="65" groups="account.group_account_user,account.group_account_manager"/>
 	<menuitem id="menu_urssaf_declarations" name="URSSAF declarations" parent="menu_urssaf_root" action="action_urssaf_declarations" sequence="10"/>
 	<menuitem id="menu_urssaf_annual" name="Annual evidence" parent="menu_urssaf_root" action="action_urssaf_annual" sequence="20"/>
 	<menuitem id="menu_urssaf_configuration" name="Configuration" parent="menu_urssaf_root" sequence="90" groups="account.group_account_manager"/>

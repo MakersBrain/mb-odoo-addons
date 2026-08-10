@@ -8,6 +8,7 @@ so dependencies keep working underneath the workshop features that use them.
 VISIBLE_APPS = (
     "sale.sale_menu_root",
     "mb_workshop_base.menu_mb_workshop_root",
+    "mb_depot.menu_depot_root",
     "point_of_sale.menu_point_root",
     "account.menu_finance",
     "purchase.menu_purchase_root",

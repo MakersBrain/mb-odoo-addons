@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mb_glazing_session_view_list" model="ir.ui.view">
+        <field name="name">mb.glazing.session.list</field>
+        <field name="model">mb.glazing.session</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="date" />
+                <field name="board_id" />
+                <field name="source_location_id" />
+                <field name="material_location_id" />
+                <field name="state" widget="badge" />
+            </list>
+        </field>
+    </record>
+    <record id="mb_glazing_session_view_form" model="ir.ui.view">
+        <field name="name">mb.glazing.session.form</field>
+        <field name="model">mb.glazing.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Start glazing"
+                            class="oe_highlight" invisible="state != 'draft'" />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1" /></h1></div>
+                    <group>
+                        <group>
+                            <field name="date" />
+                            <field name="board_id" />
+                        </group>
+                        <group>
+                            <field name="source_location_id" />
+                            <field name="material_location_id" />
+                            <field name="finished_location_id" />
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="state != 'draft'">
+                        <list>
+                            <field name="bisque_product_id" />
+                            <field name="bisque_lot_id" />
+                            <field name="available_quantity" readonly="1" />
+                            <field name="quantity" />
+                            <field name="finished_product_id" />
+                            <field name="bom_id" />
+                            <field name="production_id" readonly="1" />
+                        </list>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="bisque_product_id" />
+                                    <field name="bisque_lot_id" />
+                                    <field name="available_quantity" readonly="1" />
+                                    <field name="quantity" />
+                                </group>
+                                <group>
+                                    <field name="finished_product_id" />
+                                    <field name="bom_id" />
+                                    <field name="production_id" readonly="1" />
+                                </group>
+                            </group>
+                            <field name="allocation_ids">
+                                <list editable="bottom">
+                                    <field name="product_id" />
+                                    <field name="lot_id" />
+                                    <field name="available_quantity" readonly="1" />
+                                    <field name="quantity" />
+                                    <field name="uom_id" />
+                                    <field name="raw_move_id" readonly="1" />
+                                </list>
+                            </field>
+                        </form>
+                    </field>
+                    <field name="production_ids" readonly="1" />
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="mb_glazing_session_action" model="ir.actions.act_window">
+        <field name="name">Start Glazing</field>
+        <field name="res_model">mb.glazing.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

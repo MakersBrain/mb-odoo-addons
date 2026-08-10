@@ -2,15 +2,33 @@
 <odoo>
     <menuitem
         id="menu_mb_workshop_root"
-        name="Workshop"
+        name="Ceramics"
         web_icon="stock,static/description/icon.png"
         sequence="55"
     />
     <menuitem
+        id="menu_mb_ceramics_production"
+        name="Production"
+        parent="menu_mb_workshop_root"
+        sequence="10"
+    />
+    <menuitem
+        id="menu_mb_ceramics_stock_quality"
+        name="Stock &amp; Quality"
+        parent="menu_mb_workshop_root"
+        sequence="20"
+    />
+    <menuitem
+        id="menu_mb_ceramics_configuration"
+        name="Configuration"
+        parent="menu_mb_workshop_root"
+        sequence="90"
+    />
+    <menuitem
         id="menu_mb_migration_test"
         name="Migration tests"
-        parent="menu_mb_workshop_root"
+        parent="menu_mb_ceramics_configuration"
         action="mb_migration_test_action"
-        sequence="20"
+        sequence="90"
     />
 </odoo>
