@@ -81,14 +81,34 @@ class TestInvoiceSumUpLink(AccountTestInvoicingCommon):
     def test_a_different_amount_gets_its_own_checkout(self):
         wizard = self._open_wizard()
 
-        with patch(_SEND_REQUEST, return_value=self._checkout_response()) as send_request:
+        with patch(_SEND_REQUEST, side_effect=[
+            self._checkout_response(),
+            self._checkout_response(status="EXPIRED"),
+            self._checkout_response(
+                id="cd0d6c1a-0000-4000-8000-000000000002",
+                hosted_checkout_url="https://pay.sumup.com/b2c/ASDFGH",
+                amount=40.0,
+            ),
+        ]) as send_request:
             wizard.action_generate()
             partial = self._open_wizard()
             partial.amount = 40.0
             partial.action_generate()
 
-        self.assertEqual(send_request.call_count, 2)
+        self.assertEqual(send_request.call_count, 3)
+        self.assertEqual(send_request.call_args_list[1].args[:2], (
+            "DELETE", f"/v0.1/checkouts/{self._checkout_response()['id']}"
+        ))
         self.assertEqual(self.invoice.mb_sumup_transaction_id.amount, 40.0)
+
+    def test_amount_over_current_residual_is_refused(self):
+        wizard = self._open_wizard()
+        wizard.amount = self.invoice.amount_residual + 0.01
+
+        with patch(_SEND_REQUEST) as send_request, self.assertRaises(UserError):
+            wizard.action_generate()
+
+        send_request.assert_not_called()
 
     def test_zero_amount_is_refused(self):
         wizard = self._open_wizard()

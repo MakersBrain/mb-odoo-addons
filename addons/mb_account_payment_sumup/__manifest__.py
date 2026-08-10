@@ -29,7 +29,7 @@ explicit action, stored on the invoice, and reused while it is still open.
 The QR code is rendered by Odoo's own barcode endpoint, so nothing is fetched
 from outside when the PDF is printed.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.1.0",
     "license": "LGPL-3",
     "category": "Accounting/Accounting",
     "author": "Makersbrain",

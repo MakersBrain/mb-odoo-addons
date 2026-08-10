@@ -115,6 +115,26 @@ class AccountMove(models.Model):
         """
         self.ensure_one()
 
+        # Checkout creation is an external side effect.  Serialize it per
+        # invoice so two workers cannot both observe an empty field and mint
+        # two independently payable links.
+        self.env.cr.execute(
+            "SELECT pg_advisory_xact_lock(%s, %s)",
+            [0x4D425355, self.id],
+        )
+        self.invalidate_recordset(["amount_residual", "mb_sumup_transaction_id"])
+
+        if self.state != "posted" or self.move_type not in ("out_invoice", "out_refund"):
+            raise UserError(_("Only a posted customer invoice can have a SumUp payment link."))
+        residual = self.amount_residual
+        if residual <= 0:
+            raise UserError(_("This invoice has nothing left to pay."))
+        if amount <= 0 or self.currency_id.compare_amounts(amount, residual) > 0:
+            raise UserError(_(
+                "The SumUp checkout amount cannot exceed the amount still due (%s).",
+                self.currency_id.format(residual),
+            ))
+
         existing = self.mb_sumup_transaction_id
         if (
             existing.state in ("draft", "pending")
@@ -122,6 +142,13 @@ class AccountMove(models.Model):
             and self.currency_id.compare_amounts(existing.amount, amount) == 0
         ):
             return existing
+
+        if existing.state in ("draft", "pending") and existing.provider_reference:
+            # A replaced QR/link must stop being payable before its successor
+            # exists.  SumUp refuses DELETE once a checkout was processed; in
+            # that case abort and let polling reconcile it rather than risk an
+            # overpayment through two live checkouts.
+            existing.sudo()._sumup_deactivate_checkout()
 
         provider = self._mb_sumup_provider()
         payment_method = provider.payment_method_ids.filtered(

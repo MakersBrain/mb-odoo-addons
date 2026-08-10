@@ -91,6 +91,14 @@ class MbSumupLinkWizard(models.TransientModel):
             raise UserError(_("Set a positive amount."))
 
         if self.destination == "sumup":
+            self.move_id.invalidate_recordset(["amount_residual"])
+            if self.currency_id.compare_amounts(
+                self.amount, self.move_id.amount_residual
+            ) > 0:
+                raise UserError(_(
+                    "The amount cannot exceed the %s still due on the invoice.",
+                    self.currency_id.format(self.move_id.amount_residual),
+                ))
             tx_sudo = self.move_id._mb_sumup_get_or_create_transaction(self.amount)
             self.link = tx_sudo.sumup_checkout_url
         else:
