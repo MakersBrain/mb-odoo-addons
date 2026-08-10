@@ -45,10 +45,11 @@ class PosPaymentMethod(models.Model):
     sumup_payment_provider_id = fields.Many2one(
         comodel_name="payment.provider",
         string="SumUp Account",
-        domain=[("code", "=", "sumup")],
+        domain=[("code", "=", "sumup"), ("state", "in", ("enabled", "test"))],
+        check_company=True,
         help="The SumUp account used to verify a payment against SumUp's own "
-             "records and to refund it. Without it, the callback is taken at "
-             "face value and refunds are impossible.",
+             "records and to refund it. It is mandatory: callback URL "
+             "parameters are never accepted as payment evidence.",
     )
     sumup_skip_success_screen = fields.Boolean(
         string="Skip SumUp Success Screen",
@@ -70,10 +71,18 @@ class PosPaymentMethod(models.Model):
         """
         self.ensure_one()
         provider_sudo = self.sudo().sumup_payment_provider_id
-        if not provider_sudo:
+        if (
+            not provider_sudo
+            or provider_sudo.code != "sumup"
+            or provider_sudo.state not in ("enabled", "test")
+            or provider_sudo.company_id != self.company_id
+            or not provider_sudo.sudo().sumup_api_key
+        ):
             raise UserError(_(
-                "No SumUp account is set on the payment method %s.", self.display_name
+                "Set an enabled SumUp account for the same company on payment method %s.",
+                self.display_name,
             ))
+        provider_sudo._sumup_get_merchant_code()
         return provider_sudo
 
     def _sumup_find_transaction(self, **query):
@@ -122,6 +131,7 @@ class PosPaymentMethod(models.Model):
         """
         self.ensure_one()
 
+        self._sumup_provider_sudo()
         if not self.sumup_affiliate_key:
             raise UserError(_(
                 "Set the SumUp affiliate key on the payment method %s before "
@@ -179,22 +189,8 @@ class PosPaymentMethod(models.Model):
         """
         self.ensure_one()
 
-        claimed_success = callback_params.get("smp-status") == "success"
         transaction_code = callback_params.get("smp-tx-code") or ""
-        message = callback_params.get("smp-message") or ""
-
-        if not self.sudo().sumup_payment_provider_id:
-            # No account to ask. Taking the callback at face value is only
-            # tolerable because it never crossed the network: the SumUp app
-            # opened it in this browser, on this device.
-            return {
-                "successful": claimed_success,
-                "transaction_code": transaction_code,
-                "verified": False,
-                "message": message or (
-                    "" if claimed_success else _("SumUp refused the payment.")
-                ),
-            }
+        provider_sudo = self._sumup_provider_sudo()
 
         transaction = self._sumup_find_transaction(foreign_transaction_id=payment_uuid)
         if not transaction and transaction_code:
@@ -210,6 +206,21 @@ class PosPaymentMethod(models.Model):
 
         currency = self.journal_id.currency_id or self.company_id.currency_id
         successful = transaction.get("status") == const.TRANSACTION_STATUS_SUCCESSFUL
+        expected_merchant = provider_sudo._sumup_get_merchant_code()
+        evidence_matches = (
+            transaction.get("foreign_transaction_id") == payment_uuid
+            and transaction.get("currency") == currency.name
+            and transaction.get("merchant_code") == expected_merchant
+        )
+        if successful and not evidence_matches:
+            return {
+                "successful": False,
+                "verified": True,
+                "message": _(
+                    "SumUp returned payment evidence for a different reference, "
+                    "currency, or merchant account."
+                ),
+            }
         if successful and currency.compare_amounts(
             float(transaction.get("amount") or 0.0), currency.round(amount)
         ) != 0:
@@ -232,7 +243,7 @@ class PosPaymentMethod(models.Model):
             "card_no": card.get("last_4_digits") or "",
             "card_brand": card.get("type") or "",
             "card_type": transaction.get("entry_mode") or "",
-            "message": message if successful else _(
+            "message": "" if successful else _(
                 "SumUp reported this payment as %s.", transaction.get("status")
             ),
         }

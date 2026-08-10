@@ -14,7 +14,8 @@
                 <field name="sumup_app_id"
                        invisible="use_payment_terminal != 'sumup_mobile'"/>
                 <field name="sumup_payment_provider_id"
-                       invisible="use_payment_terminal != 'sumup_mobile'"/>
+                       invisible="use_payment_terminal != 'sumup_mobile'"
+                       required="use_payment_terminal == 'sumup_mobile'"/>
                 <field name="sumup_skip_success_screen"
                        invisible="use_payment_terminal != 'sumup_mobile'"/>
             </xpath>

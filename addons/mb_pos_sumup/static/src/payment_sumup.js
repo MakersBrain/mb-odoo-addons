@@ -105,11 +105,6 @@ export class PaymentSumUp extends PaymentInterface {
             paymentLine.card_no = result.card_no || "";
             paymentLine.card_brand = result.card_brand || "";
             paymentLine.card_type = result.card_type || "";
-            if (!result.verified) {
-                // Say so on the ticket rather than in a dialog nobody keeps: an
-                // unverified payment is one SumUp was never asked about.
-                paymentLine.setReceiptInfo(_t("SumUp payment, unverified"));
-            }
         } else {
             this._showError(result.message || _t("SumUp refused the payment."));
         }
@@ -120,7 +115,7 @@ export class PaymentSumUp extends PaymentInterface {
     }
 
     async _refund(refundLine) {
-        const transactionCode = this._findOriginalTransactionCode(refundLine);
+        const transactionCode = refundLine.uiState.sumupTransactionIdToRefund;
         if (!transactionCode) {
             this._showError(
                 _t("Only an order that was paid with SumUp can be refunded to SumUp.")
@@ -146,22 +141,6 @@ export class PaymentSumUp extends PaymentInterface {
         }
         refundLine.transaction_id = transactionCode;
         return true;
-    }
-
-    _findOriginalTransactionCode(refundLine) {
-        const currentOrder = refundLine.pos_order_id;
-        const orderToRefund = currentOrder.lines[0]?.refunded_orderline_id?.order_id;
-        if (!orderToRefund) {
-            return null;
-        }
-
-        const amountDue = Math.abs(currentOrder.remainingDue);
-        const originalLine = orderToRefund.payment_ids.find(
-            (line) =>
-                line.payment_method_id.use_payment_terminal === "sumup_mobile" &&
-                line.amount <= amountDue
-        );
-        return originalLine?.transaction_id ?? null;
     }
 
     _extractErrorMessage(error) {

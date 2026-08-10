@@ -24,6 +24,7 @@ class TestPosSumUp(AccountTestInvoicingCommon):
             [("code", "=", "sumup"), ("company_id", "=", cls.env.company.id)], limit=1
         )
         cls.provider.write({
+            "state": "test",
             "sumup_api_key": "sup_sk_dummy",
             "sumup_merchant_code": "MCTEST01",
         })
@@ -89,6 +90,8 @@ class TestPosSumUp(AccountTestInvoicingCommon):
             "status": "SUCCESSFUL",
             "amount": 12.34,
             "currency": self.env.company.currency_id.name,
+            "merchant_code": "MCTEST01",
+            "foreign_transaction_id": self.line_uuid,
             "card": {"last_4_digits": "4242", "type": "VISA"},
         }) as send_request:
             result = self.payment_method.sumup_confirm_payment(
@@ -123,6 +126,8 @@ class TestPosSumUp(AccountTestInvoicingCommon):
             "status": "SUCCESSFUL",
             "amount": 1.0,
             "currency": self.env.company.currency_id.name,
+            "merchant_code": "MCTEST01",
+            "foreign_transaction_id": self.line_uuid,
         }):
             result = self.payment_method.sumup_confirm_payment(
                 self.line_uuid, 12.34, {"smp-status": "success"}
@@ -130,30 +135,54 @@ class TestPosSumUp(AccountTestInvoicingCommon):
 
         self.assertFalse(result["successful"])
 
-    def test_without_an_account_the_callback_is_taken_at_face_value(self):
-        """Defensible only because that URL never crossed the network."""
+    def test_without_an_account_the_callback_is_refused(self):
         self.payment_method.sumup_payment_provider_id = False
 
         with patch(_SEND_REQUEST) as send_request:
-            result = self.payment_method.sumup_confirm_payment(
-                self.line_uuid, 12.34, {"smp-status": "success", "smp-tx-code": "TEEPUC2VLF"}
-            )
+            with self.assertRaises(UserError):
+                self.payment_method.sumup_confirm_payment(
+                    self.line_uuid, 12.34,
+                    {"smp-status": "success", "smp-tx-code": "TEEPUC2VLF"},
+                )
 
         send_request.assert_not_called()
-        self.assertTrue(result["successful"])
-        self.assertFalse(result["verified"])
-        self.assertEqual(result["transaction_code"], "TEEPUC2VLF")
 
-    def test_a_failed_callback_stays_failed(self):
+    def test_without_an_account_payment_handover_is_refused(self):
         self.payment_method.sumup_payment_provider_id = False
 
-        result = self.payment_method.sumup_confirm_payment(
-            self.line_uuid, 12.34,
-            {"smp-status": "failed", "smp-message": "Transaction failed."},
-        )
+        with self.assertRaises(UserError):
+            self._prepare()
 
-        self.assertFalse(result["successful"])
-        self.assertEqual(result["message"], "Transaction failed.")
+    def test_disabled_account_payment_handover_is_refused(self):
+        self.provider.state = "disabled"
+
+        with self.assertRaises(UserError):
+            self._prepare()
+
+    def test_wrong_currency_merchant_or_reference_is_refused(self):
+        valid = {
+            "id": "tx_0001",
+            "status": "SUCCESSFUL",
+            "amount": 12.34,
+            "currency": self.env.company.currency_id.name,
+            "merchant_code": "MCTEST01",
+            "foreign_transaction_id": self.line_uuid,
+        }
+        other_currency = (
+            "USD" if self.env.company.currency_id.name != "USD" else "EUR"
+        )
+        for mismatch in (
+            {"currency": other_currency},
+            {"merchant_code": "OTHER"},
+            {"foreign_transaction_id": "another-payment"},
+        ):
+            with self.subTest(mismatch=mismatch), patch(
+                _SEND_REQUEST, return_value=dict(valid, **mismatch)
+            ):
+                result = self.payment_method.sumup_confirm_payment(
+                    self.line_uuid, 12.34, {"smp-status": "success"}
+                )
+                self.assertFalse(result["successful"])
 
     # === Refunds === #
 

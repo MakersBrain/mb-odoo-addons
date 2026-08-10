@@ -29,9 +29,8 @@ older than 1.53.2, which do not echo it.
 parameter is a claim, not evidence. When the payment method names a SumUp
 provider, the result is verified against
 `GET /v2.1/merchants/{code}/transactions?foreign_transaction_id=...`, amount
-included, before the line is marked paid. Without a provider the callback is
-taken at face value, and that is defensible only because it never crosses the
-network: the SumUp app opens it in the same browser, on the same device.
+currency, merchant and foreign reference included, before the line is marked
+paid. A configured, enabled provider is mandatory.
 
 Refunds do not go through the app. They are an API call against the original
 transaction code, so they need the provider configured; without it the POS says
@@ -50,7 +49,7 @@ identifier belongs on the key next to your own - otherwise iOS opens the SumUp
 app and it fails at the reader with a server error, which reads like a
 connectivity fault and is not one.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.1.0",
     "license": "LGPL-3",
     "category": "Sales/Point of Sale",
     "author": "Makersbrain",
