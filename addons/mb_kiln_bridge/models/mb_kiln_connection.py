@@ -1,5 +1,4 @@
 import logging
-import time
 from datetime import timedelta
 
 from odoo import _, api, fields, models
@@ -61,6 +60,7 @@ class MbKilnConnection(models.Model):
     _name = "mb.kiln.connection"
     _description = "Kiln provider connection"
     _order = "name"
+    _check_company_auto = True
 
     name = fields.Char(required=True, default="myKiln")
     provider = fields.Selection(
@@ -89,7 +89,7 @@ class MbKilnConnection(models.Model):
 
     active = fields.Boolean(default=True)
     company_id = fields.Many2one(
-        comodel_name="res.company", required=True,
+        comodel_name="res.company", required=True, index=True,
         default=lambda self: self.env.company)
 
     state = fields.Selection(
@@ -444,7 +444,7 @@ class MbKilnConnection(models.Model):
                 values["cooling_end"] = reference + timedelta(
                     hours=program.cooling_hours)
         if firing:
-            firing.write(values)
+            firing._mb_apply_provider_values(values)
         else:
             values["name"] = payload["title"] or "myKiln %s" % payload["external_id"]
             values.setdefault("kind", "other")
@@ -539,36 +539,44 @@ class MbKilnConnection(models.Model):
                 "backfill_offset": 0,
                 "backfill_total": client.count_firings(),
             })
-        self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_backfill").active = True
+        self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_backfill").sudo().write({
+            "active": True,
+        })
         return True
 
     def action_stop_backfill(self):
         self.write({"backfill_state": "idle"})
         return True
 
-    def _backfill_slice(self, budget_seconds=50):
-        """Import pages until the budget is spent or the history is exhausted.
-
-        The budget exists because the listing endpoint is erratic - measured at
-        0.4s for five rows and 22s for fifty - so a fixed page count per run
-        would sometimes overrun the cron and sometimes barely work.
-        """
+    def _backfill_slice(self):
+        """Import pages while Odoo's cron budget says time remains."""
         self.ensure_one()
-        started = time.monotonic()
-        client = self._client()
-        kilns = self._describe_kilns(client)
-        applied_kilns = self._apply_kilns(kilns)
+        with self.env.cr.savepoint():
+            client = self._client()
+            kilns = self._describe_kilns(client)
+            applied_kilns = self._apply_kilns(kilns)
 
-        while time.monotonic() - started < budget_seconds:
-            summaries = client.list_firings(
-                limit=self.backfill_page_size, offset=self.backfill_offset)
-            if not summaries:
-                self.backfill_state = "done"
-                break
-            self._import_firings(client, summaries, kilns, applied_kilns)
-            self.backfill_offset += len(summaries)
-            if self.backfill_total and self.backfill_offset >= self.backfill_total:
-                self.backfill_state = "done"
+        while True:
+            with self.env.cr.savepoint():
+                summaries = client.list_firings(
+                    limit=self.backfill_page_size, offset=self.backfill_offset)
+                if not summaries:
+                    self.backfill_state = "done"
+                else:
+                    self._import_firings(client, summaries, kilns, applied_kilns)
+                    self.backfill_offset += len(summaries)
+                    if (
+                        self.backfill_total
+                        and self.backfill_offset >= self.backfill_total
+                    ):
+                        self.backfill_state = "done"
+            if self.env.context.get("cron_id"):
+                remaining = max(self.backfill_total - self.backfill_offset, 0)
+                time_left = self.env["ir.cron"]._commit_progress(
+                    processed=len(summaries), remaining=remaining)
+                if not time_left:
+                    break
+            if self.backfill_state == "done":
                 break
         self._remember_token(client)
         self.last_sync = fields.Datetime.now()
@@ -581,20 +589,19 @@ class MbKilnConnection(models.Model):
         for connection in running:
             try:
                 connection._backfill_slice()
-                connection.env.cr.commit()
             except Exception:
-                # Record and stop this connection rather than spinning. The
-                # offset is already committed, so resuming loses no work.
                 _logger.exception("kiln backfill failed for connection %s",
                                   connection.id)
-                connection.env.cr.rollback()
                 connection.write({"backfill_state": "idle",
                                   "state": "error",
                                   "last_error": "Backfill interrupted; see the log."})
-                connection.env.cr.commit()
+                self.env["ir.cron"]._commit_progress(processed=1)
         if not self.search_count([("backfill_state", "=", "running")]):
-            # Nothing left to do; stop waking up every few minutes.
-            self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_backfill").active = False
+            self.env.ref(
+                "mb_kiln_bridge.ir_cron_mb_kiln_backfill"
+            ).sudo().write({"active": False})
+            self.env["ir.cron"]._commit_progress(
+                remaining=0, deactivate=True)
         return True
 
     # -- cron --------------------------------------------------------------

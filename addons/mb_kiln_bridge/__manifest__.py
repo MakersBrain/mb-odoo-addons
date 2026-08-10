@@ -70,7 +70,7 @@ TypeScript in `ateliera-app`, whose findings about API v1 - token
 authentication, and the join between kilns, controllers and firings - are
 carried over rather than guessed at.
 """,
-    "version": "19.0.1.2.1",
+    "version": "19.0.1.2.2",
     "license": "LGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "Makersbrain",
@@ -80,6 +80,7 @@ carried over rather than guessed at.
     ],
     "data": [
         "security/ir.model.access.csv",
+        "security/mb_kiln_bridge_security.xml",
         "data/ir_cron.xml",
         "views/mb_kiln_connection_views.xml",
     ],

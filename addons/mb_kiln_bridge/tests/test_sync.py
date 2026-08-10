@@ -1,7 +1,7 @@
 import json
 from unittest.mock import patch
 
-from odoo.tests.common import TransactionCase, tagged
+from odoo.tests.common import TransactionCase, new_test_user, tagged
 
 from . import fixtures
 
@@ -72,6 +72,10 @@ class TestKilnSync(TransactionCase):
     def _sync(self, client):
         with patch.object(type(self.connection), "_client", return_value=client):
             self.connection._sync_one()
+
+    def test_routine_sync_cron_is_active(self):
+        self.assertTrue(
+            self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_sync").active)
 
     def test_import_creates_kilns_and_firing(self):
         client = FakeClient()
@@ -396,6 +400,58 @@ class TestBackfill(TransactionCase):
         self.assertEqual(self.connection.backfill_offset, 5)
         self.assertEqual(self.env["mb.firing"].search_count(
             [("external_id", "in", [str(n) for n in range(5000, 5005)])]), 5)
+
+    def test_manager_can_arm_backfill_without_scheduled_action_access(self):
+        class CountClient(FakeClient):
+            def count_firings(self_inner):
+                return 1
+
+        manager = new_test_user(
+            self.env,
+            login="kiln-backfill-manager",
+            groups="mrp.group_mrp_manager",
+        )
+        cron = self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_backfill")
+        cron.sudo().write({"active": False})
+
+        with patch.object(
+            type(self.connection), "_client", return_value=CountClient()
+        ):
+            self.connection.with_user(manager).action_start_backfill()
+
+        self.assertTrue(cron.active)
+
+    def test_cron_slice_reports_progress_to_odoo(self):
+        firings = [dict(fixtures.FIRING_DETAIL, id=5050)]
+
+        class OnePageClient(FakeClient):
+            def list_firings(self_inner, limit=100, offset=0):
+                return [
+                    {"id": firing["id"]}
+                    for firing in firings[offset:offset + limit]
+                ]
+
+            def get_firing(self_inner, firing_id):
+                return firings[0]
+
+        self.connection.write({
+            "backfill_state": "running",
+            "backfill_total": 1,
+            "backfill_offset": 0,
+        })
+        with (
+            patch.object(
+                type(self.connection), "_client", return_value=OnePageClient()
+            ),
+            patch.object(
+                type(self.env["ir.cron"]),
+                "_commit_progress",
+                return_value=0,
+            ) as commit_progress,
+        ):
+            self.connection.with_context(cron_id=99)._backfill_slice()
+
+        commit_progress.assert_called_once_with(processed=1, remaining=0)
 
     def test_backfill_is_replay_safe(self):
         firings = [dict(fixtures.FIRING_DETAIL, id=n) for n in range(6000, 6003)]

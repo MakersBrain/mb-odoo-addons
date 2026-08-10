@@ -7,9 +7,10 @@
         <field name="code">model._cron_sync()</field>
         <field name="interval_number">30</field>
         <field name="interval_type">minutes</field>
-        <!-- Off until a workshop has entered a credential. A cron that runs
-             against no connection is noise in the log every half hour. -->
-        <field name="active" eval="False" />
+        <!-- A routine cron is intentionally always present and harmless when
+             no configured connection exists. This is Odoo's standard polling
+             shape and avoids a manager needing Scheduled Actions access. -->
+        <field name="active" eval="True" />
     </record>
 
     <record id="ir_cron_mb_kiln_backfill" model="ir.cron">
