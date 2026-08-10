@@ -40,14 +40,18 @@ and it is smaller than the one it replaced.
 The **commission is a pricelist, not code**. Under achat-revente sur vente the
 gallery buys at list minus its percentage at the moment it sells.
 
-New products default to **invoicing on delivered quantities**, set by the wizard.
+Storable sale products use **invoicing on delivered quantities**, set by the wizard.
 The piece is sold when the depositary says it is, and the transfer out of the
 depot is the record of that; on ordered quantities a gallery could be billed at
 confirmation — before the movement that triggers the invoice, and before anything
 was sold at all if the report turns out to be wrong. Note the reach:
 `invoice_policy` is a product field with no per-warehouse variant, so this is the
-default for every new product, not only consigned ones. Existing products are
-left alone — rewriting a policy someone chose is not the wizard's business.
+policy for the existing catalogue and every new product, not only consigned ones.
+Confirmation checks it again and restores the depositary's depot warehouse before
+creating the delivery. It also removes explicit line routes left by the old
+location-based implementation, so an imported product, a manually changed
+warehouse, or legacy sourcing metadata cannot silently bypass the stock movement
+that gates invoicing.
 
 A depot **receives and delivers in one step**, pinned by a constraint. Multi-step
 would put a receiving bay and a packing table inside someone else's shop, and
@@ -62,7 +66,7 @@ location for a sibling.
 | `stock.move.line` | `mb_depot_sale_date` — the day the depositary reports the piece sold |
 | `mb.depot.create` | Creates a depot — warehouse and commission pricelist — in one action, because that pair repeats per gallery and has to agree with itself |
 | `mb.depot.statement` | Opening, placed, sold, returned, closing over a period, per piece, with retail / commission / net |
-| `stock.quant` views | Live stock per depot with a days-held column and ageing filters |
+| `stock.quant` views | Live stock per depot with ageing, retail value, and expected net after commission; accounting cost remains separate |
 | `stock.picking` | The product catalog, on placements only |
 | `sale.order` | The depositary's warehouse, and the pieces it holds |
 | Bon de dépôt | Placement document for the gallery to sign |
@@ -110,7 +114,10 @@ The domain is added to the standard clauses rather than replacing them, so
 `sale_ok` and the company check still apply and an ordinary customer sees
 exactly what they saw before.
 
-Menus land under Inventory > Dépôt-vente.
+The standalone **Depot Sales** application is the operational workspace. It
+links to the same standard Sales Orders, Inventory transfers, deliveries, and
+invoices that remain available in their native applications; it does not copy
+or replace those documents.
 
 ## The statement
 
@@ -191,6 +198,6 @@ the report here.
 odoo -d <db> -u mb_depot --test-enable --test-tags /mb_depot --stop-after-init
 ```
 
-Thirty-five tests, on the statement arithmetic, the reported date that decides
-which period a movement falls in, and the consistency of a created depot — the
-parts that decide money.
+The suite covers statement arithmetic, the reported date that decides which
+period a movement falls in, navigation and permissions, and the consistency of
+a created depot — the parts that decide money and who can act on it.

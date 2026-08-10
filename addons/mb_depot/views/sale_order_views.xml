@@ -33,6 +33,13 @@
         <attribute name="domain">[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)] + (mb_is_depot_order and [('id', 'in', mb_depot_product_ids)] or [])</attribute>
       </xpath>
 
+      <xpath expr="//field[@name='client_order_ref']" position="after">
+        <field name="mb_depot_sale_report_id" readonly="1" invisible="not mb_depot_sale_report_id"/>
+        <field name="mb_depot_effective_date" readonly="1" invisible="not mb_depot_sale_report_id"/>
+        <field name="mb_depot_reported_public_total" readonly="1" invisible="not mb_depot_sale_report_id"/>
+        <field name="mb_depot_reported_net_total" readonly="1" invisible="not mb_depot_sale_report_id"/>
+      </xpath>
+
     </field>
   </record>
 

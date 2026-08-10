@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_mb_depot_sale_report_list" model="ir.ui.view">
+    <field name="name">mb.depot.sale.report.list</field>
+    <field name="model">mb.depot.sale.report</field>
+    <field name="arch" type="xml">
+      <list decoration-success="state == 'processed'" decoration-muted="state == 'reversed'">
+        <field name="name"/>
+        <field name="company_id" groups="base.group_multi_company"/>
+        <field name="depot_warehouse_id"/>
+        <field name="external_reference"/>
+        <field name="report_received_on"/>
+        <field name="processed_at"/>
+        <field name="state" widget="badge"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_mb_depot_sale_report_form" model="ir.ui.view">
+    <field name="name">mb.depot.sale.report.form</field>
+    <field name="model">mb.depot.sale.report</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_process" type="object" string="Record Sale"
+                  class="btn-primary" invisible="state != 'draft'"
+                  confirm="Confirm the reported dates, prices, commission, products, and serial numbers. Past dates create historical stock evidence and cannot be changed after processing."/>
+          <button name="action_start_reversal" type="object" string="Start reversal"
+                  invisible="state != 'processed'"/>
+          <button name="action_mark_reversed" type="object" string="Mark reversed"
+                  invisible="state != 'reversal_required'"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,processed,reversal_required,reversed"/>
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button name="action_view_sale_orders" type="object" class="oe_stat_button"
+                    icon="fa-shopping-cart" invisible="not sale_order_count">
+              <field name="sale_order_count" widget="statinfo" string="Sales Orders"/>
+            </button>
+            <button name="action_view_pickings" type="object" class="oe_stat_button"
+                    icon="fa-truck" invisible="not picking_count">
+              <field name="picking_count" widget="statinfo" string="Deliveries"/>
+            </button>
+            <button name="action_view_invoices" type="object" class="oe_stat_button"
+                    icon="fa-file-text-o" invisible="not invoice_count"
+                    groups="account.group_account_invoice">
+              <field name="invoice_count" widget="statinfo" string="Invoices"/>
+            </button>
+            <button name="action_view_returns" type="object" class="oe_stat_button"
+                    icon="fa-undo" invisible="not return_picking_count">
+              <field name="return_picking_count" widget="statinfo" string="Returns"/>
+            </button>
+            <button name="action_view_credit_notes" type="object" class="oe_stat_button"
+                    icon="fa-file-text-o" invisible="not credit_note_count"
+                    groups="account.group_account_invoice">
+              <field name="credit_note_count" widget="statinfo" string="Credit Notes"/>
+            </button>
+          </div>
+          <widget name="web_ribbon" title="Processed" bg_color="text-bg-success"
+                  invisible="state != 'processed'"/>
+          <widget name="web_ribbon" title="Reversed" bg_color="text-bg-secondary"
+                  invisible="state != 'reversed'"/>
+          <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+          <group>
+            <group>
+              <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+              <field name="depot_warehouse_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+              <field name="external_reference" readonly="state != 'draft'"/>
+              <field name="report_received_on" readonly="state != 'draft'"/>
+            </group>
+            <group>
+              <field name="create_draft_invoice" readonly="state != 'draft'"
+                     groups="account.group_account_invoice"/>
+              <field name="closed_through" readonly="1"/>
+              <field name="closed_through_source" readonly="1"/>
+              <field name="processed_at" invisible="not processed_at"/>
+              <field name="processed_by_id" invisible="not processed_by_id"/>
+            </group>
+          </group>
+          <div class="alert alert-danger" role="alert" invisible="not closed_through">
+            Depot sale dates on or before <field name="closed_through" class="oe_inline"/>
+            are permanently closed by <field name="closed_through_source" class="oe_inline"/>.
+          </div>
+          <field name="available_product_ids" invisible="1"/>
+          <field name="line_ids" readonly="state != 'draft'">
+            <list editable="bottom">
+              <field name="sold_at"/>
+              <field name="depot_warehouse_id" column_invisible="True"/>
+              <field name="available_product_ids" column_invisible="True"/>
+              <field name="product_id" context="{'mb_depot_warehouse_id': depot_warehouse_id}"/>
+              <field name="available_lot_ids" column_invisible="True"/>
+              <field name="lot_id" optional="show"/>
+              <field name="quantity"/>
+              <field name="product_uom_id" readonly="1" optional="hide"/>
+              <field name="reported_public_unit_price"/>
+              <field name="reported_commission_percentage"/>
+              <field name="net_unit_price" readonly="1"/>
+              <field name="net_line_amount" readonly="1" sum="Net total"/>
+              <field name="external_line_reference" optional="hide"/>
+            </list>
+          </field>
+          <group><field name="note" readonly="state != 'draft'" placeholder="Depositary notes…"/></group>
+          <group string="Correction or reversal" invisible="state == 'draft'">
+            <field name="reversal_reason" readonly="state == 'reversed'"
+                   placeholder="Required before starting a return or correction…"/>
+            <field name="allow_partial_reversal" readonly="state == 'reversed'"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_mb_depot_sale_report" model="ir.actions.act_window">
+    <field name="name">Sale Reports</field>
+    <field name="res_model">mb.depot.sale.report</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="action_mb_depot_sale_report_new" model="ir.actions.act_window">
+    <field name="name">Record a Sale</field>
+    <field name="res_model">mb.depot.sale.report</field>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="view_mb_depot_sale_report_form"/>
+  </record>
+</odoo>

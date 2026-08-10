@@ -2,3 +2,5 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_mb_depot_create_manager,mb.depot.create.manager,model_mb_depot_create,stock.group_stock_manager,1,1,1,1
 access_mb_depot_statement_user,mb.depot.statement.user,model_mb_depot_statement,stock.group_stock_user,1,1,1,1
 access_mb_depot_statement_line_user,mb.depot.statement.line.user,model_mb_depot_statement_line,stock.group_stock_user,1,1,1,1
+access_mb_depot_sale_report_manager,mb.depot.sale.report.manager,model_mb_depot_sale_report,mb_depot.group_depot_sale_manager,1,1,1,0
+access_mb_depot_sale_report_line_manager,mb.depot.sale.report.line.manager,model_mb_depot_sale_report_line,mb_depot.group_depot_sale_manager,1,1,1,0

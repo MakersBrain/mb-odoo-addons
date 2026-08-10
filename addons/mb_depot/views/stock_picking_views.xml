@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+  <record id="view_picking_form_depot_sale_report" model="ir.ui.view">
+    <field name="name">stock.picking.form.depot.sale.report</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='origin']" position="after">
+        <field name="mb_depot_sale_report_id" readonly="1" invisible="not mb_depot_sale_report_id"/>
+        <field name="mb_depot_effective_date" readonly="1" invisible="not mb_depot_sale_report_id"/>
+      </xpath>
+    </field>
+  </record>
+
   <record id="view_picking_form_depot" model="ir.ui.view">
     <field name="name">stock.picking.form.depot</field>
     <field name="model">stock.picking</field>

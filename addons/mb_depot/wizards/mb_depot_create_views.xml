@@ -5,7 +5,7 @@
     <field name="name">mb.depot.create.form</field>
     <field name="model">mb.depot.create</field>
     <field name="arch" type="xml">
-      <form string="New depot">
+      <form string="New Depot">
         <p class="text-muted">
           Creates the depot's warehouse and its commission pricelist. Pieces
           placed there stay on your books until the depositary reports them
@@ -20,7 +20,7 @@
           <field name="assign_pricelist"/>
         </group>
         <footer>
-          <button name="action_create" type="object" string="Create depot"
+          <button name="action_create" type="object" string="Create Depot"
                   class="btn-primary"/>
           <button special="cancel" string="Cancel" class="btn-secondary"/>
         </footer>
@@ -29,7 +29,7 @@
   </record>
 
   <record id="action_mb_depot_create" model="ir.actions.act_window">
-    <field name="name">New depot</field>
+    <field name="name">New Depot</field>
     <field name="res_model">mb.depot.create</field>
     <field name="view_mode">form</field>
     <field name="target">new</field>

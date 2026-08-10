@@ -164,15 +164,57 @@ class TestDepotSale(TransactionCase):
         self.assertEqual(order.invoice_status, "to invoice")
         self.assertEqual(order.order_line.qty_delivered, 1)
 
-    def test_an_existing_product_keeps_the_policy_it_had(self):
-        """A default, not a rewrite: the wizard has no business changing a
-        policy someone already chose.
-        """
+    def test_existing_storable_sale_products_move_to_delivery_policy(self):
         self.at_home.invoice_policy = "order"
+        service = self.env["product.product"].create({
+            "name": "Unstocked workshop service",
+            "type": "service",
+            "invoice_policy": "order",
+        })
 
         self._wizard().action_create()
 
-        self.assertEqual(self.at_home.invoice_policy, "order")
+        self.assertEqual(self.at_home.invoice_policy, "delivery")
+        self.assertEqual(service.invoice_policy, "order",
+                         "services do not depend on a stock delivery")
+
+    def test_confirmation_restores_the_customer_depot_warehouse(self):
+        self._wizard().action_create()
+        depot = self._depot()
+        self._place(self.held, 1, depot.lot_stock_id)
+        obsolete_route = self.env["stock.route"].create({
+            "name": "Dépôt-vente: obsolete test route",
+            "sale_selectable": True,
+        })
+        order = self.env["sale.order"].create({
+            "partner_id": self.gallery.id,
+            "order_line": [fields.Command.create({
+                "product_id": self.held.id, "product_uom_qty": 1,
+                "route_ids": [fields.Command.link(obsolete_route.id)],
+            })],
+        })
+        order.warehouse_id = self.warehouse
+
+        order.action_confirm()
+
+        self.assertEqual(order.warehouse_id, depot)
+        self.assertFalse(order.order_line.route_ids)
+        self.assertEqual(order.picking_ids.location_id, depot.lot_stock_id)
+
+    def test_confirmation_rejects_ordered_quantity_depot_products(self):
+        self._wizard().action_create()
+        depot = self._depot()
+        self._place(self.held, 1, depot.lot_stock_id)
+        self.held.invoice_policy = "order"
+        order = self.env["sale.order"].create({
+            "partner_id": self.gallery.id,
+            "order_line": [fields.Command.create({
+                "product_id": self.held.id, "product_uom_qty": 1,
+            })],
+        })
+
+        with self.assertRaisesRegex(UserError, "Delivered quantities"):
+            order.action_confirm()
 
     def test_rerunning_moves_the_commission_rather_than_stacking_it(self):
         """Renegotiating the percentage is the reason to run the wizard twice.

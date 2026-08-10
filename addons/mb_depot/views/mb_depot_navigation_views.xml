@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- Dedicated primary search views keep depot-specific filters out of the
+       native applications while retaining Odoo's standard search features. -->
+  <record id="view_depot_sale_order_search" model="ir.ui.view">
+    <field name="name">sale.order.search.depot</field>
+    <field name="model">sale.order</field>
+    <field name="mode">primary</field>
+    <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='partner_id']" position="after">
+        <field name="warehouse_id" string="Depot" domain="[('is_depot', '=', True)]"/>
+        <field name="mb_depot_sale_report_id" string="Depot Sale Report"/>
+        <field name="mb_depot_effective_date" string="Effective Sale Date"/>
+      </xpath>
+      <xpath expr="//group" position="inside">
+        <filter name="group_depot" string="Depot" context="{'group_by': 'warehouse_id'}"/>
+        <filter name="group_depot_report" string="Depot Sale Report"
+                context="{'group_by': 'mb_depot_sale_report_id'}"/>
+      </xpath>
+      <xpath expr="//search" position="inside">
+        <searchpanel>
+          <field name="partner_id" string="Customer" select="multi" enable_counters="1"/>
+          <field name="warehouse_id" string="Depot" select="multi" enable_counters="1"
+                 domain="[('is_depot', '=', True)]"/>
+          <field name="state" string="Status" select="multi" enable_counters="1"/>
+        </searchpanel>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_depot_picking_search" model="ir.ui.view">
+    <field name="name">stock.picking.search.depot</field>
+    <field name="model">stock.picking</field>
+    <field name="mode">primary</field>
+    <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='partner_id']" position="after">
+        <field name="depot_warehouse_id" string="Depot"/>
+        <field name="mb_depot_sale_report_id" string="Depot Sale Report"/>
+        <field name="mb_depot_effective_date" string="Effective Delivery Date"/>
+      </xpath>
+      <xpath expr="//group" position="inside">
+        <filter name="group_depot" string="Depot"
+                context="{'group_by': 'depot_warehouse_id'}"/>
+        <filter name="group_depot_report" string="Depot Sale Report"
+                context="{'group_by': 'mb_depot_sale_report_id'}"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_depot_invoice_search" model="ir.ui.view">
+    <field name="name">account.move.search.depot</field>
+    <field name="model">account.move</field>
+    <field name="mode">primary</field>
+    <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='partner_id']" position="after">
+        <field name="mb_depot_sale_report_ids" string="Depot Sale Report"/>
+        <field name="mb_depot_delivery_date_from" string="Depot Delivery From"/>
+        <field name="mb_depot_delivery_date_to" string="Depot Delivery Through"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="action_depot_sale_orders" model="ir.actions.act_window">
+    <field name="name">Sales Orders</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
+    <field name="domain">[('mb_depot_sale_report_id', '!=', False)]</field>
+    <field name="context">{'search_default_sales': 1}</field>
+    <field name="search_view_id" ref="view_depot_sale_order_search"/>
+  </record>
+
+  <record id="action_depot_deliveries" model="ir.actions.act_window">
+    <field name="name">Deliveries</field>
+    <field name="res_model">stock.picking</field>
+    <field name="view_mode">list,kanban,form,calendar,activity</field>
+    <field name="domain">[('mb_depot_sale_report_id', '!=', False)]</field>
+    <field name="context">{'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0]}</field>
+    <field name="search_view_id" ref="view_depot_picking_search"/>
+  </record>
+
+  <record id="action_depot_invoices" model="ir.actions.act_window">
+    <field name="name">Invoices</field>
+    <field name="res_model">account.move</field>
+    <field name="view_mode">list,kanban,form,activity</field>
+    <field name="view_id" ref="account.view_out_invoice_tree"/>
+    <field name="domain">[('mb_depot_sale_report_ids', '!=', False), ('move_type', 'in', ['out_invoice', 'out_refund', 'out_receipt'])]</field>
+    <field name="context">{'default_move_type': 'out_invoice'}</field>
+    <field name="search_view_id" ref="view_depot_invoice_search"/>
+  </record>
+
+  <record id="action_depot_placements" model="ir.actions.act_window">
+    <field name="name">Place Products</field>
+    <field name="res_model">stock.picking</field>
+    <field name="view_mode">list,kanban,form,calendar,activity</field>
+    <field name="domain">[('is_depot_placement', '=', True)]</field>
+    <field name="context">{'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0]}</field>
+    <field name="search_view_id" ref="view_depot_picking_search"/>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Place products at a depot</p>
+      <p>Create a standard internal transfer and select the depot stock location
+         as its destination. Validate it through the normal Inventory workflow.</p>
+    </field>
+  </record>
+
+  <record id="action_depot_transfers" model="ir.actions.act_window">
+    <field name="name">Transfers</field>
+    <field name="res_model">stock.picking</field>
+    <field name="view_mode">list,kanban,form,calendar,activity</field>
+    <field name="domain">[('depot_warehouse_id', '!=', False)]</field>
+    <field name="context">{'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0]}</field>
+    <field name="search_view_id" ref="view_depot_picking_search"/>
+  </record>
+
+</odoo>

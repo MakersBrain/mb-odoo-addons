@@ -5,13 +5,17 @@
     <field name="name">stock.quant.list.depot</field>
     <field name="model">stock.quant</field>
     <field name="arch" type="xml">
-      <list string="Stock en dépôt" create="false" edit="false">
+      <list string="Stock in Depots" create="false" edit="false">
         <field name="location_id" string="Depot"/>
         <field name="depot_partner_id" optional="show"/>
         <field name="product_id"/>
         <field name="lot_id" string="Serial"/>
         <field name="quantity" string="On hand"/>
         <field name="reserved_quantity" string="Reserved" optional="show"/>
+        <field name="company_currency_id" column_invisible="True"/>
+        <field name="depot_retail_unit_price" optional="show"/>
+        <field name="depot_retail_value" sum="Retail value" optional="show"/>
+        <field name="depot_expected_net_value" sum="Expected net" optional="show"/>
         <field name="in_date" string="Placed"/>
         <field name="depot_days" string="Days held"
                decoration-warning="depot_days &gt; 90"
@@ -24,7 +28,7 @@
     <field name="name">stock.quant.search.depot</field>
     <field name="model">stock.quant</field>
     <field name="arch" type="xml">
-      <search string="Stock en dépôt">
+      <search string="Stock in Depots">
         <field name="product_id"/>
         <field name="lot_id"/>
         <field name="location_id" string="Depot"/>
@@ -49,7 +53,7 @@
   </record>
 
   <record id="action_depot_quant" model="ir.actions.act_window">
-    <field name="name">Stock en dépôt</field>
+    <field name="name">Stock in Depots</field>
     <field name="res_model">stock.quant</field>
     <field name="view_mode">list</field>
     <field name="domain">[('location_id.warehouse_id.is_depot', '=', True)]</field>

@@ -12,3 +12,6 @@ class StockMoveLine(models.Model):
              "gallery that reports March's sales in April would otherwise have "
              "every one of them counted as April business.",
     )
+    mb_depot_sale_report_line_id = fields.Many2one(
+        "mb.depot.sale.report.line", copy=False, readonly=True, index=True,
+    )

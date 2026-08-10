@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_move_form_mb_depot_sale" model="ir.ui.view">
+    <field name="name">account.move.form.mb.depot.sale</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='invoice_origin']" position="after">
+        <field name="mb_depot_sale_report_id" readonly="1" invisible="not mb_depot_sale_report_id"/>
+        <field name="mb_depot_sale_report_ids" widget="many2many_tags" readonly="1"
+               invisible="not mb_depot_sale_report_ids or mb_depot_sale_report_id"/>
+        <field name="mb_depot_delivery_date_from" readonly="1" invisible="not mb_depot_sale_report_ids"/>
+        <field name="mb_depot_delivery_date_to" readonly="1" invisible="not mb_depot_sale_report_ids"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

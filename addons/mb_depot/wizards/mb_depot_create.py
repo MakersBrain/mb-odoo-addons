@@ -95,7 +95,7 @@ class MbDepotCreate(models.TransientModel):
         self._default_to_invoicing_on_delivery()
 
     def _default_to_invoicing_on_delivery(self):
-        """New products invoice on delivered quantities.
+        """Storable sale products invoice on delivered quantities.
 
         Under dépôt-vente the piece is sold when the depositary says it is, and
         the transfer out of the depot is the record of that. Invoicing on
@@ -105,11 +105,11 @@ class MbDepotCreate(models.TransientModel):
         sold at all. On delivered quantities the stock movement is the gate.
 
         Note the reach: invoice_policy is a product field with no per-warehouse
-        variant, so this is the default for every new product, not only the ones
-        that go out on consignment. It is the right default for a workshop that
-        ships what it makes either way, and it stays a default - existing
-        products are left alone, because rewriting a policy someone chose is not
-        this wizard's business.
+        variant, so this applies to every storable sale product, not only the
+        ones currently on consignment. It is the right policy for a workshop
+        that ships what it makes either way. Existing products are included:
+        otherwise an imported catalogue remains invoiceable before delivery and
+        defeats the depot workflow even though new products are configured.
 
         ir.default rather than res.config.settings, for the same reason the
         groups above are implied rather than set: a settings record carries every
@@ -118,6 +118,11 @@ class MbDepotCreate(models.TransientModel):
         """
         self.env["ir.default"].sudo().set(
             "product.template", "invoice_policy", "delivery")
+        self.env["product.template"].search([
+            ("is_storable", "=", True),
+            ("sale_ok", "=", True),
+            ("invoice_policy", "!=", "delivery"),
+        ]).write({"invoice_policy": "delivery"})
 
     def _ensure_warehouse(self):
         """The depot's warehouse, adopting one that is already there.

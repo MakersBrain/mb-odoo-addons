@@ -1,36 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-  <menuitem id="menu_depot_root"
-            name="Dépôt-vente"
-            parent="stock.menu_stock_root"
-            sequence="35"
+  <!-- Keep this XML ID: upgrades promote the existing Inventory child instead
+       of creating a duplicate application. Leaf access makes the actionless
+       root visible only when the current user can open something below it. -->
+  <record id="menu_depot_root" model="ir.ui.menu">
+    <field name="name">Depot Sales</field>
+    <field name="parent_id" eval="False"/>
+    <field name="action" eval="False"/>
+    <field name="group_ids" eval="[(5, 0, 0)]"/>
+    <field name="sequence">35</field>
+    <field name="web_icon">mb_depot,static/description/icon.svg</field>
+    <field name="active" eval="True"/>
+  </record>
+
+  <menuitem id="menu_depot_operations" name="Operations"
+            parent="menu_depot_root" sequence="10"/>
+  <menuitem id="menu_depot_documents" name="Documents"
+            parent="menu_depot_root" sequence="20"/>
+  <menuitem id="menu_depot_stock" name="Stock"
+            parent="menu_depot_root" sequence="30"/>
+  <menuitem id="menu_depot_reporting" name="Reporting"
+            parent="menu_depot_root" sequence="40"/>
+  <menuitem id="menu_depot_configuration" name="Configuration"
+            parent="menu_depot_root" sequence="50"/>
+
+  <!-- Preserve the former Record a sale menu and its list/form action as the
+       audit-trail entry point; the direct-create menu receives a new XML ID. -->
+  <menuitem id="menu_depot_record_sale"
+            name="Sale Reports"
+            parent="menu_depot_operations"
+            action="action_mb_depot_sale_report"
+            sequence="10"
+            groups="mb_depot.group_depot_sale_manager"/>
+  <menuitem id="menu_depot_record_sale_new"
+            name="Record a Sale"
+            parent="menu_depot_operations"
+            action="action_mb_depot_sale_report_new"
+            sequence="20"
+            groups="mb_depot.group_depot_sale_manager"/>
+  <menuitem id="menu_depot_place_products"
+            name="Place Products"
+            parent="menu_depot_operations"
+            action="action_depot_placements"
+            sequence="30"
             groups="stock.group_stock_user"/>
 
+  <menuitem id="menu_depot_sale_orders"
+            name="Sales Orders"
+            parent="menu_depot_documents"
+            action="action_depot_sale_orders"
+            sequence="10"
+            groups="mb_depot.group_depot_sale_manager"/>
+  <menuitem id="menu_depot_deliveries"
+            name="Deliveries"
+            parent="menu_depot_documents"
+            action="action_depot_deliveries"
+            sequence="20"
+            groups="stock.group_stock_user"/>
+  <menuitem id="menu_depot_invoices"
+            name="Invoices"
+            parent="menu_depot_documents"
+            action="action_depot_invoices"
+            sequence="30"
+            groups="account.group_account_invoice"/>
+
   <menuitem id="menu_depot_quant"
-            name="Stock en dépôt"
-            parent="menu_depot_root"
+            name="Stock in Depots"
+            parent="menu_depot_stock"
             action="action_depot_quant"
-            sequence="10"/>
+            sequence="10"
+            groups="stock.group_stock_user"/>
+  <menuitem id="menu_depot_transfers"
+            name="Transfers"
+            parent="menu_depot_stock"
+            action="action_depot_transfers"
+            sequence="20"
+            groups="stock.group_stock_user"/>
 
   <menuitem id="menu_depot_statement"
-            name="Relevé de dépôt"
-            parent="menu_depot_root"
+            name="Depot Statement"
+            parent="menu_depot_reporting"
             action="action_mb_depot_statement"
-            sequence="20"/>
+            sequence="10"
+            groups="stock.group_stock_user"/>
 
   <menuitem id="menu_depot_locations"
-            name="Dépôts"
-            parent="menu_depot_root"
+            name="Depots"
+            parent="menu_depot_configuration"
             action="action_depot"
-            sequence="30"
+            sequence="10"
             groups="stock.group_stock_manager"/>
-
   <menuitem id="menu_depot_create"
-            name="Nouveau dépôt"
-            parent="menu_depot_root"
+            name="New Depot"
+            parent="menu_depot_configuration"
             action="action_mb_depot_create"
-            sequence="40"
+            sequence="20"
             groups="stock.group_stock_manager"/>
 
 </odoo>

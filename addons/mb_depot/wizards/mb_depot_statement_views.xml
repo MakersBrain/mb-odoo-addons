@@ -5,7 +5,7 @@
     <field name="name">mb.depot.statement.form</field>
     <field name="model">mb.depot.statement</field>
     <field name="arch" type="xml">
-      <form string="Depot statement">
+      <form string="Depot Statement">
         <group>
           <group>
             <field name="depot_id"/>
@@ -50,7 +50,7 @@
   </record>
 
   <record id="action_mb_depot_statement" model="ir.actions.act_window">
-    <field name="name">Depot statement</field>
+    <field name="name">Depot Statement</field>
     <field name="res_model">mb.depot.statement</field>
     <field name="view_mode">form</field>
     <field name="target">new</field>

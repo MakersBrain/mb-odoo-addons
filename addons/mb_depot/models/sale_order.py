@@ -5,6 +5,20 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    mb_depot_sale_report_id = fields.Many2one(
+        "mb.depot.sale.report", string="Depot sale report", copy=False,
+        index=True, readonly=True,
+    )
+    mb_depot_effective_date = fields.Datetime(
+        string="Effective depot sale date", copy=False, readonly=True,
+    )
+    mb_depot_reported_public_total = fields.Monetary(
+        string="Reported public total", copy=False, readonly=True,
+    )
+    mb_depot_reported_net_total = fields.Monetary(
+        string="Reported net total", copy=False, readonly=True,
+    )
+
     mb_depot_product_ids = fields.Many2many(
         comodel_name="product.product",
         string="Pieces at the depot",
@@ -12,6 +26,16 @@ class SaleOrder(models.Model):
         help="On hand and unreserved at the depot. What the line's product "
              "domain is built from.",
     )
+
+    def _mb_depots_by_company_and_partner(self):
+        depots = self.env["stock.warehouse"].search([
+            ("is_depot", "=", True),
+            ("company_id", "in", self.company_id.ids),
+        ])
+        return {
+            (depot.company_id.id, depot.depot_partner_id.commercial_partner_id.id): depot
+            for depot in depots
+        }
 
     # sale_stock's own depends are repeated rather than extended: the field
     # resolves its dependencies from whichever compute method it finds, so
@@ -30,10 +54,12 @@ class SaleOrder(models.Model):
         needs no route, no pull rule and no third-party module to select one.
         """
         super()._compute_warehouse_id()
-        depots = self.env["stock.warehouse"].search([("is_depot", "=", True)])
-        by_partner = {w.depot_partner_id.id: w for w in depots}
+        by_partner = self._mb_depots_by_company_and_partner()
         for order in self:
-            depot = by_partner.get(order.partner_id.commercial_partner_id.id)
+            depot = by_partner.get((
+                order.company_id.id,
+                order.partner_id.commercial_partner_id.id,
+            ))
             if depot:
                 order.warehouse_id = depot
 
@@ -61,6 +87,15 @@ class SaleOrder(models.Model):
             order.mb_depot_product_ids = [fields.Command.set(available)]
 
     def action_confirm(self):
+        by_partner = self._mb_depots_by_company_and_partner()
+        for order in self:
+            depot = by_partner.get((
+                order.company_id.id,
+                order.partner_id.commercial_partner_id.id,
+            ))
+            if depot and order.warehouse_id != depot:
+                order.warehouse_id = depot
+
         mandate = self.filtered(
             lambda order: order.warehouse_id.is_depot
             and order.warehouse_id.mb_depot_legal_structure == "mandate"
@@ -71,11 +106,69 @@ class SaleOrder(models.Model):
                 "workflow cannot be used; invoice final customers at retail and "
                 "book the gallery commission as a vendor bill."
             ))
+
+        depot_lines = self.filtered("warehouse_id.is_depot").order_line.filtered(
+            lambda line: not line.display_type
+        )
+        # Depot sales deliberately source on-hand stock from the order's depot
+        # warehouse. An explicit route can override that warehouse and was how
+        # the pre-warehouse implementation worked; remove any such stale route
+        # before procurement creates a delivery from the wrong location.
+        depot_lines.route_ids = False
+
+        invalid_lines = depot_lines.filtered(
+            lambda line: not line.display_type
+            and line.product_id.is_storable
+            and line.product_id.invoice_policy != "delivery"
+        )
+        if invalid_lines:
+            products = ", ".join(sorted(set(invalid_lines.product_id.mapped("display_name"))))
+            raise UserError(_(
+                "Depot sales must invoice delivered quantities. Change the "
+                "invoicing policy to Delivered quantities for: %(products)s",
+                products=products,
+            ))
         return super().action_confirm()
+
+    def _prepare_confirmation_values(self):
+        values = super()._prepare_confirmation_values()
+        self.ensure_one()
+        if self.mb_depot_sale_report_id and self.mb_depot_effective_date:
+            values["date_order"] = self.mb_depot_effective_date
+        return values
+
+    def _create_account_invoices(self, invoice_vals_list, final):
+        """Attach depot evidence to invoices created by Odoo's standard flow."""
+        invoices = super()._create_account_invoices(invoice_vals_list, final)
+        for invoice in invoices:
+            orders = invoice.invoice_line_ids.sale_line_ids.order_id.filtered(
+                "mb_depot_sale_report_id"
+            )
+            reports = orders.mb_depot_sale_report_id
+            if not reports:
+                continue
+            delivery_dates = [
+                order.mb_depot_sale_report_id._company_local_date(
+                    order.mb_depot_effective_date
+                )
+                for order in orders
+                if order.mb_depot_effective_date
+            ]
+            invoice.write({
+                "mb_depot_sale_report_ids": [fields.Command.set(reports.ids)],
+                "mb_depot_sale_report_id": reports.id if len(reports) == 1 else False,
+                "mb_depot_delivery_date_from": min(delivery_dates),
+                "mb_depot_delivery_date_to": max(delivery_dates),
+            })
+        return invoices
 
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
+
+    mb_depot_sale_report_line_id = fields.Many2one(
+        "mb.depot.sale.report.line", copy=False, readonly=True, index=True,
+    )
 
     # Related rather than reached through `parent.` in the line's domain: the
     # domain is evaluated per row, and a field on the row itself is the form the

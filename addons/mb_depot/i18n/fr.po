@@ -1,0 +1,212 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * mb_depot
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-10 00:00+0000\n"
+"PO-Revision-Date: 2026-08-10 00:00+0000\n"
+"Last-Translator: Makersbrain\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__available_product_ids
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__available_product_ids
+msgid "Available Products at the Depot"
+msgstr "Produits disponibles dans le dépôt"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/product_product.py:0
+msgid "%(product)s — %(quantity)s %(uom)s available at %(depot)s"
+msgstr "%(product)s — %(quantity)s %(uom)s disponibles dans %(depot)s"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__available_lot_ids
+msgid "Available Lots/Serial Numbers at the Depot"
+msgstr "Lots et numéros de série disponibles dans le dépôt"
+
+#. module: mb_depot
+#: model:ir.ui.menu,name:mb_depot.menu_depot_configuration
+msgid "Configuration"
+msgstr "Configuration"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_create_form
+msgid "Create Depot"
+msgstr "Créer le dépôt"
+
+#. module: mb_depot
+#: model_terms:ir.actions.act_window,help:mb_depot.action_depot
+msgid "Create a depot"
+msgstr "Créer un dépôt-vente"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_sale_order_search
+msgid "Customer"
+msgstr "Client"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_depot_deliveries
+#: model:ir.ui.menu,name:mb_depot.menu_depot_deliveries
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Deliveries"
+msgstr "Livraisons"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_picking_search
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_list
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_search
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_sale_order_search
+msgid "Depot"
+msgstr "Dépôt"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_invoice_search
+msgid "Depot Delivery From"
+msgstr "Livraisons du dépôt à partir du"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_invoice_search
+msgid "Depot Delivery Through"
+msgstr "Livraisons du dépôt jusqu’au"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_invoice_search
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_picking_search
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_sale_order_search
+msgid "Depot Sale Report"
+msgstr "Relevé de ventes du dépôt"
+
+#. module: mb_depot
+#: model:ir.ui.menu,name:mb_depot.menu_depot_root
+#: model:res.groups.privilege,name:mb_depot.res_groups_privilege_depot_sales
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_warehouse_form_depot
+msgid "Depot Sales"
+msgstr "Dépôt-vente"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_mb_depot_statement
+#: model:ir.ui.menu,name:mb_depot.menu_depot_statement
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Depot Statement"
+msgstr "Relevé de dépôt"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_depot
+#: model:ir.ui.menu,name:mb_depot.menu_depot_locations
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_list
+msgid "Depots"
+msgstr "Dépôts"
+
+#. module: mb_depot
+#: model:ir.ui.menu,name:mb_depot.menu_depot_documents
+msgid "Documents"
+msgstr "Documents"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_picking_search
+msgid "Effective Delivery Date"
+msgstr "Date de livraison effective"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_sale_order_search
+msgid "Effective Sale Date"
+msgstr "Date de vente effective"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_depot_invoices
+#: model:ir.ui.menu,name:mb_depot.menu_depot_invoices
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Invoices"
+msgstr "Factures"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Invoicing access is required to open invoices and credit notes."
+msgstr "L’accès à la facturation est requis pour ouvrir les factures et les avoirs."
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_mb_depot_create
+#: model:ir.ui.menu,name:mb_depot.menu_depot_create
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_create_form
+msgid "New Depot"
+msgstr "Nouveau dépôt"
+
+#. module: mb_depot
+#: model:ir.ui.menu,name:mb_depot.menu_depot_operations
+msgid "Operations"
+msgstr "Opérations"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_depot_placements
+#: model:ir.ui.menu,name:mb_depot.menu_depot_place_products
+msgid "Place Products"
+msgstr "Placer des produits"
+
+#. module: mb_depot
+#: model_terms:ir.actions.act_window,help:mb_depot.action_depot_placements
+msgid "Place products at a depot"
+msgstr "Placer des produits dans un dépôt"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_mb_depot_sale_report_new
+#: model:ir.ui.menu,name:mb_depot.menu_depot_record_sale_new
+msgid "Record a Sale"
+msgstr "Enregistrer une vente"
+
+#. module: mb_depot
+#: model:ir.ui.menu,name:mb_depot.menu_depot_reporting
+msgid "Reporting"
+msgstr "Rapports"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_mb_depot_sale_report
+#: model:ir.ui.menu,name:mb_depot.menu_depot_record_sale
+msgid "Sale Reports"
+msgstr "Relevés de ventes"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_depot_sale_orders
+#: model:ir.ui.menu,name:mb_depot.menu_depot_sale_orders
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Sales Orders"
+msgstr "Commandes clients"
+
+#. module: mb_depot
+#: model:ir.ui.menu,name:mb_depot.menu_depot_stock
+msgid "Stock"
+msgstr "Stock"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_sale_order_search
+msgid "Status"
+msgstr "Statut"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_depot_quant
+#: model:ir.ui.menu,name:mb_depot.menu_depot_quant
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_search
+msgid "Stock in Depots"
+msgstr "Stock en dépôt"
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_depot_transfers
+#: model:ir.ui.menu,name:mb_depot.menu_depot_transfers
+msgid "Transfers"
+msgstr "Transferts"
+
+#. module: mb_depot
+#: model_terms:ir.actions.act_window,help:mb_depot.action_depot_placements
+msgid "Create a standard internal transfer and select the depot stock location as its destination. Validate it through the normal Inventory workflow."
+msgstr "Créez un transfert interne standard et sélectionnez l’emplacement de stock du dépôt comme destination. Validez-le avec le processus Inventaire habituel."

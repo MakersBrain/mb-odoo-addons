@@ -46,6 +46,20 @@ class TestDepotCatalog(TransactionCase):
         self.assertTrue(self._placement().is_depot_placement,
                         "the Catalogue button hangs off this flag")
 
+    def test_depot_stock_has_commercial_values_separate_from_cost(self):
+        self.env["stock.quant"]._update_available_quantity(
+            self.bowl, self.depot, 2)
+        quant = self.env["stock.quant"].search([
+            ("product_id", "=", self.bowl.id),
+            ("location_id", "=", self.depot.id),
+        ])
+
+        self.assertEqual(quant.depot_retail_unit_price, 120.0)
+        self.assertEqual(quant.depot_retail_value, 240.0)
+        self.assertEqual(quant.depot_expected_net_value, 144.0)
+        self.assertEqual(self.bowl.standard_price, 30.0,
+                         "commercial depot values must not replace accounting cost")
+
     def test_adding_a_piece_creates_the_move_between_the_right_locations(self):
         picking = self._placement()
 

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Depot Sales">
+  <defs>
+    <linearGradient id="background" x1="18" y1="12" x2="110" y2="118" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#875A7B"/>
+      <stop offset="1" stop-color="#5D3B55"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="url(#background)"/>
+  <path d="M24 54 64 30l40 24v48a8 8 0 0 1-8 8H32a8 8 0 0 1-8-8V54Z" fill="#FFF" opacity=".96"/>
+  <path d="M18 55 64 27l46 28" fill="none" stroke="#F6D365" stroke-linecap="round" stroke-linejoin="round" stroke-width="9"/>
+  <path d="M41 69h46v41H41z" fill="#E7DDE4"/>
+  <path d="M48 78h13v13H48zm19 0h13v13H67zM48 97h13v13H48zm19 0h13v13H67z" fill="#875A7B"/>
+  <circle cx="96" cy="88" r="18" fill="#F6D365"/>
+  <path d="M96 77v22m-7-17h10a5 5 0 0 1 0 10h-7a5 5 0 0 1 0-10h10" fill="none" stroke="#5D3B55" stroke-linecap="round" stroke-width="4"/>
+</svg>

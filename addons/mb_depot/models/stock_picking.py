@@ -34,6 +34,13 @@ class StockPicking(models.Model):
              "separately; this is the shortcut for the ordinary case where one "
              "transfer stands for one reported sale.",
     )
+    mb_depot_sale_report_id = fields.Many2one(
+        "mb.depot.sale.report", string="Depot sale report", copy=False,
+        index=True, readonly=True,
+    )
+    mb_depot_effective_date = fields.Datetime(
+        string="Effective depot sale date", copy=False, readonly=True,
+    )
 
     @api.depends("move_line_ids.mb_depot_sale_date")
     def _compute_mb_depot_sale_date(self):

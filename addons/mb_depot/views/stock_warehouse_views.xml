@@ -7,7 +7,7 @@
     <field name="inherit_id" ref="stock.view_warehouse"/>
     <field name="arch" type="xml">
       <xpath expr="//group" position="inside">
-        <group string="Dépôt-vente">
+        <group string="Depot Sales">
           <field name="is_depot"/>
           <field name="mb_depot_legal_structure" invisible="not is_depot"
                  required="is_depot"/>
@@ -31,7 +31,7 @@
     <field name="name">stock.warehouse.list.depot</field>
     <field name="model">stock.warehouse</field>
     <field name="arch" type="xml">
-      <list string="Dépôts">
+      <list string="Depots">
         <field name="name" string="Depot"/>
         <field name="code" string="Short name"/>
         <field name="depot_partner_id"/>
@@ -43,16 +43,16 @@
   </record>
 
   <record id="action_depot" model="ir.actions.act_window">
-    <field name="name">Dépôts</field>
+    <field name="name">Depots</field>
     <field name="res_model">stock.warehouse</field>
     <field name="view_mode">list,form</field>
     <field name="domain">[('is_depot', '=', True)]</field>
     <field name="view_id" ref="view_depot_list"/>
     <field name="help" type="html">
-      <p class="o_view_nocontent_smiling_face">Create a dépôt-vente</p>
+      <p class="o_view_nocontent_smiling_face">Create a depot</p>
       <p>A depot is a warehouse someone else holds. Its stock stays internal, so
          unsold pieces stay on our books until the depositary reports a sale.
-         Use <b>New depot</b> rather than creating the warehouse by hand: a depot
+         Use <b>New Depot</b> rather than creating the warehouse by hand: a depot
          is a warehouse and a commission pricelist, and they have to agree with
          each other.</p>
     </field>
