@@ -76,14 +76,52 @@ class MbLabelQrAlias(models.Model):
     def _load_pos_data_read(self, records, config):
         rows = super()._load_pos_data_read(records, config)
         aliases = self.with_context(active_test=False).browse([row["id"] for row in rows])
-        quantity_cache = {}
+        storable_aliases = aliases.filtered("product_id.is_storable")
+        product_ids = storable_aliases.product_id.ids
+        available_by_product = dict.fromkeys(product_ids, 0.0)
+        available_by_lot = {}
+        location = config.picking_type_id.default_location_src_id
+        if product_ids and location:
+            # Match stock.quant._get_available_quantity(), which is sudoed.
+            # The source location and products are already bounded by the POS
+            # config and its product projection.
+            grouped_quants = self.env["stock.quant"].sudo()._read_group(
+                [
+                    ("location_id", "child_of", location.id),
+                    ("product_id", "in", product_ids),
+                ],
+                ["product_id", "lot_id"],
+                ["quantity:sum", "reserved_quantity:sum"],
+            )
+            tracked_products = storable_aliases.product_id.filtered(
+                lambda product: product.tracking != "none"
+            )
+            tracked_product_ids = set(tracked_products.ids)
+            for product, lot, quantity, reserved_quantity in grouped_quants:
+                available = quantity - reserved_quantity
+                if product.id in tracked_product_ids:
+                    # Match stock.quant._get_available_quantity(): negative
+                    # tracked buckets do not consume another lot's stock.
+                    available = max(available, 0.0)
+                available_by_product[product.id] += available
+                available_by_lot[(product.id, lot.id or False)] = available
+
         by_id = {}
         for alias in aliases:
-            key = (alias.product_id.id, alias.lot_id.id or False)
-            if key not in quantity_cache:
-                quantity_cache[key] = self._pos_available_quantity(
-                    alias.product_id, alias.lot_id, config)
-            by_id[alias.id] = quantity_cache[key]
+            if not alias.product_id.is_storable:
+                by_id[alias.id] = None
+            elif not location:
+                by_id[alias.id] = 0.0
+            elif alias.lot_id:
+                # A non-strict lot lookup includes untracked stock, exactly as
+                # stock.quant._get_available_quantity() does.
+                by_id[alias.id] = max(
+                    available_by_lot.get((alias.product_id.id, alias.lot_id.id), 0.0)
+                    + available_by_lot.get((alias.product_id.id, False), 0.0),
+                    0.0,
+                )
+            else:
+                by_id[alias.id] = max(available_by_product[alias.product_id.id], 0.0)
         for row in rows:
             row["pos_available_quantity"] = by_id[row["id"]]
         return rows

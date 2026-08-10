@@ -7,7 +7,10 @@ class PosConfig(models.Model):
     mb_label_qr_prefixes = fields.Json(compute="_compute_mb_label_qr_prefixes")
 
     def _compute_mb_label_qr_prefixes(self):
-        templates = self.env["mb.label.template"].search([
+        # POS cashiers intentionally do not receive Label Studio access. Read
+        # only the active templates needed for the computed POS projection,
+        # with an explicit company boundary before elevating privileges.
+        templates = self.env["mb.label.template"].sudo().search([
             ("active", "=", True),
             ("company_id", "in", self.mapped("company_id").ids),
         ])

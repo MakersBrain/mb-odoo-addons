@@ -8,6 +8,9 @@ import { patch } from "@web/core/utils/patch";
 
 const SQUARE_OVERLAY_KEY = "mb-pos-barcode-overlay-square-v1";
 
+BarcodeVideoScanner.props.mbLabelSquareCrop = { type: Boolean, optional: true };
+CropOverlay.props.mbLabelSquareCrop = { type: Boolean, optional: true };
+
 function bounded(value, minimum, maximum) {
     return Math.max(minimum, Math.min(maximum, value));
 }
@@ -48,12 +51,17 @@ export function selectBrightnessCapability(capabilities = {}) {
 patch(CropOverlay.prototype, {
     setup() {
         super.setup(...arguments);
-        // A new key intentionally ignores Odoo's previously stored 4:1 crop.
-        // The user can still drag the handle after the square is established.
-        this.localStorageKey = SQUARE_OVERLAY_KEY;
+        if (this.props.mbLabelSquareCrop) {
+            // A separate key leaves Odoo's native scanner crop untouched.
+            // The user can still drag the handle after initialisation.
+            this.localStorageKey = SQUARE_OVERLAY_KEY;
+        }
     },
 
     computeDefaultPoint() {
+        if (!this.props.mbLabelSquareCrop) {
+            return super.computeDefaultPoint(...arguments);
+        }
         const style = getComputedStyle(this.cropContainerRef.el.firstChild);
         const width = Number.parseFloat(style.width) || this.cropContainerRef.el.clientWidth;
         const height = Number.parseFloat(style.height) || this.cropContainerRef.el.clientHeight;

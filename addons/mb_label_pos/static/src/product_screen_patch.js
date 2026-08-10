@@ -33,6 +33,13 @@ patch(ProductScreen.prototype, {
         useBarcodeReader({ error: this._mbLabelErrorBarcodeAction });
     },
 
+    get barcodeVideoScannerProps() {
+        return {
+            ...super.barcodeVideoScannerProps,
+            mbLabelSquareCrop: true,
+        };
+    },
+
     _mbLabelCollections() {
         const aliases = this.pos.models["mb.label.qr.alias"]?.getAll() || [];
         const signature = aliases.map((alias) => `${alias.id}:${alias.active}:${alias.value}`).join("|");

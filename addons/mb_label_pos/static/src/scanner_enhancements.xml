@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
+    <t t-name="mb_label_pos.BarcodeVideoScannerSquareCrop"
+       t-inherit="web.BarcodeVideoScanner" t-inherit-mode="extension">
+        <xpath expr="//CropOverlay" position="attributes">
+            <attribute name="mbLabelSquareCrop">props.mbLabelSquareCrop</attribute>
+        </xpath>
+    </t>
     <t t-name="mb_label_pos.BarcodeVideoScannerLight"
        t-inherit="web.BarcodeVideoScanner" t-inherit-mode="extension">
         <xpath expr="//CropOverlay/video" position="after">

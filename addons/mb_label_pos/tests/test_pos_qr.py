@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+from unittest.mock import patch
 
 from odoo.tests import TransactionCase, tagged
 
@@ -67,6 +68,28 @@ class TestLabelPosQr(TransactionCase):
         row = next(item for item in data["mb.label.qr.alias"] if item["id"] == self.alias.id)
         self.assertEqual(row["value"], self.alias.value)
         self.assertIn(self.prefix, data["pos.config"][0]["mb_label_qr_prefixes"])
+
+    def test_cashier_can_bootstrap_company_scoped_label_data(self):
+        cashier = self.env["res.users"].with_context(no_reset_password=True).create({
+            "name": "Label POS cashier",
+            "login": "label-pos-cashier",
+            "company_id": self.config.company_id.id,
+            "company_ids": [(6, 0, self.config.company_id.ids)],
+            "group_ids": [(6, 0, [
+                self.env.ref("base.group_user").id,
+                self.env.ref("point_of_sale.group_pos_user").id,
+            ])],
+        })
+        self.assertFalse(cashier.has_group("mb_label.group_mb_label_user"))
+        session = self.env["pos.session"].create({
+            "config_id": self.config.id,
+            "user_id": cashier.id,
+        })
+
+        data = session.with_user(cashier).load_data([])
+
+        self.assertIn(self.prefix, data["pos.config"][0]["mb_label_qr_prefixes"])
+        self.assertIn(self.alias.id, [row["id"] for row in data["mb.label.qr.alias"]])
 
     def test_exact_alias_and_compatibility_path_resolve(self):
         exact = self.env["mb.label.qr.alias"].pos_resolve(self.alias.value, self.config.id)
@@ -179,3 +202,25 @@ class TestLabelPosQr(TransactionCase):
         self.assertGreaterEqual(len(projection), 1001)
         self.assertLess(payload_bytes, 1_000_000)
         self.assertLess(elapsed, 5.0)
+
+    def test_projection_batches_stock_availability(self):
+        aliases = self.env["mb.label.qr.alias"].create([{
+            "value": "%s#BATCH-%04d" % (self.prefix, index),
+            "company_id": self.config.company_id.id,
+            "product_id": self.product.id,
+            "lot_id": self.lot.id,
+            "template_version_id": self.version.id,
+        } for index in range(20)])
+        alias_model = self.env["mb.label.qr.alias"]
+        quant_model_class = type(self.env["stock.quant"])
+        original_read_group = quant_model_class._read_group
+        with patch.object(
+            quant_model_class,
+            "_read_group",
+            autospec=True,
+            side_effect=original_read_group,
+        ) as read_group:
+            rows = alias_model._load_pos_data_read(aliases, self.config)
+
+        self.assertEqual(read_group.call_count, 1)
+        self.assertEqual({row["pos_available_quantity"] for row in rows}, {1.0})
