@@ -1,7 +1,9 @@
 /** @odoo-module **/
+/* global ZXing */
 
 import { Component, onWillUnmount, useRef, useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import { loadJS } from "@web/core/assets";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
@@ -17,6 +19,53 @@ export function bytesToBase64(buffer) {
         binary += String.fromCharCode(...bytes.subarray(offset, offset + chunk));
     }
     return btoa(binary);
+}
+
+async function detectWithOdooZXing(file) {
+    await loadJS("/web/static/lib/zxing-library/zxing-library.js");
+    const bitmap = await createImageBitmap(file);
+    try {
+        const canvas = document.createElement("canvas");
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        canvas.getContext("2d").drawImage(bitmap, 0, 0);
+        const formats = [
+            ZXing.BarcodeFormat.EAN_8,
+            ZXing.BarcodeFormat.EAN_13,
+            ZXing.BarcodeFormat.UPC_A,
+            ZXing.BarcodeFormat.UPC_E,
+            ZXing.BarcodeFormat.CODE_128,
+            ZXing.BarcodeFormat.QR_CODE,
+            ZXing.BarcodeFormat.DATA_MATRIX,
+        ];
+        const reader = new ZXing.MultiFormatReader();
+        reader.setHints(new Map([
+            [ZXing.DecodeHintType.POSSIBLE_FORMATS, formats],
+            [ZXing.DecodeHintType.TRY_HARDER, true],
+        ]));
+        const source = new ZXing.HTMLCanvasElementLuminanceSource(canvas);
+        const result = reader.decode(new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(source)));
+        const formatNames = new Map([
+            [ZXing.BarcodeFormat.EAN_8, "ean_8"],
+            [ZXing.BarcodeFormat.EAN_13, "ean_13"],
+            [ZXing.BarcodeFormat.UPC_A, "upc_a"],
+            [ZXing.BarcodeFormat.UPC_E, "upc_e"],
+            [ZXing.BarcodeFormat.CODE_128, "code_128"],
+            [ZXing.BarcodeFormat.QR_CODE, "qr_code"],
+            [ZXing.BarcodeFormat.DATA_MATRIX, "data_matrix"],
+        ]);
+        return [{
+            rawValue: result.getText(),
+            format: formatNames.get(result.getBarcodeFormat()) || "unknown",
+        }];
+    } catch (error) {
+        if (error.name === "NotFoundException") {
+            return [];
+        }
+        throw error;
+    } finally {
+        bitmap.close();
+    }
 }
 
 export class InventoryCaptureAction extends Component {
@@ -139,28 +188,26 @@ export class InventoryCaptureAction extends Component {
 
     async detectCodes(file) {
         if (!("BarcodeDetector" in window)) {
-            this.notification.add(_t("Automatic decoding is unavailable; enter the code manually."), {
-                type: "info",
-            });
-            return;
-        }
-        const supported = await window.BarcodeDetector.getSupportedFormats();
-        const formats = BARCODE_FORMATS.filter((format) => supported.includes(format));
-        const detector = new window.BarcodeDetector({ formats });
-        const bitmap = await createImageBitmap(file);
-        try {
-            const detected = await detector.detect(bitmap);
-            this.state.decoded = detected.map((item) => ({
-                rawValue: item.rawValue,
-                format: item.format,
-            }));
-            for (const code of this.state.decoded) {
-                await this.orm.call("mb.inventory.capture", "action_record_scan", [
-                    [this.state.captureId], code.rawValue, code.format,
-                ]);
+            this.state.decoded = await detectWithOdooZXing(file);
+        } else {
+            const supported = await window.BarcodeDetector.getSupportedFormats();
+            const formats = BARCODE_FORMATS.filter((format) => supported.includes(format));
+            const detector = new window.BarcodeDetector({ formats });
+            const bitmap = await createImageBitmap(file);
+            try {
+                const detected = await detector.detect(bitmap);
+                this.state.decoded = detected.map((item) => ({
+                    rawValue: item.rawValue,
+                    format: item.format,
+                }));
+            } finally {
+                bitmap.close();
             }
-        } finally {
-            bitmap.close();
+        }
+        for (const code of this.state.decoded) {
+            await this.orm.call("mb.inventory.capture", "action_record_scan", [
+                [this.state.captureId], code.rawValue, code.format,
+            ]);
         }
     }
 

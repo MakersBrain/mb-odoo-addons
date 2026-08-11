@@ -16,11 +16,12 @@ import requests
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 
-from .identifier import GTIN_SCHEMES, normalize_identifier, parse_gs1_element_string
+from .identifier import normalize_any_gtin, parse_gs1_element_string
 
 
 MAX_SOURCE_BYTES = 15 * 1024 * 1024
-MAX_IMAGE_PIXELS = 12_000_000
+MAX_DECODE_PIXELS = 50_000_000
+MAX_SANITIZED_PIXELS = 12_000_000
 MAX_RAW_RESPONSE_CHARS = 65_536
 UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
@@ -72,10 +73,17 @@ def sanitize_image(encoded):
                 width, height = probe.size
                 image_format = probe.format
                 probe.verify()
-            if width <= 0 or height <= 0 or width * height > MAX_IMAGE_PIXELS:
-                raise ValidationError(_("The image exceeds the 12-megapixel limit."))
+            if width <= 0 or height <= 0 or width * height > MAX_DECODE_PIXELS:
+                raise ValidationError(_("The source image exceeds the safe decode limit."))
             with Image.open(io.BytesIO(received)) as opened:
                 oriented = ImageOps.exif_transpose(opened)
+                if oriented.width * oriented.height > MAX_SANITIZED_PIXELS:
+                    scale = (MAX_SANITIZED_PIXELS / (oriented.width * oriented.height)) ** 0.5
+                    resized = (
+                        max(1, int(oriented.width * scale)),
+                        max(1, int(oriented.height * scale)),
+                    )
+                    oriented = oriented.resize(resized, Image.Resampling.LANCZOS)
                 if image_format in {"JPEG", "JPG"}:
                     converted = oriented.convert("RGB")
                     mimetype, extension = "image/jpeg", "jpg"
@@ -90,6 +98,10 @@ def sanitize_image(encoded):
                 else:
                     converted.save(output, format="PNG", optimize=True)
                 sanitized = output.getvalue()
+                if len(sanitized) > MAX_SOURCE_BYTES:
+                    raise ValidationError(_(
+                        "The sanitized image exceeds the 15 MB evidence limit."
+                    ))
                 width, height = converted.size
     except ValidationError:
         raise
@@ -260,15 +272,15 @@ class InventoryCapture(models.Model):
             "ended_at": fields.Datetime.now(),
             "normalized_response": {"raw_value": raw_value, "symbology": symbology},
         })
-        parsed = parse_gs1_element_string(raw_value)
-        normalized = parsed.get("gtin")
-        if not normalized:
-            for scheme in GTIN_SCHEMES:
-                try:
-                    normalized = normalize_identifier(scheme, raw_value)
-                    break
-                except ValidationError:
-                    continue
+        looks_like_gs1 = (
+            raw_value.startswith(("]d2", "("))
+            or "\x1d" in raw_value
+            or (raw_value.startswith("01") and len(raw_value) > 14)
+        )
+        parsed = parse_gs1_element_string(raw_value) if looks_like_gs1 else {
+            "gtin": None, "lot": None, "expiry": None, "quantity": None, "warnings": [],
+        }
+        normalized = parsed.get("gtin") or normalize_any_gtin(raw_value)
         products = self.env["product.product"]
         if normalized:
             identifiers = self.env["mb.product.identifier"].search([
@@ -276,14 +288,6 @@ class InventoryCapture(models.Model):
                 ("normalized_value", "=", normalized),
             ])
             products |= identifiers.product_id
-            for product in self.env["product.product"].search([("barcode", "!=", False)]):
-                for scheme in GTIN_SCHEMES:
-                    try:
-                        if normalize_identifier(scheme, product.barcode) == normalized:
-                            products |= product
-                            break
-                    except ValidationError:
-                        continue
         if not products:
             try:
                 lookup_candidates = self._append_lookup_candidates(
@@ -330,8 +334,8 @@ class InventoryCapture(models.Model):
         return {
             "capture_id": self.id,
             "product_ids": products.ids,
-            "gtin": normalized,
             **parsed,
+            "gtin": normalized,
         }
 
     def _append_lookup_candidates(self, barcode=None, query=None):
@@ -381,7 +385,7 @@ class InventoryCapture(models.Model):
     def action_prepare_extraction(self):
         self.ensure_one()
         self.check_access("write")
-        if self.state not in {"draft", "failed", "review"}:
+        if self.state not in {"draft", "processing", "failed", "review"}:
             raise UserError(_("This capture cannot be queued for extraction."))
         source_assets = self.asset_ids.filtered(lambda asset: asset.role in {"front", "lot_detail"})
         if not source_assets:
@@ -442,6 +446,8 @@ class InventoryCapture(models.Model):
 
     def ingest_result(self, payload):
         self.ensure_one()
+        if str(payload.get("capture_id") or "").lower() != self.capture_uuid:
+            raise ValidationError(_("The result capture_id does not match this capture."))
         if self.state == "cancelled":
             raise ValidationError(_("A cancelled capture cannot accept extraction results."))
         if self.state not in {"processing", "review", "failed"}:
@@ -466,6 +472,8 @@ class InventoryCapture(models.Model):
         parent = self.attempt_ids.filtered(
             lambda item: item.attempt_uuid == str(payload.get("parent_attempt_id") or "").lower()
         )[:1]
+        if payload.get("parent_attempt_id") and not parent:
+            raise ValidationError(_("parent_attempt_id does not belong to this capture."))
         attempt = _internal(self.env["mb.inventory.capture.attempt"]).create({
             "capture_id": self.id,
             "company_id": self.company_id.id,
@@ -475,7 +483,9 @@ class InventoryCapture(models.Model):
             "kind": payload.get("kind") or "ocr",
             "provider": str(payload.get("provider") or "unknown")[:128],
             "model": str(payload.get("model") or "unknown")[:128],
-            "model_version": str(payload.get("model_version") or "")[:128],
+            "model_version": str(
+                payload.get("model_version") or payload.get("version") or ""
+            )[:128],
             "input_asset_ids": [(6, 0, self.asset_ids.filtered(
                 lambda asset: asset.sanitized_sha256 in input_digests
             ).ids)],
@@ -491,6 +501,7 @@ class InventoryCapture(models.Model):
         })
         if state == "succeeded":
             self._ingest_candidates(attempt, normalized.get("candidates") or [])
+            self._ingest_detected_codes(attempt, normalized.get("codes") or [])
             _internal(self).write({"state": "review"})
         elif state == "failed":
             _internal(self).write({
@@ -504,6 +515,7 @@ class InventoryCapture(models.Model):
     def _ingest_candidates(self, attempt, candidates):
         if not isinstance(candidates, list) or len(candidates) > 30:
             raise ValidationError(_("The provider returned too many candidates."))
+        suggested_queries = []
         for candidate in candidates:
             if not isinstance(candidate, dict):
                 raise ValidationError(_("Every candidate must be an object."))
@@ -512,6 +524,8 @@ class InventoryCapture(models.Model):
                 raise ValidationError(_("The provider returned an unsupported candidate kind."))
             raw_value = str(candidate.get("raw_value") or "")[:512]
             normalized_value = str(candidate.get("normalized_value") or raw_value)[:512]
+            if not raw_value or not normalized_value:
+                raise ValidationError(_("Candidate values cannot be empty."))
             confidence = candidate.get("confidence", 0)
             if isinstance(confidence, bool) or not isinstance(confidence, (int, float)) \
                     or not 0 <= confidence <= 1:
@@ -521,6 +535,9 @@ class InventoryCapture(models.Model):
                            or any(isinstance(value, bool) or not isinstance(value, (int, float))
                                   or not 0 <= value <= 1 for value in region)):
                 raise ValidationError(_("Candidate reported_region must be four normalized numbers."))
+            grounding_state = candidate.get("grounding_state", "unverified")
+            if grounding_state not in {"grounded", "user_confirmed_crop", "unverified"}:
+                raise ValidationError(_("Candidate grounding_state is invalid."))
             _internal(self.env["mb.inventory.capture.candidate"]).create({
                 "capture_id": self.id,
                 "company_id": self.company_id.id,
@@ -532,11 +549,97 @@ class InventoryCapture(models.Model):
                 "confidence": confidence,
                 "explanation": str(candidate.get("explanation") or "")[:2000],
                 "reported_region": region,
-                "grounding_state": candidate.get("grounding_state", "unverified"),
+                "grounding_state": grounding_state,
             })
+            if kind == "product" and grounding_state == "unverified" \
+                    and normalized_value not in suggested_queries:
+                suggested_queries.append(normalized_value)
+        # Model output can suggest a query; only a configured provider can
+        # append a separately-audited, grounded product candidate.
+        for query in suggested_queries[:5]:
+            try:
+                self._append_lookup_candidates(query=query)
+            except UserError:
+                continue
+
+    def _ingest_detected_codes(self, attempt, codes):
+        """Ground OCR barcodes against tenant identifiers and the catalogue.
+
+        Provider output remains immutable on ``attempt``.  Any catalogue lookup
+        is recorded as its own attempt, so an OCR observation is never presented
+        as a verified product identity by itself.
+        """
+        if not isinstance(codes, list) or len(codes) > 20:
+            raise ValidationError(_("The provider returned too many detected codes."))
+        candidate_model = self.env["mb.inventory.capture.candidate"]
+        for code in codes:
+            if not isinstance(code, dict):
+                raise ValidationError(_("Every detected code must be an object."))
+            raw_value = str(code.get("value") or "").strip()
+            if not raw_value or len(raw_value) > 512:
+                raise ValidationError(_("A detected code must contain 1 to 512 characters."))
+            confidence = code.get("confidence", 0)
+            if isinstance(confidence, bool) or not isinstance(confidence, (int, float)) \
+                    or not 0 <= confidence <= 1:
+                raise ValidationError(_("Detected-code confidence must be between zero and one."))
+            region = code.get("polygon") or []
+            if region and (not isinstance(region, list) or len(region) != 4
+                           or any(isinstance(value, bool)
+                                  or not isinstance(value, (int, float))
+                                  or not 0 <= value <= 1 for value in region)):
+                raise ValidationError(_(
+                    "A detected-code polygon must be four normalized numbers."
+                ))
+
+            looks_like_gs1 = (
+                raw_value.startswith(("]d2", "("))
+                or "\x1d" in raw_value
+                or (raw_value.startswith("01") and len(raw_value) > 14)
+            )
+            parsed = parse_gs1_element_string(raw_value) if looks_like_gs1 else {}
+            normalized = parsed.get("gtin") or normalize_any_gtin(raw_value)
+            if not normalized:
+                continue
+
+            products = self.env["mb.product.identifier"].search([
+                ("comparison_scheme", "=", "gtin"),
+                ("normalized_value", "=", normalized),
+            ]).product_id
+            if not products:
+                try:
+                    products |= self._append_lookup_candidates(
+                        barcode=normalized, query=raw_value,
+                    ).product_id
+                except UserError:
+                    # Catalogue availability must not discard valid OCR evidence.
+                    pass
+            for product in products:
+                duplicate = self.candidate_ids.filtered(
+                    lambda item, product=product, normalized=normalized:
+                    item.attempt_id == attempt
+                    and item.kind == "product" and item.product_id == product
+                    and item.normalized_value == normalized
+                )
+                if duplicate:
+                    continue
+                _internal(candidate_model).create({
+                    "capture_id": self.id,
+                    "company_id": self.company_id.id,
+                    "attempt_id": attempt.id,
+                    "kind": "product",
+                    "raw_value": raw_value,
+                    "normalized_value": normalized,
+                    "source": "ocr_barcode",
+                    "confidence": confidence,
+                    "reported_region": region,
+                    "grounding_state": "grounded",
+                    "product_id": product.id,
+                })
 
     def action_apply(self):
         self.ensure_one()
+        self.env.cr.execute("SELECT id FROM mb_inventory_capture WHERE id = %s FOR UPDATE", [self.id])
+        self.invalidate_recordset()
         if self.state != "review":
             raise UserError(_("Only a reviewed capture can be applied."))
         if not self.product_id:
@@ -549,7 +652,6 @@ class InventoryCapture(models.Model):
             ))
         if self.product_id.tracking != "none" and not (self.proposed_lot or self.lot_id):
             raise UserError(_("A supplier lot is required for this tracked product."))
-        self.env.cr.execute("SELECT id FROM mb_inventory_capture WHERE id = %s FOR UPDATE", [self.id])
         lot = self.lot_id
         if self.product_id.tracking != "none" and not lot:
             lot_name = self.proposed_lot.strip()
@@ -577,6 +679,8 @@ class InventoryCapture(models.Model):
                 raise UserError(_("The receipt line changed while this capture was being reviewed."))
             if lot:
                 move_line.lot_id = lot
+            if self.proposed_quantity > 0:
+                move_line.quantity = self.proposed_quantity
         _internal(self).write({
             "lot_id": lot.id if lot else False,
             "state": "applied",
@@ -795,4 +899,67 @@ class InventoryCaptureCandidate(models.Model):
         if not _is_internal(self) and allowed.intersection(values):
             _internal(self).write({"reviewed_by": self.env.user.id,
                                    "reviewed_at": fields.Datetime.now()})
+            if values.get("decision") == "accepted":
+                for candidate in self:
+                    reviewed = candidate.reviewed_value or candidate.raw_value
+                    capture_values = {}
+                    if candidate.kind == "product" and candidate.product_id:
+                        capture_values["product_id"] = candidate.product_id.id
+                    elif candidate.kind == "lot":
+                        capture_values["proposed_lot"] = reviewed
+                    elif candidate.kind == "expiry":
+                        capture_values["proposed_expiry"] = reviewed
+                    elif candidate.kind == "quantity":
+                        try:
+                            capture_values["proposed_quantity"] = float(reviewed)
+                        except (TypeError, ValueError) as error:
+                            raise ValidationError(_(
+                                "The reviewed quantity is not numeric."
+                            )) from error
+                    if capture_values:
+                        candidate.capture_id.write(capture_values)
         return result
+
+    def action_create_reviewed_product(self):
+        self.ensure_one()
+        if not self.env.user.has_group("stock.group_stock_manager"):
+            raise AccessError(_("Only an inventory manager can create a reviewed product."))
+        if self.kind != "product":
+            raise UserError(_("Only a product candidate can create a product."))
+        if self.decision not in {"accepted", "edited"}:
+            raise UserError(_("Accept or edit the product candidate before creating it."))
+        if self.capture_id.state != "review":
+            raise UserError(_("The capture must be in review before creating a product."))
+        self.env.cr.execute(
+            "SELECT id FROM mb_inventory_capture_candidate WHERE id = %s FOR UPDATE", [self.id]
+        )
+        self.invalidate_recordset(["product_id"])
+        product = self.product_id
+        if not product:
+            name = (self.reviewed_value or self.raw_value or "").strip()
+            if not name:
+                raise ValidationError(_("A reviewed product name is required."))
+            values = {
+                "name": name[:255],
+                "is_storable": True,
+                "purchase_ok": True,
+            }
+            if normalize_any_gtin(self.raw_value):
+                values["barcode"] = re.sub(r"[\s-]", "", self.raw_value)
+            product = self.env["product.product"].create(values)
+            _internal(self).write({"product_id": product.id})
+            self.capture_id.message_post(body=_(
+                "Inventory manager %(user)s created product %(product)s from reviewed "
+                "candidate %(candidate)s. No stock or lot was created.",
+                user=self.env.user.display_name,
+                product=product.display_name,
+                candidate=self.raw_value,
+            ))
+        self.capture_id.write({"product_id": product.id})
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "product.product",
+            "res_id": product.id,
+            "view_mode": "form",
+            "target": "current",
+        }

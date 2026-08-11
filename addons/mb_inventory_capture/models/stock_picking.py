@@ -16,3 +16,12 @@ class StockPicking(models.Model):
             "context": {"default_picking_id": self.id},
         }
 
+    def action_cancel(self):
+        result = super().action_cancel()
+        captures = self.env["mb.inventory.capture"].search([
+            ("picking_id", "in", self.ids),
+            ("state", "not in", ["applied", "cancelled"]),
+        ])
+        if captures:
+            captures.action_cancel()
+        return result

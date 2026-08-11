@@ -101,6 +101,10 @@
                                     <field name="grounding_state" readonly="1"/>
                                     <field name="decision"/>
                                     <field name="reviewed_value"/>
+                                    <button name="action_create_reviewed_product" type="object"
+                                            string="Create reviewed product"
+                                            groups="stock.group_stock_manager"
+                                            invisible="kind != 'product' or product_id"/>
                                 </list>
                             </field>
                         </page>

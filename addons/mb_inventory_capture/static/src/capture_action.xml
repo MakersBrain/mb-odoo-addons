@@ -50,7 +50,9 @@
                 </ul>
                 <div class="d-flex gap-2">
                     <button class="btn btn-primary" t-on-click="analyzeImages"
-                            t-att-disabled="state.busy || !state.uploaded">Analyze images</button>
+                            t-att-disabled="state.busy || !state.uploaded">
+                        Analyze images (OCR / enabled AI fallback)
+                    </button>
                     <button class="btn btn-secondary" t-on-click="openReview"
                             t-att-disabled="state.busy">Review manually</button>
                 </div>

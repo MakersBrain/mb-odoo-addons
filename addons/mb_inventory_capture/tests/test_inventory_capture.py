@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 from PIL import Image
 
 from odoo import fields
-from odoo.exceptions import ValidationError
+from odoo.exceptions import AccessError, ValidationError
 from odoo.tests import TransactionCase, tagged
 
 from odoo.addons.mb_inventory_capture.models.identifier import (
@@ -66,6 +66,15 @@ class TestInventoryCapture(TransactionCase):
         with self.assertRaises(ValidationError):
             normalize_identifier("gtin_12", "097539118055")
 
+    def test_raw_fnc1_and_invalid_expiry_are_handled_conservatively(self):
+        raw = parse_gs1_element_string("]d2010009753911805410007A\x1d3012")
+        self.assertEqual(raw["gtin"], "00097539118054")
+        self.assertEqual(raw["lot"], "007A")
+        self.assertEqual(raw["quantity"], 12)
+        invalid = parse_gs1_element_string("(17)271332")
+        self.assertFalse(invalid["expiry"])
+        self.assertTrue(invalid["warnings"])
+
     def test_upload_is_oriented_sanitized_and_idempotent(self):
         capture = self.capture()
         first = capture.upload_image(image_data(exif=True), "front", "phone.jpg")
@@ -85,6 +94,31 @@ class TestInventoryCapture(TransactionCase):
         capture.upload_image(image_data((4, 5, 6)), "lot_detail")
         with self.assertRaises(ValidationError):
             capture.upload_image(image_data((7, 8, 9)), "front")
+
+    def test_evidence_models_reject_direct_creation(self):
+        capture = self.capture()
+        user_env = self.env(user=self.env.ref("base.user_admin"))
+        with self.assertRaises(AccessError):
+            user_env["mb.inventory.capture.asset"].create({
+                "capture_id": capture.id,
+            })
+        with self.assertRaises(AccessError):
+            user_env["mb.inventory.capture.attempt"].create({
+                "capture_id": capture.id,
+            })
+        with self.assertRaises(AccessError):
+            user_env["mb.inventory.capture.candidate"].create({
+                "capture_id": capture.id,
+            })
+
+    def test_phone_image_is_downscaled_to_bounded_sanitized_evidence(self):
+        image = Image.new("RGB", (4000, 3100), (20, 30, 40))
+        output = io.BytesIO()
+        image.save(output, "JPEG", quality=80)
+        capture = self.capture()
+        capture.upload_image(base64.b64encode(output.getvalue()).decode(), "front")
+        asset = capture.asset_ids
+        self.assertLessEqual(asset.pixel_width * asset.pixel_height, 12_000_000)
 
     def test_local_barcode_and_gs1_create_review_candidates(self):
         capture = self.capture()
@@ -113,6 +147,7 @@ class TestInventoryCapture(TransactionCase):
             "kind": "multimodal",
             "provider": "fixture-ai",
             "model": "fixture-v1",
+            "version": "2026-08-10",
             "state": "succeeded",
             "input_digests": [asset["content_sha256"]],
             "normalized_response": {"candidates": [{
@@ -130,7 +165,12 @@ class TestInventoryCapture(TransactionCase):
 
         self.assertEqual(result["state"], "review")
         self.assertEqual(len(capture.attempt_ids), 1)
+        self.assertEqual(capture.attempt_ids.model_version, "2026-08-10")
         self.assertEqual(capture.candidate_ids.grounding_state, "unverified")
+        capture.candidate_ids.with_user(self.env.ref("base.user_admin")).write({
+            "decision": "accepted",
+        })
+        self.assertEqual(capture.proposed_lot, "8O1B")
         with self.assertRaises(ValidationError):
             capture.ingest_result(dict(
                 payload,
@@ -138,6 +178,158 @@ class TestInventoryCapture(TransactionCase):
                 operation_key=f"inventory:{capture.capture_uuid}:2",
                 input_digests=["0" * 64],
             ))
+        with self.assertRaises(ValidationError):
+            capture.ingest_result(dict(
+                payload,
+                attempt_id=str(uuid.uuid4()),
+                operation_key=f"inventory:{capture.capture_uuid}:wrong-capture",
+                capture_id=str(uuid.uuid4()),
+            ))
+        with self.assertRaises(ValidationError):
+            capture.ingest_result(dict(
+                payload,
+                attempt_id=str(uuid.uuid4()),
+                operation_key=f"inventory:{capture.capture_uuid}:wrong-parent",
+                parent_attempt_id=str(uuid.uuid4()),
+            ))
+
+    def test_ocr_barcode_is_grounded_to_local_product(self):
+        capture = self.capture()
+        asset = capture.upload_image(image_data(), "front")
+        capture.action_prepare_extraction()
+        capture.ingest_result({
+            "operation_key": f"inventory:{capture.capture_uuid}:ocr-code",
+            "capture_id": capture.capture_uuid,
+            "attempt_id": str(uuid.uuid4()),
+            "kind": "ocr",
+            "provider": "fixture-azure",
+            "model": "prebuilt-read",
+            "state": "succeeded",
+            "input_digests": [asset["content_sha256"]],
+            "normalized_response": {
+                "candidates": [],
+                "codes": [{
+                    "value": "097539118054",
+                    "kind": "UPCA",
+                    "confidence": 0.98,
+                    "polygon": [0.1, 0.2, 0.5, 0.3],
+                }],
+            },
+        })
+
+        candidate = capture.candidate_ids.filtered(
+            lambda item: item.source == "ocr_barcode"
+        )
+        self.assertEqual(candidate.product_id, self.product)
+        self.assertEqual(candidate.normalized_value, "00097539118054")
+        self.assertEqual(candidate.grounding_state, "grounded")
+
+    def test_ai_product_query_is_grounded_by_provider_as_separate_evidence(self):
+        capture = self.capture()
+        asset = capture.upload_image(image_data(), "front")
+        capture.action_prepare_extraction()
+        provider = self.env["mb.inventory.capture.lookup.provider"]
+        provider_result = [{
+            "canonical_id": "mayco/sw-106/473ml",
+            "label": self.product.display_name,
+            "product_id": self.product.id,
+            "source": "fixture_catalogue",
+            "confidence": 1.0,
+            "grounded": True,
+        }]
+        with patch.object(type(provider), "lookup", return_value=provider_result) as lookup:
+            capture.ingest_result({
+                "operation_key": f"inventory:{capture.capture_uuid}:ai-product",
+                "capture_id": capture.capture_uuid,
+                "attempt_id": str(uuid.uuid4()),
+                "kind": "multimodal",
+                "provider": "fixture-ai",
+                "model": "fixture-v1",
+                "state": "succeeded",
+                "input_digests": [asset["content_sha256"]],
+                "normalized_response": {"candidates": [{
+                    "kind": "product",
+                    "raw_value": "Mayco SW-106 Alabaster",
+                    "normalized_value": "Mayco SW-106 Alabaster 473 ml",
+                    "confidence": 0.8,
+                    "grounding_state": "unverified",
+                    "source": "ai_suggestion",
+                }]},
+            })
+
+        self.assertEqual(lookup.call_args.kwargs["query"], "Mayco SW-106 Alabaster 473 ml")
+        ai_candidate = capture.candidate_ids.filtered(
+            lambda item: item.source == "ai_suggestion"
+        )
+        grounded = capture.candidate_ids.filtered(
+            lambda item: item.source == "fixture_catalogue"
+        )
+        self.assertEqual(ai_candidate.grounding_state, "unverified")
+        self.assertEqual(grounded.grounding_state, "grounded")
+        self.assertEqual(grounded.product_id, self.product)
+        self.assertNotEqual(ai_candidate.attempt_id, grounded.attempt_id)
+
+    def test_manager_can_create_one_product_from_explicitly_reviewed_candidate(self):
+        capture = self.capture()
+        asset = capture.upload_image(image_data(), "front")
+        capture.action_prepare_extraction()
+        capture.ingest_result({
+            "operation_key": f"inventory:{capture.capture_uuid}:new-product",
+            "capture_id": capture.capture_uuid,
+            "attempt_id": str(uuid.uuid4()),
+            "kind": "multimodal",
+            "provider": "fixture-ai",
+            "model": "fixture-v1",
+            "state": "succeeded",
+            "input_digests": [asset["content_sha256"]],
+            "normalized_response": {"candidates": [{
+                "kind": "product",
+                "raw_value": "Reviewed unknown glaze 473 ml",
+                "confidence": 0.7,
+                "grounding_state": "unverified",
+                "source": "ai_suggestion",
+            }]},
+        })
+        candidate = capture.candidate_ids
+        manager = self.env.ref("base.user_admin")
+        candidate.with_user(manager).write({
+            "decision": "edited",
+            "reviewed_value": "Reviewed glaze 473 ml",
+        })
+        before = self.env["product.product"].search_count([])
+
+        first = candidate.with_user(manager).action_create_reviewed_product()
+        second = candidate.with_user(manager).action_create_reviewed_product()
+
+        self.assertEqual(self.env["product.product"].search_count([]), before + 1)
+        self.assertEqual(first["res_id"], second["res_id"])
+        self.assertEqual(capture.product_id.name, "Reviewed glaze 473 ml")
+        self.assertFalse(capture.lot_id)
+
+    def test_unknown_enqueue_outcome_can_be_retried_idempotently(self):
+        capture = self.capture()
+        capture.upload_image(image_data(), "front")
+        capture.company_id.mb_control_workshop_id = str(uuid.uuid4())
+        timeout = __import__("requests").Timeout("unknown outcome")
+        response = Mock(status_code=202)
+        response.raise_for_status.return_value = None
+        response.json.return_value = {"operation_id": str(uuid.uuid4())}
+        with patch.dict("os.environ", {
+            "MB_CONTROL_API_URL": "https://control.example.test",
+            "MB_CONTROL_BRIDGE_TOKEN": "fixture-token",
+        }), patch(
+            "odoo.addons.mb_inventory_capture.models.inventory_capture.requests.post",
+            side_effect=[timeout, response],
+        ) as post:
+            first = capture.action_prepare_extraction()
+            second = capture.action_prepare_extraction()
+
+        self.assertEqual(first["outcome"], "unknown")
+        self.assertEqual(second["operation_id"], response.json()["operation_id"])
+        self.assertEqual(
+            post.call_args_list[0].kwargs["headers"]["Idempotency-Key"],
+            post.call_args_list[1].kwargs["headers"]["Idempotency-Key"],
+        )
 
     def test_confirmed_capture_applies_native_lot_to_draft_receipt_line(self):
         picking = self.env["stock.picking"].create({
@@ -175,6 +367,20 @@ class TestInventoryCapture(TransactionCase):
         self.assertEqual(line.lot_id, capture.lot_id)
         self.assertEqual(capture.lot_id.mb_supplier_lot_origin, "supplier")
 
+    def test_cancelling_receipt_cancels_unapplied_capture_without_deleting_evidence(self):
+        picking = self.env["stock.picking"].create({
+            "picking_type_id": self.warehouse.in_type_id.id,
+            "location_id": self.warehouse.in_type_id.default_location_src_id.id,
+            "location_dest_id": self.warehouse.lot_stock_id.id,
+        })
+        capture = self.capture(picking_id=picking.id)
+        capture.upload_image(image_data(), "front")
+
+        picking.action_cancel()
+
+        self.assertEqual(capture.state, "cancelled")
+        self.assertTrue(capture.asset_ids)
+
     def test_alternate_gtin_cannot_shadow_primary_barcode(self):
         other = self.env["product.product"].create({
             "name": "Other glaze", "is_storable": True,
@@ -196,6 +402,22 @@ class TestInventoryCapture(TransactionCase):
         self.assertEqual(identifier.product_id, self.product)
         self.assertFalse(identifier.company_id)
         self.assertEqual(identifier.source, "primary_barcode")
+
+    def test_capture_evidence_is_isolated_by_active_company(self):
+        other_company = self.env["res.company"].sudo().create({"name": "Other workshop"})
+        other_capture = self.env["mb.inventory.capture"].sudo().with_company(
+            other_company
+        ).create({"company_id": other_company.id})
+        other_capture.action_record_scan("097539118054", "upc_a")
+        for model, record_ids in (
+            ("mb.inventory.capture", other_capture.ids),
+            ("mb.inventory.capture.attempt", other_capture.attempt_ids.ids),
+            ("mb.inventory.capture.candidate", other_capture.candidate_ids.ids),
+        ):
+            restricted = self.env[model].with_user(
+                self.env.ref("base.user_admin")
+            ).with_context(allowed_company_ids=[self.env.company.id])
+            self.assertFalse(restricted.search([("id", "in", record_ids)]))
 
     def test_control_queue_payload_contains_digests_not_image_bytes(self):
         capture = self.capture()
@@ -247,3 +469,18 @@ class TestInventoryCapture(TransactionCase):
         wizard.action_apply_safe()
         self.assertEqual(product.tracking, "lot")
         self.assertTrue(product.mb_supplier_lot_required)
+
+    def test_tracking_cutover_blocks_products_with_on_hand_stock(self):
+        product = self.env["product.product"].create({
+            "name": "Existing clay body", "is_storable": True, "tracking": "none",
+        })
+        self.env["stock.quant"]._update_available_quantity(
+            product, self.warehouse.lot_stock_id, 1,
+        )
+        wizard = self.env["mb.supplier.lot.migration"].create({
+            "product_ids": [(6, 0, product.ids)],
+        })
+        wizard.action_analyze()
+
+        self.assertNotIn(product, wizard.eligible_product_ids)
+        self.assertIn("blocked", wizard.report)

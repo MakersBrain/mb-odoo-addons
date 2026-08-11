@@ -1,5 +1,7 @@
 import re
 
+from psycopg2 import IntegrityError
+
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -29,6 +31,22 @@ def normalize_identifier(scheme, value):
     if not normalized or len(normalized) > 255:
         raise ValidationError(_("The identifier must contain between 1 and 255 characters."))
     return normalized
+
+
+def normalize_any_gtin(value):
+    """Return the GTIN-14 comparison value, or ``None`` for non/invalid GTINs."""
+    printed = (value or "").strip()
+    digits = re.sub(r"[\s-]", "", printed)
+    scheme = next(
+        (candidate for candidate, length in GTIN_SCHEMES.items() if len(digits) == length),
+        None,
+    )
+    if not scheme:
+        return None
+    try:
+        return normalize_identifier(scheme, printed)
+    except ValidationError:
+        return None
 
 
 def parse_gs1_element_string(value):
@@ -75,7 +93,13 @@ def parse_gs1_element_string(value):
             result["lot"] = extracted or None
         elif application_id == "17":
             if re.fullmatch(r"\d{6}", extracted):
-                result["expiry"] = f"20{extracted[:2]}-{extracted[2:4]}-{extracted[4:6]}"
+                proposed = f"20{extracted[:2]}-{extracted[2:4]}-{extracted[4:6]}"
+                try:
+                    fields.Date.to_date(proposed)
+                except ValueError:
+                    result["warnings"].append(_("Malformed GS1 expiry date."))
+                else:
+                    result["expiry"] = proposed
             else:
                 result["warnings"].append(_("Malformed GS1 expiry date."))
         elif application_id == "30":
@@ -140,7 +164,22 @@ class ProductIdentifier(models.Model):
                 scheme, values.get("printed_value")
             )
             prepared.append(values)
-        records = super().create(prepared)
+        try:
+            with self.env.cr.savepoint():
+                records = super().create(prepared)
+        except IntegrityError as error:
+            for values in prepared:
+                conflict = self.search([
+                    ("scope_key", "=", values.get("company_id") or 0),
+                    ("comparison_scheme", "=", values["comparison_scheme"]),
+                    ("normalized_value", "=", values["normalized_value"]),
+                ], limit=1)
+                if conflict:
+                    raise ValidationError(_(
+                        "This identifier is already assigned to %(product)s.",
+                        product=conflict.product_id.display_name,
+                    )) from error
+            raise
         records._check_primary_barcode_conflict()
         return records
 
@@ -162,16 +201,11 @@ class ProductIdentifier(models.Model):
                 ("id", "!=", identifier.product_id.id),
             ])
             for product in products:
-                for scheme in GTIN_SCHEMES:
-                    try:
-                        normalized = normalize_identifier(scheme, product.barcode)
-                    except ValidationError:
-                        continue
-                    if normalized == identifier.normalized_value:
-                        raise ValidationError(_(
-                            "This GTIN is already the primary barcode of %s.",
-                            product.display_name,
-                        ))
+                if normalize_any_gtin(product.barcode) == identifier.normalized_value:
+                    raise ValidationError(_(
+                        "This GTIN is already the primary barcode of %s.",
+                        product.display_name,
+                    ))
 
     def action_reassign(self, product, reason):
         self.ensure_one()
@@ -211,15 +245,11 @@ class ProductProduct(models.Model):
     def _register_mb_primary_barcodes(self):
         registry = self.env["mb.product.identifier"].sudo()
         for product in self.filtered("barcode"):
-            scheme = next((candidate for candidate in GTIN_SCHEMES
-                           if len(re.sub(r"[\s-]", "", product.barcode))
-                           == GTIN_SCHEMES[candidate]), None)
-            if not scheme:
+            normalized = normalize_any_gtin(product.barcode)
+            if not normalized:
                 continue
-            try:
-                normalized = normalize_identifier(scheme, product.barcode)
-            except ValidationError:
-                continue
+            digits = re.sub(r"[\s-]", "", product.barcode)
+            scheme = next(key for key, length in GTIN_SCHEMES.items() if len(digits) == length)
             existing = registry.search([
                 ("comparison_scheme", "=", "gtin"),
                 ("normalized_value", "=", normalized),
@@ -241,13 +271,7 @@ class ProductProduct(models.Model):
 
     def _check_mb_barcode_identifier_conflict(self):
         for product in self.filtered("barcode"):
-            normalized = None
-            for scheme in GTIN_SCHEMES:
-                try:
-                    normalized = normalize_identifier(scheme, product.barcode)
-                    break
-                except ValidationError:
-                    continue
+            normalized = normalize_any_gtin(product.barcode)
             if not normalized:
                 continue
             conflict = self.env["mb.product.identifier"].search([
