@@ -34,7 +34,7 @@ TAGS_ARG := $(subst $(space),$(comma),$(TAGS))
 
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \
-        test check lint format oca reset-poc
+        test check lint format oca reset-poc brand-sync brand-check
 
 help: ## Show available targets
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  %-12s %s\n", $$1, $$2}'
@@ -103,8 +103,14 @@ test: ## Install MODULES on a fresh disposable database and run their tests
 		--test-tags "$(TAGS_ARG)" \
 		--stop-after-init --http-port=0 --gevent-port=0 --log-level=test
 
-check: lint i18n-check ## Everything CI runs that needs no container
+check: lint i18n-check brand-check ## Everything CI runs that needs no container
 	python3 tools/check_addons.py
+
+brand-sync: ## Copy brand/tokens.css and brand/ui.css into the control-plane web app
+	python3 tools/sync_brand.py
+
+brand-check: ## Fail if a brand stylesheet edit never reached its consumers
+	python3 tools/sync_brand.py --check
 
 # polib comes through uv rather than a checked-in requirements file: nothing
 # here is a Python package, so there is no install step to hang a dependency on.
