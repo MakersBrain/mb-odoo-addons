@@ -1,0 +1,42 @@
+// The login page.
+//
+// `web.login_layout` has no variables for its ground or its card, so this is
+// one of the two places in this addon that uses selectors. It stays small on
+// purpose: a warm ground, a card that matches the rest of the system, and room
+// for the lockup that the template adds under it.
+//
+// The company logo inside the card is left exactly as Odoo renders it. It is
+// the workshop's own mark, and the person signing in works there.
+
+.o_mb_login {
+  // sand-50 through bg. Odoo's `bg-100` is a cold grey and reads as a
+  // different product from the moment the page paints.
+  background: #f7f3ee;
+
+  .o_database_list {
+    // Matching --mb-radius-lg and --mb-shadow-md from brand/tokens.css.
+    background: #ffffff;
+    border: 1px solid #e5dcd5 !important;
+    border-radius: 0.75rem;
+    box-shadow:
+      0 1px 2px rgba(30, 25, 21, 0.05),
+      0 6px 16px rgba(30, 25, 21, 0.06);
+  }
+
+  // The one lockup on the page, under the card rather than in it.
+  .o_mb_login_brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1.5rem auto 0;
+    color: #64564c;
+    font-size: 0.8125rem;
+
+    img {
+      height: 1.1rem;
+      width: auto;
+      opacity: 0.9;
+    }
+  }
+}

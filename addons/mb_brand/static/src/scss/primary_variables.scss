@@ -1,0 +1,113 @@
+// MakersBrain, expressed as Odoo's own variables.
+//
+// This file is PREPENDED to `web._assets_primary_variables`, so every
+// assignment here wins against core's `!default` further down the bundle.
+// Nothing in this addon may use a selector where a variable exists.
+//
+// Values come from brand/tokens.css. Keep them in step by hand: SCSS cannot
+// read CSS custom properties at compile time, so there is no way to make this
+// file derive from the tokens rather than mirror them.
+
+// ---------------------------------------------------------------------------
+// Colour
+// ---------------------------------------------------------------------------
+// clay-600, not clay-500. Odoo puts white text on $o-brand-primary for filled
+// buttons, and white on clay-500 is 4.25:1 — under AA. clay-600 clears it at
+// 5.88:1. This is the same distinction brand/tokens.css draws between
+// --mb-brand (decorative) and --mb-accent (interactive).
+$o-community-color: #a34a2c;
+$o-brand-odoo: #a34a2c;
+$o-brand-primary: #a34a2c;
+
+// Bootstrap's `$primary`, set here rather than left to follow $o-brand-primary.
+// The two bundles disagree about where it comes from: the backend's
+// `bootstrap_overridden.scss` has `$primary: $o-brand-primary !default`, but
+// the frontend's `bootstrap_overridden_frontend.scss` has `$primary: $blue
+// !default` and never consults the brand colour at all. Recolouring only
+// $o-brand-primary therefore brands the web client and leaves the login page
+// on stock Odoo — which is exactly the page a new user sees first. Setting
+// $primary here, ahead of both, covers them together.
+$primary: #a34a2c;
+
+// The public pages take their primary colour from somewhere else entirely, and
+// this is the seam that reaches it.
+//
+// `html_editor` derives Bootstrap's `$theme-colors` from a colour *palette*,
+// not from `$primary`: `$o-color-palettes['base-1']['o-color-1']` becomes
+// `$o-theme-color-palette['primary']`, which becomes `$theme-colors['primary']`,
+// which is what generates `.btn-primary`. The default `o-color-1` is
+// `$o-enterprise-color`, so without this block the login page — the first page
+// anyone sees — keeps Odoo's purple button no matter what else is set.
+//
+// `$o-color-palettes` is `!default` upstream, and this assignment is not, so it
+// wins whichever order the two files end up in.
+$o-color-palettes: (
+    'base-1': (
+        'o-color-1': #a34a2c,   // clay-600, the interactive tone
+        'o-color-2': #e9e1db,   // sand-200
+        'o-color-3': #f7f3ee,   // the page ground
+        'o-color-4': #ffffff,   // surface
+        'o-color-5': #1e1915,   // ink
+    ),
+);
+
+// Odoo builds `.btn-primary` from its own map rather than from Bootstrap's
+// `$theme-colors`, and that map is populated from `$o-brand-primary` — which
+// is not safe to rely on. Several core addons reassign `$o-brand-primary`
+// *without* `!default` after this file runs (portal's chatter variables pin it
+// to `$o-enterprise-color`), so setting the colour alone leaves the most
+// visible control in the product on stock Odoo purple.
+//
+// Defining the map entry here is immune to that: `map-merge((defaults), $o-btns-bs-override)`
+// keeps whatever is already in the variable, and these values are literals
+// rather than references, so a later reassignment cannot reach them.
+//
+// The states use the clay ramp from brand/tokens.css rather than SCSS
+// `darken()`, so the button matches the buttons on every other surface instead
+// of landing on a near-miss of them.
+$o-btns-bs-override: (
+    "primary": (
+        background: #a34a2c,          // clay-600
+        border: #a34a2c,
+        color: #ffffff,
+
+        hover-background: #833a23,    // clay-700
+        hover-border: #612b1a,        // clay-800
+        hover-color: #ffffff,
+
+        active-background: #fdf1ec,   // clay-50
+        active-border: #a34a2c,
+        active-color: #612b1a,
+    ),
+);
+
+// The warm neutral. Odoo's default greys are cold, and a cold grey against a
+// clay accent is the single fastest way to make a palette look accidental.
+$o-gray-100: #f4efeb;
+$o-gray-200: #e9e1db;
+$o-gray-300: #d6cac1;
+$o-gray-400: #b2a398;
+$o-gray-500: #877669;
+$o-gray-600: #64564c;
+$o-gray-700: #493e36;
+$o-gray-800: #2f2822;
+$o-gray-900: #1e1915;
+
+// sand-900 rather than near-black: the body copy has to sit on a warm ground
+// without reading as a different temperature from everything around it.
+$o-main-text-color: #1e1915;
+$o-main-color-muted: #64564c;
+
+// ---------------------------------------------------------------------------
+// Type
+// ---------------------------------------------------------------------------
+// Declared as plain lists rather than through `o-add-unicode-support-font`.
+// The function is available here, but a SCSS error in this bundle surfaces
+// only when a browser first requests the compiled asset — not during install,
+// and so not in CI. A plain list cannot fail that way. The cost is the CJK
+// fallback face, which this deployment does not need.
+//
+// The faces are loaded by fonts.scss; this only points Odoo at them.
+$o-font-family-sans-serif: ("IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+$o-headings-font-family: ("Bitter", Georgia, "Times New Roman", serif);
+$o-font-family-monospace: ("JetBrains Mono", "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace);

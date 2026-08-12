@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Two changes to web.login_layout, and no more.
+
+        `body_classname` is Odoo's own hook for exactly this, so the ground is
+        set without touching a selector. The lockup is appended after the card
+        rather than replacing anything inside it: the company logo the layout
+        renders is the workshop's, and it stays.
+
+        No text is added, deliberately. This addon ships no translatable
+        strings, which is why its catalogues are header-only.
+    -->
+    <template id="mb_brand_login_layout" inherit_id="web.login_layout">
+
+        <!--
+            `bg-100` is replaced rather than added to. It is a Bootstrap
+            utility, so it carries `!important` and beats any ground colour we
+            set on the same element no matter how the rule is written. Since
+            this addon is setting the ground explicitly, it takes the class
+            over entirely instead of layering on top of one that always wins.
+        -->
+        <xpath expr="//t[@t-set='body_classname']" position="attributes">
+            <attribute name="t-value">'o_mb_login'</attribute>
+        </xpath>
+
+        <!--
+            Anchored on the container, not on the card. The card carries its
+            classes through `t-attf-class`, which is a QWeb directive rather
+            than an attribute, so `hasclass('o_database_list')` finds nothing
+            at inheritance time and the install fails outright. The container's
+            `class` is static, and `inside` puts the lockup after the card,
+            which is where it belongs anyway.
+        -->
+        <xpath expr="//div[hasclass('container')]" position="inside">
+            <div class="o_mb_login_brand">
+                <img src="/mb_brand/static/src/img/weave.svg"
+                     alt="MakersBrain"
+                     loading="lazy"/>
+                <span>MakersBrain</span>
+            </div>
+        </xpath>
+
+    </template>
+
+</odoo>

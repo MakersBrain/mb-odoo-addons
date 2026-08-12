@@ -21,7 +21,7 @@ A module is listed here only if its code exists. Nothing below is planned work.
 
 - [The module set](#the-module-set)
 - [Cross-cutting rules](#cross-cutting-rules)
-- [Workshop foundation](#workshop-foundation) — `mb_workshop_base`
+- [Workshop foundation](#workshop-foundation) — `mb_workshop_base`, `mb_brand`
 - [Labels and piece identity](#labels-and-piece-identity) — `mb_label`, `mb_label_pos`
 - [Firing](#firing) — `mb_ceramics_firing`, `mb_ceramics_workflow`, `mb_kiln_bridge`
 - [Materials](#materials) — `mb_catalogue_sync`
@@ -212,6 +212,52 @@ floor. `mb_calendar_continuous` is the 24/7 calendar everything unattended runs
 on, the kiln first among them.
 
 5 test methods.
+
+### `mb_brand`
+
+Depends on `web`. Applies the MakersBrain visual identity, and deliberately
+nothing else — it declares no model, no menu and no access rule.
+
+**Variables, not selectors.** Odoo declares `$o-brand-primary`, `$primary`, the
+grey ramp and the font families in `web._assets_primary_variables`, every one of
+them `!default`. Prepending one file to that bundle sets them first, so core's
+declarations no-op and the whole web client follows. Chasing Odoo's class names
+with `!important` instead would break on each upgrade, and break silently: a
+stylesheet that no longer matches anything still compiles.
+
+**The public pages take their primary colour from a different place, and that
+cost an afternoon to find.** `html_editor` derives Bootstrap's `$theme-colors`
+from a colour *palette* rather than from `$primary`:
+`$o-color-palettes['base-1']['o-color-1']` becomes
+`$o-theme-color-palette['primary']` becomes `$theme-colors['primary']`, which is
+what generates `.btn-primary`. Its default is `$o-enterprise-color`. Setting only
+the brand colour therefore brands the backend and leaves the *login page* — the
+first page anyone sees — on stock Odoo purple. Both seams are set, and both are
+verified in the compiled bundle rather than by eye.
+
+**The login page keeps the workshop's logo.** `web.login_layout` renders
+`/web/binary/company_logo`, which is the artisan's own mark; replacing it with
+ours would be the wrong trade, because the person signing in works at that
+pottery. The company logo stays and a MakersBrain lockup sits under the card.
+
+Two selectors exist in the whole addon, both where no variable does: the login
+ground and the login card. `body_classname` is *replaced* rather than added to,
+because Bootstrap's `bg-100` carries `!important` and beats any ground colour
+set on the same element.
+
+Fonts are self-hosted: Bitter and IBM Plex Sans, both SIL OFL, in
+`static/src/fonts`. A webfont CDN would put a third party in the request path of
+every page load.
+
+The values mirror `brand/tokens.css`; `brand/design-chart.html` documents what
+they mean. SCSS cannot read CSS custom properties at compile time, so the mirror
+is maintained by hand and a change belongs upstream in the tokens first.
+
+Deliberately not done: the app switcher, list and form views keep Odoo's layout.
+
+No test methods: the addon ships no Python and no translatable strings, and what
+it does assert — that the bundles compile with the brand values in them — is not
+something an Odoo test method can see.
 
 ## Labels and piece identity
 
