@@ -1,0 +1,341 @@
+<title>MakersBrain</title>
+<style>
+__FONT_CSS__
+__TOKENS_CSS__
+__UI_CSS__
+
+/* ==========================================================================
+   Landing layer.
+   --------------------------------------------------------------------------
+   The interface runs at 15px because a members list is scanned a hundred
+   times. A landing page is read once, so it runs at the marketing scale
+   instead. Everything else -- colour, spacing, buttons, radius -- is the same
+   system the product uses; only the type scale and the rhythm change.
+
+   Prefix: lp-. Nothing here ships to the product.
+   ========================================================================== */
+
+.lp { font-size: var(--mb-text-body-lg); line-height: 1.6; }
+.lp h1, .lp h2, .lp h3 { letter-spacing: -0.022em; }
+
+.lp-wrap { max-width: 68rem; margin: 0 auto; padding: 0 1.5rem; }
+.lp-wrap.lp-column { max-width: 52rem; }
+.lp-narrow { max-width: 46rem; }
+
+/* The thread. The product's whole claim is that one record runs from raw
+   material to filed declaration, so the page is built on a literal one: a rule
+   down the left with a node at each stage. It is a sequence, which is the only
+   thing that justifies numbering it. */
+.lp-thread { position: relative; padding-left: 3.25rem; }
+.lp-thread::before {
+  content: "";
+  position: absolute;
+  left: 0.9rem;
+  top: 0.6rem;
+  bottom: 3rem;
+  width: 2px;
+  background: linear-gradient(var(--mb-accent-border), var(--mb-line));
+}
+.lp-node { position: relative; padding-bottom: var(--mb-space-7); }
+.lp-node::before {
+  content: "";
+  position: absolute;
+  left: -2.75rem;
+  top: 0.45rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  background: var(--mb-bg);
+  border: 2px solid var(--mb-accent);
+}
+.lp-node:last-child { padding-bottom: 0; }
+.lp-node h3 { font-size: 1.375rem; margin-bottom: 0.3rem; }
+.lp-node p { color: var(--mb-text-muted); max-width: 44ch; }
+.lp-node .lp-src {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-family: var(--mb-font-mono);
+  font-size: 0.75rem;
+  color: var(--mb-text-subtle);
+}
+@media (max-width: 640px) {
+  .lp-thread { padding-left: 2rem; }
+  .lp-thread::before { left: 0.28rem; }
+  .lp-node::before { left: -2rem; }
+}
+
+/* ---- hero ---- */
+.lp-hero { padding: var(--mb-space-8) 0 var(--mb-space-9); }
+.lp-hero-inner { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: var(--mb-space-7); align-items: center; }
+@media (max-width: 860px) { .lp-hero-inner { grid-template-columns: minmax(0, 1fr); gap: var(--mb-space-6); } }
+.lp-hero h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); line-height: 1.05; margin-bottom: var(--mb-space-4); }
+.lp-hero p.lp-sub { font-size: 1.1875rem; color: var(--mb-text-muted); max-width: 34ch; margin-bottom: var(--mb-space-5); }
+.lp-hero-art { display: grid; place-items: center; }
+.lp-hero-art svg { width: min(15rem, 60vw); height: auto; }
+@media (max-width: 860px) { .lp-hero-art { justify-items: start; } .lp-hero-art svg { width: 7rem; } }
+
+.lp-cta-row { display: flex; flex-wrap: wrap; gap: var(--mb-space-3); align-items: center; }
+.lp .button { font-size: 1rem; padding: 0.7rem 1.15rem; }
+.lp-aside { font-size: var(--mb-text-small); color: var(--mb-text-subtle); }
+
+/* ---- masthead ---- */
+.lp-top { border-bottom: var(--mb-border); background: var(--mb-surface); }
+.lp-top-inner { display: flex; align-items: center; gap: var(--mb-space-5); min-height: 4rem; }
+.lp-top .brand { font-size: 1.125rem; }
+.lp-top nav { margin-left: auto; display: flex; gap: var(--mb-space-5); font-size: var(--mb-text-small); }
+.lp-top nav a { color: var(--mb-text-muted); text-decoration: none; }
+.lp-top nav a:hover { color: var(--mb-text); }
+@media (max-width: 720px) { .lp-top nav { display: none; } }
+
+/* ---- bands ---- */
+.lp-band { padding: var(--mb-space-9) 0; border-top: var(--mb-border); }
+.lp-band.lp-sunken { background: var(--mb-surface-sunken); }
+.lp-band.lp-paper { background: var(--mb-surface); }
+.lp-band h2 { font-size: clamp(1.875rem, 4vw, 2.5rem); line-height: 1.12; margin-bottom: var(--mb-space-4); }
+.lp-band .lp-intro { color: var(--mb-text-muted); max-width: 52ch; margin-bottom: var(--mb-space-7); }
+
+.lp-eyebrow {
+  display: block;
+  font-size: var(--mb-text-micro);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--mb-tracking-micro);
+  color: var(--mb-accent-text);
+  margin-bottom: var(--mb-space-3);
+}
+
+/* ---- capability grid ---- */
+.lp-caps { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: var(--mb-space-5); }
+.lp-cap { display: flex; flex-direction: column; gap: 0.45rem; padding-top: var(--mb-space-4); border-top: 2px solid var(--mb-line-strong); }
+.lp-cap h3 { font-size: 1.125rem; }
+.lp-cap p { font-size: var(--mb-text-body); color: var(--mb-text-muted); }
+.lp-cap .lp-src { font-family: var(--mb-font-mono); font-size: 0.75rem; color: var(--mb-text-subtle); margin-top: auto; padding-top: 0.5rem; }
+
+/* ---- status ---- */
+.lp-status { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: var(--mb-space-4); }
+.lp-status-item { background: var(--mb-surface); border: var(--mb-border); border-radius: var(--mb-radius-lg); padding: var(--mb-space-4); display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+.lp-status-item p { font-size: var(--mb-text-body); color: var(--mb-text-muted); }
+.lp-status-item strong { font-family: var(--mb-font-display); font-size: 1.125rem; }
+
+.lp-quote { border-left: 3px solid var(--mb-accent); padding-left: var(--mb-space-4); font-size: 1.25rem; line-height: 1.45; max-width: 38ch; }
+
+/* ---- footer ---- */
+.lp-foot { border-top: var(--mb-border); padding: var(--mb-space-7) 0; background: var(--mb-surface); }
+.lp-foot-inner { display: flex; flex-wrap: wrap; gap: var(--mb-space-4); justify-content: space-between; align-items: center; font-size: var(--mb-text-small); color: var(--mb-text-subtle); }
+.lp-foot a { color: var(--mb-text-muted); }
+</style>
+
+<div class="lp">
+
+<header class="lp-top">
+  <div class="lp-wrap lp-top-inner">
+    <a class="brand" href="#top">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 3h26v6H9v20H3Z" fill="currentColor"/><path d="M29 29H3v-6h20V3h6Z" fill="var(--mb-brand)"/><path d="M23 3h6v6h-6Z" fill="currentColor"/></svg>
+      <span>MakersBrain</span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#thread">The thread</a>
+      <a href="#does">What it does</a>
+      <a href="#odoo">Built on Odoo</a>
+      <a href="#status">Where it is</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="lp-hero" id="top">
+  <div class="lp-wrap lp-hero-inner">
+    <div>
+      <h1>Your workshop already has a system. This one remembers it.</h1>
+      <p class="lp-sub">Materials, firings, pieces, labels, markets and the paperwork the state wants &mdash; one thread, from the clay to the receipt.</p>
+      <div class="lp-cta-row">
+        <a class="button" href="#access">Ask for early access</a>
+        <a class="button secondary" href="#thread">See how it works</a>
+      </div>
+      <p class="lp-aside" style="margin-top:var(--mb-space-4);">Open source, on Odoo 19. One database per workshop, and it is yours.</p>
+    </div>
+    <div class="lp-hero-art" aria-hidden="true">
+      <svg viewBox="0 0 32 32"><path d="M3 3h26v6H9v20H3Z" fill="currentColor"/><path d="M29 29H3v-6h20V3h6Z" fill="var(--mb-brand)"/><path d="M23 3h6v6h-6Z" fill="currentColor"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THE THREAD ================= -->
+<section class="lp-band lp-sunken" id="thread">
+  <div class="lp-wrap lp-column">
+    <span class="lp-eyebrow">The idea</span>
+    <h2>One thread, end to end</h2>
+    <p class="lp-intro">Most workshop software gives you an inventory list, a till, and a spreadsheet for the rest. The pieces never connect, so the question you actually have &mdash; <em>which bucket of glaze went on the mugs that sold at Vannes in March</em> &mdash; has no answer. MakersBrain is built the other way round: one identity that survives every step.</p>
+
+    <div class="lp-thread">
+      <div class="lp-node">
+        <h3>A material arrives</h3>
+        <p>A sack of stoneware, a bucket of glaze. It carries its supplier lot, and glazes carry whether they are food-safe &mdash; because that decides what you are allowed to make with them.</p>
+        <span class="lp-src">mb_catalogue_sync &middot; mb_inventory_capture</span>
+      </div>
+      <div class="lp-node">
+        <h3>A piece is made</h3>
+        <p>Thrown, trimmed, assembled. The work centres are real resources you queue for, so a fourteen-hour firing does not get chopped across three working days by a calendar that thinks you go home.</p>
+        <span class="lp-src">mb_workshop_base &middot; mb_ceramics_workflow</span>
+      </div>
+      <div class="lp-node">
+        <h3>It is fired</h3>
+        <p>Bisque, then glaze. The firing is a record with its programme and its load, and if your controller is a ROHDE, MakersBrain reads the schedule off it rather than asking you to retype it.</p>
+        <span class="lp-src">mb_ceramics_firing &middot; mb_kiln_bridge</span>
+      </div>
+      <div class="lp-node">
+        <h3>It gets a label</h3>
+        <p>A code, a QR and a printed label that comes out of a thermal printer at the right physical size. The QR resolves to that exact piece &mdash; not the product, the piece.</p>
+        <span class="lp-src">mb_label</span>
+      </div>
+      <div class="lp-node">
+        <h3>It sells</h3>
+        <p>Scan the label at a market and the till sells that serial. Or it goes out on d&eacute;p&ocirc;t-vente and you can still say where it is and whether it has sold.</p>
+        <span class="lp-src">mb_label_pos &middot; mb_depot &middot; mb_pos_sumup</span>
+      </div>
+      <div class="lp-node">
+        <h3>It is declared</h3>
+        <p>The market day totals up against the stall fee, the fuel and the hours. The quarter totals up against the URSSAF rates in force on the declaration date &mdash; not today's.</p>
+        <span class="lp-src">mb_commercial_operations &middot; l10n_fr_micro_urssaf</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHAT IT DOES ================= -->
+<section class="lp-band" id="does">
+  <div class="lp-wrap">
+    <span class="lp-eyebrow">What it keeps track of</span>
+    <h2>The parts you would otherwise keep in your head</h2>
+    <p class="lp-intro">Every one of these is a module you can install or leave out. A workshop that sells at markets but owns no kiln takes the label branch and none of the firing branch.</p>
+
+    <div class="lp-caps">
+      <div class="lp-cap">
+        <h3>Pieces and labels</h3>
+        <p>Serial identity for one-off work, QR codes that decode to the exact piece, and label layouts you edit in the browser and print on a thermal printer.</p>
+        <span class="lp-src">mb_label, mb_label_pos</span>
+      </div>
+      <div class="lp-cap">
+        <h3>Firing</h3>
+        <p>Kilns as schedulable resources on a 24/7 calendar, firing records with programmes and loads, and a connector for ROHDE controllers.</p>
+        <span class="lp-src">mb_ceramics_firing, mb_kiln_bridge</span>
+      </div>
+      <div class="lp-cap">
+        <h3>Food-contact compliance</h3>
+        <p>A mug carries the lead and cadmium limits of Directive 84/500/EEC. A decorative plate does not. The distinction is declared once and everything else follows from it.</p>
+        <span class="lp-src">mb_workshop_base</span>
+      </div>
+      <div class="lp-cap">
+        <h3>Consignment</h3>
+        <p>D&eacute;p&ocirc;t-vente as a first-class thing: what is out, at which shop, since when, and what has sold without anyone telling you.</p>
+        <span class="lp-src">mb_depot</span>
+      </div>
+      <div class="lp-cap">
+        <h3>Markets and profitability</h3>
+        <p>What a market day actually earned once the stall, the travel and the hours are counted against it. Some of them do not earn anything, and it is better to know which.</p>
+        <span class="lp-src">mb_commercial_operations</span>
+      </div>
+      <div class="lp-cap">
+        <h3>Payments</h3>
+        <p>SumUp as a payment provider at the till and against invoices, so the card machine you already own is the one the books know about.</p>
+        <span class="lp-src">mb_payment_sumup, mb_pos_sumup</span>
+      </div>
+      <div class="lp-cap">
+        <h3>French paperwork</h3>
+        <p>Micro-entreprise VAT handling and URSSAF declarations, computed from the rates that applied in the period rather than the ones showing today.</p>
+        <span class="lp-src">l10n_fr_micro_enterprise, l10n_fr_micro_urssaf</span>
+      </div>
+      <div class="lp-cap">
+        <h3>Capture</h3>
+        <p>Photograph a delivery or a supplier invoice and let it read the barcodes, the products and the lot numbers instead of typing them.</p>
+        <span class="lp-src">mb_inventory_capture, mb_invoice_capture</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ODOO ================= -->
+<section class="lp-band lp-paper" id="odoo">
+  <div class="lp-wrap">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));gap:var(--mb-space-7);align-items:start;">
+      <div>
+        <span class="lp-eyebrow">Built on Odoo</span>
+        <h2>Not a box you can be locked out of</h2>
+        <p class="lp-intro" style="margin-bottom:var(--mb-space-4);">MakersBrain is a set of addons for Odoo 19 Community, licensed LGPL-3 throughout. That is a deliberate choice with consequences you can check rather than take on trust.</p>
+        <p class="lp-quote">If we stopped tomorrow, your workshop would still open in the morning.</p>
+      </div>
+      <div class="lp-caps" style="grid-template-columns:minmax(0,1fr);gap:var(--mb-space-5);">
+        <div class="lp-cap">
+          <h3>One database per workshop</h3>
+          <p>Your records are not rows in a shared table keyed by a customer id. They are a database, and you can have a copy of it.</p>
+        </div>
+        <div class="lp-cap">
+          <h3>Real accounting underneath</h3>
+          <p>Invoicing, stock moves, manufacturing and point of sale are Odoo's, not a reimplementation. The specialist parts sit on top of them.</p>
+        </div>
+        <div class="lp-cap">
+          <h3>Open source, and inspectable</h3>
+          <p>Every module is LGPL-3. Nothing about how your firings, lots or declarations are computed is hidden from you.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATUS ================= -->
+<section class="lp-band lp-sunken" id="status">
+  <div class="lp-wrap">
+    <span class="lp-eyebrow">Where it is today</span>
+    <h2>Honestly: early, and specific</h2>
+    <p class="lp-intro">This is not a finished product with a marketing page pretending otherwise. It is being built in a working ceramics studio, and it is furthest along in the places that studio needed first.</p>
+
+    <div class="lp-status">
+      <div class="lp-status-item">
+        <span class="badge good"><span class="dot"></span>Working</span>
+        <strong>Ceramics, deeply</strong>
+        <p>Firing, glaze chemistry, food-contact rules and piece identity are built and tested. Other crafts can use the label, consignment, market and paperwork branches today.</p>
+      </div>
+      <div class="lp-status-item">
+        <span class="badge good"><span class="dot"></span>Working</span>
+        <strong>France, first</strong>
+        <p>Micro-entreprise and URSSAF are built because that is the regime in front of us. Other countries are not done and are not pretended to be.</p>
+      </div>
+      <div class="lp-status-item">
+        <span class="badge info"><span class="dot"></span>Verified</span>
+        <strong>192 server tests</strong>
+        <p>Run on every push, alongside a clean install and an in-place upgrade against an empty database. The label QR is checked by decoding a real generated image.</p>
+      </div>
+      <div class="lp-status-item">
+        <span class="badge warn"><span class="dot"></span>Not yet</span>
+        <strong>No open sign-up</strong>
+        <p>There is no self-serve checkout and no price list, because neither would be honest yet. Early access is a conversation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="lp-band" id="access">
+  <div class="lp-wrap lp-column">
+    <span class="lp-eyebrow">Early access</span>
+    <h2>If this sounds like your workshop</h2>
+    <p class="lp-intro">Tell us what you make, roughly how much of it, and what you currently do instead. If MakersBrain is not right for you we would rather say so than sell you a migration.</p>
+    <div class="lp-cta-row">
+      <!-- Placeholder address: confirm the real inbox before this page goes live. -->
+      <a class="button" href="mailto:hello@makersbrain.app?subject=Early%20access">Write to us</a>
+      <span class="lp-aside">hello@makersbrain.app</span>
+    </div>
+  </div>
+</section>
+
+<footer class="lp-foot">
+  <div class="lp-wrap lp-foot-inner">
+    <span class="brand" style="font-size:1rem;">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 3h26v6H9v20H3Z" fill="currentColor"/><path d="M29 29H3v-6h20V3h6Z" fill="var(--mb-brand)"/><path d="M23 3h6v6h-6Z" fill="currentColor"/></svg>
+      <span>MakersBrain</span>
+    </span>
+    <span>Addons for Odoo 19 Community &middot; LGPL-3</span>
+  </div>
+</footer>
+
+</div>
