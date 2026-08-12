@@ -1,0 +1,471 @@
+[
+ {
+  "module": "l10n_fr_micro_enterprise",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A VAT number is required when VAT-liable mode is selected.",
+  "fr": "Un numéro de TVA est obligatoire lorsque le mode assujetti à la TVA est sélectionné."
+ },
+ {
+  "module": "l10n_fr_micro_enterprise",
+  "surface": "field",
+  "locator": "l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__ape_code",
+  "msgid": "APE / NAF code",
+  "fr": "Code APE / NAF"
+ },
+ {
+  "module": "l10n_fr_micro_enterprise",
+  "surface": "action",
+  "locator": "l10n_fr_micro_enterprise.action_l10n_fr_micro_vat_switch_wizard",
+  "msgid": "Activate VAT-liable mode",
+  "fr": "Activer le mode assujetti à la TVA"
+ },
+ {
+  "module": "l10n_fr_micro_urssaf",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A filed URSSAF declaration cannot be deleted.",
+  "fr": "Une déclaration URSSAF déposée ne peut pas être supprimée."
+ },
+ {
+  "module": "l10n_fr_micro_urssaf",
+  "surface": "field",
+  "locator": "l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_acre_from",
+  "msgid": "ACRE from",
+  "fr": "ACRE depuis le"
+ },
+ {
+  "module": "l10n_fr_micro_urssaf",
+  "surface": "action",
+  "locator": "l10n_fr_micro_urssaf.action_urssaf_acre_rules",
+  "msgid": "ACRE rules",
+  "fr": "Règles ACRE"
+ },
+ {
+  "module": "mb_account_payment_sumup",
+  "surface": "field",
+  "locator": "mb_account_payment_sumup.field_mb_sumup_link_wizard__amount_max",
+  "msgid": "Amount Max",
+  "fr": "Montant maximum"
+ },
+ {
+  "module": "mb_account_payment_sumup",
+  "surface": "python",
+  "locator": "",
+  "msgid": "Only a posted customer invoice can have a SumUp payment link.",
+  "fr": "Seule une facture client comptabilisée peut avoir un lien de paiement SumUp."
+ },
+ {
+  "module": "mb_ai_bridge",
+  "surface": "python",
+  "locator": "",
+  "msgid": "AI job payloads may contain descriptors, never image bytes or credentials.",
+  "fr": "Les charges utiles des travaux d'IA peuvent contenir des descripteurs, jamais d'octets d'image ni d'identifiants de connexion."
+ },
+ {
+  "module": "mb_catalogue_sync",
+  "surface": "field",
+  "locator": "mb_catalogue_sync.field_mb_catalogue_service__api_key",
+  "msgid": "API key",
+  "fr": "Clé API"
+ },
+ {
+  "module": "mb_catalogue_sync",
+  "surface": "action",
+  "locator": "mb_catalogue_sync.action_mb_catalogue_service",
+  "msgid": "Catalogue service",
+  "fr": "Service de catalogue"
+ },
+ {
+  "module": "mb_catalogue_sync",
+  "surface": "menu",
+  "locator": "mb_catalogue_sync.menu_mb_catalogue_import",
+  "msgid": "Import materials",
+  "fr": "Importer des matières"
+ },
+ {
+  "module": "mb_ceramics_firing",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A completed or cancelled firing cannot be deleted.",
+  "fr": "Une cuisson terminée ou annulée ne peut pas être supprimée."
+ },
+ {
+  "module": "mb_ceramics_firing",
+  "surface": "field",
+  "locator": "mb_ceramics_firing.field_mb_kiln_program__provider_firing_at",
+  "msgid": "As fired on",
+  "fr": "Cuisson du"
+ },
+ {
+  "module": "mb_ceramics_firing",
+  "surface": "action",
+  "locator": "mb_ceramics_firing.mb_firing_action",
+  "msgid": "Firings",
+  "fr": "Cuissons"
+ },
+ {
+  "module": "mb_ceramics_workflow",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A completed or cancelled workshop session cannot be deleted.",
+  "fr": "Une séance d'atelier terminée ou annulée ne peut pas être supprimée."
+ },
+ {
+  "module": "mb_ceramics_workflow",
+  "surface": "field",
+  "locator": "mb_ceramics_workflow.field_mb_bisque_inspection__accepted_quantity",
+  "msgid": "Accepted Quantity",
+  "fr": "Quantité acceptée"
+ },
+ {
+  "module": "mb_ceramics_workflow",
+  "surface": "action",
+  "locator": "mb_ceramics_workflow.mb_bisque_stock_action",
+  "msgid": "Bisque Stock",
+  "fr": "Stock de biscuit"
+ },
+ {
+  "module": "mb_commercial_operations",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A completed occurrence cannot be cancelled.",
+  "fr": "Une occurrence terminée ne peut pas être annulée."
+ },
+ {
+  "module": "mb_commercial_operations",
+  "surface": "field",
+  "locator": "mb_commercial_operations.field_mb_commercial_operation_plan_wizard__accept_quote",
+  "msgid": "Accept Quote",
+  "fr": "Accepter le devis"
+ },
+ {
+  "module": "mb_commercial_operations",
+  "surface": "menu",
+  "locator": "mb_commercial_operations.menu_commercial_all_operations",
+  "msgid": "All Operations",
+  "fr": "Toutes les opérations"
+ },
+ {
+  "module": "mb_commercial_operations_depot",
+  "surface": "field",
+  "locator": "mb_commercial_operations_depot.field_mb_commercial_rent_period__active_days",
+  "msgid": "Active Days",
+  "fr": "Jours actifs"
+ },
+ {
+  "module": "mb_commercial_operations_depot",
+  "surface": "menu",
+  "locator": "mb_commercial_operations_depot.menu_commercial_depot_rules",
+  "msgid": "Assortment Rules",
+  "fr": "Règles d'assortiment"
+ },
+ {
+  "module": "mb_commercial_operations_depot",
+  "surface": "python",
+  "locator": "",
+  "msgid": "Choose a category for an assortment-bucket depot rule.",
+  "fr": "Choisissez une catégorie pour une règle de dépôt par segment d'assortiment."
+ },
+ {
+  "module": "mb_commercial_operations_expense",
+  "surface": "python",
+  "locator": "",
+  "msgid": "Complete the expected operation expenses before financial close.",
+  "fr": "Complétez les notes de frais attendues pour l'opération avant la clôture financière."
+ },
+ {
+  "module": "mb_commercial_operations_expense",
+  "surface": "field",
+  "locator": "mb_commercial_operations_expense.field_mb_commercial_operation__expenses_complete",
+  "msgid": "Expenses Complete",
+  "fr": "Notes de frais complètes"
+ },
+ {
+  "module": "mb_commercial_operations_fleet",
+  "surface": "python",
+  "locator": "",
+  "msgid": "Accepted travel estimates are immutable; calculate a new revision.",
+  "fr": "Les estimations de déplacement acceptées sont immuables ; calculez une nouvelle révision."
+ },
+ {
+  "module": "mb_commercial_operations_fleet",
+  "surface": "field",
+  "locator": "mb_commercial_operations_fleet.field_mb_commercial_contract__default_vehicle_id",
+  "msgid": "Default Vehicle",
+  "fr": "Véhicule par défaut"
+ },
+ {
+  "module": "mb_commercial_operations_mrp",
+  "surface": "python",
+  "locator": "",
+  "msgid": "Confirmed supply is late or lacks components.",
+  "fr": "L'approvisionnement confirmé est en retard ou manque de composants."
+ },
+ {
+  "module": "mb_commercial_operations_mrp",
+  "surface": "field",
+  "locator": "mb_commercial_operations_mrp.field_mb_market_stock_plan_line__manufacturing_product_id",
+  "msgid": "Manufacturable Product",
+  "fr": "Produit fabricable"
+ },
+ {
+  "module": "mb_commercial_operations_pos",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A processed POS order cannot be moved to another operation.",
+  "fr": "Une commande POS traitée ne peut pas être rattachée à une autre opération."
+ },
+ {
+  "module": "mb_commercial_operations_pos",
+  "surface": "field",
+  "locator": "mb_commercial_operations_pos.field_pos_config__mb_commercial_operation_id",
+  "msgid": "Market Operation",
+  "fr": "Opération de marché"
+ },
+ {
+  "module": "mb_commercial_operations_purchase",
+  "surface": "python",
+  "locator": "",
+  "msgid": "Draft RFQ supply awaits review and confirmation.",
+  "fr": "L'approvisionnement en demande de prix brouillon attend une révision et une confirmation."
+ },
+ {
+  "module": "mb_commercial_operations_purchase",
+  "surface": "field",
+  "locator": "mb_commercial_operations_purchase.field_purchase_order__mb_commercial_operation_id",
+  "msgid": "Mb Commercial Operation",
+  "fr": "Opération commerciale"
+ },
+ {
+  "module": "mb_commercial_operations_sale",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A confirmed sales order cannot be moved to another commercial operation.",
+  "fr": "Une commande client confirmée ne peut pas être rattachée à une autre opération commerciale."
+ },
+ {
+  "module": "mb_commercial_operations_sale",
+  "surface": "field",
+  "locator": "mb_commercial_operations_sale.field_sale_order__mb_commercial_operation_id",
+  "msgid": "Commercial Operation",
+  "fr": "Opération commerciale"
+ },
+ {
+  "module": "mb_commercial_operations_stock",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A lot or serial number can satisfy only one target in an operation.",
+  "fr": "Un lot ou numéro de série ne peut couvrir qu'une seule cible d'une opération."
+ },
+ {
+  "module": "mb_commercial_operations_stock",
+  "surface": "field",
+  "locator": "mb_commercial_operations_stock.field_mb_market_stock_plan_line__availability_calculated_at",
+  "msgid": "Availability Calculated At",
+  "fr": "Disponibilité calculée le"
+ },
+ {
+  "module": "mb_commercial_operations_urssaf",
+  "surface": "field",
+  "locator": "mb_commercial_operations_urssaf.field_mb_commercial_operation_plan_wizard_line__apply_urssaf_goods_rates",
+  "msgid": "Apply Urssaf Goods Rates",
+  "fr": "Appliquer les taux Urssaf marchandises"
+ },
+ {
+  "module": "mb_control_bridge",
+  "surface": "field",
+  "locator": "mb_control_bridge.field_mb_control_operation_receipt__command",
+  "msgid": "Command",
+  "fr": "Commande"
+ },
+ {
+  "module": "mb_control_bridge",
+  "surface": "python",
+  "locator": "",
+  "msgid": "French accounting cannot be initialized after journal items exist.",
+  "fr": "La comptabilité française ne peut pas être initialisée une fois que des écritures comptables existent."
+ },
+ {
+  "module": "mb_depot",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A commission must be between 0 and 100 percent.",
+  "fr": "Une commission doit être comprise entre 0 et 100 pour cent."
+ },
+ {
+  "module": "mb_depot",
+  "surface": "field",
+  "locator": "mb_depot.field_mb_depot_statement_line__amount_commission",
+  "msgid": "Amount Commission",
+  "fr": "Montant de la commission"
+ },
+ {
+  "module": "mb_depot",
+  "surface": "menu",
+  "locator": "mb_depot.menu_depot_root",
+  "msgid": "Depot Sales",
+  "fr": "Dépôt-vente"
+ },
+ {
+  "module": "mb_inventory_capture",
+  "surface": "python",
+  "locator": "",
+  "msgid": "; historical moves remain unchanged",
+  "fr": " ; les mouvements historiques restent inchangés"
+ },
+ {
+  "module": "mb_inventory_capture",
+  "surface": "javascript",
+  "locator": "",
+  "msgid": "Accepted image preview for selecting the lot area",
+  "fr": "Aperçu de l'image acceptée pour sélectionner la zone du lot"
+ },
+ {
+  "module": "mb_inventory_capture",
+  "surface": "field",
+  "locator": "mb_inventory_capture.field_res_company__mb_inventory_ai_enabled",
+  "msgid": "Allow inventory image AI fallback",
+  "fr": "Autoriser le repli IA sur les images de stock"
+ },
+ {
+  "module": "mb_inventory_capture_catalogue",
+  "surface": "python",
+  "locator": "",
+  "msgid": "Catalogue match; import or map it before applying inventory.",
+  "fr": "Correspondance dans le catalogue ; importez-la ou associez-la avant d'appliquer l'inventaire."
+ },
+ {
+  "module": "mb_invoice_capture",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A changed Paperless document revision was retained without overwriting the prior bill.",
+  "fr": "Une révision modifiée du document Paperless a été conservée sans écraser la facture précédente."
+ },
+ {
+  "module": "mb_invoice_capture",
+  "surface": "menu",
+  "locator": "mb_invoice_capture.menu_mb_invoice_capture",
+  "msgid": "Captured invoices",
+  "fr": "Factures capturées"
+ },
+ {
+  "module": "mb_invoice_capture",
+  "surface": "action",
+  "locator": "mb_invoice_capture.action_mb_invoice_capture",
+  "msgid": "Captured supplier invoices",
+  "fr": "Factures fournisseur capturées"
+ },
+ {
+  "module": "mb_kiln_bridge",
+  "surface": "field",
+  "locator": "mb_kiln_bridge.field_mb_kiln_connection__backfill_offset",
+  "msgid": "Backfill Offset",
+  "fr": "Décalage de reprise"
+ },
+ {
+  "module": "mb_kiln_bridge",
+  "surface": "action",
+  "locator": "mb_kiln_bridge.mb_kiln_connection_action",
+  "msgid": "Kiln connections",
+  "fr": "Connexions de four"
+ },
+ {
+  "module": "mb_kiln_bridge",
+  "surface": "python",
+  "locator": "",
+  "msgid": "Programmes refreshed",
+  "fr": "Programmes rafraîchis"
+ },
+ {
+  "module": "mb_label",
+  "surface": "javascript",
+  "locator": "",
+  "msgid": "1 successful send in this window",
+  "fr": "1 envoi réussi dans cette fenêtre"
+ },
+ {
+  "module": "mb_label",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A QR value cannot exceed 1024 characters.",
+  "fr": "Une valeur QR ne peut pas dépasser 1024 caractères."
+ },
+ {
+  "module": "mb_label",
+  "surface": "field",
+  "locator": "mb_label.field_mb_label_print_job__artifact_name",
+  "msgid": "Artifact Name",
+  "fr": "Nom de l'artefact"
+ },
+ {
+  "module": "mb_label_pos",
+  "surface": "javascript",
+  "locator": "",
+  "msgid": "Flash off",
+  "fr": "Torche éteinte"
+ },
+ {
+  "module": "mb_label_pos",
+  "surface": "field",
+  "locator": "mb_label_pos.field_pos_config__mb_label_qr_prefixes",
+  "msgid": "Mb Label Qr Prefixes",
+  "fr": "Préfixes de QR d'étiquette"
+ },
+ {
+  "module": "mb_payment_sumup",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A completed SumUp checkout cannot be replaced.",
+  "fr": "Un paiement SumUp déjà finalisé ne peut pas être remplacé."
+ },
+ {
+  "module": "mb_payment_sumup",
+  "surface": "field",
+  "locator": "mb_payment_sumup.field_payment_transaction__sumup_checkout_url",
+  "msgid": "SumUp Checkout URL",
+  "fr": "URL de paiement SumUp"
+ },
+ {
+  "module": "mb_pos_sumup",
+  "surface": "javascript",
+  "locator": "",
+  "msgid": "Only an order that was paid with SumUp can be refunded to SumUp.",
+  "fr": "Seule une commande réglée avec SumUp peut être remboursée via SumUp."
+ },
+ {
+  "module": "mb_pos_sumup",
+  "surface": "field",
+  "locator": "mb_pos_sumup.field_pos_payment_method__sumup_skip_success_screen",
+  "msgid": "Skip SumUp Success Screen",
+  "fr": "Ignorer l'écran de confirmation SumUp"
+ },
+ {
+  "module": "mb_pos_sumup",
+  "surface": "python",
+  "locator": "",
+  "msgid": "SumUp has no record of the payment to refund.",
+  "fr": "SumUp n'a aucune trace du paiement à rembourser."
+ },
+ {
+  "module": "mb_workshop_base",
+  "surface": "field",
+  "locator": "mb_workshop_base.field_mb_migration_test__cadmium_result",
+  "msgid": "Cadmium migration",
+  "fr": "Migration de cadmium"
+ },
+ {
+  "module": "mb_workshop_base",
+  "surface": "menu",
+  "locator": "mb_workshop_base.menu_mb_workshop_root",
+  "msgid": "Ceramics",
+  "fr": "Céramique"
+ },
+ {
+  "module": "mb_workshop_base",
+  "surface": "action",
+  "locator": "mb_workshop_base.mb_migration_test_action",
+  "msgid": "Migration tests",
+  "fr": "Essais de migration"
+ }
+]

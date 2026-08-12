@@ -15,7 +15,7 @@ DISPOSABLE_DB ?= mb_scratch
 # itself, but writing it down means `make install` on an empty database is one
 # command and the reader can see the addon families from SPEC.md.
 MODULES := mb_workshop_base,mb_label,mb_label_pos,mb_ceramics_firing,mb_ceramics_workflow,mb_kiln_bridge,\
-mb_catalogue_sync,mb_control_bridge,mb_invoice_capture,mb_inventory_capture,mb_inventory_capture_catalogue,mb_depot,mb_payment_sumup,\
+mb_catalogue_sync,mb_control_bridge,mb_ai_bridge,mb_invoice_capture,mb_inventory_capture,mb_inventory_capture_catalogue,mb_depot,mb_payment_sumup,\
 mb_pos_sumup,mb_account_payment_sumup,l10n_fr_micro_enterprise,l10n_fr_micro_urssaf
 MODULES := $(MODULES),mb_commercial_operations,mb_commercial_operations_stock,mb_commercial_operations_depot,\
 mb_commercial_operations_mrp,mb_commercial_operations_purchase,mb_commercial_operations_fleet,\
@@ -35,7 +35,7 @@ MODULES_ARG := $(subst $(space),,$(MODULES))
 # Down to one class:   make test TAGS=/mb_label:TestLabel
 # Or one method:       make test TAGS=/mb_label:TestLabel.test_qr_collision
 TAGS ?= /mb_workshop_base,/mb_label,/mb_label_pos,/mb_ceramics_firing,/mb_ceramics_workflow,/mb_kiln_bridge,\
-/mb_catalogue_sync,/mb_control_bridge,/mb_invoice_capture,/mb_inventory_capture,/mb_inventory_capture_catalogue,/mb_depot,/mb_payment_sumup,\
+/mb_catalogue_sync,/mb_control_bridge,/mb_ai_bridge,/mb_invoice_capture,/mb_inventory_capture,/mb_inventory_capture_catalogue,/mb_depot,/mb_payment_sumup,\
 /mb_pos_sumup,/mb_account_payment_sumup,/l10n_fr_micro_enterprise,/l10n_fr_micro_urssaf
 TAGS := $(TAGS),/mb_commercial_operations,/mb_commercial_operations_stock,\
 /mb_commercial_operations_depot,/mb_commercial_operations_mrp,/mb_commercial_operations_purchase,\
@@ -113,8 +113,17 @@ test: ## Install MODULES on a fresh disposable database and run their tests
 		--test-tags "$(subst $(space),,$(TAGS))" \
 		--stop-after-init --http-port=0 --gevent-port=0 --log-level=test
 
-check: lint ## Everything CI runs that needs no container
+check: lint i18n-check ## Everything CI runs that needs no container
 	python3 tools/check_addons.py
+
+# polib comes through uv rather than a checked-in requirements file: nothing
+# here is a Python package, so there is no install step to hang a dependency on.
+i18n-check: ## Translation catalogues and source marking (no container needed)
+	uv run --no-project --with polib python tools/check_i18n.py --all --summary
+
+i18n-pot: ## Re-export every POT from DB_NAME; the catalogue-freshness gate
+	./tools/i18n.sh pot $(DB_NAME) $(shell ls addons)
+	uv run --no-project --with polib python tools/i18n_seed_po.py $(shell ls addons)
 
 lint: ## Ruff, using the narrow correctness ruleset in pyproject.toml
 	@command -v ruff >/dev/null 2>&1 && ruff check . || uvx ruff@latest check .

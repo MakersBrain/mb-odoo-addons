@@ -1,0 +1,179 @@
+{
+  "_comment": [
+    "Reviewed exceptions for tools/check_i18n.py. Every entry is a decision, not",
+    "a way to make a finding go away. The coordinator owns this file.",
+    "",
+    "_global applies to every addon, for terms Odoo exports into each module's",
+    "catalogue separately but whose French is the English word. Terms marked",
+    "below as verified appear identically in the French catalogues shipped with",
+    "the Odoo 19 image (docs/i18n/odoo_fr_reference.json); the rest are ordinary",
+    "French words that happen to be spelled as in English. Neither kind is an",
+    "untranslated string.",
+    "",
+    "Per addon:",
+    "  identical  msgids whose French translation is legitimately the same string",
+    "             as the English source: brands, acronyms, legal references, and",
+    "             technical tokens that appear as UI labels.",
+    "  stale      msgids kept in fr.po although the current POT no longer has",
+    "             them. Temporary by design; each needs a reason and a removal.",
+    "  source     escape hatches for the source scanner.",
+    "    files    repository-relative path prefixes that hold data rather than",
+    "             interface: protocol constant tables, device capability maps.",
+    "    texts    exact literals that stay English everywhere, such as barcode",
+    "             symbology names and device model names."
+  ],
+
+  "_global": {
+    "_verified_against_odoo": [
+      "Alias", "Code", "Configuration", "Copies", "Date", "Destination",
+      "Documents", "Format", "ID", "Journal", "Lot", "Manager", "Messages",
+      "Note", "Notes", "Orientation", "Plan", "Portrait", "Production",
+      "Productions", "Route", "Session", "Source", "Total", "Type", "km"
+    ],
+    "identical": [
+      "Alias",
+      "Capture",
+      "Catalogue",
+      "Centre",
+      "Code",
+      "Commission",
+      "Configuration",
+      "Copies",
+      "Date",
+      "Description",
+      "Destination",
+      "Documents",
+      "Format",
+      "Horizontal",
+      "ID",
+      "Journal",
+      "Lot",
+      "Manager",
+      "Messages",
+      "Net",
+      "Note",
+      "Notes",
+      "OCR",
+      "Orientation",
+      "Phases",
+      "Plan",
+      "Portrait",
+      "Production",
+      "Productions",
+      "Rotation",
+      "Route",
+      "Service",
+      "Session",
+      "Source",
+      "Stock",
+      "Total",
+      "Type",
+      "Version",
+      "Versions",
+      "Vertical",
+      "Zones",
+      "Zoom",
+      "id",
+      "km"
+    ]
+  },
+
+  "l10n_fr_micro_enterprise": {
+    "identical": [
+      "32.99Z",
+      "Factur-x/XRechnung CII 2.2.0"
+    ]
+  },
+
+  "mb_payment_sumup": {
+    "identical": [
+      "SumUp"
+    ]
+  },
+
+  "mb_commercial_operations": {
+    "identical": [
+      "h",
+      "Source / date"
+    ]
+  },
+
+  "mb_commercial_operations_urssaf": {
+    "identical": [
+      "URSSAF",
+      "CFP",
+      "VFL"
+    ]
+  },
+
+  "mb_ceramics_firing": {
+    "identical": [
+      "Programme",
+      "Programmes",
+      "Programme %s",
+      "Programme 4",
+      "ROHDE myKiln"
+    ]
+  },
+
+  "mb_kiln_bridge": {
+    "identical": [
+      "ROHDE myKiln",
+      "myKiln"
+    ]
+  },
+
+  "mb_catalogue_sync": {
+    "identical": [
+      "PC-20, SC74, hot tamale",
+      "https://catalogue.makersbrain.example"
+    ]
+  },
+
+  "mb_depot": {
+    "identical": [
+      "%(partner)s (-%(pct)s%%)",
+      "Commission (%)"
+    ]
+  },
+
+  "mb_inventory_capture": {
+    "identical": [
+      "Anthropic Claude",
+      "Azure multimodal",
+      "GTIN 8",
+      "GTIN 12",
+      "GTIN 13",
+      "GTIN 14",
+      "Google Gemini",
+      "OpenAI"
+    ]
+  },
+
+  "mb_invoice_capture": {
+    "identical": [
+      "Azure Document Intelligence"
+    ]
+  },
+
+  "mb_label": {
+    "identical": [
+      "%(name)s · v%(version)s",
+      "(mm)",
+      "Floyd-Steinberg (photo)",
+      "Label Studio",
+      "NIIMBOT BLE",
+      "Phomemo BLE",
+      "QR",
+      "https://instagram.com/username"
+    ],
+    "source": {
+      "texts": [
+        "Code 128",
+        "Code 39",
+        "Phomemo BLE families",
+        "NIIMBOT D110 family"
+      ]
+    }
+  }
+}
