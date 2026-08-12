@@ -1,0 +1,146 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_ai_bridge
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid ""
+"AI job payloads may contain descriptors, never image bytes or credentials."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "An AI job payload must be an object."
+msgstr ""
+
+#. module: mb_ai_bridge
+#: model:ir.model.fields,field_description:mb_ai_bridge.field_mb_ai_gateway__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_ai_bridge
+#: model:ir.model.fields,field_description:mb_ai_bridge.field_mb_ai_gateway__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_ai_bridge
+#: model:ir.model,name:mb_ai_bridge.model_mb_ai_gateway
+msgid "Provider-neutral MakersBrain AI gateway"
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "Raw AI provider responses must not be retained in Odoo."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI callback attempt ID is invalid."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI callback kind is not allowed for this task."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI callback must be an object."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI callback provider and model are invalid."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI callback request ID is invalid."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI job payload exceeds the descriptor limit."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI job payload must be valid JSON."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI operation key is invalid."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI request could not be queued. Try again."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI request failed; try again."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI request timed out; try again."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The AI task has an invalid internal route."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The MakersBrain AI gateway is not configured."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "The requested AI task is not registered."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "This AI task does not allow synchronous requests."
+msgstr ""
+
+#. module: mb_ai_bridge
+#. odoo-python
+#: code:addons/mb_ai_bridge/models/gateway.py:0
+msgid "This company is not linked to a control-plane workshop."
+msgstr ""

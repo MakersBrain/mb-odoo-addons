@@ -43,6 +43,7 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 	)
 	source_ids = fields.One2many(
 		"l10n.fr.micro.urssaf.declaration.source", "declaration_id", copy=False,
+		string="Receipt evidence",
 	)
 	anomaly_text = fields.Text(readonly=True, copy=False)
 	blocking_anomaly = fields.Boolean(readonly=True, copy=False)
@@ -774,7 +775,7 @@ class L10nFrMicroUrssafDeclaration(models.Model):
 			missing.append(_("consular-chamber"))
 		if self.company_id._l10n_fr_micro_has_versement_on(event["date"]) \
 				and not rate_values["liberatoire_rate_id"]:
-			missing.append(_("versement-libératoire"))
+			missing.append(_("flat-rate income tax payment"))
 		return [
 			_(
 				"No applicable %(levy)s rate exists for %(category)s on %(date)s.",
@@ -1032,6 +1033,7 @@ class L10nFrMicroUrssafDeclarationLine(models.Model):
 	category = fields.Selection(URSSAF_CATEGORIES, required=True, index=True)
 	source_ids = fields.One2many(
 		"l10n.fr.micro.urssaf.declaration.source", "declaration_line_id",
+		string="Receipt evidence",
 	)
 	current_turnover = fields.Monetary(readonly=True)
 	prior_period_adjustment = fields.Monetary(readonly=True)
@@ -1179,7 +1181,7 @@ class L10nFrMicroUrssafDeclarationSource(models.Model):
 	partial_id = fields.Many2one("account.partial.reconcile", ondelete="restrict")
 	origin_move_id = fields.Many2one("account.move", ondelete="restrict")
 	pos_order_id = fields.Many2one("pos.order", ondelete="restrict")
-	description = fields.Char()
+	description = fields.Char(string="Receipt description")
 	receipt_method = fields.Selection(
 		selection=[
 			("transfer", "Bank transfer"), ("card", "Card"),
@@ -1200,8 +1202,13 @@ class L10nFrMicroUrssafDeclarationSource(models.Model):
 	chamber_rate_id = fields.Many2one("l10n.fr.micro.urssaf.rate", string="Chamber-tax rule", ondelete="restrict")
 	chamber_rate = fields.Float(string="Chamber-tax rate (%)", digits=(8, 4))
 	chamber_amount = fields.Monetary()
-	liberatoire_rate_id = fields.Many2one("l10n.fr.micro.urssaf.rate", string="Versement-libératoire rule", ondelete="restrict")
-	liberatoire_rate = fields.Float(string="Versement-libératoire rate (%)", digits=(8, 4))
+	liberatoire_rate_id = fields.Many2one(
+		"l10n.fr.micro.urssaf.rate", string="Flat-rate income tax payment rule",
+		ondelete="restrict",
+	)
+	liberatoire_rate = fields.Float(
+		string="Flat-rate income tax payment rate (%)", digits=(8, 4),
+	)
 	liberatoire_amount = fields.Monetary()
 
 	_company_event_unique = models.Constraint(

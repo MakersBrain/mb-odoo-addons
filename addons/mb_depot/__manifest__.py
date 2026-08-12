@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Dépôt-vente",
+    "name": "Makersbrain Consignment",
     "summary": "Consignment stock held at galleries and shops, and the statement that settles it.",
     "description": """
 Odoo has no outbound consignment. Its built-in Consignment setting is the other
@@ -9,7 +9,7 @@ everyone builds.
 
 A depot is a *warehouse* owned by us and physically held by a gallery. Its stock
 location is internal, which keeps unsold pieces on our balance sheet with no
-revenue recognised - the legal situation of dépôt-vente; delivering to the
+revenue recognised - the legal situation of consignment selling; delivering to the
 customer location instead would derecognise the stock with no counterpart
 revenue. Being a warehouse of its own is what keeps an ordinary delivery from
 reserving a piece standing on a shelf in Nantes, and what makes every
@@ -32,7 +32,7 @@ This module adds what Odoo and OCA do not have:
   period, per piece. Sold and returned are both outgoing moves and are told
   apart by destination, which is what makes the statement reconcile against the
   quants rather than drift from them;
-* a bon de dépôt for the placement transfer. stock_picking_report_valued cannot
+* a consignment note for the placement transfer. stock_picking_report_valued cannot
   serve here: every value on it comes from move_id.sale_line_id, and a placement
   is an internal transfer with no sale line, so it renders blank;
 * the product catalog on a placement transfer. product.catalog.mixin is opt-in
@@ -46,7 +46,7 @@ This module adds what Odoo and OCA do not have:
   transfer out of the depot is what gates the gallery's invoice rather than the
   confirmation of an order.
 
-The commission itself is a pricelist, not code: under achat-revente sur vente
+The commission itself is a pricelist, not code: under purchase-resale on sale
 the gallery buys at list minus its percentage at the moment it sells. For that
 percentage to appear on the invoice as a discount rather than a quietly reduced
 unit price, the pricelist item must be compute_price='percentage' AND the
@@ -56,7 +56,7 @@ _show_discount(). The wizard sets both.
 Sourcing needs no third-party module: a sale from a depot is a sale from that
 warehouse, which is Odoo's own Warehouse field on the quotation.
 """,
-    "version": "19.0.4.0.6",
+    "version": "19.0.4.0.7",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",

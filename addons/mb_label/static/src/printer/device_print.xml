@@ -6,7 +6,7 @@
                 <div class="row g-4 justify-content-center">
                     <div class="col-lg-6 text-center">
                         <div class="o_mb_print_preview p-4 rounded border bg-light"><img t-att-src="state.job.png_url" t-att-alt="state.job.name"/></div>
-                        <p class="text-muted mt-2"><t t-esc="state.job.width_mm"/> × <t t-esc="state.job.height_mm"/> mm · <t t-esc="state.job.dpi"/> dpi · <t t-esc="state.job.copies"/> copies</p>
+                        <p class="text-muted mt-2"><t t-esc="jobSummary"/></p>
                     </div>
                     <div class="col-lg-4">
                         <h2 class="h4">Print label</h2>
@@ -26,9 +26,7 @@
                             <select class="form-select" data-setting="model" t-on-change="updatePhomemoSetting" t-att-value="state.model">
                                 <option value="auto">Automatic from Bluetooth name</option>
                                 <t t-foreach="state.phomemoModels" t-as="model" t-key="model.id">
-                                    <option t-att-value="model.id" t-att-disabled="!model.ble">
-                                        <t t-esc="model.name"/> · <t t-esc="model.dpi"/> dpi<t t-if="!model.ble"> · USB only</t>
-                                    </option>
+                                    <option t-att-value="model.id" t-att-disabled="!model.ble"><t t-esc="phomemoModelLabel(model)"/></option>
                                 </t>
                             </select>
                             <label class="form-label mt-3">Speed: <t t-esc="state.speed"/></label>
@@ -70,7 +68,7 @@
                         <div class="d-grid gap-2 mt-4">
                             <button class="btn btn-primary btn-lg" t-on-click="print" t-att-disabled="state.busy"><t t-if="state.busy">Printing…</t><t t-elif="state.printedCount">Print another</t><t t-else="">Print</t></button>
                             <button t-if="state.adapter === 'phomemo' || state.adapter === 'niimbot'" class="btn btn-outline-primary" t-on-click="chooseAnother" t-att-disabled="state.busy">Choose another printer and print</button>
-                            <p t-if="state.printedCount" class="small text-success text-center mb-0"><t t-esc="state.printedCount"/> successful send<t t-if="state.printedCount !== 1">s</t> in this window</p>
+                            <p t-if="state.printedCount" class="small text-success text-center mb-0"><t t-esc="sendSummary"/></p>
                             <button class="btn btn-outline-secondary" t-on-click="downloadPdf">Download exact-size PDF</button>
                             <button class="btn btn-link" t-on-click="close">Close</button>
                         </div>

@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.float_utils import float_compare
 
@@ -58,14 +58,14 @@ class MbInspection(models.TransientModel):
     def _check_nonnegative(self):
         for wizard in self:
             if min(wizard.accepted_quantity, wizard.second_quantity, wizard.loss_quantity) < 0:
-                raise ValidationError("Inspection quantities cannot be negative.")
+                raise ValidationError(_("Inspection quantities cannot be negative."))
 
     def _create_lots(self, product, quantity):
         if product.tracking == "none" or not quantity:
             return self.env["stock.lot"]
         count = 1 if product.tracking == "lot" else int(quantity)
         if product.tracking == "serial" and quantity != count:
-            raise UserError("A serial-tracked inspection quantity must be a whole number.")
+            raise UserError(_("A serial-tracked inspection quantity must be a whole number."))
         return self.env["stock.lot"].create([{
             "name": self.env["ir.sequence"].next_by_code("mb.finished.identity"),
             "product_id": product.id,
@@ -76,9 +76,9 @@ class MbInspection(models.TransientModel):
         if not self.second_quantity:
             return self.env["stock.move"]
         if not self.second_product_id:
-            raise UserError("Configure a seconds product before recording seconds.")
+            raise UserError(_("Configure a seconds product before recording seconds."))
         if not self.seconds_location_id:
-            raise UserError("Choose the internal location that receives seconds.")
+            raise UserError(_("Choose the internal location that receives seconds."))
         production = self.production_id
         values = production._get_move_finished_values(
             self.second_product_id.id,
@@ -109,17 +109,19 @@ class MbInspection(models.TransientModel):
                 move.product_uom_qty,
                 precision_rounding=move.product_uom.rounding,
             ) != 0:
-                raise UserError(
-                    "%s must be reserved in the exact bill-of-material quantity."
-                    % move.product_id.display_name
-                )
+                raise UserError(_(
+                    "%(product)s must be reserved in the exact "
+                    "bill-of-material quantity.",
+                    product=move.product_id.display_name,
+                ))
             if move.product_id.tracking != "none" and any(
                 not line.lot_id for line in lines
             ):
-                raise UserError(
-                    "%s requires a lot or serial number before inspection."
-                    % move.product_id.display_name
-                )
+                raise UserError(_(
+                    "%(product)s requires a lot or serial number before "
+                    "inspection.",
+                    product=move.product_id.display_name,
+                ))
             if move.state != "done":
                 move.picked = True
 
@@ -127,26 +129,24 @@ class MbInspection(models.TransientModel):
         self.ensure_one()
         production = self.production_id
         if production.state in ("done", "cancel") or production.mb_inspected:
-            raise UserError("This manufacturing order has already been closed.")
+            raise UserError(_("This manufacturing order has already been closed."))
         rounding = production.product_uom_id.rounding
         total = self.accepted_quantity + self.second_quantity + self.loss_quantity
         if float_compare(total, production.product_qty, precision_rounding=rounding) != 0:
-            raise UserError(
-                "First-quality, second and process-loss quantities must equal selected blanks."
-            )
+            raise UserError(_("First-quality, second and process-loss quantities must equal selected blanks."))
         firing_orders = production.workorder_ids.filtered(
             lambda workorder: workorder.operation_id.mb_kiln_program_id
         )
         if any(order.mb_firing_id.state != "done" for order in firing_orders):
-            raise UserError("Every firing operation must be unloaded before inspection.")
+            raise UserError(_("Every firing operation must be unloaded before inspection."))
         final_order = production.workorder_ids[-1:]
         unfinished_predecessors = (production.workorder_ids - final_order).filtered(
             lambda workorder: workorder.state not in ("done", "cancel")
         )
         if unfinished_predecessors:
-            raise UserError("Complete every operation before final inspection.")
+            raise UserError(_("Complete every operation before final inspection."))
         if self.loss_quantity and not self.loss_reason:
-            raise UserError("Record why the pieces were lost.")
+            raise UserError(_("Record why the pieces were lost."))
         self._prepare_exact_material_consumption()
         main_lots = self._create_lots(production.product_id, self.accepted_quantity)
         production.lot_producing_ids = [fields.Command.set(main_lots.ids)]
@@ -171,7 +171,7 @@ class MbInspection(models.TransientModel):
             skip_redirection=True,
         ).button_mark_done()
         if production.state != "done":
-            raise UserError("The manufacturing order needs manual review before completion.")
+            raise UserError(_("The manufacturing order needs manual review before completion."))
         production.write({"mb_inspected": True})
         production.mb_board_content_ids.filtered(
             lambda content: content.state == "current").action_remove()

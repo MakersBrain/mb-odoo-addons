@@ -1,6 +1,6 @@
 import re
 
-from odoo import fields, models
+from odoo import _, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -26,16 +26,23 @@ class ResCompany(models.Model):
     mb_control_workshop_id = fields.Char(
         string="Control-plane workshop ID", copy=False, readonly=True, index=True
     )
-    mb_entitlement_version = fields.Integer(default=0, readonly=True, copy=False)
-    mb_entitlement_plan = fields.Char(readonly=True, copy=False)
+    mb_entitlement_version = fields.Integer(
+        string="Entitlement version", default=0, readonly=True, copy=False
+    )
+    mb_entitlement_plan = fields.Char(string="Entitlement plan", readonly=True, copy=False)
     mb_entitlement_status = fields.Selection(
+        string="Entitlement status",
         selection=[(value, value.replace("_", " ").title()) for value in sorted(ENTITLEMENT_STATUSES)],
         readonly=True,
         copy=False,
     )
-    mb_entitlement_limits = fields.Json(readonly=True, copy=False)
-    mb_entitlement_expires_at = fields.Datetime(readonly=True, copy=False)
-    mb_entitlement_signature = fields.Char(readonly=True, copy=False)
+    mb_entitlement_limits = fields.Json(string="Entitlement limits", readonly=True, copy=False)
+    mb_entitlement_expires_at = fields.Datetime(
+        string="Entitlement expiry", readonly=True, copy=False
+    )
+    mb_entitlement_signature = fields.Char(
+        string="Entitlement signature", readonly=True, copy=False
+    )
 
     _control_workshop_unique = models.Constraint(
         "UNIQUE(mb_control_workshop_id)",
@@ -49,17 +56,17 @@ class ResCompany(models.Model):
         client_id = str(payload.get("oidc_client_id", "")).strip()
         issuer = str(payload.get("oidc_issuer", "")).rstrip("/")
         if not UUID_RE.fullmatch(workshop_id):
-            raise ValidationError("workshop_id must be a lowercase UUID")
+            raise ValidationError(_("workshop_id must be a lowercase UUID"))
         if self.mb_control_workshop_id and self.mb_control_workshop_id != workshop_id:
-            raise ValidationError("this company is linked to another workshop")
+            raise ValidationError(_("this company is linked to another workshop"))
         if not client_id or not issuer.startswith(("https://", "http://rauthy.localhost:")):
-            raise ValidationError("OIDC client and trusted issuer are required")
+            raise ValidationError(_("OIDC client and trusted issuer are required"))
         if "auth.oauth.provider" not in self.env:
-            raise ValidationError("the authorization-code OIDC module is not installed")
+            raise ValidationError(_("the authorization-code OIDC module is not installed"))
         provider_model = self.env["auth.oauth.provider"].sudo()
         required = {"flow", "token_endpoint", "jwks_uri", "client_secret"}
         if not required.issubset(provider_model._fields):
-            raise ValidationError("the installed OAuth provider does not support authorization-code OIDC")
+            raise ValidationError(_("the installed OAuth provider does not support authorization-code OIDC"))
         values = {
             "name": "MakersBrain",
             "client_id": client_id,
@@ -101,7 +108,7 @@ class ResCompany(models.Model):
             ("company_id", "=", self.id),
         ]):
             raise ValidationError(
-                "French accounting cannot be initialized after journal items exist."
+                _("French accounting cannot be initialized after journal items exist.")
             )
         self.env["account.chart.template"].sudo().try_loading(
             "fr", company=self, install_demo=False
@@ -124,22 +131,22 @@ class ResCompany(models.Model):
         module_key = str(payload.get("module_key", ""))
         modules = payload.get("modules")
         if workshop_id != self.mb_control_workshop_id:
-            raise ValidationError("module bundle belongs to another workshop")
+            raise ValidationError(_("module bundle belongs to another workshop"))
         expected = MODULE_BUNDLES.get(module_key)
         if expected is None or not isinstance(modules, list) or tuple(modules) != expected:
-            raise ValidationError("unsupported module bundle")
+            raise ValidationError(_("unsupported module bundle"))
         records = self.env["ir.module.module"].sudo().search([
             ("name", "in", list(expected)),
         ])
         if set(records.mapped("name")) != set(expected):
-            raise ValidationError("a supported module is unavailable in this release")
+            raise ValidationError(_("a supported module is unavailable in this release"))
         invalid = records.filtered(
             lambda module: module.state not in (
                 "uninstalled", "to install", "installed", "to upgrade",
             )
         )
         if invalid:
-            raise ValidationError("a supported module cannot currently be enabled")
+            raise ValidationError(_("a supported module cannot currently be enabled"))
         pending = records.filtered(lambda module: module.state == "uninstalled")
         if pending:
             # Only schedule the native module operation here. Immediate module
@@ -165,21 +172,21 @@ class ResCompany(models.Model):
         limits = payload.get("limits", {})
         signature = payload.get("signature")
         if not UUID_RE.fullmatch(workshop_id):
-            raise ValidationError("workshop_id must be a lowercase UUID")
+            raise ValidationError(_("workshop_id must be a lowercase UUID"))
         if not isinstance(version, int) or isinstance(version, bool) or version < 1:
-            raise ValidationError("entitlement version must be a positive integer")
+            raise ValidationError(_("entitlement version must be a positive integer"))
         if status not in ENTITLEMENT_STATUSES:
-            raise ValidationError("unsupported entitlement status")
+            raise ValidationError(_("unsupported entitlement status"))
         if not isinstance(plan, str) or not plan.strip():
-            raise ValidationError("entitlement plan is required")
+            raise ValidationError(_("entitlement plan is required"))
         if not isinstance(limits, dict):
-            raise ValidationError("entitlement limits must be an object")
+            raise ValidationError(_("entitlement limits must be an object"))
         if not isinstance(signature, str) or not signature:
-            raise ValidationError("entitlement signature is required")
+            raise ValidationError(_("entitlement signature is required"))
         if self.mb_control_workshop_id and self.mb_control_workshop_id != workshop_id:
-            raise ValidationError("this company is linked to another workshop")
+            raise ValidationError(_("this company is linked to another workshop"))
         if version < self.mb_entitlement_version:
-            raise ValidationError("an older entitlement cannot replace the current version")
+            raise ValidationError(_("an older entitlement cannot replace the current version"))
         if version == self.mb_entitlement_version:
             same = (
                 self.mb_entitlement_plan == plan
@@ -188,7 +195,7 @@ class ResCompany(models.Model):
                 and self.mb_entitlement_signature == signature
             )
             if not same:
-                raise ValidationError("the entitlement version already contains different data")
+                raise ValidationError(_("the entitlement version already contains different data"))
             return {"applied": False, "version": version, "workshop_id": workshop_id}
         self.write({
             "mb_control_workshop_id": workshop_id,

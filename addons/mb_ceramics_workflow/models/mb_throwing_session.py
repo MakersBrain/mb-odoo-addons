@@ -54,9 +54,9 @@ class MbThrowingSession(models.Model):
     def _check_clay_lot(self):
         for session in self:
             if session.clay_product_id.tracking != "lot":
-                raise ValidationError("Clay used for throwing must be tracked by lot.")
+                raise ValidationError(_("Clay used for throwing must be tracked by lot."))
             if session.clay_lot_id.product_id != session.clay_product_id:
-                raise ValidationError("The clay lot must belong to the selected clay product.")
+                raise ValidationError(_("The clay lot must belong to the selected clay product."))
 
     @api.onchange("clay_product_id", "source_location_id")
     def _onchange_clay_product_id(self):
@@ -86,7 +86,7 @@ class MbThrowingSession(models.Model):
             if session.state != "draft":
                 continue
             if not session.line_ids:
-                raise UserError("Add at least one blank output.")
+                raise UserError(_("Add at least one blank output."))
             for line in session.line_ids:
                 line._produce_blank()
             session.state = "done"
@@ -127,14 +127,14 @@ class MbThrowingSessionLine(models.Model):
         for line in self:
             if line.blank_product_id not in (
                     line.bom_id.product_id | line.bom_id.product_tmpl_id.product_variant_ids):
-                raise ValidationError("The bill of materials does not produce this blank.")
+                raise ValidationError(_("The bill of materials does not produce this blank."))
             if line.blank_product_id.tracking != "lot":
-                raise ValidationError("Reusable blank products must be tracked by lot.")
+                raise ValidationError(_("Reusable blank products must be tracked by lot."))
 
     def action_print_wip_label(self):
         self.ensure_one()
         if not self.blank_lot_id:
-            raise UserError("Record the throwing output before printing its label.")
+            raise UserError(_("Record the throwing output before printing its label."))
         return self.blank_lot_id.with_context(
             mb_wip_quantity=self.quantity,
         ).action_mb_print_wip_label()
@@ -158,9 +158,11 @@ class MbThrowingSessionLine(models.Model):
         clay_move = production.move_raw_ids.filtered(
             lambda move: move.product_id == session.clay_product_id)[:1]
         if not clay_move:
-            raise UserError(
-                "%s's bill of materials does not consume the selected clay."
-                % self.blank_product_id.display_name)
+            raise UserError(_(
+                "The bill of materials of %(product)s does not consume the "
+                "selected clay.",
+                product=self.blank_product_id.display_name,
+            ))
         available = self.env["stock.quant"]._get_available_quantity(
             session.clay_product_id,
             session.source_location_id,
@@ -171,7 +173,7 @@ class MbThrowingSessionLine(models.Model):
             lambda move_line: move_line.lot_id == session.clay_lot_id
         ).mapped("quantity"))
         if available + reserved_from_lot < self.clay_quantity:
-            raise UserError("The selected clay lot does not have enough available stock.")
+            raise UserError(_("The selected clay lot does not have enough available stock."))
         production.action_assign()
         clay_move.lot_ids = session.clay_lot_id
         clay_move.quantity = self.clay_quantity
@@ -187,6 +189,6 @@ class MbThrowingSessionLine(models.Model):
         production.with_context(
             skip_backorder=True, skip_redirection=True).button_mark_done()
         if production.state != "done":
-            raise UserError("The throwing order needs manual manufacturing review.")
+            raise UserError(_("The throwing order needs manual manufacturing review."))
         self.write({"production_id": production.id, "blank_lot_id": lot.id})
         return production

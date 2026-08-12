@@ -1,0 +1,1485 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_ceramics_firing
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "%(firing)s and kiln %(kiln)s must belong to the same company."
+msgstr "%(firing)s et le four %(kiln)s doivent appartenir à la même société."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid ""
+"%(name)s is cooling until %(until)s. Unloading now needs the interruption "
+"recorded, because opening a kiln early changes what came out of it."
+msgstr ""
+"%(name)s refroidit jusqu'à %(until)s. Défourner maintenant exige "
+"d'enregistrer l'interruption, car ouvrir un four trop tôt change ce qui en "
+"sort."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "%(workorder)s and %(firing)s have incompatible firing kinds."
+msgstr "%(workorder)s et %(firing)s ont des types de cuisson incompatibles."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "%(workorder)s and %(firing)s must belong to the same company."
+msgstr "%(workorder)s et %(firing)s doivent appartenir à la même société."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "%(workorder)s is not planned with programme %(program)s."
+msgstr "%(workorder)s n'est pas planifié avec le programme %(program)s."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "%(workorder)s is not ready for firing yet."
+msgstr "%(workorder)s n'est pas encore prêt pour la cuisson."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "%(workorder)s is planned on %(planned)s, not kiln %(kiln)s."
+msgstr ""
+"%(workorder)s est planifié sur %(planned)s, et non sur le four %(kiln)s."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "A completed or cancelled firing cannot be deleted."
+msgstr "Une cuisson terminée ou annulée ne peut pas être supprimée."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid ""
+"A completed or cancelled firing is immutable. Record a new firing or use the"
+" provider synchronisation path."
+msgstr ""
+"Une cuisson terminée ou annulée est immuable. Enregistrez une nouvelle "
+"cuisson ou passez par la synchronisation du fournisseur."
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid ""
+"A controller reports only a programme slot. This\n"
+"                                is where it becomes a bisque or a glaze firing,\n"
+"                                where the cooling hold that gates unloading comes\n"
+"                                from, and where a routing operation gets the\n"
+"                                length of a firing instead of somebody typing it.\n"
+"                                Open one to see its ramps and holds. Scheduled is\n"
+"                                what those add up to, measured is the median of\n"
+"                                what actually ran; adopting either is deliberate,\n"
+"                                so a plan never moves on its own."
+msgstr ""
+"Un contrôleur ne rapporte qu'un emplacement de programme. C'est ici\n"
+"                                qu'il devient une cuisson biscuit ou une cuisson d'émail, ici que\n"
+"                                naît le palier de refroidissement qui conditionne le défournement, et\n"
+"                                ici qu'une opération de gamme obtient la durée d'une cuisson\n"
+"                                au lieu qu'on la saisisse à la main. Ouvrez-en un pour\n"
+"                                voir ses montées et ses paliers. La durée planifiée est\n"
+"                                leur somme, la durée mesurée est la médiane de ce\n"
+"                                qui a réellement tourné ; adopter l'une ou l'autre est un\n"
+"                                geste délibéré, afin qu'un plan ne bouge jamais tout seul."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mrp_routing_workcenter__mb_kiln_occupies_cooling
+msgid ""
+"A kiln cannot take the next load while it is still hot, so the cooling hold "
+"is time the work centre is occupied even though nobody is working. Turn this"
+" off only if the load is drawn hot."
+msgstr ""
+"Un four ne peut pas recevoir la charge suivante tant qu'il est encore chaud "
+": le palier de refroidissement est donc du temps pendant lequel le poste de "
+"travail est occupé alors que personne ne travaille. Ne désactivez ceci que "
+"si la charge est défournée à chaud."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.constraint,message:mb_ceramics_firing.constraint_mb_kiln_provider_device_uniq
+msgid "A kiln may only be bound once to a given provider device."
+msgstr ""
+"Un four ne peut être associé qu'une seule fois à un appareil donné du "
+"fournisseur."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.constraint,message:mb_ceramics_firing.constraint_mb_kiln_program_kiln_program_uniq
+msgid "A programme is mapped once per kiln."
+msgstr "Un programme n'est associé qu'une seule fois par four."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.constraint,message:mb_ceramics_firing.constraint_mb_kiln_program_segment_program_segment_uniq
+msgid "A programme numbers each segment once."
+msgstr "Un programme ne numérote chaque palier qu'une seule fois."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.constraint,message:mb_ceramics_firing.constraint_mb_firing_provider_firing_uniq
+msgid "A provider firing may only be imported once."
+msgstr "Une cuisson du fournisseur ne peut être importée qu'une seule fois."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_kiln_program_segment.py:0
+msgid "A segment cannot have a negative rate or hold."
+msgstr "Un palier ne peut pas avoir une vitesse ou un maintien négatif."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "A work order cannot be removed from a completed firing."
+msgstr "Un ordre de travail ne peut pas être retiré d'une cuisson terminée."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__active
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Adopt measured"
+msgstr "Adopter la mesurée"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Adopt scheduled"
+msgstr "Adopter la planifiée"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__provider_firing_at
+msgid "As fired on"
+msgstr "Cuisson du"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__kind__bisque
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln_program__kind__bisque
+msgid "Bisque"
+msgstr "Biscuit"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Boards"
+msgstr "Plaques"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__carrier_ids
+msgid "Boards loaded"
+msgstr "Plaques enfournées"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__state__cancel
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Chamber"
+msgstr "Chambre"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__chamber_litres
+msgid "Chamber volume (L)"
+msgstr "Volume de chambre (L)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__configuration
+msgid "Configuration"
+msgstr "Configuration"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__power_kw
+msgid ""
+"Connected load. It is what a firing's energy cost is estimated from when the"
+" controller does not report consumption itself."
+msgstr ""
+"Puissance raccordée. C'est à partir d'elle qu'est estimé le coût énergétique"
+" d'une cuisson lorsque le contrôleur ne rapporte pas lui-même la "
+"consommation."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__energy_kwh
+msgid "Consumed by this firing, where the controller reports it."
+msgstr "Consommé par cette cuisson, lorsque le contrôleur le rapporte."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__state__cooling
+msgid "Cooling"
+msgstr "Refroidissement"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__cooling_hours
+msgid "Cooling (hours)"
+msgstr "Refroidissement (heures)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__cooling_end
+msgid "Cooling End"
+msgstr "Fin du refroidissement"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__cooling_interrupted
+msgid "Cooling Interrupted"
+msgstr "Refroidissement interrompu"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Cooling interrupted"
+msgstr "Refroidissement interrompu"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid ""
+"Created with the kiln and renamed with it. The\n"
+"                                work centre is what planning queues against, the\n"
+"                                equipment is where servicing history goes. Point\n"
+"                                them at existing records instead if this kiln\n"
+"                                already has either."
+msgstr ""
+"Créés avec le four et renommés avec lui.\n"
+"                                Le poste de travail est ce sur quoi\n"
+"                                la planification met en file d'attente, l'équipement est là\n"
+"                                où va l'historique d'entretien. Pointez-les plutôt vers des\n"
+"                                enregistrements existants si ce four en a déjà."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__date_end
+msgid "Date End"
+msgstr "Date de fin"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__date_start
+msgid "Date Start"
+msgstr "Date de début"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_production__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_routing_workcenter__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_workorder__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__duration_hours
+msgid "Duration Hours"
+msgstr "Durée (heures)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__cooling_end
+msgid ""
+"Earliest moment the load may be unloaded and labelled. Not the same moment "
+"the manufacturing order is marked done."
+msgstr ""
+"Premier moment où la charge peut être défournée et étiquetée. Ce n'est pas "
+"le moment où l'ordre de fabrication est marqué comme fait."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__elapsed_minutes
+msgid "Elapsed (min)"
+msgstr "Écoulé (min)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln__heating_method__electric
+msgid "Electric"
+msgstr "Electrique"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__energy_kwh
+msgid "Energy (kWh)"
+msgstr "Énergie (kWh)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln_program__source__manual
+msgid "Entered here"
+msgstr "Saisi ici"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__provider__manual
+msgid "Entered manually"
+msgstr "Saisi manuellement"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__equipment_id
+msgid "Equipment"
+msgstr "Équipement"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__raw_attachment_id
+msgid ""
+"Exactly what the provider returned, kept for diagnostics and for fields this"
+" model does not model yet. Measured at about 82 KB per firing. Never "
+"contains a credential: the client sends the token in a header and the body "
+"carries none."
+msgstr ""
+"Exactement ce que le fournisseur a renvoyé, conservé pour le diagnostic et "
+"pour les champs que ce modèle ne modélise pas encore. Mesuré à environ 82 Ko"
+" par cuisson. Ne contient jamais d'identifiant : le client envoie le jeton "
+"dans un en-tête et le corps n'en porte aucun."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__peak_temperature
+msgid ""
+"Expected peak, for reference. Not enforced: a firing that missed its peak is"
+" exactly the thing you want to be able to see."
+msgstr ""
+"Pic attendu, à titre de référence. Non contraignant : une cuisson qui a "
+"manqué son pic est précisément ce que l'on veut pouvoir constater."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__external_id
+msgid "External"
+msgstr "Externe"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Finish firing"
+msgstr "Terminer la cuisson"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_workorder__mb_firing_id
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__state__firing
+msgid "Firing"
+msgstr "Cuisson"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__firing_hours
+msgid "Firing (hours)"
+msgstr "Cuisson (heures)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__firing_count
+msgid "Firing Count"
+msgstr "Nombre de cuissons"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__curve_attachment_id
+msgid "Firing curve"
+msgstr "Courbe de cuisson"
+
+#. module: mb_ceramics_firing
+#: model:ir.actions.act_window,name:mb_ceramics_firing.mb_firing_action
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__firing_ids
+#: model:ir.ui.menu,name:mb_ceramics_firing.menu_mb_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid "Firings"
+msgstr "Cuissons"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__start_temperature
+msgid "From (deg C)"
+msgstr "De (deg C)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln__configuration__front_loader
+msgid "Front loader"
+msgstr "Chargement frontal"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__full_power
+msgid "Full power"
+msgstr "Pleine puissance"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln__heating_method__gas
+msgid "Gas"
+msgstr "Gaz"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__kind__glaze
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln_program__kind__glaze
+msgid "Glaze"
+msgstr "Émail"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__heating_method
+msgid "Heating Method"
+msgstr "Mode de chauffage"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__duration_hours
+msgid ""
+"Heating only, end minus start. Cooling is held separately, because a "
+"programme's cooling hold is declared rather than observed - the kiln stops "
+"reporting long before the load is cool."
+msgstr ""
+"Chauffe seule, fin moins début. Le refroidissement est tenu à part, car le "
+"palier de refroidissement d'un programme est déclaré et non observé : le "
+"four cesse de rapporter bien avant que la charge ne soit froide."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__hold_minutes
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__soak_time
+msgid "Hold (minutes)"
+msgstr "Maintien (minutes)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program_segment__ramp_rate
+msgid ""
+"How fast the controller climbs to the target. At or above 999 the controller"
+" reads it as full power and the ramp is not scheduled at all."
+msgstr ""
+"À quelle vitesse le contrôleur monte jusqu'à la consigne. À 999 ou au-delà, "
+"le contrôleur l'interprète comme la pleine puissance et la montée n'est pas "
+"planifiée du tout."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__cooling_hours
+msgid ""
+"How long after the firing ends before the load may be unloaded. Sets the "
+"cooling hold on every firing imported under this programme, and - because a "
+"kiln cannot take the next load while it is still hot - counts toward how "
+"long the work centre is occupied."
+msgstr ""
+"Combien de temps après la fin de la cuisson la charge peut être défournée. "
+"Définit le palier de refroidissement de toute cuisson importée sous ce "
+"programme et, parce qu'un four ne peut pas recevoir la charge suivante tant "
+"qu'il est chaud, compte dans le temps d'occupation du poste de travail."
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid "How long it takes"
+msgstr "Combien de temps cela prend"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__firing_hours
+msgid ""
+"How long the programme runs, from the start of the first ramp to the end of "
+"the last segment. This is what a routing operation takes its duration from, "
+"so a firing on a bill of materials stops being a number somebody typed and "
+"starts being the schedule."
+msgstr ""
+"Combien de temps dure le programme, du début de la première montée à la fin "
+"du dernier palier. C'est de là qu'une opération de gamme tire sa durée : une"
+" cuisson sur une nomenclature cesse d'être un chiffre saisi à la main pour "
+"devenir le programme lui-même."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program_segment__soak_time
+msgid "How long the target is held before the next segment starts."
+msgstr ""
+"Combien de temps la consigne est maintenue avant le début du palier suivant."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__pieces_per_load
+msgid ""
+"How many pieces fit in one firing. This is what makes the kiln behave as a "
+"batch rather than as per-piece work: Odoo computes a work order as "
+"ceil(quantity / capacity) cycles, so at forty pieces per load a firing of "
+"eight and a firing of forty both take one firing's time, and forty-one takes"
+" two. Left at zero, Odoo falls back on the quantity the bill of materials "
+"produces."
+msgstr ""
+"Combien de pièces tiennent dans une cuisson. C'est ce qui fait que le four "
+"se comporte comme une série et non comme un travail à la pièce : Odoo "
+"calcule un ordre de travail en ceil(quantité / capacité) cycles, si bien "
+"qu'à quarante pièces par charge une cuisson de huit et une cuisson de "
+"quarante prennent le temps d'une cuisson, et quarante et une en prennent "
+"deux. Laissé à zéro, Odoo se rabat sur la quantité produite par la "
+"nomenclature."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__configuration
+msgid ""
+"How the kiln is loaded. It decides how the shelves stack and therefore what "
+"actually fits in the chamber volume."
+msgstr ""
+"Comment le four est chargé. Cela détermine l'empilement des plaques et donc "
+"ce qui tient réellement dans le volume de la chambre."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_production__id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_routing_workcenter__id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_workorder__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__message_has_error
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__zone_count
+msgid ""
+"Independently controlled heating zones. A single-zone kiln reports one "
+"temperature; a three-zone kiln can be even where a single-zone one cannot."
+msgstr ""
+"Zones de chauffe pilotées indépendamment. Un four à une zone rapporte une "
+"température ; un four à trois zones peut être homogène là où un four à une "
+"zone ne le peut pas."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__interruption_reason
+msgid "Interruption Reason"
+msgstr "Motif de l'interruption"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
+
+#. module: mb_ceramics_firing
+#: model:ir.model,name:mb_ceramics_firing.model_mb_kiln
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__kiln_id
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__kiln_id
+msgid "Kiln"
+msgstr "Four"
+
+#. module: mb_ceramics_firing
+#: model:ir.model,name:mb_ceramics_firing.model_mb_firing
+msgid "Kiln firing"
+msgstr "Cuisson au four"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_routing_workcenter__mb_kiln_occupies_cooling
+msgid "Kiln held while cooling"
+msgstr "Four occupé pendant le refroidissement"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Kiln name"
+msgstr "Nom du four"
+
+#. module: mb_ceramics_firing
+#: model:ir.model,name:mb_ceramics_firing.model_mb_kiln_program
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_routing_workcenter__mb_kiln_program_id
+msgid "Kiln programme"
+msgstr "Programme de cuisson"
+
+#. module: mb_ceramics_firing
+#: model:ir.model,name:mb_ceramics_firing.model_mb_kiln_program_segment
+msgid "Kiln programme segment"
+msgstr "Palier de programme de cuisson"
+
+#. module: mb_ceramics_firing
+#: model:ir.actions.act_window,name:mb_ceramics_firing.mb_kiln_action
+#: model:ir.ui.menu,name:mb_ceramics_firing.menu_mb_kiln
+msgid "Kilns"
+msgstr "Fours"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__kind
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__kind
+msgid "Kind"
+msgstr "Type"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Load"
+msgstr "Charger"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__state__draft
+msgid "Loading"
+msgstr "En cours de chargement..."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_production.py:0
+msgid "Lot %(lot)s belongs to %(other)s, not to %(wanted)s."
+msgstr "Le lot %(lot)s appartient à %(other)s, et non à %(wanted)s."
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Make and model"
+msgstr "Marque et modèle"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Make the measured duration the declared one"
+msgstr "Faire de la durée mesurée la durée déclarée"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid "Make the median of past firings the declared duration"
+msgstr "Faire de la médiane des cuissons passées la durée déclarée"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid "Make what the segments add up to the declared duration"
+msgstr "Faire de la somme des paliers la durée déclarée"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Make what the segments add up to the declared one"
+msgstr "Faire de la somme des paliers la durée déclarée"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__manufacturer
+msgid "Manufacturer"
+msgstr "Fabricant"
+
+#. module: mb_ceramics_firing
+#: model:ir.model,name:mb_ceramics_firing.model_mrp_production
+msgid "Manufacturing Order"
+msgstr "Ordre de fabrication"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__production_ids
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Manufacturing orders"
+msgstr "Ordres de fabrication"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__max_temperature
+msgid "Maximum temperature"
+msgstr "Température maximale"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__measured_hours
+msgid "Measured (hours)"
+msgstr "Mesurée (heures)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__model_number
+msgid "Model"
+msgstr "Modèle"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__provider
+msgid ""
+"Most kilns in most workshops report nothing, and that is a supported "
+"configuration rather than a gap."
+msgstr ""
+"La plupart des fours, dans la plupart des ateliers, ne rapportent rien : "
+"c'est une configuration prise en charge et non une lacune."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__name
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__name
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "New"
+msgstr "Nouveau"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln__provider__none
+msgid "No telemetry"
+msgstr "Aucune télémétrie"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__number
+msgid "Number"
+msgstr "Numéro"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Only a cooling firing can be force-unloaded."
+msgstr "Seule une cuisson en refroidissement peut être défournée de force."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Only a cooling firing can be unloaded."
+msgstr "Seule une cuisson en refroidissement peut être défournée."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Only a firing in progress can enter cooling."
+msgstr "Seule une cuisson en cours peut passer en refroidissement."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Only a loading firing can be started."
+msgstr "Seule une cuisson en cours d'enfournement peut être démarrée."
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Open early"
+msgstr "Ouvrir en avance"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__kind__other
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln__configuration__other
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln__heating_method__other
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln_program__kind__other
+msgid "Other"
+msgstr "Autre"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__peak_temperature
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__peak_temperature
+msgid "Peak Temperature"
+msgstr "Température de pic"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__phases
+msgid "Phases"
+msgstr "Phases"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__pieces_per_load
+msgid "Pieces per load"
+msgstr "Pièces par charge"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__power_kw
+msgid "Power (kW)"
+msgstr "Puissance (kW)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__program_id
+msgid "Program"
+msgstr "Programme"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__program_name
+msgid "Programme"
+msgstr "Programme"
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Programme %(program)s belongs to %(program_kiln)s, not %(kiln)s."
+msgstr ""
+"Le programme %(program)s appartient à %(program_kiln)s, et non à %(kiln)s."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Programme %(program)s is for %(program_kind)s firing, not %(kind)s."
+msgstr ""
+"Le programme %(program)s est prévu pour une cuisson %(program_kind)s, et non"
+" %(kind)s."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid ""
+"Programme %(program)s peaks at %(peak)s C, above %(kiln)s's maximum of "
+"%(maximum)s C."
+msgstr ""
+"Le programme %(program)s culmine à %(peak)s C, au-dessus du maximum de "
+"%(maximum)s C du four %(kiln)s."
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_kiln_program.py:0
+msgid "Programme %s"
+msgstr "Programme %s"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid "Programme 4"
+msgstr "Programme 4"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__program_id
+msgid "Programme mapping"
+msgstr "Correspondance des programmes"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__program_ids
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Programmes"
+msgstr "Programmes"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__provider
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__provider
+msgid "Provider"
+msgstr "Fournisseur"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__provider_external_id
+msgid "Provider device id"
+msgstr "Identifiant d'appareil du fournisseur"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__raw_attachment_id
+msgid "Provider payload"
+msgstr "Charge utile du fournisseur"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__purchase_date
+msgid "Purchase Date"
+msgstr "Date d'achat"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__peak_temperature
+msgid ""
+"Queried and reportable. An under-fired glaze is a less mature glaze, so this"
+" is a compliance figure and not only a schedule one."
+msgstr ""
+"Interrogeable et déclarable. Un émail sous-cuit est un émail moins mûr : "
+"c'est donc une donnée de conformité et pas seulement de planification."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__provider__rohde_mykiln
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln__provider__rohde_mykiln
+msgid "ROHDE myKiln"
+msgstr "ROHDE myKiln"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__ramp_minutes
+msgid "Ramp (min)"
+msgstr "Montée (min)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__ramp_rate
+msgid "Rate (deg/h)"
+msgstr "Vitesse (deg/h)"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid ""
+"Rate, target and hold, exactly as the controller\n"
+"                                stores them. A rate of 999 or more means full\n"
+"                                power: the kiln climbs as fast as its elements\n"
+"                                allow, so that ramp cannot be scheduled and\n"
+"                                counts as nothing here. The first segment is\n"
+"                                assumed to start from a cold chamber at 20 C."
+msgstr ""
+"Vitesse, consigne et maintien, exactement tels que le contrôleur les\n"
+"                                stocke. Une vitesse de 999 ou plus signifie la\n"
+"                                pleine puissance : le four monte aussi vite que ses\n"
+"                                résistances le permettent, cette montée ne peut donc pas être\n"
+"                                planifiée et ne compte pour rien ici. Le premier\n"
+"                                palier est réputé partir d'une chambre froide à 20 C."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__rating_ids
+msgid "Ratings"
+msgstr "Évaluations"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln_program__source__provider
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid "Read from the kiln"
+msgstr "Lu depuis le four"
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Record why %s was opened early before forcing it."
+msgstr ""
+"Indiquez pourquoi %s a été ouvert en avance avant de forcer l'opération."
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Result"
+msgstr "Résultat"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Erreur d'envoi SMS"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Schedule"
+msgstr "Planifier"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__scheduled_hours
+msgid "Scheduled (hours)"
+msgstr "Planifiée (heures)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__duration_minutes
+msgid "Segment (min)"
+msgstr "Palier (min)"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__segment_count
+msgid "Segment Count"
+msgstr "Nombre de paliers"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program_segment__number
+msgid "Segment order, as the controller numbers it."
+msgstr "Ordre du palier, tel que le contrôleur le numérote."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__segment_ids
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid "Segments"
+msgstr "Paliers"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__provider_synced_at
+msgid "Segments read at"
+msgstr "Paliers lus le"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__serial_number
+msgid "Serial Number"
+msgstr "Numéro de série"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__series
+msgid "Series"
+msgstr "Gamme"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mrp_routing_workcenter_view_form_firing
+msgid ""
+"Set by the programme, cooling included where the kiln is held\n"
+"                    while it cools. Change it on the kiln and every routing that\n"
+"                    fires this programme follows."
+msgstr ""
+"Défini par le programme, refroidissement compris lorsque le four\n"
+"                    reste occupé pendant qu'il refroidit. Modifiez-le sur le four\n"
+"                    et toutes les gammes qui cuisent ce programme suivent."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__cooling_interrupted
+msgid "Set when the load was opened before cooling finished."
+msgstr ""
+"Renseigné lorsque la charge a été ouverte avant la fin du refroidissement."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__program_number
+msgid "Slot"
+msgstr "Créneau"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__source
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Source"
+msgstr "Source"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Start firing"
+msgstr "Démarrer la cuisson"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__state
+msgid "State"
+msgstr "Statut"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Supply"
+msgstr "Alimentation"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__phases
+msgid "Supply phases the model is built for."
+msgstr "Phases d'alimentation pour lesquelles le modèle est prévu."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__voltage
+msgid "Supply voltage the model is built for."
+msgstr "Tension d'alimentation pour laquelle le modèle est prévu."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__target_temperature
+msgid "Target (deg C)"
+msgstr "Consigne (deg C)"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Telemetry"
+msgstr "Télémétrie"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__program_name
+msgid ""
+"The controller programme this load was fired on, as the provider labels it."
+msgstr ""
+"Le programme du contrôleur sur lequel cette charge a été cuite, tel que le "
+"fournisseur le nomme."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mrp_routing_workcenter__mb_kiln_program_id
+msgid ""
+"The controller schedule this operation fires. Choosing one takes the "
+"duration out of your hands and puts it on the programme, where a change "
+"reaches every routing that fires it."
+msgstr ""
+"Le programme du contrôleur que cette opération cuit. En choisir un retire la"
+" durée de vos mains pour la confier au programme, où une modification "
+"atteint toutes les gammes qui le cuisent."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__provider_external_id
+msgid "The device identifier at the provider. Never written back to them."
+msgstr ""
+"L'identifiant de l'appareil chez le fournisseur. Jamais réécrit chez lui."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__curve_attachment_id
+msgid ""
+"The full trace, as evidence. Roughly 1,400 points for a twelve hour firing, "
+"and never read point by point, so it is a file rather than a table."
+msgstr ""
+"La trace complète, à titre de preuve. Environ 1 400 points pour une cuisson "
+"de douze heures, et jamais lue point par point : c'est donc un fichier "
+"plutôt qu'une table."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__max_temperature
+msgid ""
+"The highest the kiln is rated for, in degrees Celsius. A programme asking "
+"for more than this is asking for a kiln that does not exist."
+msgstr ""
+"La valeur maximale pour laquelle le four est prévu, en degrés Celsius. Un "
+"programme qui en demande davantage demande un four qui n'existe pas."
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid ""
+"The make, model and chamber above are read from the\n"
+"                            provider and refreshed on every sync. They describe\n"
+"                            the machine, so the kiln it is connected to is the\n"
+"                            authority on them; everything else on this form is\n"
+"                            yours."
+msgstr ""
+"La marque, le modèle et la chambre ci-dessus sont lus chez le\n"
+"                            fournisseur et rafraîchis à chaque synchronisation.\n"
+"                            Ils décrivent la machine : le four auquel il est\n"
+"                            connecté fait donc autorité sur eux ; tout le reste\n"
+"                            de ce formulaire vous appartient."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__model_number
+msgid ""
+"The manufacturer's model, such as 'TE 80 S'. This is what turns a kiln "
+"called 'Leonardo' into something whose specification can be looked up."
+msgstr ""
+"Le modèle du fabricant, par exemple 'TE 80 S'. C'est ce qui transforme un "
+"four appelé 'Leonardo' en quelque chose dont la fiche technique peut être "
+"retrouvée."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__serial_number
+msgid ""
+"The manufacturer's serial. Kept on the equipment record too, which is where "
+"Odoo expects to find an asset's serial."
+msgstr ""
+"Le numéro de série du fabricant. Conservé aussi sur la fiche d'équipement, "
+"là où Odoo s'attend à trouver le numéro de série d'un actif."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__program_id
+msgid ""
+"The mapping `program_name` was matched to. Kept as a link and not only as "
+"the label, because it is what lets a programme say how long its own firings "
+"actually take."
+msgstr ""
+"La correspondance à laquelle `program_name` a été rattaché. Conservée comme "
+"lien et pas seulement comme libellé, car c'est ce qui permet à un programme "
+"de dire combien de temps ses propres cuissons durent réellement."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__measured_hours
+msgid ""
+"The median duration of the firings actually recorded under this programme. "
+"Compare it with the declared figure; press Adopt to make it the one plans "
+"are built on."
+msgstr ""
+"La durée médiane des cuissons réellement enregistrées sous ce programme. "
+"Comparez-la à la valeur déclarée ; appuyez sur Adopter pour en faire celle "
+"sur laquelle les plans reposent."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__series
+msgid ""
+"The model range, such as 'TE-S'. Useful when a manual or a spare part is "
+"published per range rather than per model."
+msgstr ""
+"La gamme du modèle, par exemple 'TE-S'. Utile lorsqu'une notice ou une pièce"
+" détachée est publiée par gamme plutôt que par modèle."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mrp_workorder__mb_firing_id
+msgid ""
+"The physical firing this operation happened in. A Many2one here and a "
+"One2many there is the whole many-to-many: one firing holds work orders from "
+"several manufacturing orders, and each work order sits in exactly one "
+"firing."
+msgstr ""
+"La cuisson physique dans laquelle cette opération a eu lieu. Un Many2one ici"
+" et un One2many là forment toute la relation plusieurs-à-plusieurs : une "
+"cuisson accueille des ordres de travail issus de plusieurs ordres de "
+"fabrication, et chaque ordre de travail tient dans exactement une cuisson."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__name
+msgid ""
+"The programme label exactly as the provider reports it, such as 'Programme "
+"4'. On a kiln with no telemetry it is whatever the controller calls it."
+msgstr ""
+"Le libellé du programme exactement tel que le fournisseur le rapporte, par "
+"exemple 'Programme 4'. Sur un four sans télémétrie, c'est le nom que lui "
+"donne le contrôleur."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__external_id
+msgid ""
+"The provider's identifier for this firing. The key that makes import "
+"idempotent, so replaying a sync window converges."
+msgstr ""
+"L'identifiant de cette cuisson chez le fournisseur. La clé qui rend l'import"
+" idempotent, de sorte que rejouer une fenêtre de synchronisation converge."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__segment_ids
+msgid ""
+"The ramps and holds the controller runs, in order. Typed in for a kiln that "
+"reports nothing, read from the controller for one that does."
+msgstr ""
+"Les montées et les paliers que le contrôleur exécute, dans l'ordre. Saisis à"
+" la main pour un four qui ne rapporte rien, lus depuis le contrôleur pour un"
+" four qui rapporte."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program_segment__full_power
+msgid ""
+"The rate says climb as fast as the elements allow, so how long the climb "
+"takes is the kiln's business and cannot be scheduled."
+msgstr ""
+"La vitesse demande de monter aussi vite que les résistances le permettent : "
+"la durée de la montée relève donc du four et ne peut pas être planifiée."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__program_ids
+msgid ""
+"The schedules this kiln fires, and how long each one takes. A kiln that "
+"reports nothing still has them - they are simply typed in rather than "
+"imported."
+msgstr ""
+"Les programmes que ce four cuit, et la durée de chacun. Un four qui ne "
+"rapporte rien en a tout autant : ils sont simplement saisis à la main plutôt"
+" qu'importés."
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid ""
+"The segments below were read from the controller as\n"
+"                            it ran that firing, and a refresh replaces them with\n"
+"                            whatever the most recent firing used. The name, the\n"
+"                            kind and the cooling hold are yours and no refresh\n"
+"                            touches them."
+msgstr ""
+"Les paliers ci-dessous ont été lus sur le contrôleur pendant\n"
+"                            qu'il exécutait cette cuisson, et un rafraîchissement\n"
+"                            les remplace par ceux de la cuisson la plus récente.\n"
+"                            Le nom, le type et le palier de refroidissement vous\n"
+"                            appartiennent : aucun rafraîchissement n'y touche."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__provider_firing_at
+msgid ""
+"The start of the firing these segments were read from. The controller "
+"reports a programme as it ran, so the most recent firing is the most current"
+" profile."
+msgstr ""
+"Le début de la cuisson dont ces paliers ont été lus. Le contrôleur rapporte "
+"un programme tel qu'il s'est déroulé : la cuisson la plus récente donne donc"
+" le profil le plus à jour."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln__configuration__top_loader
+msgid "Top loader"
+msgstr "Chargement par le dessus"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Unload"
+msgstr "Défourner"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__state__done
+msgid "Unloaded"
+msgstr "Défourné"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__voltage
+msgid "Voltage"
+msgstr "Tension"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__carrier_ids
+msgid ""
+"Ware boards and shelves. Scanned instead of the pieces, which cannot hold a "
+"label before firing."
+msgstr ""
+"Plaques et planches de séchage. Scannées à la place des pièces, qui ne "
+"peuvent pas porter d'étiquette avant cuisson."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__website_message_ids
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__website_message_ids
+msgid "Website communication history"
+msgstr "Historique de communication du site web"
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form
+msgid "What it is"
+msgstr "Ce que c'est"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__workcenter_id
+msgid ""
+"What routing operations point at, so a firing can be an operation on a bill "
+"of materials."
+msgstr ""
+"Ce que les opérations de gamme désignent, afin qu'une cuisson puisse être "
+"une opération d'une nomenclature."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__chamber_litres
+msgid ""
+"What the chamber holds. Together with the loading configuration it is the "
+"honest upper bound on a load."
+msgstr ""
+"Ce que contient la chambre. Avec la configuration de chargement, c'est la "
+"limite haute honnête d'une charge."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__scheduled_hours
+msgid ""
+"What the segments add up to: every ramp at its stated rate plus every hold. "
+"Zero when the programme has no segments, or when every ramp is at full power"
+" and so cannot be scheduled at all."
+msgstr ""
+"La somme des paliers : chaque montée à sa vitesse déclarée plus chaque "
+"maintien. Zéro lorsque le programme n'a aucun palier, ou lorsque toutes les "
+"montées sont à pleine puissance et ne peuvent donc pas être planifiées."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__provider_synced_at
+msgid "When the segments were last refreshed from the controller."
+msgstr "Date du dernier rafraîchissement des paliers depuis le contrôleur."
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
+msgid "Where Odoo keeps it"
+msgstr "Où Odoo le conserve"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__equipment_id
+msgid "Where servicing history and maintenance requests live."
+msgstr "Là où vivent l'historique d'entretien et les demandes de maintenance."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program_segment__start_temperature
+msgid "Where the previous segment left off; ambient for the first."
+msgstr "Là où le palier précédent s'est arrêté ; l'ambiante pour le premier."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__source
+msgid ""
+"Where the segments came from. A programme read from the kiln is refreshed as"
+" the controller's own programme changes; one entered here is never touched "
+"by a refresh."
+msgstr ""
+"D'où viennent les paliers. Un programme lu depuis le four est rafraîchi à "
+"mesure que le programme du contrôleur change ; un programme saisi ici n'est "
+"jamais touché par un rafraîchissement."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program_segment__elapsed_minutes
+msgid "Where this segment ends, measured from the start of the programme."
+msgstr "Là où ce palier se termine, mesuré depuis le début du programme."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program_segment__target_temperature
+msgid "Where this segment ends. The next segment ramps from here."
+msgstr "Là où ce palier se termine. Le palier suivant monte à partir d'ici."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__program_number
+msgid ""
+"Which numbered slot this programme occupies on the controller. It is how a "
+"firing says which programme it ran, and it survives the potter renaming the "
+"programme to something they recognise."
+msgstr ""
+"Quel emplacement numéroté ce programme occupe sur le contrôleur. C'est ainsi"
+" qu'une cuisson indique quel programme elle a exécuté, et cela survit au "
+"renommage du programme par le potier."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln__manufacturer
+msgid ""
+"Who made the kiln. Filled from the provider where one reports it, typed in "
+"otherwise."
+msgstr ""
+"Qui a fabriqué le four. Renseigné depuis le fournisseur lorsqu'il le "
+"rapporte, saisi à la main sinon."
+
+#. module: mb_ceramics_firing
+#: model:ir.model,name:mb_ceramics_firing.model_mrp_routing_workcenter
+msgid "Work Center Usage"
+msgstr "Utilisation du poste de travail"
+
+#. module: mb_ceramics_firing
+#: model:ir.model,name:mb_ceramics_firing.model_mrp_workorder
+msgid "Work Order"
+msgstr "Ordre de travail"
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "Work can only be added while a firing is loading."
+msgstr ""
+"Du travail ne peut être ajouté que pendant l'enfournement d'une cuisson."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__workcenter_id
+msgid "Work centre"
+msgstr "Poste de travail"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__workorder_ids
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Work orders"
+msgstr "Ordres de travail"
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__workorder_ids
+msgid ""
+"Work orders from any number of manufacturing orders. A kiln is filled "
+"because firing is expensive, so a load mixes them."
+msgstr ""
+"Des ordres de travail issus d'un nombre quelconque d'ordres de fabrication. "
+"On remplit un four parce que la cuisson coûte cher : une charge les mélange "
+"donc."
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__zone_count
+msgid "Zones"
+msgstr "Zones"

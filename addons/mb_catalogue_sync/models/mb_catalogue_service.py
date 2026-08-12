@@ -25,14 +25,16 @@ class MbCatalogueService(models.Model):
     _description = "Master catalogue service"
 
     name = fields.Char(required=True, default="Makersbrain catalogue")
-    base_url = fields.Char(required=True, help="Root URL of the catalogue read API.")
+    base_url = fields.Char(
+        string="Base URL", required=True,
+        help="Root URL of the catalogue read API.")
     # TODO(control-plane): per POC-PLAN section 5.1 a tenant should hold a
     # reference to a credential, not the credential. This field is the stand-in
     # until mb_connected_account exists.
-    api_key = fields.Char(groups="base.group_system")
+    api_key = fields.Char(string="API key", groups="base.group_system")
     active = fields.Boolean(default=True)
-    last_import_at = fields.Datetime(readonly=True)
-    last_import_summary = fields.Text(readonly=True)
+    last_import_at = fields.Datetime(string="Last import", readonly=True)
+    last_import_summary = fields.Text(string="Last import summary", readonly=True)
 
     _base_url_unique = models.Constraint(
         "unique(base_url)",
@@ -100,11 +102,12 @@ class MbCatalogueService(models.Model):
     @api.model
     def _format_summary(self, summary):
         lines = [
-            _("%s created, %s updated, %s supplier prices", summary["imported"],
-              summary["updated"], summary["offers"]),
+            _("%(created)s created, %(updated)s updated, %(offers)s supplier prices.",
+              created=summary["imported"], updated=summary["updated"],
+              offers=summary["offers"]),
         ]
         # Refusals are reported, never hidden. An import that silently dropped
         # half the offers looks exactly like a supplier that has no prices.
         for reason, count in sorted(summary["refused"].items()):
-            lines.append(_("refused %s: %s", reason, count))
+            lines.append(_("Refused %(reason)s: %(count)s", reason=reason, count=count))
         return "\n".join(lines)

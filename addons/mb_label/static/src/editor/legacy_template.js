@@ -1,5 +1,7 @@
 /** @odoo-module **/
 
+import { _t } from "@web/core/l10n/translation";
+
 const SUPPORTED_TYPES = new Set([
 	"text", "qr", "barcode", "image", "rect", "ellipse", "triangle", "line",
 ]);
@@ -68,7 +70,7 @@ function fieldExpressions(fields = [], warnings = []) {
 			expressions[key] = FIELD_BINDINGS[key];
 		} else {
 			expressions[key] = `manual.${key.replace(/[^A-Za-z0-9_-]/g, "_")}`;
-			warnings.push(`Field “${key}” was imported as a manual value.`);
+			warnings.push(_t("Field “%(field)s” was imported as a manual value.", { field: key }));
 		}
 	}
 	return expressions;
@@ -85,7 +87,7 @@ function translateBindings(source, expressions, warnings) {
 				}
 				const manual = `manual.${key.replace(/[^A-Za-z0-9_-]/g, "_")}`;
 				expressions[key] = manual;
-				warnings.push(`Binding “${key}” was imported as “${manual}”.`);
+				warnings.push(_t("Binding “%(binding)s” was imported as “%(target)s”.", { binding: key, target: manual }));
 				return `{{${manual}}}`;
 			}
 			return expression.includes("{{") ? expression : `{{${expression}}}`;
@@ -99,7 +101,7 @@ function translateBindings(source, expressions, warnings) {
 function convertElement(raw, index, dpm, expressions, warnings) {
 	const type = elementType(raw);
 	if (!SUPPORTED_TYPES.has(raw.type) && raw.type !== "shape" && !raw.shapeType) {
-		warnings.push(`Unknown element type “${raw.type || "empty"}” became text.`);
+		warnings.push(_t("Unknown element type “%(type)s” became text.", { type: raw.type || "empty" }));
 	}
 	const mm = (value) => finite(value) / dpm;
 	const element = {
@@ -140,7 +142,7 @@ function convertElement(raw, index, dpm, expressions, warnings) {
 		element.pre_binarised = Boolean(raw.preBinarised || raw.pre_binarised);
 		element.dither = raw.dither || "threshold";
 		element.dither_threshold = finite(raw.ditherThreshold ?? raw.dither_threshold, 160);
-		if (raw.assetUid) warnings.push(`Image ${element.id} used an external brand asset; embed it before importing.`);
+		if (raw.assetUid) warnings.push(_t("Image %(element)s used an external brand asset; embed it before importing.", { element: element.id }));
 	} else {
 		Object.assign(element, thermalFill(raw));
 		element.stroke_width = Math.max(0.1, mm(raw.strokeWidth ?? raw.stroke_width ?? 2));
@@ -150,7 +152,7 @@ function convertElement(raw, index, dpm, expressions, warnings) {
 
 export function importLegacyTemplate(raw, fallbackName = "Imported label") {
 	if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
-		throw new Error("The label JSON must contain one object.");
+		throw new Error(_t("The label JSON must contain one object."));
 	}
 	if (raw.schema === 1 && Array.isArray(raw.elements)) {
 		return {
@@ -162,13 +164,13 @@ export function importLegacyTemplate(raw, fallbackName = "Imported label") {
 	}
 	const warnings = [];
 	const dpm = finite(raw.dotsPerMm ?? raw.dots_per_mm, 8);
-	if (dpm <= 0) throw new Error("The label resolution must be greater than zero.");
+	if (dpm <= 0) throw new Error(_t("The label resolution must be greater than zero."));
 	const fields = Array.isArray(raw.fields) ? raw.fields : [];
 	const expressions = fieldExpressions(fields, warnings);
 	const sourceElements = Array.isArray(raw.elements) ? raw.elements : [];
 	const width = finite(raw.widthMm ?? raw.width_mm ?? raw.labelSize?.width, 30);
 	const height = finite(raw.heightMm ?? raw.height_mm ?? raw.labelSize?.height, 20);
-	if (width <= 0 || height <= 0) throw new Error("The imported label needs positive dimensions.");
+	if (width <= 0 || height <= 0) throw new Error(_t("The imported label needs positive dimensions."));
 	return {
 		name: String(raw.name || fallbackName || "Imported label"),
 		document: {

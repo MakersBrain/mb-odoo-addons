@@ -57,9 +57,10 @@ class ResUsers(models.Model):
         string="Rauthy subject", readonly=True, copy=False, index=True
     )
     mb_control_role = fields.Selection(
+        string="Workshop role",
         selection=[
             ("viewer", "Viewer"),
-            ("artisan", "Artisan"),
+            ("artisan", "Craftsperson"),
             ("accountant", "Accountant"),
             ("studio_manager", "Studio manager"),
             ("owner", "Owner"),
@@ -67,7 +68,9 @@ class ResUsers(models.Model):
         readonly=True,
         copy=False,
     )
-    mb_control_membership_epoch = fields.Integer(default=0, readonly=True, copy=False)
+    mb_control_membership_epoch = fields.Integer(
+        string="Membership epoch", default=0, readonly=True, copy=False
+    )
 
     _control_user_unique = models.Constraint(
         "UNIQUE(mb_control_user_id)",
@@ -97,19 +100,19 @@ class ResUsers(models.Model):
         epoch = payload.get("epoch")
         active = payload.get("active")
         if not UUID_RE.fullmatch(user_id):
-            raise ValidationError("user_id must be a lowercase UUID")
+            raise ValidationError(_("user_id must be a lowercase UUID"))
         if not SUBJECT_RE.fullmatch(subject):
-            raise ValidationError("subject is invalid")
+            raise ValidationError(_("subject is invalid"))
         if not email or "@" not in email or email != email.lower():
-            raise ValidationError("email must be a normalized address")
+            raise ValidationError(_("email must be a normalized address"))
         if not name:
-            raise ValidationError("name is required")
+            raise ValidationError(_("name is required"))
         if role not in PUBLIC_ROLES:
-            raise ValidationError("unsupported workshop role")
+            raise ValidationError(_("unsupported workshop role"))
         if not isinstance(epoch, int) or isinstance(epoch, bool) or epoch < 1:
-            raise ValidationError("membership epoch must be a positive integer")
+            raise ValidationError(_("membership epoch must be a positive integer"))
         if not isinstance(active, bool):
-            raise ValidationError("active must be a boolean")
+            raise ValidationError(_("active must be a boolean"))
         return user_id, subject, email, name, role, epoch, active
 
     @api.model
@@ -120,9 +123,9 @@ class ResUsers(models.Model):
         company = self.env.company
         workshop_id = str(payload.get("workshop_id", "")).lower()
         if not UUID_RE.fullmatch(workshop_id):
-            raise ValidationError("workshop_id must be a lowercase UUID")
+            raise ValidationError(_("workshop_id must be a lowercase UUID"))
         if company.mb_control_workshop_id and company.mb_control_workshop_id != workshop_id:
-            raise ValidationError("membership belongs to another workshop")
+            raise ValidationError(_("membership belongs to another workshop"))
 
         user = self.search([
             "|", ("mb_control_user_id", "=", user_id),
@@ -132,7 +135,7 @@ class ResUsers(models.Model):
             user.mb_control_user_id not in (False, user_id)
             or user.mb_rauthy_subject not in (False, subject)
         ):
-            raise ValidationError("control-plane identity links conflict")
+            raise ValidationError(_("control-plane identity links conflict"))
         if not user:
             login_match = self.with_context(active_test=False).search(
                 [("login", "=", email)], limit=1
@@ -173,7 +176,7 @@ class ResUsers(models.Model):
                 and user.name == name
             )
             if not same:
-                raise ValidationError("the membership epoch already contains different data")
+                raise ValidationError(_("the membership epoch already contains different data"))
             return {"applied": False, "stale": False, "epoch": epoch, "user_id": user_id}
 
         managed = self._mb_managed_group_ids()

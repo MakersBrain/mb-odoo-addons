@@ -4,31 +4,31 @@
   <template id="report_depot_statement_document">
     <t t-call="web.external_layout">
       <div class="page">
-        <h2>Relevé de dépôt-vente</h2>
+        <h2>Consignment Statement</h2>
         <div class="row mb-4">
           <div class="col-6">
-            <strong>Dépositaire</strong><br/>
+            <strong>Consignee</strong><br/>
             <span t-field="doc.partner_id"/><br/>
             <span t-field="doc.depot_id.name"/>
           </div>
           <div class="col-6">
-            <strong>Période</strong><br/>
-            du <span t-field="doc.date_from"/> au <span t-field="doc.date_to"/>
+            <strong>Period</strong><br/>
+            <t t-translation="off"><span t-field="doc.date_from"/> - <span t-field="doc.date_to"/></t>
           </div>
         </div>
 
         <table class="table table-sm">
           <thead>
             <tr>
-              <th>Pièce</th>
-              <th>N° de série</th>
-              <th class="text-end">Début</th>
-              <th class="text-end">Déposé</th>
-              <th class="text-end">Vendu</th>
-              <th>Vendu le</th>
-              <th class="text-end">Repris</th>
-              <th class="text-end">En dépôt</th>
-              <th class="text-end">Prix public</th>
+              <th>Piece</th>
+              <th>Serial number</th>
+              <th class="text-end">Opening</th>
+              <th class="text-end">Placed</th>
+              <th class="text-end">Sold</th>
+              <th>Sold on</th>
+              <th class="text-end">Returned</th>
+              <th class="text-end">On consignment</th>
+              <th class="text-end">Retail price</th>
               <th class="text-end">Commission</th>
               <th class="text-end">Net</th>
             </tr>
@@ -63,21 +63,21 @@
           <div class="col-5">
             <table class="table table-sm">
               <tr>
-                <td>Total prix public</td>
+                <td>Total retail price</td>
                 <td class="text-end">
                   <span t-field="doc.total_gross"
                         t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                 </td>
               </tr>
               <tr>
-                <td>Commission dépositaire</td>
+                <td>Consignee commission</td>
                 <td class="text-end">
                   <span t-field="doc.total_commission"
                         t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                 </td>
               </tr>
               <tr class="border-black">
-                <td><strong>Net à facturer</strong></td>
+                <td><strong>Net to invoice</strong></td>
                 <td class="text-end">
                   <strong>
                     <span t-field="doc.total_sold"
@@ -90,7 +90,7 @@
         </div>
 
         <p class="text-muted mt-4">
-          Les pièces en dépôt restent la propriété du déposant jusqu'à leur vente.
+          Pieces on consignment remain the property of the consignor until they are sold.
         </p>
       </div>
     </t>

@@ -1,0 +1,73 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_inventory_capture_catalogue
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-12 11:55+0000\n"
+"PO-Revision-Date: 2026-08-12 11:55+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_inventory_capture_catalogue
+#. odoo-python
+#: code:addons/mb_inventory_capture_catalogue/models/lookup_provider.py:0
+msgid "Catalogue match; import or map it before applying inventory."
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_lookup_provider__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_lookup_provider__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#: model:ir.model,name:mb_inventory_capture_catalogue.model_mb_inventory_capture_lookup_provider
+msgid "Inventory capture product lookup provider"
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#. odoo-python
+#: code:addons/mb_inventory_capture_catalogue/models/inventory_capture_candidate.py:0
+msgid "No catalogue service is configured."
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#. odoo-python
+#: code:addons/mb_inventory_capture_catalogue/models/inventory_capture_candidate.py:0
+msgid "Only a Makersbrain catalogue candidate can be imported."
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#. odoo-python
+#: code:addons/mb_inventory_capture_catalogue/models/inventory_capture_candidate.py:0
+msgid "Only an inventory manager can import a reviewed product."
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#. odoo-python
+#: code:addons/mb_inventory_capture_catalogue/models/inventory_capture_candidate.py:0
+msgid "The capture must be in review before importing a product."
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#. odoo-python
+#: code:addons/mb_inventory_capture_catalogue/models/inventory_capture_candidate.py:0
+msgid "The catalogue product was imported without an inventory variant."
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#. odoo-python
+#: code:addons/mb_inventory_capture_catalogue/models/lookup_provider.py:0
+msgid "Verified catalogue identity %(identity)s"
+msgstr ""

@@ -1,7 +1,7 @@
 {
     "name": "Makersbrain Commercial Operations",
     "summary": "Plan markets and site obligations, travel costs, and profitability.",
-    "version": "19.0.2.0.0",
+    "version": "19.0.2.0.1",
     "license": "LGPL-3",
     "category": "Services/Project",
     "author": "Makersbrain",

@@ -1,0 +1,174 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_commercial_operations_urssaf
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "<strong>Recognition:</strong>"
+msgstr "<strong>Reconnaissance :</strong>"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "ACRE coefficient"
+msgstr "Coefficient ACRE"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation_plan_wizard_line__apply_urssaf_goods_rates
+msgid "Apply Urssaf Goods Rates"
+msgstr "Appliquer les taux Urssaf marchandises"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "CFP"
+msgstr "CFP"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "Chamber"
+msgstr "Chambre"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "Combined"
+msgstr "Cumul"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model,name:mb_commercial_operations_urssaf.model_mb_commercial_operation
+msgid "Commercial Operation"
+msgstr "Opération commerciale"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model,name:mb_commercial_operations_urssaf.model_mb_commercial_operation_plan_wizard_line
+msgid "Commercial Planning Product Assumption"
+msgstr "Hypothèse produit de planification commerciale"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model,name:mb_commercial_operations_urssaf.model_mb_commercial_profitability_scenario_line
+msgid "Commercial Profitability Sales Mix"
+msgstr "Mix de ventes de rentabilité commerciale"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "Date"
+msgstr "Date"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation_plan_wizard_line__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields.selection,name:mb_commercial_operations_urssaf.selection__mb_commercial_operation__urssaf_recognition_status__filed
+msgid "Filed"
+msgstr "Déposé"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation_plan_wizard_line__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields.selection,name:mb_commercial_operations_urssaf.selection__mb_commercial_operation__urssaf_recognition_status__computed
+msgid "Included in Draft Declaration"
+msgstr "Inclus dans la déclaration brouillon"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields.selection,name:mb_commercial_operations_urssaf.selection__mb_commercial_operation__urssaf_recognition_status__not_applicable
+msgid "No Recognizable Revenue"
+msgstr "Aucun chiffre d'affaires reconnaissable"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields.selection,name:mb_commercial_operations_urssaf.selection__mb_commercial_operation__urssaf_recognition_status__pending
+msgid "Pending Recognition"
+msgstr "Reconnaissance en attente"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "Product / basket"
+msgstr "Produit / panier"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "Social contributions"
+msgstr "Cotisations sociales"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid ""
+"This is a dated planning estimate. Legal recognition remains in the URSSAF "
+"declaration workflow and, for consolidated depot invoices, follows payment."
+msgstr ""
+"Il s'agit d'une estimation de planification datée. La reconnaissance légale "
+"reste du ressort du flux de déclaration URSSAF et, pour les factures de "
+"dépôt consolidées, suit le paiement."
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.view_commercial_operation_form_urssaf
+msgid "URSSAF"
+msgstr "URSSAF"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation__urssaf_source_ids
+msgid "URSSAF Evidence"
+msgstr "Justificatifs URSSAF"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation__urssaf_recognition_status
+msgid "URSSAF Recognition"
+msgstr "Reconnaissance URSSAF"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "URSSAF planning estimate and legal recognition"
+msgstr "Estimation de planification URSSAF et reconnaissance légale"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__urssaf_acre_coefficient
+msgid "Urssaf Acre Coefficient"
+msgstr "Coefficient ACRE Urssaf"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__urssaf_cfp_rate_id
+msgid "Urssaf Cfp Rate"
+msgstr "Taux CFP Urssaf"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__urssaf_chamber_rate_id
+msgid "Urssaf Chamber Rate"
+msgstr "Taux de chambre Urssaf"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__urssaf_cotisation_rate_id
+msgid "Urssaf Cotisation Rate"
+msgstr "Taux de cotisation Urssaf"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__urssaf_liberatoire_rate_id
+msgid "Urssaf Liberatoire Rate"
+msgstr "Taux du versement libératoire Urssaf"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__urssaf_rate_date
+msgid "Urssaf Rate Date"
+msgstr "Date des taux Urssaf"
+
+#. module: mb_commercial_operations_urssaf
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
+msgid "VFL"
+msgstr "VFL"

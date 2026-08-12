@@ -24,7 +24,7 @@ class L10nFrMicroUrssafRate(models.Model):
 			("cotisation", "Social contributions"),
 			("cfp", "Professional training contribution"),
 			("chamber", "Consular chamber tax"),
-			("liberatoire", "Versement libératoire"),
+			("liberatoire", "Flat-rate income tax payment"),
 		],
 		required=True,
 		index=True,
@@ -32,20 +32,23 @@ class L10nFrMicroUrssafRate(models.Model):
 	category = fields.Selection(URSSAF_CATEGORIES, required=True, index=True)
 	taxpayer_kind = fields.Selection(
 		selection=[
-			("artisan", "Artisan"),
+			("artisan", "Craftsperson"),
 			("merchant", "Merchant"),
 			("liberal", "Liberal profession"),
 		],
 		index=True,
 	)
 	chamber_kind = fields.Selection(
-		selection=[("cma", "CMA"), ("cci", "CCI")], index=True,
+		selection=[
+			("cma", "Chamber of trades (CMA)"),
+			("cci", "Chamber of commerce (CCI)"),
+		], index=True,
 	)
 	chamber_zone = fields.Selection(
 		selection=[
 			("general", "Metropolitan France — general"),
-			("alsace", "Bas-Rhin / Haut-Rhin"),
-			("moselle", "Moselle"),
+			("alsace", "Alsace departments (Bas-Rhin / Haut-Rhin)"),
+			("moselle", "Moselle department"),
 		],
 		index=True,
 	)
@@ -197,6 +200,7 @@ class L10nFrMicroUrssafAnnual(models.Model):
 	vat_global = fields.Monetary()
 	vat_services = fields.Monetary()
 	source = fields.Selection(
+		string="Evidence source",
 		selection=[("computed", "Computed from filed evidence"), ("manual", "Manual opening evidence")],
 		required=True,
 		default="computed",

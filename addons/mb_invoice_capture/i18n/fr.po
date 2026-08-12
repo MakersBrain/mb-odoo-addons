@@ -1,0 +1,1134 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_invoice_capture
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "%(field)s must be a decimal number."
+msgstr "%(field)s doit être un nombre décimal."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "%(field)s must be finite."
+msgstr "%(field)s doit être un nombre fini."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "%(label)s from %(reference)s"
+msgstr "%(label)s issu de %(reference)s"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid ""
+"A changed Paperless document revision was retained without overwriting the "
+"prior bill."
+msgstr ""
+"Une révision modifiée du document Paperless a été conservée sans écraser la "
+"facture précédente."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,help:mb_invoice_capture.field_mb_invoice_capture_line__is_storable
+msgid "A storable product is a product for which you manage stock."
+msgstr "Un produit stockable est un produit pour lequel vous gérez le stock."
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Accounting confirmation"
+msgstr "Confirmation comptable"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__allowed_uom_ids
+msgid "Allowed Uom"
+msgstr "Unité de mesure autorisée"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture__extraction_provider__azure
+msgid "Azure Document Intelligence"
+msgstr "Azure Document Intelligence"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture_line__match_method__barcode
+msgid "Barcode"
+msgstr "Code-barres"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__capture_id
+msgid "Capture"
+msgstr "Capture"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Captured invoice %(number)s"
+msgstr "Facture capturée %(number)s"
+
+#. module: mb_invoice_capture
+#: model:ir.ui.menu,name:mb_invoice_capture.menu_mb_invoice_capture
+msgid "Captured invoices"
+msgstr "Factures capturées"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Captured source evidence and lifecycle fields cannot be edited."
+msgstr ""
+"Les justificatifs source capturés et les champs de cycle de vie ne peuvent "
+"pas être modifiés."
+
+#. module: mb_invoice_capture
+#: model:ir.actions.act_window,name:mb_invoice_capture.action_mb_invoice_capture
+msgid "Captured supplier invoices"
+msgstr "Factures fournisseur capturées"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__company_id
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Confidence"
+msgstr "Confiance"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__confidence_summary
+msgid "Confidence Summary"
+msgstr "Résumé de confiance"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__review_supplier_id
+msgid "Confirmed supplier"
+msgstr "Fournisseur confirmé"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__content_digest
+msgid "Content Digest"
+msgstr "Empreinte du contenu"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Create draft bill"
+msgstr "Créer la facture fournisseur brouillon"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Create draft purchase order"
+msgstr "Créer le bon de commande brouillon"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__create_uid
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__create_date
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Currency"
+msgstr "Devise"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__currency_code
+msgid "Currency Code"
+msgstr "Code devise"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Customer address"
+msgstr "Adresse du client"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Customer name"
+msgstr "Nom du client"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__description
+msgid "Description"
+msgstr "Description"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__display_name
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Draft bill"
+msgstr "Facture fournisseur brouillon"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture__status__draft_bill
+msgid "Draft bill created"
+msgstr "Facture fournisseur brouillon créée"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid ""
+"Draft bill created from the reviewed header totals. Verify its supplier, tax"
+" and line details before posting."
+msgstr ""
+"Facture fournisseur brouillon créée à partir des totaux d'en-tête révisés. "
+"Vérifiez son fournisseur, sa taxe et le détail des lignes avant de la "
+"comptabiliser."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Draft supplier bill"
+msgstr "Facture fournisseur brouillon"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__due_date_display
+msgid "Due Date Display"
+msgstr "Date d'échéance affichée"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Due date"
+msgstr "Date d'échéance"
+
+#. module: mb_invoice_capture
+#: model:ir.model.constraint,message:mb_invoice_capture.constraint_mb_invoice_capture_line_capture_sequence_unique
+msgid "Each captured invoice line sequence must be unique."
+msgstr "Chaque séquence de ligne de facture capturée doit être unique."
+
+#. module: mb_invoice_capture
+#: model:ir.model.constraint,message:mb_invoice_capture.constraint_mb_invoice_capture_document_revision_number_unique
+msgid "Each document revision number must be unique."
+msgstr "Chaque numéro de révision de document doit être unique."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid ""
+"Every matched line needs a positive quantity, a non-negative price, and a "
+"unit compatible with the product."
+msgstr ""
+"Chaque ligne appariée exige une quantité positive, un prix non négatif et "
+"une unité compatible avec le produit."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__review_expense_account_id
+msgid "Expense account"
+msgstr "Compte de charge"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__external_document_id
+msgid "External Document"
+msgstr "Document externe"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__extracted_barcode
+msgid "Extracted Barcode"
+msgstr "Code-barres extrait"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__extracted_product_code
+msgid "Extracted Product Code"
+msgstr "Code produit extrait"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__extracted_quantity
+msgid "Extracted Quantity"
+msgstr "Quantité extraite"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__extracted_unit_price
+msgid "Extracted Unit Price"
+msgstr "Prix unitaire extrait"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Extracted field"
+msgstr "Champ extrait"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Extracted invoice-line evidence cannot be created manually."
+msgstr ""
+"Les justificatifs de ligne de facture extraits ne peuvent pas être créés "
+"manuellement."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Extracted invoice-line evidence cannot be edited."
+msgstr ""
+"Les justificatifs de ligne de facture extraits ne peuvent pas être modifiés."
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Extracted totals"
+msgstr "Totaux extraits"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Extracted untaxed, tax and total amounts do not reconcile."
+msgstr ""
+"Les montants hors taxes, de taxe et total extraits ne se réconcilient pas."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__extraction_model
+msgid "Extraction Model"
+msgstr "Modèle d'extraction"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__extraction_model_version
+msgid "Extraction Model Version"
+msgstr "Version du modèle d'extraction"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__extraction_operation_id
+msgid "Extraction Operation"
+msgstr "Opération d'extraction"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__extraction_provider
+msgid "Extraction Provider"
+msgstr "Fournisseur d'extraction"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Extraction confidence requires accountant review."
+msgstr "La confiance de l'extraction exige une révision par le comptable."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__field_confidence
+msgid "Field Confidence"
+msgstr "Confiance par champ"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Field confidence"
+msgstr "Confiance par champ"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__id
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,help:mb_invoice_capture.field_mb_invoice_capture__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,help:mb_invoice_capture.field_mb_invoice_capture__message_has_error
+#: model:ir.model.fields,help:mb_invoice_capture.field_mb_invoice_capture__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture_line__match_method__internal_reference
+msgid "Internal reference"
+msgstr "Référence interne"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__invoice_date_display
+msgid "Invoice Date Display"
+msgstr "Date de facture affichée"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__invoice_lines_summary
+msgid "Invoice Lines Summary"
+msgstr "Résumé des lignes de facture"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__invoice_number
+msgid "Invoice Number"
+msgstr "Numéro de la facture"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Invoice capture may create draft bills only."
+msgstr ""
+"La capture de facture ne peut créer que des factures fournisseur brouillon."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Invoice capture may create draft purchase orders only."
+msgstr ""
+"La capture de facture ne peut créer que des bons de commande brouillon."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Invoice date"
+msgstr "Date de facture"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Invoice line"
+msgstr "Ligne de facture"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Invoice line %(line)s does not map to one existing expense account."
+msgstr ""
+"La ligne de facture %(line)s ne correspond pas à un seul compte de charge "
+"existant."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Invoice line %(line)s does not map to one existing product."
+msgstr ""
+"La ligne de facture %(line)s ne correspond pas à un seul produit existant."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Invoice line %(line)s does not map to one purchase tax."
+msgstr ""
+"La ligne de facture %(line)s ne correspond pas à une seule taxe d'achat."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Invoice line %(line)s is not an object."
+msgstr "La ligne de facture %(line)s n'est pas un objet."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Invoice line %(line)s needs a description and a positive quantity."
+msgstr ""
+"La ligne de facture %(line)s exige une description et une quantité positive."
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Invoice lines"
+msgstr "Lignes de facture"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Invoice number"
+msgstr "Numéro de facture"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Invoice review"
+msgstr "Révision de la facture"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__write_uid
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__write_date
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Line items"
+msgstr "Lignes de détail"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture_line__match_method__manual
+msgid "Manual"
+msgstr "Manuelle"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__match_method
+msgid "Match Method"
+msgstr "Méthode d'appariement"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid ""
+"Match each extracted line to an inventory product. Creating the\n"
+"                                purchase order does not confirm it and does not change stock;\n"
+"                                stock changes only when its receipt is validated."
+msgstr ""
+"Appariez chaque ligne extraite à un produit d'inventaire. La création du\n"
+"                                bon de commande ne le confirme pas et ne modifie pas le stock ;\n"
+"                                le stock ne change que lorsque sa réception est validée."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid ""
+"Match every invoice line to an existing product before creating the purchase"
+" order."
+msgstr ""
+"Appariez chaque ligne de facture à un produit existant avant de créer le bon"
+" de commande."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__review_product_id
+msgid "Matched product"
+msgstr "Produit apparié"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__move_id
+msgid "Move"
+msgstr "Mouvement"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture__status__review
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_search
+msgid "Needs review"
+msgstr "À réviser"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "No confidence scores supplied."
+msgstr "Aucun score de confiance fourni."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "No existing supplier matches the extracted identity."
+msgstr "Aucun fournisseur existant ne correspond à l'identité extraite."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "No line items extracted."
+msgstr "Aucune ligne de détail extraite."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "No valid extracted invoice lines are available to purchase."
+msgstr "Aucune ligne de facture extraite valide n'est disponible à l'achat."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__normalized_payload
+msgid "Normalized Payload"
+msgstr "Charge utile normalisée"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Normalized payload"
+msgstr "Charge utile normalisée"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Not available"
+msgstr "Pas disponible"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture_line__match_method__unmatched
+msgid "Not matched"
+msgstr "Non apparié"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,help:mb_invoice_capture.field_mb_invoice_capture__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,help:mb_invoice_capture.field_mb_invoice_capture__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Only an invoice awaiting review can create a reviewed bill."
+msgstr ""
+"Seule une facture en attente de révision peut créer une facture fournisseur "
+"révisée."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Original source"
+msgstr "Source d'origine"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__page_count
+msgid "Page Count"
+msgstr "Nombre de pages"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__source_document_url
+msgid "Paperless document"
+msgstr "Document Paperless"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__previous_revision_id
+msgid "Previous Revision"
+msgstr "Révision précédente"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__review_line_ids
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Product matching"
+msgstr "Appariement des produits"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Product matching is locked after creating the purchase order."
+msgstr ""
+"L'appariement des produits est verrouillé après la création du bon de "
+"commande."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__purchase_line_id
+msgid "Purchase Line"
+msgstr "Ligne d'achat"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__purchase_order_id
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Purchase order"
+msgstr "Bon de commande"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__review_quantity
+msgid "Purchase quantity"
+msgstr "Quantité achetée"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__review_tax_id
+msgid "Purchase tax"
+msgstr "Taxe d'achat"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__review_uom_id
+msgid "Purchase unit"
+msgstr "Unité d'achat"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__rating_ids
+msgid "Ratings"
+msgstr "Évaluations"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Raw confidence payload"
+msgstr "Charge utile brute de confiance"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture__status__received
+msgid "Received"
+msgstr "Reçu"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__received_at
+msgid "Received At"
+msgstr "Reçu le"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Retry product matching"
+msgstr "Relancer l'appariement des produits"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Review draft bill"
+msgstr "Réviser la facture fournisseur brouillon"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Review purchase order"
+msgstr "Réviser le bon de commande"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__review_reason
+msgid "Review reason"
+msgstr "Motif de révision"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__revision
+msgid "Revision"
+msgstr "Révision"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Erreur d'envoi SMS"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Select an expense account, then create the draft bill again."
+msgstr ""
+"Sélectionnez un compte de charge, puis créez à nouveau la facture "
+"fournisseur brouillon."
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Select or confirm the supplier"
+msgstr "Sélectionnez ou confirmez le fournisseur"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Select the purchase tax, then create the draft bill again."
+msgstr ""
+"Sélectionnez la taxe d'achat, puis créez à nouveau la facture fournisseur "
+"brouillon."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Select the supplier before creating a purchase order."
+msgstr "Sélectionnez le fournisseur avant de créer un bon de commande."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Several suppliers have the extracted SIREN."
+msgstr "Plusieurs fournisseurs portent le SIREN extrait."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Several suppliers have the extracted VAT identifier."
+msgstr "Plusieurs fournisseurs portent le numéro de TVA extrait."
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__source_attachment_id
+msgid "Source Attachment"
+msgstr "Pièce jointe source"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__source_filename
+msgid "Source Filename"
+msgstr "Nom du fichier source"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__source_mimetype
+msgid "Source Mimetype"
+msgstr "Type MIME de la source"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Source and audit"
+msgstr "Source et audit"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Source document:"
+msgstr "Document source :"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Source invoice"
+msgstr "Facture source"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__status
+msgid "Status"
+msgstr "Statut"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture__extraction_provider__structured
+msgid "Structured invoice"
+msgstr "Facture structurée"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Supplier"
+msgstr "Fournisseur"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__supplier_name
+msgid "Supplier Name"
+msgstr "Nom du fournisseur"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Supplier VAT"
+msgstr "TVA du fournisseur"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__supplier_vat
+msgid "Supplier Vat"
+msgstr "TVA du fournisseur"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Supplier address"
+msgstr "Adresse du fournisseur"
+
+#. module: mb_invoice_capture
+#: model:ir.model,name:mb_invoice_capture.model_mb_invoice_capture
+msgid "Supplier invoice capture"
+msgstr "Capture de facture fournisseur"
+
+#. module: mb_invoice_capture
+#: model:ir.model,name:mb_invoice_capture.model_mb_invoice_capture_line
+msgid "Supplier invoice product matching line"
+msgstr "Ligne d'appariement produit d'une facture fournisseur"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Supplier name"
+msgstr "Nom du fournisseur"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields.selection,name:mb_invoice_capture.selection__mb_invoice_capture_line__match_method__supplier_code
+msgid "Supplier product code"
+msgstr "Code produit du fournisseur"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Tax"
+msgstr "Taxe"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__tax_amount_display
+msgid "Tax Amount Display"
+msgstr "Montant de taxe affiché"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Tax amount"
+msgstr "Montant de la taxe"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Tax rate"
+msgstr "Taux de taxe"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Technical data"
+msgstr "Données techniques"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid ""
+"The bill line count no longer matches the captured invoice. Reconcile the "
+"bill lines before creating its purchase order."
+msgstr ""
+"Le nombre de lignes de la facture fournisseur ne correspond plus à la "
+"facture capturée. Réconciliez les lignes avant de créer son bon de commande."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "The extracted currency is not active in Odoo."
+msgstr "La devise extraite n'est pas active dans Odoo."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "The extracted supplier name is ambiguous."
+msgstr "Le nom de fournisseur extrait est ambigu."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "The extraction contains no invoice lines."
+msgstr "L'extraction ne contient aucune ligne de facture."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "The extraction has no invoice date."
+msgstr "L'extraction ne comporte aucune date de facture."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "The previous revision must be an earlier capture of the same document."
+msgstr ""
+"La révision précédente doit être une capture antérieure du même document."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid ""
+"The reviewed lines total %(lines)s but the extracted header is %(header)s. "
+"Add an explicit freight, discount, or rounding line before creating the "
+"bill."
+msgstr ""
+"Le total des lignes révisées est %(lines)s alors que l'en-tête extrait "
+"indique %(header)s. Ajoutez une ligne explicite de transport, de remise ou "
+"d'arrondi avant de créer la facture fournisseur."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "The source attachment must belong to its invoice capture."
+msgstr "La pièce jointe source doit appartenir à sa capture de facture."
+
+#. module: mb_invoice_capture
+#: model:ir.model.constraint,message:mb_invoice_capture.constraint_mb_invoice_capture_document_revision_unique
+msgid "This document revision has already been captured."
+msgstr "Cette révision de document a déjà été capturée."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid ""
+"This purchase order was reconstructed from a supplier invoice. Confirm it "
+"only after reviewing the products and quantities; validate the receipt only "
+"after physically receiving the goods."
+msgstr ""
+"Ce bon de commande a été reconstitué à partir d'une facture fournisseur. Ne "
+"le confirmez qu'après avoir vérifié les produits et les quantités ; ne "
+"validez la réception qu'après avoir physiquement reçu la marchandise."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Total"
+msgstr "Total"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__total_amount_display
+msgid "Total Amount Display"
+msgstr "Montant total affiché"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__is_storable
+msgid "Tracks inventory"
+msgstr "Suit le stock"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__review_unit_price
+msgid "Unit price"
+msgstr "Prix unitaire"
+
+#. module: mb_invoice_capture
+#: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
+msgid "Untaxed"
+msgstr "Hors taxes"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__untaxed_amount_display
+msgid "Untaxed Amount Display"
+msgstr "Montant hors taxes affiché"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Untaxed amount"
+msgstr "Montant hors taxes"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__website_message_ids
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,help:mb_invoice_capture.field_mb_invoice_capture__website_message_ids
+msgid "Website communication history"
+msgstr "Historique de communication du site web"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "content_digest must be a lowercase SHA-256 digest"
+msgstr "content_digest doit être une empreinte SHA-256 en minuscules"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "external_document_id is invalid"
+msgstr "external_document_id est invalide"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "field_confidence must be an object"
+msgstr "field_confidence doit être un objet"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "invoice capture belongs to another workshop"
+msgstr "la capture de facture appartient à un autre atelier"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "invoice must be an object"
+msgstr "invoice doit être un objet"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "invoice source does not match content_digest"
+msgstr "la source de la facture ne correspond pas à content_digest"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "invoice source is empty or exceeds 20 MiB"
+msgstr "la source de la facture est vide ou dépasse 20 Mio"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "page_count must be a positive integer"
+msgstr "page_count doit être un entier positif"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "source_base64 is invalid"
+msgstr "source_base64 est invalide"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "source_base64 is required"
+msgstr "source_base64 est obligatoire"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "source_document_url must be an absolute HTTPS URL"
+msgstr "source_document_url doit être une URL HTTPS absolue"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "source_filename must be a plain filename"
+msgstr "source_filename doit être un simple nom de fichier"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "the Odoo company is not linked to a control-plane workshop"
+msgstr "la société Odoo n'est liée à aucun atelier du plan de contrôle"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "unsupported extraction provider"
+msgstr "fournisseur d'extraction non pris en charge"
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "unsupported invoice source type"
+msgstr "type de source de facture non pris en charge"

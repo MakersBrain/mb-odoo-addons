@@ -1,0 +1,212 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_payment_sumup
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_payment_sumup
+#. odoo-python
+#: code:addons/mb_payment_sumup/models/payment_transaction.py:0
+msgid "A completed SumUp checkout cannot be replaced."
+msgstr "Un paiement SumUp déjà finalisé ne peut pas être remplacé."
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_provider__code
+msgid "Code"
+msgstr "Code"
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,help:mb_payment_sumup.field_payment_transaction__sumup_refund_target_amount
+msgid ""
+"Cumulative successful refund amount that SumUp must report before this "
+"refund transaction may be completed."
+msgstr ""
+"Montant cumulé des remboursements réussis que SumUp doit avoir enregistré "
+"avant que cette transaction de remboursement puisse être finalisée."
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_provider__display_name
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_transaction__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_provider__id
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_transaction__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_payment_sumup
+#: model_terms:ir.ui.view,arch_db:mb_payment_sumup.payment_provider_form
+msgid "Merchant Code"
+msgstr "Code marchand"
+
+#. module: mb_payment_sumup
+#. odoo-python
+#: code:addons/mb_payment_sumup/models/payment_provider.py:0
+msgid ""
+"No SumUp merchant code is set on the provider %s. No payment can be taken "
+"until it is, because the merchant code is what decides which account "
+"receives the money."
+msgstr ""
+"Aucun code marchand SumUp n'est renseigné sur le fournisseur %s. Aucun "
+"paiement ne peut être encaissé tant qu'il manque, car le code marchand "
+"détermine le compte qui reçoit l'argent."
+
+#. module: mb_payment_sumup
+#: model:ir.model,name:mb_payment_sumup.model_payment_provider
+msgid "Payment Provider"
+msgstr "Fournisseur de paiement"
+
+#. module: mb_payment_sumup
+#: model:ir.model,name:mb_payment_sumup.model_payment_transaction
+msgid "Payment Transaction"
+msgstr "Transaction de paiement"
+
+#. module: mb_payment_sumup
+#. odoo-python
+#: code:addons/mb_payment_sumup/models/payment_transaction.py:0
+msgid "Received data with invalid checkout status: %s."
+msgstr "Données reçues avec un statut de paiement invalide : %s."
+
+#. module: mb_payment_sumup
+#: model_terms:ir.ui.view,arch_db:mb_payment_sumup.payment_provider_form
+msgid "Secret Key"
+msgstr "Clé secrète"
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields.selection,name:mb_payment_sumup.selection__payment_provider__code__sumup
+#: model:payment.provider,name:mb_payment_sumup.payment_provider_sumup
+msgid "SumUp"
+msgstr "SumUp"
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_transaction__sumup_checkout_url
+msgid "SumUp Checkout URL"
+msgstr "URL de paiement SumUp"
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_provider__sumup_merchant_code
+msgid "SumUp Merchant Code"
+msgstr "Code marchand SumUp"
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_transaction__sumup_refund_target_amount
+msgid "SumUp Refund Target"
+msgstr "Cible de remboursement SumUp"
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_provider__sumup_api_key
+msgid "SumUp Secret Key"
+msgstr "Clé secrète SumUp"
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,field_description:mb_payment_sumup.field_payment_transaction__sumup_transaction_id
+msgid "SumUp Transaction ID"
+msgstr "Identifiant de transaction SumUp"
+
+#. module: mb_payment_sumup
+#. odoo-python
+#: code:addons/mb_payment_sumup/models/payment_transaction.py:0
+msgid "SumUp reported that the refund failed."
+msgstr "SumUp signale que le remboursement a échoué."
+
+#. module: mb_payment_sumup
+#. odoo-python
+#: code:addons/mb_payment_sumup/models/payment_transaction.py:0
+msgid "SumUp reported the checkout as %s."
+msgstr "SumUp a signalé le paiement comme %s."
+
+#. module: mb_payment_sumup
+#: model:ir.actions.server,name:mb_payment_sumup.cron_poll_sumup_checkouts_ir_actions_server
+msgid "SumUp: Poll pending checkouts"
+msgstr "SumUp : interroger les paiements en attente"
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,help:mb_payment_sumup.field_payment_transaction__sumup_checkout_url
+msgid ""
+"The SumUp-hosted page that takes this payment. It is what a payment link "
+"points at and what a QR code encodes."
+msgstr ""
+"La page hébergée par SumUp qui encaisse ce paiement. C'est la cible d'un "
+"lien de paiement et le contenu d'un code QR."
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,help:mb_payment_sumup.field_payment_transaction__sumup_transaction_id
+msgid ""
+"The identifier of the transaction inside the checkout. Refunds are addressed"
+" to it, not to the checkout."
+msgstr ""
+"L'identifiant de la transaction à l'intérieur du paiement. Les "
+"remboursements s'adressent à elle, et non au paiement."
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,help:mb_payment_sumup.field_payment_provider__sumup_merchant_code
+msgid ""
+"The merchant account that receives the money. Every checkout names it "
+"explicitly, so it has to be the account whose legal identity is printed on "
+"the invoice."
+msgstr ""
+"Le compte marchand qui reçoit l'argent. Chaque paiement le désigne "
+"explicitement : ce doit donc être le compte dont l'identité légale est "
+"imprimée sur la facture."
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,help:mb_payment_sumup.field_payment_provider__sumup_api_key
+msgid ""
+"The secret key (sup_sk_...) of this workshop's SumUp account, from Developer"
+" settings in the SumUp dashboard."
+msgstr ""
+"La clé secrète (sup_sk_...) du compte SumUp de cet atelier, disponible dans "
+"les paramètres développeur du tableau de bord SumUp."
+
+#. module: mb_payment_sumup
+#: model:ir.model.fields,help:mb_payment_sumup.field_payment_provider__code
+msgid "The technical code of this payment provider."
+msgstr "Le code technique de ce fournisseur de paiement."
+
+#. module: mb_payment_sumup
+#. odoo-python
+#: code:addons/mb_payment_sumup/models/payment_transaction.py:0
+msgid "This SumUp checkout was replaced by a new payment link."
+msgstr "Ce paiement SumUp a été remplacé par un nouveau lien de paiement."
+
+#. module: mb_payment_sumup
+#. odoo-python
+#: code:addons/mb_payment_sumup/models/payment_transaction.py:0
+msgid ""
+"This payment has no SumUp transaction to refund. A checkout that was never "
+"paid has nothing to give back."
+msgstr ""
+"Ce paiement n'a aucune transaction SumUp à rembourser. Un paiement jamais "
+"réglé n'a rien à restituer."
+
+#. module: mb_payment_sumup
+#: model_terms:payment.provider,auth_msg:mb_payment_sumup.payment_provider_sumup
+msgid "Your payment has been authorized."
+msgstr "Votre paiement a été autorisé."
+
+#. module: mb_payment_sumup
+#: model_terms:payment.provider,cancel_msg:mb_payment_sumup.payment_provider_sumup
+msgid "Your payment has been cancelled."
+msgstr "Votre paiement a été annulé."
+
+#. module: mb_payment_sumup
+#: model_terms:payment.provider,pending_msg:mb_payment_sumup.payment_provider_sumup
+msgid "Your payment has been processed but is waiting for approval."
+msgstr "Votre paiement a été traité mais est en attente d'approbation."
+
+#. module: mb_payment_sumup
+#: model_terms:payment.provider,done_msg:mb_payment_sumup.payment_provider_sumup
+msgid "Your payment has been processed."
+msgstr "Votre paiement a été traité."

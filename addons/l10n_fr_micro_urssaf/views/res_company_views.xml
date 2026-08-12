@@ -21,7 +21,7 @@
 						<field name="l10n_fr_micro_versement_from"/>
 						<field name="l10n_fr_micro_versement_to"/>
 					</group>
-					<group string="ACRE">
+					<group string="ACRE scheme">
 						<field name="l10n_fr_micro_acre_granted"/>
 						<field name="l10n_fr_micro_acre_from" invisible="not l10n_fr_micro_acre_granted"/>
 						<field name="l10n_fr_micro_acre_to" invisible="not l10n_fr_micro_acre_granted"/>

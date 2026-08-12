@@ -345,7 +345,8 @@ class MbCommercialOperation(models.Model):
                 raise UserError(_("Complete the operation before closing its stock."))
             discrepancies = operation._stock_discrepancies()
             if discrepancies:
-                raise ValidationError("\n".join(discrepancies))
+                discrepancy_message = "\n".join(discrepancies)
+                raise ValidationError(discrepancy_message)
             operation.write({
                 "stock_closed": True,
                 "stock_close_date": fields.Date.context_today(operation),

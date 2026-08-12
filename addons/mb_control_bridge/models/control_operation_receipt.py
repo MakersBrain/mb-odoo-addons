@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import _, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -22,9 +22,9 @@ class ControlOperationReceipt(models.Model):
         if not receipt:
             return self.browse()
         if receipt.command != command or receipt.payload_digest != digest:
-            raise ValidationError(
+            raise ValidationError(_(
                 "The operation key was already used with a different command or payload."
-            )
+            ))
         return receipt
 
     def record(self, operation_key, command, digest, response):

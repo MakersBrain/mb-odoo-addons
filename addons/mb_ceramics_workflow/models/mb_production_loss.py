@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -36,14 +36,14 @@ class MbProductionLoss(models.Model):
     def _check_links(self):
         for loss in self:
             if loss.operation_id and loss.operation_id.production_id != loss.production_id:
-                raise ValidationError("The loss operation must belong to its manufacturing order.")
+                raise ValidationError(_("The loss operation must belong to its manufacturing order."))
             if loss.firing_id and loss.operation_id.mb_firing_id != loss.firing_id:
-                raise ValidationError("The loss firing must be the operation's firing.")
+                raise ValidationError(_("The loss firing must be the operation's firing."))
 
     def write(self, values):
         if not self.env.context.get("mb_allow_loss_correction"):
-            raise UserError("Production loss is immutable; create a correcting entry instead.")
+            raise UserError(_("Production loss is immutable; create a correcting entry instead."))
         return super().write(values)
 
     def unlink(self):
-        raise UserError("Production loss is immutable and cannot be deleted.")
+        raise UserError(_("Production loss is immutable and cannot be deleted."))

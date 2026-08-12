@@ -1,0 +1,1843 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_label
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "%(count)s successful sends in this window"
+msgstr "%(count)s envois réussis dans cette fenêtre"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/phomemo_adapter.js:0
+msgid "%(device)s requires USB and cannot use Web Bluetooth."
+msgstr "%(device)s exige l'USB et ne peut pas utiliser le Bluetooth Web."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "%(name)s · %(dpi)s dpi"
+msgstr "%(name)s · %(dpi)s ppp"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "%(name)s · %(dpi)s dpi · USB only"
+msgstr "%(name)s · %(dpi)s ppp · USB uniquement"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "%(name)s · v%(version)s"
+msgstr "%(name)s · v%(version)s"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid "%(width)s mm continuous"
+msgstr "%(width)s mm continu"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid "%(width)s × %(height)s mm (D/tape)"
+msgstr "%(width)s × %(height)s mm (série D/ruban)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid "%(width)s × %(height)s mm (PM-241, USB only)"
+msgstr "%(width)s × %(height)s mm (PM-241, USB uniquement)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid "%(width)s × %(height)s mm continuous"
+msgstr "%(width)s × %(height)s mm continu"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "%(width)s × %(height)s mm · %(dpi)s dpi"
+msgstr "%(width)s × %(height)s mm · %(dpi)s ppp"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "%(width)s × %(height)s mm · %(dpi)s dpi · %(copies)s copies"
+msgstr "%(width)s × %(height)s mm · %(dpi)s ppp · %(copies)s exemplaires"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "(mm)"
+msgstr "(mm)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "1 successful send in this window"
+msgstr "1 envoi réussi dans cette fenêtre"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid ""
+"203 dpi, rotated D-series feed; use label stock 12-15 mm across the print "
+"head."
+msgstr ""
+"203 ppp, avance série D pivotée ; utilisez un support d'étiquettes de 12 à "
+"15 mm sur la largeur de la tête d'impression."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid ""
+"300 dpi render; the operating-system driver must print at true size, without"
+" scaling."
+msgstr ""
+"Rendu à 300 ppp ; le pilote du système d'exploitation doit imprimer à taille"
+" réelle, sans mise à l'échelle."
+
+#. module: mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.product_product_form_mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.product_template_form_mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.stock_lot_form_mb_label
+msgid "<span class=\"o_stat_text\">Create Label</span>"
+msgstr "<span class=\"o_stat_text\">Créer une étiquette</span>"
+
+#. module: mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.product_product_form_mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.product_template_form_mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.stock_lot_form_mb_label
+msgid "<span class=\"o_stat_text\">Print Label</span>"
+msgstr "<span class=\"o_stat_text\">Imprimer l'étiquette</span>"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "A QR value cannot exceed 1024 characters."
+msgstr "Une valeur QR ne peut pas dépasser 1024 caractères."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid ""
+"A binding can be chained with format filters: money_trim removes a zero-only"
+" decimal, money keeps the currency decimals, and fixed sets the number of "
+"decimals. Date expressions are available too."
+msgstr ""
+"Une liaison peut être enchaînée avec des filtres de mise en forme : "
+"money_trim supprime une décimale nulle, money conserve les décimales de la "
+"devise et fixed impose le nombre de décimales. Des expressions de date sont "
+"également disponibles."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "A company can have only one default label template."
+msgstr "Une société ne peut avoir qu'un seul modèle d'étiquette par défaut."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "A label formatting argument cannot exceed 64 characters."
+msgstr ""
+"Un argument de mise en forme d'étiquette ne peut pas dépasser 64 caractères."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "A lot or serial QR path cannot be empty."
+msgstr "Un chemin QR de lot ou de numéro de série ne peut pas être vide."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "A new immutable label version was saved."
+msgstr "Une nouvelle version immuable d'étiquette a été enregistrée."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_renderer.py:0
+msgid "A numeric label filter received a non-numeric value."
+msgstr "Un filtre numérique d'étiquette a reçu une valeur non numérique."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid ""
+"A product needs an internal reference before a QR label can be printed."
+msgstr ""
+"Un produit doit avoir une référence interne avant qu'une étiquette QR puisse"
+" être imprimée."
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__active
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: mb_label
+#: model:ir.model.fields,help:mb_label.field_mb_label_template__printer_target
+msgid "Advisory printer or media target imported from the label design."
+msgstr ""
+"Imprimante ou support cible indicatif, importé depuis la conception de "
+"l'étiquette."
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__alias_id
+msgid "Alias"
+msgstr "Alias"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Already 1-bit; preserve pixels"
+msgstr "Déjà en 1 bit ; préserver les pixels"
+
+#. module: mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_template_form
+msgid "Archived"
+msgstr "Archivé"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__artifact_name
+msgid "Artifact Name"
+msgstr "Nom de l'artefact"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__artifact_pdf
+msgid "Artifact Pdf"
+msgstr "PDF de l'artefact"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "Atkinson (light)"
+msgstr "Atkinson (doux)"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__author_id
+msgid "Author"
+msgstr "Auteur"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Automatic from Bluetooth name"
+msgstr "Automatique d'après le nom Bluetooth"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "BARCODE"
+msgstr "CODE-BARRES"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Background"
+msgstr "Arrière-plan"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Binding '%s' is not allowed."
+msgstr "La liaison '%s' n'est pas autorisée."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/legacy_template.js:0
+msgid "Binding “%(binding)s” was imported as “%(target)s”."
+msgstr "La liaison “%(binding)s” a été importée comme “%(target)s”."
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__bindings_snapshot
+msgid "Bindings Snapshot"
+msgstr "Instantané des liaisons"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Bindings:"
+msgstr "Liaisons :"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Bold"
+msgstr "Gras"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Bring forward"
+msgstr "Avancer d'un plan"
+
+#. module: mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_print_wizard_form
+msgid "Browser Print"
+msgstr "Impression par le navigateur"
+
+#. module: mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_print_wizard_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Centre"
+msgstr "Centre"
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_mb_label_print_wizard
+msgid "Choose Label Template and Subject"
+msgstr "Choisir le modèle d'étiquette et le sujet"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_print_job.py:0
+msgid "Choose a product and a saved label template."
+msgstr "Choisissez un produit et un modèle d'étiquette enregistré."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Choose an available product for the label preview."
+msgstr "Choisissez un produit disponible pour l'aperçu de l'étiquette."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "Choose an image smaller than 2 MB."
+msgstr "Choisissez une image de moins de 2 Mo."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Choose another printer and print"
+msgstr "Choisir une autre imprimante et imprimer"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Close"
+msgstr "Fermer"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__company_id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__company_id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__company_id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__company_id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "Connection test failed."
+msgstr "Le test de connexion a échoué."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Continuous"
+msgstr "Continu"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__continuous_media
+msgid "Continuous Media"
+msgstr "Support continu"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__continuous_media
+msgid "Continuous media"
+msgstr "Support continu"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Continuous paper (disable gap sensing)"
+msgstr "Papier continu (désactiver la détection d'intervalle)"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__copies
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__copies
+msgid "Copies"
+msgstr "Copies"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_print_job.py:0
+#: code:addons/mb_label/wizards/mb_label_print_wizard.py:0
+msgid "Copies must be between 1 and 99."
+msgstr "Le nombre d'exemplaires doit être compris entre 1 et 99."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/stock_lot.py:0
+msgid "Create Lot or Piece Label"
+msgstr "Créer l'étiquette de lot ou de pièce"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/product.py:0
+msgid "Create Product Label"
+msgstr "Créer l'étiquette produit"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__create_uid
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__create_uid
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__create_uid
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__create_uid
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__create_date
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__create_date
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__create_date
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__create_date
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__current_version_id
+msgid "Current Version"
+msgstr "Version actuelle"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Custom / manual"
+msgstr "Personnalisé / manuel"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Custom size"
+msgstr "Taille personnalisée"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "DPI"
+msgstr "PPP"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__is_default
+msgid "Default"
+msgstr "Par défaut"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Delete"
+msgstr "Supprimer"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Density:"
+msgstr "Densité :"
+
+#. module: mb_label
+#: model:res.groups,name:mb_label.group_mb_label_manager
+msgid "Designer"
+msgstr "Concepteur"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Destination"
+msgstr "Destination"
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_mb_label_render_service
+msgid "Deterministic Label Render Service"
+msgstr "Service de rendu déterministe d'étiquettes"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "Discard unsaved label changes?"
+msgstr "Abandonner les modifications d'étiquette non enregistrées ?"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__display_name
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__display_name
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__display_name
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_render_service__display_name
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__display_name
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__display_name
+#: model:ir.model.fields,field_description:mb_label.field_product_product__display_name
+#: model:ir.model.fields,field_description:mb_label.field_product_template__display_name
+#: model:ir.model.fields,field_description:mb_label.field_stock_lot__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Dithering"
+msgstr "Tramage"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__document_json
+msgid "Document Json"
+msgstr "Document JSON"
+
+#. module: mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_print_wizard_form
+msgid "Download PDF"
+msgstr "Télécharger le PDF"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Download exact-size PDF"
+msgstr "Télécharger le PDF à taille réelle"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__dpi
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__dpi
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__dpi
+msgid "Dpi"
+msgstr "PPP"
+
+#. module: mb_label
+#: model:ir.model.fields.selection,name:mb_label.selection__mb_label_print_job__state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Duplicate"
+msgstr "Dupliquer"
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_mb_label_qr_alias
+msgid "Durable Printed QR Alias"
+msgstr "Alias QR imprimé durable"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Element content must be text."
+msgstr "Le contenu d'un élément doit être du texte."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Element geometry must use positive millimetres."
+msgstr "La géométrie d'un élément doit utiliser des millimètres positifs."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Element group identifiers must be text."
+msgstr "Les identifiants de groupe d'éléments doivent être du texte."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Encoded value"
+msgstr "Valeur encodée"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__error
+msgid "Error"
+msgstr "Erreur"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Every element needs a unique stable id."
+msgstr "Chaque élément doit avoir un identifiant stable et unique."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Export JSON"
+msgstr "Exporter le JSON"
+
+#. module: mb_label
+#: model:ir.model.fields.selection,name:mb_label.selection__mb_label_print_job__state__failed
+msgid "Failed"
+msgstr "Échec"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Feed after label (dots)"
+msgstr "Avance après l'étiquette (points)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/legacy_template.js:0
+msgid "Field “%(field)s” was imported as a manual value."
+msgstr "Le champ “%(field)s” a été importé comme valeur manuelle."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Filled"
+msgstr "Rempli"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "Floyd-Steinberg (photo)"
+msgstr "Floyd-Steinberg (photo)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Font"
+msgstr "Police"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Font size (mm)"
+msgstr "Taille de police (mm)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Format"
+msgstr "Format"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "Glazed stoneware mug"
+msgstr "Tasse en grès émaillée"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Group"
+msgstr "Groupe"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Height (mm)"
+msgstr "Hauteur (mm)"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__height_mm
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__height_mm
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__height_mm
+msgid "Height Mm"
+msgstr "Hauteur en mm"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Horizontal"
+msgstr "Horizontal"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Human-readable value"
+msgstr "Valeur lisible"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_render_service__id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__id
+#: model:ir.model.fields,field_description:mb_label.field_product_product__id
+#: model:ir.model.fields,field_description:mb_label.field_product_template__id
+#: model:ir.model.fields,field_description:mb_label.field_stock_lot__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/legacy_template.js:0
+msgid ""
+"Image %(element)s used an external brand asset; embed it before importing."
+msgstr ""
+"L'image %(element)s utilisait une ressource de marque externe ; intégrez-la "
+"avant l'import."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Image data URL"
+msgstr "URL de données de l'image"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Image treatment"
+msgstr "Traitement de l'image"
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_mb_label_template_version
+msgid "Immutable Label Template Version"
+msgstr "Version immuable de modèle d'étiquette"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Import JSON"
+msgstr "Importer un JSON"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "Imported with %(count)s warning(s): %(warnings)s"
+msgstr "Importé avec %(count)s avertissement(s) : %(warnings)s"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_renderer.py:0
+msgid "Invalid manual label field."
+msgstr "Champ manuel d'étiquette invalide."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Inverted ink"
+msgstr "Encre inversée"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Italic"
+msgstr "Italique"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_print_job.py:0
+msgid "Label"
+msgstr "Libellé"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Label DPI must be between 72 and 600."
+msgstr "La résolution de l'étiquette doit être comprise entre 72 et 600 ppp."
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_mb_label_print_job
+msgid "Label Print Job"
+msgstr "Impression d'étiquette"
+
+#. module: mb_label
+#: model:ir.actions.client,name:mb_label.action_mb_label_studio
+#: model:ir.module.category,name:mb_label.module_category_mb_labels
+#: model:ir.ui.menu,name:mb_label.menu_mb_label_studio
+#: model:res.groups.privilege,name:mb_label.privilege_mb_labels
+msgid "Label Studio"
+msgstr "Label Studio"
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_mb_label_template
+msgid "Label Template"
+msgstr "Modèle d'étiquette"
+
+#. module: mb_label
+#: model:ir.actions.act_window,name:mb_label.action_mb_label_templates
+msgid "Label Templates"
+msgstr "Modèles d'étiquettes"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_renderer.py:0
+msgid "Label binding '%s' has no value for this subject."
+msgstr "La liaison d'étiquette '%s' n'a aucune valeur pour ce sujet."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Label dimensions must be between 5 and 300/500 mm."
+msgstr ""
+"Les dimensions de l'étiquette doivent être comprises entre 5 et 300/500 mm."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Label stock"
+msgstr "Support d'étiquettes"
+
+#. module: mb_label
+#: model:ir.ui.menu,name:mb_label.menu_mb_label_root
+msgid "Labels"
+msgstr "Libellés"
+
+#. module: mb_label
+#: model:ir.model.fields.selection,name:mb_label.selection__mb_label_template__orientation__landscape
+msgid "Landscape"
+msgstr "Paysage"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__write_uid
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__write_uid
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__write_uid
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__write_uid
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__write_date
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__write_date
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__write_date
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__write_date
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Left"
+msgstr "Gauche"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__lot_id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__lot_id
+msgid "Lot"
+msgstr "Lot"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__lot_id
+msgid "Lot or Serial"
+msgstr "Lot ou numéro de série"
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_stock_lot
+msgid "Lot/Serial"
+msgstr "Lot/série"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__lot_name
+msgid "Lot/Serial Number"
+msgstr "Lot/numéro de série"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Malformed label binding expression."
+msgstr "Expression de liaison d'étiquette mal formée."
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__manual_values
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__manual_values_json
+msgid "Manual Values"
+msgstr "Valeurs manuelles"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Model default"
+msgstr "Valeur par défaut du modèle"
+
+#. module: mb_label
+#: model:ir.model.fields.selection,name:mb_label.selection__mb_label_print_job__printer_adapter__niimbot
+msgid "NIIMBOT BLE"
+msgstr "NIIMBOT BLE"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/niimbot_adapter.js:0
+msgid "NIIMBOT D110 family (Bluetooth)"
+msgstr "Famille NIIMBOT D110 (Bluetooth)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/raster.js:0
+msgid "NIIMBOT label width must resolve to a whole byte."
+msgstr "La largeur d'étiquette NIIMBOT doit correspondre à un octet entier."
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__name
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "New 40 x 30 mm label"
+msgstr "Nouvelle étiquette 40 x 30 mm"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "New template"
+msgstr "Nouveau modèle"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "No wrap"
+msgstr "Pas de retour à la ligne"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/niimbot_adapter.js:0
+msgid "No writable NIIMBOT Bluetooth channel was found."
+msgstr "Aucun canal Bluetooth NIIMBOT accessible en écriture n'a été trouvé."
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__number
+msgid "Number"
+msgstr "Numéro"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_alias.py:0
+msgid "Only a Label Designer can reactivate printed QR aliases."
+msgstr "Seul un concepteur d'étiquettes peut réactiver des alias QR imprimés."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_alias.py:0
+msgid "Only a Label Designer can retire printed QR aliases."
+msgstr "Seul un concepteur d'étiquettes peut retirer des alias QR imprimés."
+
+#. module: mb_label
+#: model:ir.model.fields,help:mb_label.field_mb_label_template__qr_url_prefix
+msgid ""
+"Optional public URL placed before #SKU or #SKU/LOT in every generated QR "
+"code."
+msgstr ""
+"URL publique facultative placée avant #SKU ou #SKU/LOT dans chaque code QR "
+"généré."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "Ordered pattern"
+msgstr "Trame ordonnée"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__orientation
+msgid "Orientation"
+msgstr "Orientation"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Paper position on print head"
+msgstr "Position du papier sur la tête d'impression"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/phomemo_adapter.js:0
+msgid "Phomemo (Ateliera transport)"
+msgstr "Phomemo (transport Ateliera)"
+
+#. module: mb_label
+#: model:ir.model.fields.selection,name:mb_label.selection__mb_label_print_job__printer_adapter__phomemo
+msgid "Phomemo BLE"
+msgstr "Phomemo BLE"
+
+#. module: mb_label
+#: model:ir.model.fields.selection,name:mb_label.selection__mb_label_template__orientation__portrait
+msgid "Portrait"
+msgstr "Portrait"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Preparing label…"
+msgstr "Préparation de l'étiquette…"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__preview_error
+msgid "Preview Error"
+msgstr "Erreur d'aperçu"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__preview_html
+msgid "Preview Html"
+msgstr "Aperçu HTML"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__preview_png
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__preview_png
+msgid "Preview Png"
+msgstr "Aperçu PNG"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Preview lot/serial"
+msgstr "Aperçu du lot ou numéro de série"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Preview product"
+msgstr "Aperçu du produit"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_print_job_list
+msgid "Print"
+msgstr "Imprimer"
+
+#. module: mb_label
+#: model:ir.ui.menu,name:mb_label.menu_mb_label_jobs
+msgid "Print History"
+msgstr "Historique d'impression"
+
+#. module: mb_label
+#: model:ir.actions.act_window,name:mb_label.action_mb_label_print_jobs
+msgid "Print Jobs"
+msgstr "Impressions"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_print_job.py:0
+#: model:ir.actions.act_window,name:mb_label.action_mb_label_print_wizard
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_print_wizard_form
+msgid "Print Label"
+msgstr "Imprimer l'étiquette"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/stock_lot.py:0
+msgid "Print Lot or Piece Label"
+msgstr "Imprimer l'étiquette de lot ou de pièce"
+
+#. module: mb_label
+#: model:ir.actions.server,name:mb_label.server_action_mb_product_print_label
+msgid "Print Makersbrain Label"
+msgstr "Imprimer une étiquette Makersbrain"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/product.py:0
+#: model:ir.ui.menu,name:mb_label.menu_mb_label_print
+msgid "Print Product Label"
+msgstr "Imprimer l'étiquette produit"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Print another"
+msgstr "Imprimer un autre exemplaire"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Print hardware test pattern"
+msgstr "Imprimer la mire de test matériel"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Print label"
+msgstr "Imprimer l'étiquette"
+
+#. module: mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_print_wizard_form
+msgid "Print to Device"
+msgstr "Imprimer sur un appareil"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_print_job.py:0
+msgid "Print-job audit fields can only be changed by the rendering service."
+msgstr ""
+"Les champs d'audit d'une impression ne peuvent être modifiés que par le "
+"service de rendu."
+
+#. module: mb_label
+#: model:ir.model.fields.selection,name:mb_label.selection__mb_label_print_job__state__printed
+msgid "Printed"
+msgstr "Imprimé"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__printed_at
+msgid "Printed At"
+msgstr "Imprimé le"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_alias.py:0
+msgid "Printed QR aliases are audit records and cannot be deleted."
+msgstr ""
+"Les alias QR imprimés sont des enregistrements d'audit et ne peuvent pas "
+"être supprimés."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+#: model:res.groups,name:mb_label.group_mb_label_user
+msgid "Printer"
+msgstr "Imprimante"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__printer_adapter
+msgid "Printer Adapter"
+msgstr "Adaptateur d'imprimante"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__printer_target
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__printer_target
+msgid "Printer Target"
+msgstr "Imprimante cible"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "Printer connection is healthy."
+msgstr "La connexion à l'imprimante est saine."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Printer model"
+msgstr "Modèle d'imprimante"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "Printing failed."
+msgstr "L'impression a échoué."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Printing…"
+msgstr "Impression…"
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_product_template
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__product_id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__product_tmpl_id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__product_id
+msgid "Product"
+msgstr "Produit"
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_product_product
+msgid "Product Variant"
+msgstr "Variante de produit"
+
+#. module: mb_label
+#: model:mb.label.template,name:mb_label.template_product_40x30
+msgid "Product label 40 × 30 mm"
+msgstr "Étiquette produit 40 × 30 mm"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Product only"
+msgstr "Produit seul"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "QR"
+msgstr "QR"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__qr_url_prefix
+msgid "QR URL Prefix"
+msgstr "Préfixe d'URL du QR"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "QR URL prefix"
+msgstr "Préfixe d'URL du QR"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_alias.py:0
+msgid ""
+"QR alias '%s' was retired and cannot be printed again until an administrator"
+" reactivates it."
+msgstr ""
+"L'alias QR '%s' a été retiré et ne peut plus être imprimé tant qu'un "
+"administrateur ne l'a pas réactivé."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_alias.py:0
+msgid "QR collision: '%s' already identifies another product or piece."
+msgstr ""
+"Collision de QR : '%s' identifie déjà un autre produit ou une autre pièce."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid ""
+"QR elements remain square. Use 0 to fill the defined box; use 2–4 when dark "
+"artwork touches the QR."
+msgstr ""
+"Les éléments QR restent carrés. Utilisez 0 pour remplir la zone définie ; "
+"utilisez 2–4 lorsqu'un visuel sombre touche le QR."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "QR payload expression"
+msgstr "Expression de charge utile du QR"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__qr_payload_template
+msgid "Qr Payload Template"
+msgstr "Modèle de charge utile du QR"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__qr_url_prefix
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__qr_url_prefix
+msgid "Qr Url Prefix"
+msgstr "Préfixe d'URL du QR"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Quiet zone (modules)"
+msgstr "Zone de silence (modules)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Redo"
+msgstr "Rétablir"
+
+#. module: mb_label
+#: model:ir.model.fields.selection,name:mb_label.selection__mb_label_print_job__state__rendered
+msgid "Rendered"
+msgstr "Rendu"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_print_job.py:0
+msgid "Rendered print jobs are audit records and cannot be deleted."
+msgstr ""
+"Les impressions rendues sont des enregistrements d'audit et ne peuvent pas "
+"être supprimées."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Required value"
+msgstr "Valeur obligatoire"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__retired_at
+msgid "Retired At"
+msgstr "Retiré le"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__retired_by_id
+msgid "Retired By"
+msgstr "Retiré par"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Right"
+msgstr "Droite"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Rotation"
+msgstr "Rotation"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Round"
+msgstr "Rond"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid "Round %(size)s mm"
+msgstr "Rond %(size)s mm"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid "Round %(size)s mm (D-series)"
+msgstr "Rond %(size)s mm (série D)"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__round_media
+msgid "Round Media"
+msgstr "Support rond"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__round_media
+msgid "Round label"
+msgstr "Étiquette ronde"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Sample values"
+msgstr "Valeurs d'exemple"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Save new version"
+msgstr "Enregistrer une nouvelle version"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/wizards/mb_label_print_wizard.py:0
+msgid "Save the template in Label Studio before printing it."
+msgstr "Enregistrez le modèle dans Label Studio avant de l'imprimer."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Saved label versions are immutable; save a new version instead."
+msgstr ""
+"Les versions d'étiquette enregistrées sont immuables ; enregistrez plutôt "
+"une nouvelle version."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Saved label versions cannot be deleted."
+msgstr "Les versions d'étiquette enregistrées ne peuvent pas être supprimées."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Saving…"
+msgstr "Enregistrement…"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Select an element to edit its exact geometry and content."
+msgstr ""
+"Sélectionnez un élément pour modifier sa géométrie exacte et son contenu."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Send backward"
+msgstr "Reculer d'un plan"
+
+#. module: mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_template_form
+msgid "Set Default"
+msgstr "Définir par défaut"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid ""
+"Shift-click multi-selects. Keyboard: arrows move 0.5 mm, Shift+arrows 0.1 "
+"mm, Ctrl+A select all, Ctrl+G group, Ctrl+Shift+G ungroup, Ctrl+D duplicate,"
+" Delete remove, Ctrl+Z/Ctrl+Y history."
+msgstr ""
+"Maj+clic pour une sélection multiple. Clavier : les flèches déplacent de 0,5"
+" mm, Maj+flèches de 0,1 mm, Ctrl+A tout sélectionner, Ctrl+G grouper, "
+"Ctrl+Maj+G dissocier, Ctrl+D dupliquer, Suppr supprimer, Ctrl+Z/Ctrl+Y "
+"historique."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Snap 0.5 mm"
+msgstr "Aimanter à 0,5 mm"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Speed:"
+msgstr "Vitesse :"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__state
+msgid "State"
+msgstr "Statut"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Stroke (mm)"
+msgstr "Trait (mm)"
+
+#. module: mb_label
+#: model:ir.model.fields.selection,name:mb_label.selection__mb_label_print_job__printer_adapter__system
+msgid "System / PDF"
+msgstr "Système / PDF"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid "System / exact-size PDF"
+msgstr "Système / PDF à taille réelle"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/system_adapter.js:0
+msgid "System print dialog / Save as PDF"
+msgstr "Boîte de dialogue d'impression du système / Enregistrer en PDF"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__template_id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__template_id
+msgid "Template"
+msgstr "Modèle"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__template_version_id
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__template_version_id
+msgid "Template Version"
+msgstr "Version du modèle"
+
+#. module: mb_label
+#: model:ir.model.constraint,message:mb_label.constraint_mb_label_template_version_number_unique
+msgid "Template version numbers must be unique."
+msgstr "Les numéros de version de modèle doivent être uniques."
+
+#. module: mb_label
+#: model:ir.ui.menu,name:mb_label.menu_mb_label_templates
+msgid "Templates"
+msgstr "Modèles"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Test Ateliera connection"
+msgstr "Tester la connexion Ateliera"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "Test pattern sent: %(bytes)s bytes, %(ink)s ink coverage."
+msgstr ""
+"Mire de test envoyée : %(bytes)s octets, %(ink)s de couverture d'encre."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "Test print failed."
+msgstr "L'impression de test a échoué."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Text and bindings"
+msgstr "Texte et liaisons"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "The '%s' label filter does not accept an argument."
+msgstr "Le filtre d'étiquette '%s' n'accepte pas d'argument."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "The JSON file must be smaller than 5 MB."
+msgstr "Le fichier JSON doit faire moins de 5 Mo."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "The JSON label could not be imported."
+msgstr "L'étiquette JSON n'a pas pu être importée."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "The QR URL prefix must be an HTTP(S) URL without a fragment."
+msgstr "Le préfixe d'URL du QR doit être une URL HTTP(S) sans fragment."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_renderer.py:0
+msgid ""
+"The QR element is too small for its encoded value. Enlarge it or shorten the"
+" URL."
+msgstr ""
+"L'élément QR est trop petit pour la valeur qu'il encode. Agrandissez-le ou "
+"raccourcissez l'URL."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "The QR quiet zone must contain between 0 and 8 modules."
+msgstr "La zone de silence du QR doit contenir entre 0 et 8 modules."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "The fixed filter needs a decimal count between 0 and 4."
+msgstr "Le filtre fixed exige un nombre de décimales compris entre 0 et 4."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "The image threshold must be between 0 and 255."
+msgstr "Le seuil de l'image doit être compris entre 0 et 255."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/legacy_template.js:0
+msgid "The imported label needs positive dimensions."
+msgstr "L'étiquette importée doit avoir des dimensions positives."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/legacy_template.js:0
+msgid "The label JSON must contain one object."
+msgstr "Le JSON de l'étiquette doit contenir un seul objet."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_renderer.py:0
+msgid "The label contains an unreadable image."
+msgstr "L'étiquette contient une image illisible."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "The label could not be saved."
+msgstr "L'étiquette n'a pas pu être enregistrée."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "The label document must be a JSON object."
+msgstr "Le document d'étiquette doit être un objet JSON."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "The label document needs an elements list."
+msgstr "Le document d'étiquette doit comporter une liste d'éléments."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/legacy_template.js:0
+msgid "The label resolution must be greater than zero."
+msgstr "La résolution de l'étiquette doit être supérieure à zéro."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "The label was sent. This window remains open for repeat printing."
+msgstr ""
+"L'étiquette a été envoyée. Cette fenêtre reste ouverte pour réimprimer."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_alias.py:0
+msgid "The lot or serial does not belong to the selected product."
+msgstr "Le lot ou le numéro de série n'appartient pas au produit sélectionné."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_print_job.py:0
+#: code:addons/mb_label/models/label_renderer.py:0
+msgid "The lot or serial does not belong to this product."
+msgstr "Le lot ou le numéro de série n'appartient pas à ce produit."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/printer_presets.js:0
+msgid ""
+"The model table selects the protocol, head width, 203/300 dpi and roll "
+"alignment at print time."
+msgstr ""
+"La table des modèles choisit le protocole, la largeur de tête, les 203/300 "
+"ppp et l'alignement du rouleau au moment de l'impression."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "The old JSON label was imported as immutable version 1."
+msgstr "L'ancienne étiquette JSON a été importée comme version immuable 1."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "The rendered QR value is empty."
+msgstr "La valeur QR rendue est vide."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/raster.js:0
+msgid "The rendered label image could not be loaded."
+msgstr "L'image d'étiquette rendue n'a pas pu être chargée."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "The required-value setting must be true or false."
+msgstr "Le réglage de valeur obligatoire doit être vrai ou faux."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/phomemo_adapter.js:0
+msgid ""
+"The selected paper uses %(used)s dots across the print head, but %(device)s "
+"has %(available)s. Select the correct model or paper size."
+msgstr ""
+"Le papier sélectionné utilise %(used)s points sur la largeur de la tête "
+"d'impression, alors que %(device)s en compte %(available)s. Sélectionnez le "
+"bon modèle ou le bon format de papier."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Thermal tint"
+msgstr "Nuance thermique"
+
+#. module: mb_label
+#: model:ir.model.constraint,message:mb_label.constraint_mb_label_qr_alias_value_company_unique
+msgid "This printed QR value already belongs to another identity."
+msgstr "Cette valeur QR imprimée appartient déjà à une autre identité."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Threshold (0–255)"
+msgstr "Seuil (0–255)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.js:0
+msgid "Threshold (sharp)"
+msgstr "Seuil (net)"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid ""
+"Turn this off for optional content such as a product lot or serial. If every"
+" binding resolves empty, the whole element is omitted."
+msgstr ""
+"Désactivez ceci pour un contenu facultatif tel qu'un lot ou un numéro de "
+"série de produit. Si toutes les liaisons se résolvent à vide, l'élément "
+"entier est omis."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Underline"
+msgstr "Souligné"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Undo"
+msgstr "Annuler"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Ungroup"
+msgstr "Dissocier"
+
+#. module: mb_label
+#: model:ir.model.fields,help:mb_label.field_mb_label_qr_alias__lot_name
+msgid "Unique Lot/Serial Number"
+msgstr "Lot/numéro de série unique"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/legacy_template.js:0
+msgid "Unknown element type “%(type)s” became text."
+msgstr "Le type d'élément inconnu “%(type)s” est devenu du texte."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported element background."
+msgstr "Arrière-plan d'élément non pris en charge."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported image dithering mode."
+msgstr "Mode de tramage d'image non pris en charge."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported label document schema."
+msgstr "Schéma de document d'étiquette non pris en charge."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported label element."
+msgstr "Élément d'étiquette non pris en charge."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported label font."
+msgstr "Police d'étiquette non prise en charge."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported label formatting filter: %s"
+msgstr "Filtre de mise en forme d'étiquette non pris en charge : %s"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported label setting: %s"
+msgstr "Réglage d'étiquette non pris en charge : %s"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported text alignment."
+msgstr "Alignement de texte non pris en charge."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported thermal tint."
+msgstr "Nuance thermique non prise en charge."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Unsupported vertical text alignment."
+msgstr "Alignement vertical de texte non pris en charge."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Upload image"
+msgstr "Téléverser une image"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_qr_alias__value
+msgid "Value"
+msgstr "Valeur"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_wizard__product_id
+msgid "Variant"
+msgstr "Variante"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__version_ids
+msgid "Version"
+msgstr "Version"
+
+#. module: mb_label
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_template_form
+msgid "Versions"
+msgstr "Versions"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Vertical"
+msgstr "Vertical"
+
+#. module: mb_label
+#: model:mb.label.template,name:mb_label.template_wip_lot_30x20
+msgid "WIP lot label 30 × 20 mm"
+msgstr "Étiquette de lot en-cours 30 × 20 mm"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_memory.js:0
+msgid "Web Bluetooth is unavailable in this browser."
+msgstr "Le Bluetooth Web n'est pas disponible dans ce navigateur."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid ""
+"Web Bluetooth requires Chrome or Edge on desktop/Android. Use system print "
+"on iPhone/iPad."
+msgstr ""
+"Le Bluetooth Web exige Chrome ou Edge sur ordinateur ou Android. Utilisez "
+"l'impression système sur iPhone/iPad."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Width (mm)"
+msgstr "Largeur (mm)"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__width_mm
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__width_mm
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__width_mm
+msgid "Width Mm"
+msgstr "Largeur en mm"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "Workshop"
+msgstr "Atelier"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "Zoom"
+msgstr "Zoom"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+#: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_template_form
+msgid "https://instagram.com/username"
+msgstr "https://instagram.com/username"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "— fill the box"
+msgstr "— remplir la zone"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.xml:0
+msgid "— scan-safe standard"
+msgstr "— standard sûr pour la lecture"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "— unavailable"
+msgstr "— indisponible"

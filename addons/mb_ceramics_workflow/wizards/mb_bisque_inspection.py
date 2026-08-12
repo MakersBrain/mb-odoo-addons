@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.float_utils import float_compare
 
@@ -57,7 +57,7 @@ class MbBisqueInspection(models.TransientModel):
     def _check_nonnegative(self):
         for wizard in self:
             if min(wizard.accepted_quantity, wizard.loss_quantity) < 0:
-                raise ValidationError("Inspection quantities cannot be negative.")
+                raise ValidationError(_("Inspection quantities cannot be negative."))
 
     def _prepare_exact_material_consumption(self):
         for move in self.production_id.move_raw_ids:
@@ -68,17 +68,19 @@ class MbBisqueInspection(models.TransientModel):
                 move.product_uom_qty,
                 precision_rounding=move.product_uom.rounding,
             ) != 0:
-                raise UserError(
-                    "%s must be reserved in the exact bill-of-material quantity."
-                    % move.product_id.display_name
-                )
+                raise UserError(_(
+                    "%(product)s must be reserved in the exact "
+                    "bill-of-material quantity.",
+                    product=move.product_id.display_name,
+                ))
             if move.product_id.tracking != "none" and any(
                 not line.lot_id for line in lines
             ):
-                raise UserError(
-                    "%s requires a lot or serial number before inspection."
-                    % move.product_id.display_name
-                )
+                raise UserError(_(
+                    "%(product)s requires a lot or serial number before "
+                    "inspection.",
+                    product=move.product_id.display_name,
+                ))
             if move.state != "done":
                 move.picked = True
 
@@ -89,7 +91,7 @@ class MbBisqueInspection(models.TransientModel):
             return self.env["stock.lot"]
         count = 1 if product.tracking == "lot" else int(quantity)
         if product.tracking == "serial" and quantity != count:
-            raise UserError("A serial-tracked bisque quantity must be a whole number.")
+            raise UserError(_("A serial-tracked bisque quantity must be a whole number."))
         return self.env["stock.lot"].create([{
             "name": self.env["ir.sequence"].next_by_code("mb.bisque.lot"),
             "product_id": product.id,
@@ -114,9 +116,7 @@ class MbBisqueInspection(models.TransientModel):
             skip_redirection=True,
         ).button_mark_done()
         if production.state != "done":
-            raise UserError(
-                "The bisque order needs manual review before its loss can be scrapped."
-            )
+            raise UserError(_("The bisque order needs manual review before its loss can be scrapped."))
         if production.product_id.tracking == "serial":
             quantities = [(lot, 1.0) for lot in lots]
         else:
@@ -133,38 +133,34 @@ class MbBisqueInspection(models.TransientModel):
             })
             result = scrap.action_validate()
             if result is not True:
-                raise UserError(
-                    "The manufactured loss is not available in the destination "
-                    "location for scrapping."
-                )
+                raise UserError(_("The manufactured loss is not available in the destination "
+                    "location for scrapping."))
 
     def action_confirm(self):
         self.ensure_one()
         production = self.production_id
         if production.state in ("done", "cancel") or production.mb_bisque_inspected:
-            raise UserError("This bisque manufacturing order has already been closed.")
+            raise UserError(_("This bisque manufacturing order has already been closed."))
         if float_compare(
             self.accepted_quantity + self.loss_quantity,
             production.product_qty,
             precision_rounding=production.product_uom_id.rounding,
         ) != 0:
-            raise UserError(
-                "Accepted and process-loss quantities must equal the selected green ware."
-            )
+            raise UserError(_("Accepted and process-loss quantities must equal the selected green ware."))
         firing_orders = production.workorder_ids.filtered(
             lambda workorder: workorder.operation_id.mb_kiln_program_id.kind == "bisque"
         )
         if not firing_orders or any(
             order.mb_firing_id.state != "done" for order in firing_orders
         ):
-            raise UserError("Every bisque firing operation must be unloaded before inspection.")
+            raise UserError(_("Every bisque firing operation must be unloaded before inspection."))
         unfinished = production.workorder_ids.filtered(
             lambda workorder: workorder.state not in ("done", "cancel")
         )
         if unfinished:
-            raise UserError("Complete every bisque operation before inspection.")
+            raise UserError(_("Complete every bisque operation before inspection."))
         if self.loss_quantity and not self.loss_reason:
-            raise UserError("Record why the pieces were lost.")
+            raise UserError(_("Record why the pieces were lost."))
         self._prepare_exact_material_consumption()
         lots = self._create_output_lots()
         production.lot_producing_ids = [fields.Command.set(lots.ids)]
@@ -188,7 +184,7 @@ class MbBisqueInspection(models.TransientModel):
         else:
             self._complete_total_loss()
         if production.state != "done":
-            raise UserError("The bisque order needs manual review before completion.")
+            raise UserError(_("The bisque order needs manual review before completion."))
         production.mb_bisque_inspected = True
         production.mb_board_content_ids.filtered(
             lambda content: content.state == "current"

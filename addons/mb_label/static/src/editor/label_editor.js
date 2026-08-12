@@ -1,6 +1,7 @@
 /** @odoo-module **/
 
 import { Component, onWillStart, useState } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardActionServiceProps } from "@web/webclient/actions/action_service";
@@ -74,6 +75,22 @@ export class LabelEditor extends Component {
         return this.state.previewLots.filter((lot) => lot.product_id === this.state.previewProductId);
     }
 
+    templateOptionLabel(item) {
+        return _t("%(name)s · v%(version)s", { name: item.name, version: item.version_number });
+    }
+
+    get canvasSizeSummary() {
+        return _t("%(width)s × %(height)s mm · %(dpi)s dpi", {
+            width: this.template.width_mm,
+            height: this.template.height_mm,
+            dpi: this.template.dpi,
+        });
+    }
+
+    printerProfileLabel(profile) {
+        return _t("%(name)s · %(dpi)s dpi", { name: profile.label, dpi: profile.dpi });
+    }
+
     get types() { return TYPES; }
 
     get printerProfiles() { return PRINTER_PROFILES; }
@@ -91,7 +108,7 @@ export class LabelEditor extends Component {
     }
 
     selectTemplate(id) {
-        if (this.state.dirty && !window.confirm("Discard unsaved label changes?")) return;
+        if (this.state.dirty && !window.confirm(_t("Discard unsaved label changes?"))) return;
         const template = this.state.templates.find((item) => item.id === Number(id));
         if (!template) return;
         this.state.selectedTemplateId = template.id;
@@ -400,7 +417,7 @@ export class LabelEditor extends Component {
         const file = event.target.files?.[0];
         if (!file || !this.selected || this.selected.type !== "image") return;
         if (!file.type.startsWith("image/") || file.size > 2 * 1024 * 1024) {
-            this.notification.add("Choose an image smaller than 2 MB.", { type: "warning" });
+            this.notification.add(_t("Choose an image smaller than 2 MB."), { type: "warning" });
             return;
         }
         const reader = new FileReader();
@@ -445,10 +462,10 @@ export class LabelEditor extends Component {
 
     elementText(element) {
         const fallback = {
-            "product.name": "Tasse grès émaillée", "product.price": "45,00 €",
+            "product.name": _t("Glazed stoneware mug"), "product.price": "45.00 €",
             "product.price.raw": 45, "company.currency": "EUR",
             "product.default_code": "MUG-001", "product.barcode": "3760000000000",
-            "lot.name": "LOT-2026-08", "company.name": "Atelier",
+            "lot.name": "LOT-2026-08", "company.name": _t("Workshop"),
             "qr.path": "MUG-001/LOT-2026-08",
             qr: `${this.template?.qr_url_prefix || "https://example.com/profile"}#MUG-001/LOT-2026-08`,
         };
@@ -458,7 +475,7 @@ export class LabelEditor extends Component {
 
     async createTemplate() {
         const ids = await this.orm.create("mb.label.template", [{
-            name: "New 40 × 30 mm label", width_mm: 40, height_mm: 30, dpi: 203,
+            name: _t("New 40 x 30 mm label"), width_mm: 40, height_mm: 30, dpi: 203,
         }]);
         await this.orm.call("mb.label.template", "save_version", [ids, { schema: 1, elements: [] }, "{{qr}}"]);
         await this.load(ids[0]);
@@ -469,7 +486,7 @@ export class LabelEditor extends Component {
         event.target.value = "";
         if (!file) return;
         if (file.size > 5 * 1024 * 1024) {
-            this.notification.add("The JSON file must be smaller than 5 MB.", { type: "warning" });
+            this.notification.add(_t("The JSON file must be smaller than 5 MB."), { type: "warning" });
             return;
         }
         try {
@@ -489,11 +506,14 @@ export class LabelEditor extends Component {
             ]);
             await this.load(ids[0]);
             const message = imported.warnings.length
-                ? `Imported with ${imported.warnings.length} warning(s): ${imported.warnings.join(" ")}`
-                : "The old JSON label was imported as immutable version 1.";
+                ? _t("Imported with %(count)s warning(s): %(warnings)s", {
+                    count: imported.warnings.length,
+                    warnings: imported.warnings.join(" "),
+                })
+                : _t("The old JSON label was imported as immutable version 1.");
             this.notification.add(message, { type: imported.warnings.length ? "warning" : "success", sticky: imported.warnings.length > 0 });
         } catch (error) {
-            this.notification.add(error.message || "The JSON label could not be imported.", { type: "danger" });
+            this.notification.add(error.message || _t("The JSON label could not be imported."), { type: "danger" });
         }
     }
 
@@ -525,11 +545,11 @@ export class LabelEditor extends Component {
                     continuous_media: Boolean(this.template.continuous_media),
                 },
             ]);
-            this.notification.add("A new immutable label version was saved.", { type: "success" });
+            this.notification.add(_t("A new immutable label version was saved."), { type: "success" });
             this.state.dirty = false;
             await this.load(this.template.id);
         } catch (error) {
-            this.notification.add(error.message || "The label could not be saved.", { type: "danger" });
+            this.notification.add(error.message || _t("The label could not be saved."), { type: "danger" });
         } finally {
             this.state.saving = false;
         }

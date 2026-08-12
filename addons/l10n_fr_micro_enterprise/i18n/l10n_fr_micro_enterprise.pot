@@ -1,0 +1,794 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_fr_micro_enterprise
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.l10n_fr_micro_setup_wizard_view_form
+msgid "32.99Z"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "A VAT number is required when VAT-liable mode is selected."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "A VAT regime cannot be activated before its effective date."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__ape_code
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_ape_code
+msgid "APE / NAF code"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.view_l10n_fr_micro_vat_switch_wizard_form
+msgid "Activate VAT liable"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.res_config_settings_view_form_micro_enterprise
+msgid "Activate VAT liable…"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.actions.act_window,name:l10n_fr_micro_enterprise.action_l10n_fr_micro_vat_switch_wizard
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.view_l10n_fr_micro_vat_switch_wizard_form
+msgid "Activate VAT-liable mode"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.res_config_settings_view_form_micro_enterprise
+msgid "Activate franchise en base"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,help:l10n_fr_micro_enterprise.field_l10n_fr_micro_vat_switch_wizard__effective_date
+msgid "Actual date on which the VAT franchise ceased to apply."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model,name:l10n_fr_micro_enterprise.model_l10n_fr_micro_vat_switch_wizard
+msgid "Apply a dated micro-enterprise VAT-regime switch"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.res_config_settings_view_form_micro_enterprise
+msgid "Apply the Article 293 B exemption to future domestic sales?"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid ""
+"Automatic franchise mapping is disabled. Products keep their configured "
+"economic VAT taxes."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__bic
+msgid "BIC / SWIFT code"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "BIC services"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__account_tax__l10n_fr_micro_urssaf_category__bic_service
+msgid "BIC — commercial or craft services"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__account_tax__l10n_fr_micro_urssaf_category__bic_goods
+msgid "BIC — sales of goods"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "BNC activity"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__account_tax__l10n_fr_micro_urssaf_category__bnc
+msgid "BNC — liberal activity"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.l10n_fr_micro_setup_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.view_l10n_fr_micro_vat_switch_wizard_form
+msgid "Cancel"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "Cash-basis base transition"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__city
+msgid "City"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model,name:l10n_fr_micro_enterprise.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__company_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_vat_switch_wizard__company_id
+msgid "Company"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model,name:l10n_fr_micro_enterprise.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__country_id
+msgid "Country"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_vat_switch_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_vat_switch_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_tax_switch_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__l10n_fr_micro_tax_switch_date
+msgid "Current VAT regime effective from"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_edi_xml_cii__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_fiscal_position__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_move__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_tax__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_tax_group__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_vat_switch_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_bnc_economic_tax_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__l10n_fr_micro_bnc_economic_tax_id
+msgid "Economic VAT tax — BNC"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__edi_mode
+msgid "Edi Mode"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_vat_switch_wizard__effective_date
+msgid "Effective Date"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_edi_mode
+msgid "Electronic invoicing route"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__email
+msgid "Email"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__bnc_enabled
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_bnc_enabled
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__l10n_fr_micro_bnc_enabled
+msgid "Enable a BNC turnover category"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "FR — VAT exemption"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__l10n_fr_micro_setup_wizard__edi_mode__external_facturx
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__res_company__l10n_fr_micro_edi_mode__external_facturx
+msgid "Factur-X file for an external approved platform"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "Factur-X setup is incomplete:"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model,name:l10n_fr_micro_enterprise.model_account_edi_xml_cii
+msgid "Factur-x/XRechnung CII 2.2.0"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__facturx_ready
+msgid "Facturx Ready"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model,name:l10n_fr_micro_enterprise.model_account_fiscal_position
+msgid "Fiscal Position"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "Franchise en base activated"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_fiscal_position_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__l10n_fr_micro_fiscal_position_id
+msgid "Franchise fiscal position"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_tax_group_id
+msgid "Franchise tax group"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_bnc_tax_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__l10n_fr_micro_bnc_tax_id
+msgid "Franchise tax — BNC"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_goods_tax_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__l10n_fr_micro_goods_tax_id
+msgid "Franchise tax — goods"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_purchase_tax_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__l10n_fr_micro_purchase_tax_id
+msgid "Franchise tax — purchases"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_service_tax_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__l10n_fr_micro_service_tax_id
+msgid "Franchise tax — services"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_bank_statement_line__l10n_fr_micro_franchise_invoice
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_move__l10n_fr_micro_franchise_invoice
+msgid "Franchise-en-base invoice"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.actions.act_window,name:l10n_fr_micro_enterprise.action_l10n_fr_micro_setup_wizard
+#: model:ir.ui.menu,name:l10n_fr_micro_enterprise.menu_l10n_fr_micro_setup_wizard
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.l10n_fr_micro_setup_wizard_view_form
+msgid "French EI Setup"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "French EI setup saved"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model,name:l10n_fr_micro_enterprise.model_l10n_fr_micro_setup_wizard
+msgid "French sole proprietor setup"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid ""
+"Future domestic sales will use the Article 293 B exemption. Existing "
+"documents were not changed."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_edi_xml_cii__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_fiscal_position__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_move__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_tax__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_tax_group__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_vat_switch_wizard__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__id
+msgid "ID"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model,name:l10n_fr_micro_enterprise.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.res_config_settings_view_form_micro_enterprise
+msgid ""
+"Keep economic VAT on products and switch domestic sales through an auditable"
+" fiscal position."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_vat_switch_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_vat_switch_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__legal_form
+msgid "Legal Form"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_legal_form
+msgid "Legal form"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.l10n_fr_micro_setup_wizard_view_form
+msgid "Legal identity"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__legal_name
+msgid "Legal name"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__activity_description
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_activity_description
+msgid "Main activity"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_tax_regime
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_config_settings__l10n_fr_micro_tax_regime
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.res_config_settings_view_form_micro_enterprise
+msgid "Micro-enterprise VAT regime"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "Micro-enterprise cash-basis recognition"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_tax_group__l10n_fr_micro_franchise_group
+msgid "Micro-enterprise franchise group"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_fiscal_position__l10n_fr_micro_franchise_position
+msgid "Micro-enterprise franchise position"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_tax__l10n_fr_micro_franchise_tax
+msgid "Micro-enterprise franchise tax"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "Micro-enterprise taxes prepared"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,help:l10n_fr_micro_enterprise.field_account_tax__l10n_fr_micro_urssaf_category
+msgid "Micro-social turnover box carried by sale lines using this tax."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "Non-deductible VAT — VAT exemption"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "Non-deductible VAT — VAT exemption (purchases)"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__l10n_fr_micro_setup_wizard__tax_regime__unchanged
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__res_company__l10n_fr_micro_tax_regime__unchanged
+msgid "Not managed by this module"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid ""
+"Only an Accounting Administrator can change the micro-enterprise VAT regime."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/account_tax.py:0
+msgid "Only an Accounting Administrator can classify URSSAF taxes."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__company_partner_id
+msgid "Partner"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.l10n_fr_micro_setup_wizard_view_form
+msgid "Payment details"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__phone
+msgid "Phone"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.res_config_settings_view_form_micro_enterprise
+msgid "Prepare / repair setup"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "Prepare an ordinary French service VAT tax before enabling BNC."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__iban
+msgid "Professional IBAN"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__bank_account_id
+msgid "Professional bank account"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__readiness_html
+msgid "Readiness Html"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid ""
+"Ready. Click Save and validate below to apply this setup to the company."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__tax_effective_date
+msgid "Regime effective from"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.l10n_fr_micro_setup_wizard_view_form
+msgid "Registered office"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "SIREN must contain 9 digits and pass its checksum."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__siren
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_siren
+msgid "SIREN number"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__siret
+msgid "SIRET (head office)"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "SIRET must contain 14 digits and pass its checksum."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_siret
+msgid "SIRET number"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.l10n_fr_micro_setup_wizard_view_form
+msgid "Save and validate"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,help:l10n_fr_micro_enterprise.field_account_bank_statement_line__l10n_fr_micro_franchise_invoice
+#: model:ir.model.fields,help:l10n_fr_micro_enterprise.field_account_move__l10n_fr_micro_franchise_invoice
+msgid ""
+"Snapshot used to preserve the legally required Article 293 B mention when "
+"the invoice is reprinted."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__l10n_fr_micro_setup_wizard__legal_form__ei
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__res_company__l10n_fr_micro_legal_form__ei
+msgid "Sole trader (entrepreneur individuel)"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__street
+msgid "Street"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__street2
+msgid "Street2"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "Supplier VAT included in the expense"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_tax_switch_user_id
+msgid "Switched by"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model,name:l10n_fr_micro_enterprise.model_account_tax
+msgid "Tax"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model,name:l10n_fr_micro_enterprise.model_account_tax_group
+msgid "Tax Group"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__tax_regime
+msgid "Tax Regime"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.l10n_fr_micro_setup_wizard_view_form
+msgid "Tax and electronic invoicing"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,help:l10n_fr_micro_enterprise.field_account_fiscal_position__l10n_fr_micro_franchise_position
+msgid "Technical marker for the domestic franchise-en-base fiscal position."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,help:l10n_fr_micro_enterprise.field_account_tax__l10n_fr_micro_franchise_tax
+msgid ""
+"Technical marker for the franchise-en-base taxes managed by the micro-"
+"enterprise module."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid ""
+"The French chart of accounts cannot replace an accounting localization after"
+" journal items exist. Ask an Accounting Administrator to migrate it."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "The SIRET must belong to the entered SIREN."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_vat_switch_wizard.py:0
+msgid "The VAT regime is recorded as effective from %s."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "The company identity, payment details, and tax setup were updated."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid ""
+"The franchise taxes and domestic fiscal position are ready. No regime was "
+"changed."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid ""
+"The micro-enterprise tax setup is only available for a French fiscal "
+"company."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.view_l10n_fr_micro_vat_switch_wizard_form
+msgid ""
+"This date must be the verified legal crossing date. Existing documents are "
+"not rewritten."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_enterprise.res_config_settings_view_form_micro_enterprise
+msgid ""
+"This switch never rewrites products, posted invoices, or historical tax "
+"lines."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__trade_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_res_company__l10n_fr_micro_trade_name
+msgid "Trading name"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_account_tax__l10n_fr_micro_urssaf_category
+msgid "URSSAF turnover category"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "Unsupported micro-enterprise VAT regime."
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "VAT 0% — VAT exemption"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__l10n_fr_micro_setup_wizard__tax_regime__franchise
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__res_company__l10n_fr_micro_tax_regime__franchise
+msgid "VAT exemption"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__l10n_fr_micro_setup_wizard__tax_regime__vat
+#: model:ir.model.fields.selection,name:l10n_fr_micro_enterprise.selection__res_company__l10n_fr_micro_tax_regime__vat
+msgid "VAT liable"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "VAT not applicable — Article 293 B"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "VAT not applicable — VAT exemption (%(category)s)"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__vat
+msgid "VAT number"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "VAT regime"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "VAT — BNC service"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_vat_switch_wizard.py:0
+msgid "VAT-liable mode activated"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#: model:ir.model.fields,field_description:l10n_fr_micro_enterprise.field_l10n_fr_micro_setup_wizard__zip
+msgid "Zip"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "email"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
+msgid "goods"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "legal name"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "phone"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "professional IBAN"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "registered address"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "valid SIREN"
+msgstr ""
+
+#. module: l10n_fr_micro_enterprise
+#. odoo-python
+#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+msgid "valid SIRET"
+msgstr ""

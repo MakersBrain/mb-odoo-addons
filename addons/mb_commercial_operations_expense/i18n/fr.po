@@ -1,0 +1,78 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_commercial_operations_expense
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_commercial_operations_expense
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_expense.view_commercial_operation_form_expense
+msgid "<span>Expenses</span>"
+msgstr "<span>Notes de frais</span>"
+
+#. module: mb_commercial_operations_expense
+#: model:ir.model,name:mb_commercial_operations_expense.model_mb_commercial_operation
+msgid "Commercial Operation"
+msgstr "Opération commerciale"
+
+#. module: mb_commercial_operations_expense
+#. odoo-python
+#: code:addons/mb_commercial_operations_expense/models/commercial_operation.py:0
+msgid "Complete the expected operation expenses before financial close."
+msgstr ""
+"Complétez les notes de frais attendues pour l'opération avant la clôture "
+"financière."
+
+#. module: mb_commercial_operations_expense
+#: model:ir.model.fields,field_description:mb_commercial_operations_expense.field_hr_expense__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_expense.field_mb_commercial_operation__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_commercial_operations_expense
+#: model:ir.model,name:mb_commercial_operations_expense.model_hr_expense
+msgid "Expense"
+msgstr "Dépense"
+
+#. module: mb_commercial_operations_expense
+#: model:ir.model.fields,field_description:mb_commercial_operations_expense.field_mb_commercial_operation__expense_ids
+msgid "Expenses"
+msgstr "Dépenses"
+
+#. module: mb_commercial_operations_expense
+#: model:ir.model.fields,field_description:mb_commercial_operations_expense.field_mb_commercial_operation__expenses_complete
+msgid "Expenses Complete"
+msgstr "Notes de frais complètes"
+
+#. module: mb_commercial_operations_expense
+#: model:ir.model.fields,field_description:mb_commercial_operations_expense.field_mb_commercial_operation__expenses_expected
+msgid "Expenses Expected"
+msgstr "Notes de frais attendues"
+
+#. module: mb_commercial_operations_expense
+#: model:ir.model.fields,field_description:mb_commercial_operations_expense.field_hr_expense__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_expense.field_mb_commercial_operation__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_commercial_operations_expense
+#: model:ir.model.fields,field_description:mb_commercial_operations_expense.field_hr_expense__mb_commercial_operation_id
+msgid "Mb Commercial Operation"
+msgstr "Opération commerciale"
+
+#. module: mb_commercial_operations_expense
+#. odoo-python
+#: code:addons/mb_commercial_operations_expense/models/hr_expense.py:0
+msgid "Reopen the financially closed operation before changing expense links."
+msgstr ""
+"Rouvrez l'opération clôturée financièrement avant de modifier les liens vers"
+" les notes de frais."

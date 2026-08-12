@@ -70,7 +70,7 @@ TypeScript in `ateliera-app`, whose findings about API v1 - token
 authentication, and the join between kilns, controllers and firings - are
 carried over rather than guessed at.
 """,
-    "version": "19.0.1.2.2",
+    "version": "19.0.1.2.3",
     "license": "LGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "Makersbrain",

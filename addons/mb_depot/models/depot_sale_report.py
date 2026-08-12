@@ -133,12 +133,19 @@ class MbDepotSaleReport(models.Model):
         self.ensure_one()
         company = self.company_id
         barriers = {}
-        for field_name, label in (
-            ("fiscalyear_lock_date", _("global accounting lock")),
-            ("tax_lock_date", _("tax return lock")),
-            ("sale_lock_date", _("sales lock")),
-            ("hard_lock_date", _("hard accounting lock")),
-        ):
+        barrier_fields = (
+            "fiscalyear_lock_date",
+            "tax_lock_date",
+            "sale_lock_date",
+            "hard_lock_date",
+        )
+        barrier_labels = (
+            _("global accounting lock"),
+            _("tax return lock"),
+            _("sales lock"),
+            _("hard accounting lock"),
+        )
+        for field_name, label in zip(barrier_fields, barrier_labels, strict=True):
             value = company[field_name]
             if value:
                 barriers[label] = value

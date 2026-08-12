@@ -25,8 +25,8 @@ class ResCompany(models.Model):
 		default="monthly",
 		required=True,
 	)
-	l10n_fr_micro_versement_from = fields.Date(string="Versement libératoire from")
-	l10n_fr_micro_versement_to = fields.Date(string="Versement libératoire through")
+	l10n_fr_micro_versement_from = fields.Date(string="Flat-rate income tax payment from")
+	l10n_fr_micro_versement_to = fields.Date(string="Flat-rate income tax payment through")
 	l10n_fr_micro_acre_granted = fields.Boolean(string="ACRE granted")
 	l10n_fr_micro_acre_from = fields.Date(string="ACRE from")
 	l10n_fr_micro_acre_to = fields.Date(string="ACRE through")
@@ -36,7 +36,7 @@ class ResCompany(models.Model):
 	)
 	l10n_fr_micro_cfp_kind = fields.Selection(
 		selection=[
-			("artisan", "Artisan"),
+			("artisan", "Craftsperson"),
 			("merchant", "Merchant"),
 			("liberal", "Liberal profession"),
 		],
@@ -44,15 +44,19 @@ class ResCompany(models.Model):
 		default="artisan",
 	)
 	l10n_fr_micro_chamber_kind = fields.Selection(
-		selection=[("cma", "CMA"), ("cci", "CCI"), ("none", "Not registered")],
+		selection=[
+			("cma", "Chamber of trades (CMA)"),
+			("cci", "Chamber of commerce (CCI)"),
+			("none", "Not registered"),
+		],
 		string="Consular chamber",
 		default="cma",
 	)
 	l10n_fr_micro_chamber_zone = fields.Selection(
 		selection=[
 			("general", "Metropolitan France — general"),
-			("alsace", "Bas-Rhin / Haut-Rhin"),
-			("moselle", "Moselle"),
+			("alsace", "Alsace departments (Bas-Rhin / Haut-Rhin)"),
+			("moselle", "Moselle department"),
 		],
 		string="Chamber-tax zone",
 		default="general",
@@ -159,8 +163,13 @@ class ResCompany(models.Model):
 					and company.l10n_fr_micro_urssaf_tracking_start_date < company.l10n_fr_micro_activity_start_date:
 				raise ValidationError(_("URSSAF tracking cannot start before the activity."))
 			for date_from, date_to, label in (
-				(company.l10n_fr_micro_versement_from, company.l10n_fr_micro_versement_to, _("Versement libératoire")),
-				(company.l10n_fr_micro_acre_from, company.l10n_fr_micro_acre_to, _("ACRE")),
+				(
+					company.l10n_fr_micro_versement_from,
+					company.l10n_fr_micro_versement_to,
+					_("Flat-rate income tax payment"),
+				),
+				# "ACRE" is a scheme acronym and is never translated.
+				(company.l10n_fr_micro_acre_from, company.l10n_fr_micro_acre_to, "ACRE"),
 			):
 				if date_from and date_to and date_to < date_from:
 					raise ValidationError(_("%(label)s end date precedes its start date.", label=label))

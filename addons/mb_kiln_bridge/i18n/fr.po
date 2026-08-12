@@ -1,0 +1,429 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_kiln_bridge
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "%s has no password set."
+msgstr "%s n'a pas de mot de passe défini."
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "%s programme(s) read from the controller."
+msgstr "%s programme(s) lu(s) depuis le contrôleur."
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__store_raw_payload
+msgid ""
+"Attach the provider's own JSON to each firing. Roughly 82 KB each, so about "
+"6 MB for a full myKiln history. Worth it while the integration is young; "
+"switch it off once the normalized fields are trusted."
+msgstr ""
+"Joindre à chaque cuisson le JSON du fournisseur lui-même. Environ 82 Ko par "
+"cuisson, soit à peu près 6 Mo pour un historique myKiln complet. Cela en "
+"vaut la peine tant que l'intégration est jeune ; désactivez-le une fois que "
+"les champs normalisés sont fiables."
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_progress
+msgid "Backfill %"
+msgstr "Reprise d'historique %"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_offset
+msgid "Backfill Offset"
+msgstr "Décalage de reprise"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_page_size
+msgid "Backfill Page Size"
+msgstr "Taille de page de reprise"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_state
+msgid "Backfill State"
+msgstr "État de la reprise"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_total
+msgid "Backfill Total"
+msgstr "Total de la reprise"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__base_url
+msgid "Base Url"
+msgstr "URL de base"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__backfill_state__done
+msgid "Complete"
+msgstr "Terminée"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__state__ok
+msgid "Connected"
+msgstr "Connecté"
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "Connection failed: %s"
+msgstr "Échec de la connexion : %s"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Credentials"
+msgstr "Identifiants"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln__display_name
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__state__error
+msgid "Failing"
+msgstr "En échec"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__firing_count
+msgid "Firing Count"
+msgstr "Nombre de cuissons"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__firing_limit
+msgid "Firing Limit"
+msgstr "Limite de cuissons"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__backfill_page_size
+msgid ""
+"Firings listed per provider call during backfill. Kept small because the "
+"listing endpoint degrades badly with page size, while fetching each firing's"
+" detail and samples is cheap."
+msgstr ""
+"Nombre de cuissons listées par appel au fournisseur pendant la reprise "
+"d'historique. Volontairement faible, car le point d'accès de listage se "
+"dégrade fortement avec la taille de page, alors que récupérer le détail et "
+"les mesures de chaque cuisson coûte peu."
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "History import"
+msgstr "Import de l'historique"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__program_scan_limit
+msgid ""
+"How many recent firings the Refresh programmes button looks through to find "
+"each controller slot. Only the newest firing per slot is fetched in full, so"
+" this is one listing call plus one call per programme found."
+msgstr ""
+"Combien de cuissons récentes le bouton Rafraîchir les programmes parcourt "
+"pour retrouver chaque emplacement du contrôleur. Seule la cuisson la plus "
+"récente par emplacement est récupérée en entier : cela représente un appel "
+"de listage plus un appel par programme trouvé."
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__firing_limit
+msgid ""
+"How many recent firings the routine poll pulls. Small on purpose: history is"
+" the backfill's job, not the cron's."
+msgstr ""
+"Combien de cuissons récentes l'interrogation régulière récupère. "
+"Volontairement faible : l'historique est le travail de la reprise, pas celui"
+" de la tâche planifiée."
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln__id
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Import full history"
+msgstr "Importer tout l'historique"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__sync_programs
+msgid ""
+"Keep each kiln's programmes in step with the controller as firings come in. "
+"The provider has no programme library to read, so a programme is learned "
+"from the firings that ran it - which means this costs nothing beyond the "
+"firings already imported."
+msgstr ""
+"Maintenir les programmes de chaque four alignés sur le contrôleur au fil des"
+" cuissons importées. Le fournisseur n'expose aucune bibliothèque de "
+"programmes : un programme s'apprend donc à partir des cuissons qui l'ont "
+"exécuté, ce qui ne coûte rien de plus que les cuissons déjà importées."
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__store_raw_payload
+msgid "Keep provider payload"
+msgstr "Conserver la charge utile du fournisseur"
+
+#. module: mb_kiln_bridge
+#: model:ir.model,name:mb_kiln_bridge.model_mb_kiln
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__kiln_ids
+msgid "Kiln"
+msgstr "Four"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__kiln_count
+msgid "Kiln Count"
+msgstr "Nombre de fours"
+
+#. module: mb_kiln_bridge
+#: model:ir.actions.server,name:mb_kiln_bridge.ir_cron_mb_kiln_backfill_ir_actions_server
+msgid "Kiln bridge: backfill history"
+msgstr "Passerelle four : reprise de l'historique"
+
+#. module: mb_kiln_bridge
+#: model:ir.actions.server,name:mb_kiln_bridge.ir_cron_mb_kiln_sync_ir_actions_server
+msgid "Kiln bridge: import firings"
+msgstr "Passerelle four : import des cuissons"
+
+#. module: mb_kiln_bridge
+#: model:ir.actions.act_window,name:mb_kiln_bridge.mb_kiln_connection_action
+#: model:ir.ui.menu,name:mb_kiln_bridge.menu_mb_kiln_connection
+msgid "Kiln connections"
+msgstr "Connexions de four"
+
+#. module: mb_kiln_bridge
+#: model:ir.model,name:mb_kiln_bridge.model_mb_kiln_connection
+msgid "Kiln provider connection"
+msgstr "Connexion au fournisseur de four"
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Kilns"
+msgstr "Fours"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__last_error
+msgid "Last Error"
+msgstr "Dernière erreur"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__last_sync
+msgid "Last Sync"
+msgstr "Dernière synchronisation"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Last run"
+msgstr "Dernière exécution"
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid ""
+"Make, model and chamber are read from the\n"
+"                                provider on every sync; the name and everything\n"
+"                                about how the workshop uses the kiln are left\n"
+"                                alone. Open a kiln to see its programmes."
+msgstr ""
+"La marque, le modèle et la chambre sont lus chez le\n"
+"                                fournisseur à chaque synchronisation ; le nom et\n"
+"                                tout ce qui concerne l'usage du four dans\n"
+"                                l'atelier restent intacts. Ouvrez un four pour voir ses programmes."
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__state__draft
+msgid "Never connected"
+msgstr "Jamais connecté"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__backfill_state__idle
+msgid "Not started"
+msgstr "Non démarrée"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__password
+msgid "Password"
+msgstr "Mot de passe"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__program_count
+msgid "Program Count"
+msgstr "Nombre de programmes"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__program_scan_limit
+msgid "Program Scan Limit"
+msgstr "Limite de balayage des programmes"
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "Programmes refreshed"
+msgstr "Programmes rafraîchis"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__provider
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Provider"
+msgstr "Fournisseur"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__provider_token
+msgid "Provider Token"
+msgstr "Jeton du fournisseur"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__provider_token_at
+msgid "Provider Token At"
+msgstr "Date du jeton du fournisseur"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln__connection_id
+msgid "Provider connection"
+msgstr "Connexion au fournisseur"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__provider__rohde_mykiln
+msgid "ROHDE myKiln"
+msgstr "ROHDE myKiln"
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Read each kiln's programmes back from its controller"
+msgstr "Relire les programmes de chaque four depuis son contrôleur"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__sync_programs
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Refresh programmes"
+msgstr "Rafraîchir les programmes"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__backfill_state__running
+msgid "Running"
+msgstr "En cours"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__timeout
+msgid ""
+"Seconds to wait on one provider call. Measured against myKiln, a listing of "
+"fifty firings took twenty-two seconds and was slower than one of two "
+"hundred, so this is generous by design."
+msgstr ""
+"Nombre de secondes d'attente pour un appel au fournisseur. Mesuré sur "
+"myKiln, un listage de cinquante cuissons a pris vingt-deux secondes et s'est"
+" révélé plus lent qu'un listage de deux cents : cette valeur est donc "
+"généreuse à dessein."
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__state
+msgid "State"
+msgstr "Statut"
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Stop backfill"
+msgstr "Arrêter la reprise"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__password
+msgid "Stored in this database. Restricted to manufacturing managers."
+msgstr ""
+"Stocké dans cette base de données. Réservé aux responsables de fabrication."
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Sync now"
+msgstr "Synchroniser maintenant"
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Test connection"
+msgstr "Tester la connexion"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln__connection_id
+msgid ""
+"The connection this kiln was imported through. Clearing it leaves the kiln "
+"and its firings in place; they are ours, not the provider's."
+msgstr ""
+"La connexion par laquelle ce four a été importé. L'effacer laisse le four et"
+" ses cuissons en place : ils sont à nous, pas au fournisseur."
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid ""
+"This imports every firing the provider holds, a page at a time in the "
+"background. Continue?"
+msgstr ""
+"Ceci importe toutes les cuissons détenues par le fournisseur, page par page "
+"en arrière-plan. Continuer ?"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__timeout
+msgid "Timeout"
+msgstr "Délai d'expiration"
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__username
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "myKiln"
+msgstr "myKiln"
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "myKiln did not answer"
+msgstr "myKiln n'a pas répondu"

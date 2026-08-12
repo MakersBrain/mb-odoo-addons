@@ -84,7 +84,7 @@ class InvoiceCapture(models.Model):
         tracking=True,
         index=True,
     )
-    review_reason = fields.Text(readonly=True, tracking=True)
+    review_reason = fields.Text(string="Review reason", readonly=True, tracking=True)
     move_id = fields.Many2one(
         "account.move", readonly=True, ondelete="restrict", check_company=True,
     )
@@ -421,57 +421,57 @@ class InvoiceCapture(models.Model):
         company = self.env.company
         workshop_id = str(payload.get("workshop_id", "")).lower()
         if not company.mb_control_workshop_id:
-            raise ValidationError("the Odoo company is not linked to a control-plane workshop")
+            raise ValidationError(_("the Odoo company is not linked to a control-plane workshop"))
         if workshop_id != company.mb_control_workshop_id:
-            raise ValidationError("invoice capture belongs to another workshop")
+            raise ValidationError(_("invoice capture belongs to another workshop"))
         external_id = str(payload.get("external_document_id", ""))
         digest = str(payload.get("content_digest", "")).lower()
         provider = payload.get("provider")
         filename = str(payload.get("source_filename", "")).strip()
         mimetype = str(payload.get("source_mimetype", "")).strip().lower()
         if not SAFE_EXTERNAL_ID_RE.fullmatch(external_id):
-            raise ValidationError("external_document_id is invalid")
+            raise ValidationError(_("external_document_id is invalid"))
         if not HEX_64_RE.fullmatch(digest):
-            raise ValidationError("content_digest must be a lowercase SHA-256 digest")
+            raise ValidationError(_("content_digest must be a lowercase SHA-256 digest"))
         if provider not in {"structured", "azure"}:
-            raise ValidationError("unsupported extraction provider")
+            raise ValidationError(_("unsupported extraction provider"))
         if not filename or "/" in filename or "\\" in filename:
-            raise ValidationError("source_filename must be a plain filename")
+            raise ValidationError(_("source_filename must be a plain filename"))
         if mimetype not in {
             "application/pdf", "image/jpeg", "image/png", "image/tiff",
             "application/xml", "text/xml",
         }:
-            raise ValidationError("unsupported invoice source type")
+            raise ValidationError(_("unsupported invoice source type"))
         page_count = payload.get("page_count", 1)
         if not isinstance(page_count, int) or isinstance(page_count, bool) or page_count < 1:
-            raise ValidationError("page_count must be a positive integer")
+            raise ValidationError(_("page_count must be a positive integer"))
         normalized = payload.get("invoice")
         confidence = payload.get("field_confidence", {})
         source_url = str(payload.get("source_document_url") or "").strip()
         if source_url:
             parsed_url = urlparse(source_url)
             if parsed_url.scheme != "https" or not parsed_url.netloc or len(source_url) > 2048:
-                raise ValidationError("source_document_url must be an absolute HTTPS URL")
+                raise ValidationError(_("source_document_url must be an absolute HTTPS URL"))
         if not isinstance(normalized, dict):
-            raise ValidationError("invoice must be an object")
+            raise ValidationError(_("invoice must be an object"))
         if not isinstance(confidence, dict):
-            raise ValidationError("field_confidence must be an object")
+            raise ValidationError(_("field_confidence must be an object"))
         return company, external_id, digest, provider, filename, mimetype, page_count, normalized, confidence
 
     @api.model
     def _decode_source(self, encoded, digest):
         if not isinstance(encoded, str) or not encoded:
-            raise ValidationError("source_base64 is required")
+            raise ValidationError(_("source_base64 is required"))
         try:
             source = base64.b64decode(encoded, validate=True)
         except (binascii.Error, ValueError) as exc:
-            raise ValidationError("source_base64 is invalid") from exc
+            raise ValidationError(_("source_base64 is invalid")) from exc
         if not source or len(source) > MAX_SOURCE_BYTES:
-            raise ValidationError("invoice source is empty or exceeds 20 MiB")
+            raise ValidationError(_("invoice source is empty or exceeds 20 MiB"))
         import hashlib
 
         if hashlib.sha256(source).hexdigest() != digest:
-            raise ValidationError("invoice source does not match content_digest")
+            raise ValidationError(_("invoice source does not match content_digest"))
         return source
 
     @api.model
@@ -488,7 +488,7 @@ class InvoiceCapture(models.Model):
             if len(matches) == 1:
                 return matches
             if len(matches) > 1:
-                return self.env["res.partner"], "Several suppliers have the extracted VAT identifier."
+                return self.env["res.partner"], _("Several suppliers have the extracted VAT identifier.")
         if siren:
             def partner_siren(partner):
                 siret = partner["siret"] if "siret" in partner._fields else ""
@@ -498,14 +498,14 @@ class InvoiceCapture(models.Model):
             if len(matches) == 1:
                 return matches
             if len(matches) > 1:
-                return self.env["res.partner"], "Several suppliers have the extracted SIREN."
+                return self.env["res.partner"], _("Several suppliers have the extracted SIREN.")
         if name:
             matches = candidates.filtered(lambda partner: _normalized_name(partner.name) == name)
             if len(matches) == 1:
                 return matches
             if len(matches) > 1:
-                return self.env["res.partner"], "The extracted supplier name is ambiguous."
-        return self.env["res.partner"], "No existing supplier matches the extracted identity."
+                return self.env["res.partner"], _("The extracted supplier name is ambiguous.")
+        return self.env["res.partner"], _("No existing supplier matches the extracted identity.")
 
     @api.model
     def _currency(self, code):
@@ -539,19 +539,19 @@ class InvoiceCapture(models.Model):
     def _prepare_lines(self, invoice, company):
         source_lines = invoice.get("lines")
         if not isinstance(source_lines, list) or not source_lines:
-            return [], "The extraction contains no invoice lines."
+            return [], _("The extraction contains no invoice lines.")
         commands = []
         for position, line in enumerate(source_lines, start=1):
             if not isinstance(line, dict):
-                return [], f"Invoice line {position} is not an object."
+                return [], _("Invoice line %(line)s is not an object.", line=position)
             description = str(line.get("description", "")).strip()
             quantity = _decimal(line.get("quantity"), f"line {position} quantity")
             price_unit = _decimal(line.get("unit_price"), f"line {position} unit_price")
             if not description or quantity <= 0:
-                return [], f"Invoice line {position} needs a description and positive quantity."
+                return [], _("Invoice line %(line)s needs a description and a positive quantity.", line=position)
             account = self._account_for_code(line.get("account_code"), company)
             if len(account) != 1:
-                return [], f"Invoice line {position} does not map to one existing expense account."
+                return [], _("Invoice line %(line)s does not map to one existing expense account.", line=position)
             product = self.env["product.product"]
             sku = line.get("product_default_code")
             if sku:
@@ -560,12 +560,12 @@ class InvoiceCapture(models.Model):
                     ("company_id", "in", [False, company.id]),
                 ], limit=2)
                 if len(product) != 1:
-                    return [], f"Invoice line {position} does not map to one existing product."
+                    return [], _("Invoice line %(line)s does not map to one existing product.", line=position)
             taxes = self.env["account.tax"]
             if line.get("tax_rate") is not None:
                 taxes = self._tax_for_rate(line["tax_rate"], company)
                 if len(taxes) != 1:
-                    return [], f"Invoice line {position} does not map to one purchase tax."
+                    return [], _("Invoice line %(line)s does not map to one purchase tax.", line=position)
             commands.append((0, 0, {
                 "name": description,
                 "quantity": float(quantity),
@@ -583,12 +583,12 @@ class InvoiceCapture(models.Model):
             return self.env["account.move"], supplier[1]
         currency = self._currency(invoice.get("currency"))
         if not currency:
-            return self.env["account.move"], "The extracted currency is not active in Odoo."
+            return self.env["account.move"], _("The extracted currency is not active in Odoo.")
         line_commands, reason = self._prepare_lines(invoice, company)
         if reason:
             return self.env["account.move"], reason
         if not invoice.get("invoice_date"):
-            return self.env["account.move"], "The extraction has no invoice date."
+            return self.env["account.move"], _("The extraction has no invoice date.")
         move = self.env["account.move"].with_company(company).create({
             "move_type": "in_invoice",
             "company_id": company.id,
@@ -613,10 +613,10 @@ class InvoiceCapture(models.Model):
             for left, right in zip(actual, expected, strict=True)
         ):
             move.unlink()
-            return self.env["account.move"], "Extracted untaxed, tax and total amounts do not reconcile."
+            return self.env["account.move"], _("Extracted untaxed, tax and total amounts do not reconcile.")
         if move.state != "draft":
             move.unlink()
-            return self.env["account.move"], "Invoice capture may create draft bills only."
+            return self.env["account.move"], _("Invoice capture may create draft bills only.")
         capture._link_source_to_bill(move)
         return move, None
 
@@ -667,7 +667,7 @@ class InvoiceCapture(models.Model):
         if previous:
             capture.write({
                 "status": "review",
-                "review_reason": "A changed Paperless document revision was retained without overwriting the prior bill.",
+                "review_reason": _("A changed Paperless document revision was retained without overwriting the prior bill."),
             })
             return capture._result(applied=True)
         move, reason = self._create_draft_bill(capture, invoice, company)
@@ -678,7 +678,7 @@ class InvoiceCapture(models.Model):
             capture.write({
                 "move_id": move.id,
                 "status": "review" if requires_review else "draft_bill",
-                "review_reason": "Extraction confidence requires accountant review." if requires_review else False,
+                "review_reason": _("Extraction confidence requires accountant review.") if requires_review else False,
             })
         return capture._result(applied=True)
 

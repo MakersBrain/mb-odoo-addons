@@ -49,7 +49,7 @@ class MbFinishingSession(models.Model):
             if session.state != "draft":
                 continue
             if not session.line_ids:
-                raise UserError("Select at least one damp-box blank.")
+                raise UserError(_("Select at least one damp-box blank."))
             for line in session.line_ids:
                 line._start_finishing()
             session.state = "progress"
@@ -90,10 +90,10 @@ class MbFinishingSessionLine(models.Model):
     def _check_selection(self):
         for line in self:
             if line.blank_lot_id.product_id != line.blank_product_id:
-                raise ValidationError("The blank lot belongs to another product.")
+                raise ValidationError(_("The blank lot belongs to another product."))
             if line.finished_product_id not in (
                     line.bom_id.product_id | line.bom_id.product_tmpl_id.product_variant_ids):
-                raise ValidationError("The bill of materials does not produce this article.")
+                raise ValidationError(_("The bill of materials does not produce this article."))
 
     @api.onchange("blank_product_id")
     def _onchange_blank_product_id(self):
@@ -138,9 +138,11 @@ class MbFinishingSessionLine(models.Model):
         blank_move = production.move_raw_ids.filtered(
             lambda move: move.product_id == self.blank_product_id)[:1]
         if not blank_move:
-            raise UserError(
-                "%s's bill of materials does not consume the selected blank."
-                % self.finished_product_id.display_name)
+            raise UserError(_(
+                "The bill of materials of %(product)s does not consume the "
+                "selected blank.",
+                product=self.finished_product_id.display_name,
+            ))
         available = self.env["stock.quant"]._get_available_quantity(
             self.blank_product_id,
             session.source_location_id,
@@ -151,7 +153,7 @@ class MbFinishingSessionLine(models.Model):
             lambda move_line: move_line.lot_id == self.blank_lot_id
         ).mapped("quantity"))
         if available + reserved_from_lot < self.quantity:
-            raise UserError("The selected blank lot does not have enough available stock.")
+            raise UserError(_("The selected blank lot does not have enough available stock."))
         production.action_assign()
         blank_move.lot_ids = self.blank_lot_id
         blank_move.quantity = self.quantity

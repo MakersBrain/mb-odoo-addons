@@ -239,7 +239,9 @@ class PaymentTransaction(models.Model):
                 "GET", f"/v0.1/checkouts/{self.provider_reference}"
             )
         except (UserError, ValidationError):
-            _logger.warning("Unable to read SumUp checkout for %s.", self.reference)
+            _logger.warning(
+                "Unable to read SumUp checkout for %s.", self.reference
+            )
             return
         self._process("sumup", checkout_data)
 
@@ -256,7 +258,9 @@ class PaymentTransaction(models.Model):
                 params={"id": source_tx.sumup_transaction_id},
             )
         except (UserError, ValidationError):
-            _logger.warning("Unable to verify SumUp refund %s.", self.reference)
+            _logger.warning(
+                "Unable to verify SumUp refund %s.", self.reference
+            )
             return
 
         events = transaction_data.get("events") or transaction_data.get("transaction_events") or []

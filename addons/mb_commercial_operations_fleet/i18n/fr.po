@@ -1,0 +1,156 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_commercial_operations_fleet
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_commercial_operations_fleet
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_fleet.report_commercial_operation_fleet
+msgid "<strong>Vehicle:</strong>"
+msgstr "<strong>Véhicule :</strong>"
+
+#. module: mb_commercial_operations_fleet
+#. odoo-python
+#: code:addons/mb_commercial_operations_fleet/models/travel_estimate.py:0
+msgid "Accepted travel estimates are immutable; calculate a new revision."
+msgstr ""
+"Les estimations de déplacement acceptées sont immuables ; calculez une "
+"nouvelle révision."
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model,name:mb_commercial_operations_fleet.model_mb_commercial_contract
+msgid "Commercial Contract"
+msgstr "Contrat commercial"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model,name:mb_commercial_operations_fleet.model_mb_commercial_operation
+msgid "Commercial Operation"
+msgstr "Opération commerciale"
+
+#. module: mb_commercial_operations_fleet
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_fleet.fleet_vehicle_view_form_commercial
+msgid "Commercial Travel"
+msgstr "Déplacements commerciaux"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model,name:mb_commercial_operations_fleet.model_mb_commercial_operation_plan_wizard
+msgid "Complete Commercial Operation Planning"
+msgstr "Compléter la planification de l'opération commerciale"
+
+#. module: mb_commercial_operations_fleet
+#. odoo-python
+#: code:addons/mb_commercial_operations_fleet/models/commercial_operation.py:0
+msgid "Completed or closed operations cannot change vehicle assignment."
+msgstr ""
+"Une opération terminée ou clôturée ne peut pas changer d'affectation de "
+"véhicule."
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_contract__default_vehicle_id
+msgid "Default Vehicle"
+msgstr "Véhicule par défaut"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_fleet_vehicle__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_contract__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_operation__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_operation_plan_wizard__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_travel_estimate__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_fleet_vehicle__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_contract__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_operation__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_operation_plan_wizard__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_travel_estimate__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_commercial_operations_fleet
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_fleet.report_commercial_operation_fleet
+msgid "L/100 km · <strong>Driver rate:</strong>"
+msgstr "L/100 km · <strong>Tarif conducteur :</strong>"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_fleet_vehicle__mb_cost_per_km
+msgid "Mb Cost Per Km"
+msgstr "Coût par km"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_fleet_vehicle__mb_driver_cost_eur_per_hour
+msgid "Mb Driver Cost Eur Per Hour"
+msgstr "Coût du conducteur (EUR/heure)"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_fleet_vehicle__mb_fuel_consumption_l_per_100km
+msgid "Mb Fuel Consumption L Per 100Km"
+msgstr "Consommation de carburant (L/100 km)"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_fleet_vehicle__mb_tollquote_payment_option
+msgid "Mb Tollquote Payment Option"
+msgstr "Option de paiement TollQuote"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_fleet_vehicle__mb_tollquote_vehicle_class
+msgid "Mb Tollquote Vehicle Class"
+msgstr "Classe de véhicule TollQuote"
+
+#. module: mb_commercial_operations_fleet
+#. odoo-python
+#: code:addons/mb_commercial_operations_fleet/models/commercial_operation.py:0
+msgid "Reopen the approved operation before changing its vehicle."
+msgstr "Rouvrez l'opération approuvée avant de changer son véhicule."
+
+#. module: mb_commercial_operations_fleet
+#. odoo-python
+#: code:addons/mb_commercial_operations_fleet/models/commercial_operation.py:0
+msgid "The selected vehicle is assigned to an overlapping operation."
+msgstr "Le véhicule sélectionné est affecté à une opération qui se chevauche."
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model,name:mb_commercial_operations_fleet.model_mb_travel_estimate
+msgid "Travel Cost Estimate"
+msgstr "Estimation du coût de déplacement"
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model,name:mb_commercial_operations_fleet.model_fleet_vehicle
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_operation__vehicle_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_operation_plan_wizard__vehicle_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_travel_estimate__vehicle_id
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_fleet.report_commercial_operation_fleet
+msgid "Vehicle"
+msgstr "Véhicule"
+
+#. module: mb_commercial_operations_fleet
+#. odoo-python
+#: code:addons/mb_commercial_operations_fleet/models/commercial_operation.py:0
+msgid ""
+"Vehicle %(vehicle)s is already assigned to %(operation)s in this time "
+"window."
+msgstr ""
+"Le véhicule %(vehicle)s est déjà affecté à %(operation)s sur cette plage "
+"horaire."
+
+#. module: mb_commercial_operations_fleet
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_operation__vehicle_conflict_acknowledged
+#: model:ir.model.fields,field_description:mb_commercial_operations_fleet.field_mb_commercial_operation_plan_wizard__vehicle_conflict_acknowledged
+msgid "Vehicle Conflict Acknowledged"
+msgstr "Conflit de véhicule acquitté"
+
+#. module: mb_commercial_operations_fleet
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_fleet.report_commercial_operation_fleet
+msgid "· <strong>Consumption:</strong>"
+msgstr "· <strong>Consommation :</strong>"

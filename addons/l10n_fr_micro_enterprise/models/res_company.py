@@ -12,7 +12,7 @@ class ResCompany(models.Model):
 	l10n_fr_micro_tax_regime = fields.Selection(
 		selection=[
 			("unchanged", "Not managed by this module"),
-			("franchise", "Franchise en base de TVA"),
+			("franchise", "VAT exemption"),
 			("vat", "VAT liable"),
 		],
 		string="Micro-enterprise VAT regime",
@@ -21,12 +21,12 @@ class ResCompany(models.Model):
 		copy=False,
 	)
 	l10n_fr_micro_legal_form = fields.Selection(
-		selection=[("ei", "Entrepreneur individuel")],
+		selection=[("ei", "Sole trader (entrepreneur individuel)")],
 		string="Legal form", default="ei", copy=False,
 	)
 	l10n_fr_micro_trade_name = fields.Char(string="Trading name", copy=False)
-	l10n_fr_micro_siren = fields.Char(string="SIREN", copy=False)
-	l10n_fr_micro_siret = fields.Char(string="SIRET", copy=False)
+	l10n_fr_micro_siren = fields.Char(string="SIREN number", copy=False)
+	l10n_fr_micro_siret = fields.Char(string="SIRET number", copy=False)
 	l10n_fr_micro_ape_code = fields.Char(string="APE / NAF code", copy=False)
 	l10n_fr_micro_activity_description = fields.Char(
 		string="Main activity", copy=False,
@@ -115,7 +115,9 @@ class ResCompany(models.Model):
 		if not source:
 			raise UserError(_("Prepare an ordinary French service VAT tax before enabling BNC."))
 		return source.copy(default={
-			"name": _("%(name)s — BNC", name=source.name),
+			# "BNC" is a tax-code acronym and the rest is the source tax name:
+			# there is nothing here to translate.
+			"name": "%s — BNC" % source.name,
 			"invoice_label": _("VAT — BNC service"),
 			"l10n_fr_micro_urssaf_category": "bnc",
 			"original_tax_ids": [Command.clear()],
@@ -129,7 +131,7 @@ class ResCompany(models.Model):
 			("l10n_fr_micro_franchise_group", "=", True),
 		], limit=1)
 		values = {
-			"name": _("TVA 0% — franchise en base"),
+			"name": _("VAT 0% — VAT exemption"),
 			"company_id": self.id,
 			"country_id": country.id,
 			"l10n_fr_micro_franchise_group": True,
@@ -159,16 +161,18 @@ class ResCompany(models.Model):
 		category_label = {
 			"bic_goods": _("goods"),
 			"bic_service": _("BIC services"),
-			"bnc": _("BNC"),
+			"bnc": _("BNC activity"),
 		}[category]
-		label = _("TVA non applicable — franchise en base (%s)", category_label)
+		label = _(
+			"VAT not applicable — VAT exemption (%(category)s)", category=category_label,
+		)
 		original_taxes = self._l10n_fr_micro_source_taxes(scope, category)
 		original_taxes.filtered(lambda source: not source.l10n_fr_micro_urssaf_category).write({
 			"l10n_fr_micro_urssaf_category": category,
 		})
 		values = {
 			"name": label,
-			"invoice_label": _("TVA non applicable — art. 293 B CGI"),
+			"invoice_label": _("VAT not applicable — Article 293 B"),
 			"description": LEGAL_NOTE,
 			"invoice_legal_notes": LEGAL_NOTE,
 			"company_id": self.id,
@@ -202,9 +206,9 @@ class ResCompany(models.Model):
 			("type_tax_use", "=", "purchase"),
 		], limit=1)
 		values = {
-			"name": _("TVA non déductible — franchise en base (achats)"),
-			"invoice_label": _("TVA non déductible — franchise en base"),
-			"description": _("TVA fournisseur incluse dans la charge"),
+			"name": _("Non-deductible VAT — VAT exemption (purchases)"),
+			"invoice_label": _("Non-deductible VAT — VAT exemption"),
+			"description": _("Supplier VAT included in the expense"),
 			"company_id": self.id,
 			"country_id": country.id,
 			"tax_group_id": tax_group.id,
@@ -246,7 +250,7 @@ class ResCompany(models.Model):
 				("l10n_fr_micro_franchise_position", "=", True),
 			], limit=1)
 			position_values = {
-				"name": _("FR — Franchise en base de TVA"),
+				"name": _("FR — VAT exemption"),
 				"company_id": company.id,
 				"country_id": country.id,
 				"sequence": 1,

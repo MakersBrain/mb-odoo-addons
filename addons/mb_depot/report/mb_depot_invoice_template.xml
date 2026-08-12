@@ -3,7 +3,8 @@
   <template id="report_invoice_document_mb_depot" inherit_id="account.report_invoice_document">
     <xpath expr="//div[@id='informations']" position="inside">
       <div class="col" t-if="o.mb_depot_sale_report_ids" name="depot_sale_report_reference">
-        <strong>Depot report<span t-if="len(o.mb_depot_sale_report_ids) &gt; 1">s</span></strong>
+        <strong t-if="len(o.mb_depot_sale_report_ids) &gt; 1">Depot reports</strong>
+        <strong t-else="">Depot report</strong>
         <div t-esc="', '.join(o.mb_depot_sale_report_ids.mapped('external_reference'))"/>
       </div>
       <div class="col" t-if="o.mb_depot_delivery_date_from" name="depot_delivery_period">

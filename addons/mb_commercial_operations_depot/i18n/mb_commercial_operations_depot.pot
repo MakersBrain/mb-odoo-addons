@@ -1,0 +1,834 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_commercial_operations_depot
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.report_commercial_operation_depot
+msgid ""
+". This comparison is not included in operation-attributed actual revenue and"
+" is not revenue claimed to be caused by this visit."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.report_commercial_operation_depot
+msgid "<strong>Contract sales in comparison window:</strong>"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.report_commercial_operation_depot
+msgid "<strong>Depot:</strong>"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.constraint,message:mb_commercial_operations_depot.constraint_mb_depot_refill_forecast_snapshot_unique
+msgid "A rule already has a forecast snapshot for this date."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__active
+msgid "Active"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__active_days
+msgid "Active Days"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__amount
+msgid "Amount"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_assortment_rule__target_type__bucket
+msgid "Assortment Bucket"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depot_rules
+msgid "Assortment Rules"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.constraint,message:mb_commercial_operations_depot.constraint_mb_depot_assortment_rule_price_policy
+msgid "Assortment price bands must be non-negative and ordered."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__available_now
+msgid "Available Now"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__average_daily_sales
+msgid "Average Daily Sales"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__bill_id
+msgid "Bill"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__calculated_at
+msgid "Calculated At"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_rent_period__state__cancelled
+msgid "Cancelled"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__category_id
+msgid "Category"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_forecast.py:0
+msgid "Choose a category for an assortment-bucket depot rule."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_forecast.py:0
+msgid "Choose a product for an exact-product depot rule."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_operation.py:0
+msgid "Choose both boundaries for a contract recovery period."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_operation.py:0
+msgid "Choose the depot recovery-period boundaries."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
+msgid "Choose the rent service product first."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_commercial_contract
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_sale_report__commercial_contract_id
+msgid "Commercial Contract"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_commercial_obligation
+msgid "Commercial Contract Obligation"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_commercial_rent_period
+msgid "Commercial Contract Rent Period"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_commercial_obligation_occurrence
+msgid "Commercial Obligation Occurrence"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_commercial_operation
+msgid "Commercial Operation"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.actions.server,name:mb_commercial_operations_depot.ir_cron_refresh_depot_forecasts_ir_actions_server
+msgid "Commercial Operations: refresh depot forecasts"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__company_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__company_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__company_id
+msgid "Company"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_commercial_operation_plan_wizard
+msgid "Complete Commercial Operation Planning"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__confidence
+msgid "Confidence"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
+msgid "Configure the depot and its default refill source first."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__contract_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__contract_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__contract_id
+msgid "Contract"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__comparison_window_revenue
+msgid "Contract Sales in Comparison Window"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_operation_form_depot
+msgid "Create Refill Transfer"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__create_uid
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__create_uid
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__create_date
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__create_date
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__currency_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__current_quantity
+msgid "Current Quantity"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__days_of_cover
+msgid "Days Of Cover"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__source_warehouse_id
+msgid "Default Refill Source"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__demand_window_days
+msgid "Demand Window Days"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_depot_sale_report
+msgid "Depositary sale report"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__depot_warehouse_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__depot_warehouse_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__depot_warehouse_id
+msgid "Depot"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
+msgid "Depot %(depot)s already has an overlapping active commercial contract."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.actions.act_window,name:mb_commercial_operations_depot.action_depot_assortment_rules
+msgid "Depot Assortment Rules"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_depot_assortment_rule
+msgid "Depot Assortment and Refill Policy"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depot_contracts
+msgid "Depot Contracts"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.actions.act_window,name:mb_commercial_operations_depot.action_commercial_depot_permanence
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation__operation_type__depot_permanence
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_operation_search_depot
+msgid "Depot Permanence"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation__operation_type__depot_refill
+msgid "Depot Refill"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.actions.act_window,name:mb_commercial_operations_depot.action_depot_refill_forecasts
+msgid "Depot Refill Forecast"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_depot_refill_forecast
+msgid "Depot Refill Forecast Snapshot"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_contract_form_depot
+msgid "Depot Refill Policy"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.actions.act_window,name:mb_commercial_operations_depot.action_commercial_depot_refills
+msgid "Depot Refill Visits"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_operation_search_depot
+msgid "Depot Refills"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__depot_warehouse_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation_plan_wizard__depot_warehouse_id
+msgid "Depot Warehouse"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.report_commercial_operation_depot
+msgid "Depot contract and recovery scope"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_obligation__obligation_type__depot_permanence
+msgid "Depot permanence"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_operation.py:0
+msgid "Depot recovery windows for the same contract cannot overlap."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_obligation__obligation_type__depot_refill
+msgid "Depot refill visit"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation__recovery_scope__until_next_refill
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation_plan_wizard__recovery_scope__until_next_refill
+msgid "Depot sales until next approved refill"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depots
+msgid "Depots"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_account_move__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_obligation__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_obligation_occurrence__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation_plan_wizard__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_sale_report__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_sale_order__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_sale_order_line__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_rent_period__state__draft_bill
+msgid "Draft Bill"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_sale_report.py:0
+msgid ""
+"Enable Analytic Costs on operation type %(operation_type)s before processing"
+" depot sales, so sold stock is charged exactly once."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_assortment_rule__target_type__product
+msgid "Exact Product"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__exposed_days
+msgid "Exposed Days"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__forecast_ids
+msgid "Forecast"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_refill_forecast__confidence__forecast
+msgid "Forecast Based"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__forecast_stock_on_visit
+msgid "Forecast Stock On Visit"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__forecast_visit_date
+msgid "Forecast Visit Date"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__forecast_ids
+msgid "Forecasts"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_account_move__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_obligation__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_obligation_occurrence__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation_plan_wizard__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_sale_report__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_sale_order__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_sale_order_line__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__write_uid
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__write_uid
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__write_date
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__write_date
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_refill_forecast__confidence__low
+msgid "Low Confidence"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_account_bank_statement_line__mb_commercial_contract_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_account_move__mb_commercial_contract_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_sale_order__mb_commercial_contract_id
+msgid "Mb Commercial Contract"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__minimum_quantity
+msgid "Minimum Quantity"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__name
+msgid "Name"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
+msgid "No refill quantity is currently suggested."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_obligation__obligation_type
+msgid "Obligation Type"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__operation_type
+msgid "Operation Type"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation__recovery_scope__operation_only
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation_plan_wizard__recovery_scope__operation_only
+msgid "Operation-linked evidence only"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_rent_period__state__pending
+msgid "Pending"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__period_end
+msgid "Period End"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__period_start
+msgid "Period Start"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depot_permanence
+msgid "Permanence"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_contract_form_depot
+msgid "Plan Refill"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.actions.act_window,name:mb_commercial_operations_depot.action_plan_depot_permanence
+msgid "Plan a Depot Permanence"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.actions.act_window,name:mb_commercial_operations_depot.action_plan_depot_refill
+msgid "Plan a Depot Refill"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_plan_depot_permanence
+msgid "Plan a Permanence"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_plan_depot_refill
+msgid "Plan a Refill"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation__recovery_scope__informational
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation_plan_wizard__recovery_scope__informational
+msgid "Planning only"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_refill_forecast__confidence__policy
+msgid "Policy Based"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_rent_period__state__posted
+msgid "Posted"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_contract_form_depot
+msgid "Prepare Rent Bill"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__price_max
+msgid "Price Max"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__price_min
+msgid "Price Min"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__priority
+msgid "Priority"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__product_id
+msgid "Product"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_refill_forecast_form
+msgid "Recommendation"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__recovery_date_from
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation_plan_wizard__recovery_date_from
+msgid "Recovery Date From"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__recovery_date_to
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation_plan_wizard__recovery_date_to
+msgid "Recovery Date To"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__recovery_scope
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation_plan_wizard__recovery_scope
+msgid "Recovery Scope"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
+msgid "Refill %(depot)s"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__refill_due_date
+msgid "Refill Due Date"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depot_forecast
+msgid "Refill Forecast"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__assortment_rule_ids
+msgid "Refill Policies"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__refill_review_date
+msgid "Refill Review Date"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depot_refills
+msgid "Refill Visits"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.constraint,message:mb_commercial_operations_depot.constraint_mb_depot_assortment_rule_day_policy
+msgid ""
+"Refill day policies must be non-negative and the demand window positive."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_contract_form_depot
+msgid "Refresh Forecast"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
+msgid "Rent %(contract)s %(period)s"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__rent_bill_ids
+msgid "Rent Bills"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_contract_form_depot
+msgid "Rent Evidence"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__rent_period_to_prepare
+msgid "Rent Period To Prepare"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__rent_period_ids
+msgid "Rent Periods"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.constraint,message:mb_commercial_operations_depot.constraint_mb_commercial_rent_period_period_unique
+msgid "Rent has already been prepared for this contract period."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__reserved_quantity
+msgid "Reserved Quantity"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__returned_quantity
+msgid "Returned Quantity"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__rule_id
+msgid "Rule"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__safety_days
+msgid "Safety Days"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__season_end
+msgid "Season End"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__season_start
+msgid "Season Start"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation__recovery_scope__contract_period
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation_plan_wizard__recovery_scope__contract_period
+msgid "Selected contract period"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
+msgid "Set a monthly rent amount first."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__snapshot_date
+msgid "Snapshot Date"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__sold_quantity
+msgid "Sold Quantity"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__state
+msgid "State"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__stockout_biased
+msgid "Stockout Biased"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__stockout_days
+msgid "Stockout Days"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__suggested_quantity
+msgid "Suggested Quantity"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__target_days
+msgid "Target Days"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__target_quantity
+msgid "Target Quantity"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__target_type
+msgid "Target Type"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.constraint,message:mb_commercial_operations_depot.constraint_mb_depot_assortment_rule_quantity_policy
+msgid "Target quantity must be at least the non-negative minimum quantity."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_sale_report.py:0
+msgid "The commercial contract does not belong to this depot."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
+msgid "The contract partner must be the selected depot's depositary."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_operation.py:0
+msgid "The recovery period must end after it starts."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_operation.py:0
+msgid "The refill transfer is not completed."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
+msgid "This contract does not use separate rent vendor bills."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_contract_form_depot
+msgid "Total"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__window_end
+msgid "Window End"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__window_start
+msgid "Window Start"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.report_commercial_operation_depot
+msgid "· <strong>Contract:</strong>"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.report_commercial_operation_depot
+msgid "· <strong>Recovery scope:</strong>"
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.report_commercial_operation_depot
+msgid "· <strong>Window:</strong>"
+msgstr ""

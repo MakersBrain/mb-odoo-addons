@@ -64,7 +64,7 @@ class MrpProduction(models.Model):
         self.ensure_one()
         return {
             "type": "ir.actions.act_window",
-            "name": "Unload and inspect",
+            "name": _("Unload and inspect"),
             "res_model": "mb.inspection",
             "view_mode": "form",
             "target": "new",
@@ -75,7 +75,7 @@ class MrpProduction(models.Model):
         self.ensure_one()
         return {
             "type": "ir.actions.act_window",
-            "name": "Inspect bisque firing",
+            "name": _("Inspect bisque firing"),
             "res_model": "mb.bisque.inspection",
             "view_mode": "form",
             "target": "new",

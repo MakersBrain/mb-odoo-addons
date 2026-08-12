@@ -1,0 +1,181 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_pos_sumup
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,field_description:mb_pos_sumup.field_pos_payment_method__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,help:mb_pos_sumup.field_pos_payment_method__sumup_affiliate_key
+msgid ""
+"From Developer settings in the SumUp dashboard. The key allows a list of "
+"application identifiers, and the POS runs in a browser rather than in an "
+"application of yours, so that list has to include the browser: on iOS the "
+"SumUp app reports the caller as com.sumup.appswitch, whatever the URL says. "
+"Add it to the key beside your own identifier."
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,field_description:mb_pos_sumup.field_pos_payment_method__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-javascript
+#: code:addons/mb_pos_sumup/static/src/payment_sumup.js:0
+msgid "Only an order that was paid with SumUp can be refunded to SumUp."
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model,name:mb_pos_sumup.model_pos_payment_method
+msgid "Point of Sale Payment Methods"
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,help:mb_pos_sumup.field_pos_payment_method__sumup_skip_success_screen
+msgid ""
+"Return to the POS as soon as the card is approved instead of waiting for the"
+" cashier to dismiss SumUp's own screen."
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,help:mb_pos_sumup.field_pos_payment_method__sumup_app_id
+msgid ""
+"Sent as the app-id parameter, which only Android reads. iOS takes no such "
+"parameter and derives the caller itself - see the affiliate key above. Use "
+"an identifier registered on the key."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-python
+#: code:addons/mb_pos_sumup/models/pos_payment_method.py:0
+msgid ""
+"Set an enabled SumUp account for the same company on payment method %s."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-python
+#: code:addons/mb_pos_sumup/models/pos_payment_method.py:0
+msgid ""
+"Set the SumUp affiliate key on the payment method %s before taking a payment"
+" with it."
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,field_description:mb_pos_sumup.field_pos_payment_method__sumup_skip_success_screen
+msgid "Skip SumUp Success Screen"
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,field_description:mb_pos_sumup.field_pos_payment_method__sumup_payment_provider_id
+msgid "SumUp Account"
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,field_description:mb_pos_sumup.field_pos_payment_method__sumup_affiliate_key
+msgid "SumUp Affiliate Key"
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,field_description:mb_pos_sumup.field_pos_payment_method__sumup_app_id
+msgid "SumUp App ID"
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-javascript
+#: code:addons/mb_pos_sumup/static/src/payment_sumup.js:0
+msgid "SumUp Error"
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-python
+#: code:addons/mb_pos_sumup/models/pos_payment_method.py:0
+msgid "SumUp has no record of the payment to refund."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-python
+#: code:addons/mb_pos_sumup/models/pos_payment_method.py:0
+msgid "SumUp has no record of this payment."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-javascript
+#: code:addons/mb_pos_sumup/static/src/payment_sumup.js:0
+msgid "SumUp refused the payment."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-javascript
+#: code:addons/mb_pos_sumup/static/src/payment_sumup.js:0
+msgid "SumUp refused the refund."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-python
+#: code:addons/mb_pos_sumup/models/pos_payment_method.py:0
+msgid "SumUp reported this payment as %s."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-javascript
+#: code:addons/mb_pos_sumup/static/src/overrides/pos_store.js:0
+msgid "SumUp returned a payment that matches no open order."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-python
+#: code:addons/mb_pos_sumup/models/pos_payment_method.py:0
+msgid ""
+"SumUp returned payment evidence for a different reference, currency, or "
+"merchant account."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-python
+#: code:addons/mb_pos_sumup/models/pos_payment_method.py:0
+msgid "SumUp took %(charged)s for this payment, not %(expected)s."
+msgstr ""
+
+#. module: mb_pos_sumup
+#: model:ir.model.fields,help:mb_pos_sumup.field_pos_payment_method__sumup_payment_provider_id
+msgid ""
+"The SumUp account used to verify a payment against SumUp's own records and "
+"to refund it. It is mandatory: callback URL parameters are never accepted as"
+" payment evidence."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-javascript
+#: code:addons/mb_pos_sumup/static/src/payment_sumup.js:0
+msgid ""
+"The SumUp app did not open. Install it on this device, or record the payment"
+" another way."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-python
+#: code:addons/mb_pos_sumup/models/pos_payment_method.py:0
+msgid "The SumUp callback must return to this Odoo instance."
+msgstr ""
+
+#. module: mb_pos_sumup
+#. odoo-python
+#: code:addons/mb_pos_sumup/models/pos_payment_method.py:0
+msgid "The payment identifier is too long for SumUp."
+msgstr ""

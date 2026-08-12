@@ -74,7 +74,7 @@ class StockLot(models.Model):
         self.ensure_one()
         return {
             "type": "ir.actions.act_window",
-            "name": "Ceramics trace - %s" % self.display_name,
+            "name": _("Ceramics trace - %(lot)s", lot=self.display_name),
             "res_model": "mrp.production",
             "view_mode": "list,form",
             "domain": [("id", "in", self.mb_production_ids.ids)],

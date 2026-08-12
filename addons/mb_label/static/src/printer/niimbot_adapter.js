@@ -3,6 +3,7 @@
 // Packet framing and the common D110 print sequence follow the MIT-licensed
 // niimbluelib protocol documentation. The transport remains isolated here so
 // another NIIMBOT firmware family can be added without touching Label Studio.
+import { _t } from "@web/core/l10n/translation";
 import { encodeNiimbotRows, loadRaster, sleep } from "./raster";
 import { registerPrinterAdapter } from "./printer_registry";
 import { selectBluetoothDevice } from "./device_memory";
@@ -75,12 +76,12 @@ async function connectNiimbot(forceChooser = false) {
         return { device, server, channel };
     }
     server.disconnect();
-    throw new Error("No writable NIIMBOT Bluetooth channel was found.");
+    throw new Error(_t("No writable NIIMBOT Bluetooth channel was found."));
 }
 
 registerPrinterAdapter({
     id: "niimbot",
-    label: "NIIMBOT D110 family (Bluetooth)",
+    label: _t("NIIMBOT D110 family (Bluetooth)"),
     available: () => Boolean(navigator.bluetooth),
     async print(job, options = {}) {
         const image = await loadRaster(job.png_url);

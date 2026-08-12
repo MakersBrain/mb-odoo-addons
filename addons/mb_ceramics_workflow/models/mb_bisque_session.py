@@ -60,9 +60,7 @@ class MbBisqueSession(models.Model):
     def _check_company_and_locations(self):
         for session in self:
             if session.source_location_id == session.bisque_location_id:
-                raise ValidationError(
-                    "Green stock and accepted bisque stock need different locations."
-                )
+                raise ValidationError(_("Green stock and accepted bisque stock need different locations."))
             records = (
                 session.board_id,
                 session.source_location_id,
@@ -72,16 +70,14 @@ class MbBisqueSession(models.Model):
                 record.company_id and record.company_id != session.company_id
                 for record in records
             ):
-                raise ValidationError(
-                    "The board, locations and bisque session must share a company."
-                )
+                raise ValidationError(_("The board, locations and bisque session must share a company."))
 
     def action_start(self):
         for session in self:
             if session.state != "draft":
                 continue
             if not session.line_ids:
-                raise UserError("Select at least one green-ware lot.")
+                raise UserError(_("Select at least one green-ware lot."))
             for line in session.line_ids:
                 line._start_bisque()
             session.state = "progress"
@@ -157,11 +153,11 @@ class MbBisqueSessionLine(models.Model):
     def _check_selection(self):
         for line in self:
             if line.green_product_id.product_tmpl_id.mb_ceramics_stage != "green":
-                raise ValidationError("The selected input must be green ware.")
+                raise ValidationError(_("The selected input must be green ware."))
             if line.bisque_product_id.product_tmpl_id.mb_ceramics_stage != "bisque":
-                raise ValidationError("The selected output must be bisque ware.")
+                raise ValidationError(_("The selected output must be bisque ware."))
             if line.green_lot_id.product_id != line.green_product_id:
-                raise ValidationError("The green lot belongs to another product.")
+                raise ValidationError(_("The green lot belongs to another product."))
             records = (
                 line.green_lot_id,
                 line.green_product_id,
@@ -172,14 +168,12 @@ class MbBisqueSessionLine(models.Model):
                 and record.company_id != line.session_id.company_id
                 for record in records
             ):
-                raise ValidationError(
-                    "The selected products, lot and bisque session must share a company."
-                )
+                raise ValidationError(_("The selected products, lot and bisque session must share a company."))
             outputs = line.bom_id.product_id | line.bom_id.product_tmpl_id.product_variant_ids
             if line.bisque_product_id not in outputs:
-                raise ValidationError("The bill of materials does not produce this bisque ware.")
+                raise ValidationError(_("The bill of materials does not produce this bisque ware."))
             if line.green_product_id not in line.bom_id.bom_line_ids.product_id:
-                raise ValidationError("The bisque bill of materials does not consume the green ware.")
+                raise ValidationError(_("The bisque bill of materials does not consume the green ware."))
 
     @api.onchange("green_product_id")
     def _onchange_green_product_id(self):
@@ -211,10 +205,11 @@ class MbBisqueSessionLine(models.Model):
             lambda move: move.product_id == self.green_product_id
         )[:1]
         if not green_move:
-            raise UserError(
-                "%s's bill of materials does not consume the selected green ware."
-                % self.bisque_product_id.display_name
-            )
+            raise UserError(_(
+                "The bill of materials of %(product)s does not consume the "
+                "selected green ware.",
+                product=self.bisque_product_id.display_name,
+            ))
         required = green_move.product_uom_qty
         required_product_uom = green_move.product_uom._compute_quantity(
             required, self.green_product_id.uom_id, rounding_method="HALF-UP"
@@ -230,7 +225,7 @@ class MbBisqueSessionLine(models.Model):
             required_product_uom,
             precision_rounding=self.green_product_id.uom_id.rounding,
         ) < 0:
-            raise UserError("The selected green lot does not have enough available stock.")
+            raise UserError(_("The selected green lot does not have enough available stock."))
         taken = green_move._update_reserved_quantity(
             required,
             session.source_location_id,
@@ -242,7 +237,7 @@ class MbBisqueSessionLine(models.Model):
             required_product_uom,
             precision_rounding=self.green_product_id.uom_id.rounding,
         ) != 0:
-            raise UserError("The exact selected green lot could not be reserved.")
+            raise UserError(_("The exact selected green lot could not be reserved."))
         (production.move_raw_ids - green_move)._action_assign()
         green_move.picked = True
         green_move._action_done(cancel_backorder=True)

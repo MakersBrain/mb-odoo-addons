@@ -80,16 +80,14 @@ class MbGlazingSession(models.Model):
                 record.company_id and record.company_id != session.company_id
                 for record in records
             ):
-                raise ValidationError(
-                    "The board, locations and glazing session must share a company."
-                )
+                raise ValidationError(_("The board, locations and glazing session must share a company."))
 
     def action_start(self):
         for session in self:
             if session.state != "draft":
                 continue
             if not session.line_ids:
-                raise UserError("Select at least one bisque lot.")
+                raise UserError(_("Select at least one bisque lot."))
             for line in session.line_ids:
                 line._start_glazing()
             session.state = "progress"
@@ -171,11 +169,11 @@ class MbGlazingSessionLine(models.Model):
     def _check_selection(self):
         for line in self:
             if line.bisque_product_id.product_tmpl_id.mb_ceramics_stage != "bisque":
-                raise ValidationError("The selected input must be bisque ware.")
+                raise ValidationError(_("The selected input must be bisque ware."))
             if line.finished_product_id.product_tmpl_id.mb_ceramics_stage != "finished":
-                raise ValidationError("The selected output must be finished ware.")
+                raise ValidationError(_("The selected output must be finished ware."))
             if line.bisque_lot_id.product_id != line.bisque_product_id:
-                raise ValidationError("The bisque lot belongs to another product.")
+                raise ValidationError(_("The bisque lot belongs to another product."))
             records = (
                 line.bisque_lot_id,
                 line.bisque_product_id,
@@ -186,14 +184,12 @@ class MbGlazingSessionLine(models.Model):
                 and record.company_id != line.session_id.company_id
                 for record in records
             ):
-                raise ValidationError(
-                    "The selected products, lot and glazing session must share a company."
-                )
+                raise ValidationError(_("The selected products, lot and glazing session must share a company."))
             outputs = line.bom_id.product_id | line.bom_id.product_tmpl_id.product_variant_ids
             if line.finished_product_id not in outputs:
-                raise ValidationError("The bill of materials does not produce this article.")
+                raise ValidationError(_("The bill of materials does not produce this article."))
             if line.bisque_product_id not in line.bom_id.bom_line_ids.product_id:
-                raise ValidationError("The glazing bill of materials does not consume the bisque ware.")
+                raise ValidationError(_("The glazing bill of materials does not consume the bisque ware."))
 
     @api.onchange("bisque_product_id")
     def _onchange_bisque_product_id(self):
@@ -215,10 +211,11 @@ class MbGlazingSessionLine(models.Model):
             product_quantity,
             precision_rounding=move.product_id.uom_id.rounding,
         ) < 0:
-            raise UserError(
-                "%s lot %s does not have enough available stock."
-                % (move.product_id.display_name, lot.name)
-            )
+            raise UserError(_(
+                "Lot %(lot)s of %(product)s does not have enough available stock.",
+                lot=lot.name,
+                product=move.product_id.display_name,
+            ))
         taken = move._update_reserved_quantity(
             quantity,
             location,
@@ -230,10 +227,11 @@ class MbGlazingSessionLine(models.Model):
             product_quantity,
             precision_rounding=move.product_id.uom_id.rounding,
         ) != 0:
-            raise UserError(
-                "The exact %s lot could not be reserved; no substitute was used."
-                % move.product_id.display_name
-            )
+            raise UserError(_(
+                "The exact %(product)s lot could not be reserved; no substitute "
+                "was used.",
+                product=move.product_id.display_name,
+            ))
 
     def _reserve_tracked_materials(self, production, bisque_move):
         tracked_moves = production.move_raw_ids.filtered(
@@ -243,9 +241,7 @@ class MbGlazingSessionLine(models.Model):
             lambda allocation: allocation.product_id not in tracked_moves.product_id
         )
         if unexpected:
-            raise UserError(
-                "A material allocation does not match a tracked glazing component."
-        )
+            raise UserError(_("A material allocation does not match a tracked glazing component."))
         for move in tracked_moves:
             move.manual_consumption = True
             allocations = self.allocation_ids.filtered(
@@ -263,14 +259,13 @@ class MbGlazingSessionLine(models.Model):
                 move.product_uom_qty,
                 precision_rounding=move.product_uom.rounding,
             ) != 0:
-                raise UserError(
-                    "%s allocations must total exactly %s %s."
-                    % (
-                        move.product_id.display_name,
-                        move.product_uom_qty,
-                        move.product_uom.display_name,
-                    )
-                )
+                raise UserError(_(
+                    "%(product)s allocations must total exactly "
+                    "%(quantity)s %(uom)s.",
+                    product=move.product_id.display_name,
+                    quantity=move.product_uom_qty,
+                    uom=move.product_uom.display_name,
+                ))
             for allocation in allocations:
                 quantity = allocation.uom_id._compute_quantity(
                     allocation.quantity, move.product_uom, rounding_method="HALF-UP"
@@ -308,10 +303,11 @@ class MbGlazingSessionLine(models.Model):
             lambda move: move.product_id == self.bisque_product_id
         )[:1]
         if not bisque_move:
-            raise UserError(
-                "%s's bill of materials does not consume the selected bisque ware."
-                % self.finished_product_id.display_name
-            )
+            raise UserError(_(
+                "The bill of materials of %(product)s does not consume the "
+                "selected bisque ware.",
+                product=self.finished_product_id.display_name,
+            ))
         (production.move_raw_ids - bisque_move).write({
             "location_id": session.material_location_id.id,
         })

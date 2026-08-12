@@ -1,0 +1,221 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_commercial_operations_mrp
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_commercial_operations_mrp
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_mrp.view_commercial_operation_form_mrp
+msgid "<span>Manufacturing</span>"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields.selection,name:mb_commercial_operations_mrp.selection__mb_market_stock_plan_line__readiness__at_risk
+msgid "At Risk"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_market_stock_plan_line__manufacturing_bom_id
+msgid "Bill of Materials"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model,name:mb_commercial_operations_mrp.model_mb_commercial_operation
+msgid "Commercial Operation"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_mrp.report_commercial_operation_mrp
+msgid "Components"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#. odoo-python
+#: code:addons/mb_commercial_operations_mrp/models/commercial_operation.py:0
+msgid "Confirmed supply is late or lacks components."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_mrp.report_commercial_operation_mrp
+msgid "Deadline"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_commercial_operation__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_market_stock_plan_line__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mrp_production__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#. odoo-python
+#: code:addons/mb_commercial_operations_mrp/models/commercial_operation.py:0
+msgid "Draft manufacturing supply awaits review and confirmation."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#. odoo-python
+#: code:addons/mb_commercial_operations_mrp/models/commercial_operation.py:0
+msgid ""
+"Draft supply proposal for commercial stock target %(target)s. Review "
+"components, capacity, and dates before native confirmation."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_commercial_operation__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_market_stock_plan_line__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mrp_production__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields.selection,name:mb_commercial_operations_mrp.selection__mb_market_stock_plan_line__readiness__in_progress
+msgid "In Progress"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_market_stock_plan_line__manufacturing_product_id
+msgid "Manufacturable Product"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields.selection,name:mb_commercial_operations_mrp.selection__mb_market_stock_plan_line__supply_method__manufacture
+msgid "Manufacture"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model,name:mb_commercial_operations_mrp.model_mrp_production
+msgid "Manufacturing Order"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_commercial_operation__manufacturing_order_ids
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_market_stock_plan_line__production_ids
+msgid "Manufacturing Orders"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#. odoo-python
+#: code:addons/mb_commercial_operations_mrp/models/commercial_operation.py:0
+msgid ""
+"Manufacturing is complete; refresh stock availability before preparation."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#. odoo-python
+#: code:addons/mb_commercial_operations_mrp/models/commercial_operation.py:0
+msgid "Manufacturing is in progress."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_mrp.report_commercial_operation_mrp
+msgid "Manufacturing order"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_mrp.report_commercial_operation_mrp
+msgid "Manufacturing supply"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#. odoo-python
+#: code:addons/mb_commercial_operations_mrp/models/commercial_operation.py:0
+msgid "Manufacturing supply is confirmed."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#. odoo-python
+#: code:addons/mb_commercial_operations_mrp/models/commercial_operation.py:0
+msgid ""
+"Map assortment target %(target)s to a concrete manufacturable product first."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model,name:mb_commercial_operations_mrp.model_mb_market_stock_plan_line
+msgid "Market Stock Target"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mrp_production__mb_commercial_operation_id
+msgid "Mb Commercial Operation"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mrp_production__mb_market_stock_plan_line_id
+msgid "Mb Market Stock Plan Line"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#. odoo-python
+#: code:addons/mb_commercial_operations_mrp/models/commercial_operation.py:0
+msgid "No bill of materials is available for %(product)s."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#. odoo-python
+#: code:addons/mb_commercial_operations_mrp/models/commercial_operation.py:0
+msgid "No manufacturing supply covers this shortage."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_mrp.report_commercial_operation_mrp
+msgid "Product"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_mrp.report_commercial_operation_mrp
+msgid "Quantity"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_market_stock_plan_line__readiness
+msgid "Readiness"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields.selection,name:mb_commercial_operations_mrp.selection__mb_market_stock_plan_line__readiness__ready_to_pick
+msgid "Ready to Pick"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,help:mb_commercial_operations_mrp.field_mb_market_stock_plan_line__manufacturing_product_id
+msgid ""
+"Required for an assortment bucket; no arbitrary SKU is manufactured "
+"automatically."
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields.selection,name:mb_commercial_operations_mrp.selection__mb_market_stock_plan_line__readiness__shortage
+msgid "Shortage"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_mrp.report_commercial_operation_mrp
+msgid "State"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields.selection,name:mb_commercial_operations_mrp.selection__mb_market_stock_plan_line__readiness__supply_confirmed
+msgid "Supply Confirmed"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields,field_description:mb_commercial_operations_mrp.field_mb_market_stock_plan_line__supply_method
+msgid "Supply Method"
+msgstr ""
+
+#. module: mb_commercial_operations_mrp
+#: model:ir.model.fields.selection,name:mb_commercial_operations_mrp.selection__mb_market_stock_plan_line__readiness__supply_proposed
+msgid "Supply Proposed"
+msgstr ""

@@ -1,14 +1,12 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#   * mb_depot
+# 	* mb_depot
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-10 00:00+0000\n"
-"PO-Revision-Date: 2026-08-10 00:00+0000\n"
-"Last-Translator: Makersbrain\n"
+"Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -17,10 +15,48 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. module: mb_depot
-#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__available_product_ids
-#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__available_product_ids
-msgid "Available Products at the Depot"
-msgstr "Produits disponibles dans le dépôt"
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"%(item)s was not available at stock boundary %(date)s after applying every "
+"sale in this report."
+msgstr ""
+"%(item)s n'était pas disponible à la limite de stock du %(date)s après "
+"application de toutes les ventes de ce relevé."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/wizards/mb_depot_create.py:0
+msgid "%(partner)s (-%(pct)s%%)"
+msgstr "%(partner)s (-%(pct)s%%)"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "%(product)s is dated %(date)s, which is in the future."
+msgstr "%(product)s est daté du %(date)s, ce qui est dans le futur."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"%(product)s is dated %(date)s. Depot sales are permanently closed through "
+"%(barrier)s (%(source)s)."
+msgstr ""
+"%(product)s est daté du %(date)s. Les ventes en dépôt sont définitivement "
+"clôturées jusqu'au %(barrier)s (%(source)s)."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "%(product)s must be a saleable storable product."
+msgstr "%(product)s doit être un produit stockable et vendable."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "%(product)s must invoice Delivered quantities."
+msgstr "%(product)s doit être facturé sur les quantités livrées."
 
 #. module: mb_depot
 #. odoo-python
@@ -29,9 +65,280 @@ msgid "%(product)s — %(quantity)s %(uom)s available at %(depot)s"
 msgstr "%(product)s — %(quantity)s %(uom)s disponibles dans %(depot)s"
 
 #. module: mb_depot
+#: model:ir.actions.report,print_report_name:mb_depot.action_report_bon_depot
+msgid "'Consignment Note %s' % (object.name)"
+msgstr "'Bon de dépôt %s' % (object.name)"
+
+#. module: mb_depot
+#: model:ir.actions.report,print_report_name:mb_depot.action_report_depot_statement
+msgid "'Statement %s' % (object.partner_id.name or '')"
+msgstr "'Relevé %s' % (object.partner_id.name or '')"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "<span class=\"text-muted\">Consignment</span>"
+msgstr "<span class=\"text-muted\">Dépôt-vente</span>"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "<span> (planned)</span>"
+msgstr "<span> (prévu)</span>"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "<strong>Consignee</strong><br/>"
+msgstr "<strong>Dépositaire</strong><br/>"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_invoice_document_mb_depot
+msgid "<strong>Delivery period</strong>"
+msgstr "<strong>Période de livraison</strong>"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "<strong>Net to invoice</strong>"
+msgstr "<strong>Net à facturer</strong>"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "<strong>Period</strong><br/>"
+msgstr "<strong>Période</strong><br/>"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "<strong>Total retail price</strong>"
+msgstr "<strong>Total prix public</strong>"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/wizards/mb_depot_create.py:0
+msgid "A commission must be between 0 and 100 percent."
+msgstr "Une commission doit être comprise entre 0 et 100 pour cent."
+
+#. module: mb_depot
+#: model_terms:ir.actions.act_window,help:mb_depot.action_depot
+msgid ""
+"A depot is a warehouse someone else holds. Its stock stays internal, so\n"
+"         unsold pieces stay on our books until the depositary reports a sale.\n"
+"         Use <b>New Depot</b> rather than creating the warehouse by hand: a depot\n"
+"         is a warehouse and a commission pricelist, and they have to agree with\n"
+"         each other."
+msgstr ""
+"Un dépôt est un entrepôt détenu par un tiers. Son stock reste interne, de sorte que\n"
+"         les pièces invendues restent dans nos comptes jusqu'à ce que le dépositaire déclare une vente.\n"
+"         Utilisez <b>Nouveau dépôt</b> plutôt que de créer l'entrepôt à la main : un dépôt\n"
+"         est un entrepôt et une liste de prix de commission, et les deux doivent s'accorder\n"
+"         entre eux."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/stock_warehouse.py:0
+msgid ""
+"A depot receives and delivers in one step. %(name)s is set to more, which "
+"would put a receiving bay and a packing table inside the depositary's shop."
+msgstr ""
+"Un dépôt réceptionne et livre en une seule étape. %(name)s est configuré "
+"avec davantage d'étapes, ce qui placerait un quai de réception et une table "
+"de colisage dans la boutique du dépositaire."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "A depot report must be created in Draft state."
+msgstr "Un relevé de dépôt doit être créé à l'état Brouillon."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/stock_warehouse.py:0
+msgid "A mandate review date requires a mandate depot and a review note."
+msgstr ""
+"Une date de revue de mandat exige un dépôt en mandat et une note de revue."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_warehouse__mb_depot_mandate_reviewed_through
+msgid ""
+"Accounting Administrator attestation that retail customer invoices and "
+"gallery commission bills have been reviewed through this date."
+msgstr ""
+"Attestation de l'administrateur comptable indiquant que les factures clients"
+" au détail et les factures de commission de la galerie ont été revues "
+"jusqu'à cette date."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__activity_ids
+msgid "Activities"
+msgstr "Activités"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Indicateur d’exception d’activité"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__activity_state
+msgid "Activity State"
+msgstr "Statut de l'activité"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Icône de type d'activité"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Add at least one reported sale line."
+msgstr "Ajoutez au moins une ligne de vente déclarée."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_statement_line__amount_net
+msgid "After the depositary's commission."
+msgstr "Après la commission du dépositaire."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__amount_commission
+msgid "Amount Commission"
+msgstr "Montant de la commission"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__assign_pricelist
+msgid "Assign the pricelist to the depositary"
+msgstr "Affecter la liste de prix au dépositaire"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_statement_line__amount_gross
+msgid "At the price the piece sold for."
+msgstr "Au prix auquel la pièce a été vendue."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: mb_depot
 #: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__available_lot_ids
 msgid "Available Lots/Serial Numbers at the Depot"
 msgstr "Lots et numéros de série disponibles dans le dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__available_product_ids
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__available_product_ids
+msgid "Available Products at the Depot"
+msgstr "Produits disponibles dans le dépôt"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_create_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Cancel every draft invoice before completing the reversal."
+msgstr "Annulez toutes les factures brouillon avant de terminer l'extourne."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_picking_form_depot
+msgid "Catalogue"
+msgstr "Catalogue"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Choose an active depot warehouse."
+msgstr "Choisissez un entrepôt de dépôt actif."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/stock_warehouse.py:0
+msgid "Choose the signed legal structure for depot %(name)s."
+msgstr "Choisissez la structure juridique signée pour le dépôt %(name)s."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__closed_through
+msgid "Closed Through"
+msgstr "Clôturé jusqu'au"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__closed_through_source
+msgid "Closed Through Source"
+msgstr "Origine de la clôture"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__qty_closing
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Closing"
+msgstr "Clôture"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Commission"
+msgstr "Commission"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__commission
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__depot_commission
+msgid "Commission (%)"
+msgstr "Commission (%)"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__depot_pricelist_id
+msgid "Commission pricelist"
+msgstr "Liste de prix de commission"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__company_id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_quant__company_currency_id
+msgid "Company currency"
+msgstr "Devise de la société"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Complete at least one linked stock return first."
+msgstr "Terminez d'abord au moins un retour de stock lié."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Complete the return of %s first."
+msgstr "Terminez d'abord le retour de %s."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Complete the return of lot or serial %(lot)s for %(product)s."
+msgstr ""
+"Terminez le retour du lot ou numéro de série %(lot)s pour %(product)s."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Completed from depot report %(reference)s, effective %(date)s."
+msgstr ""
+"Terminé à partir du relevé de dépôt %(reference)s, effectif le %(date)s."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Compute"
+msgstr "Calculer"
 
 #. module: mb_depot
 #: model:ir.ui.menu,name:mb_depot.menu_depot_configuration
@@ -39,9 +346,100 @@ msgid "Configuration"
 msgstr "Configuration"
 
 #. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Configure the depositary and commission pricelist on %(depot)s."
+msgstr ""
+"Configurez le dépositaire et la liste de prix de commission sur %(depot)s."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid ""
+"Confirm the reported dates, prices, commission, products, and serial "
+"numbers. Past dates create historical stock evidence and cannot be changed "
+"after processing."
+msgstr ""
+"Confirmez les dates, prix, commission, produits et numéros de série "
+"déclarés. Les dates passées créent des justificatifs de stock historiques et"
+" ne peuvent plus être modifiées après traitement."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Consignee"
+msgstr "Dépositaire"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "Consignee commission"
+msgstr "Commission dépositaire"
+
+#. module: mb_depot
+#: model:ir.actions.report,name:mb_depot.action_report_bon_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Consignment Note"
+msgstr "Bon de dépôt"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "Consignment Statement"
+msgstr "Relevé de dépôt-vente"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__is_depot
+msgid "Consignment depot"
+msgstr "Dépôt-vente"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_mb_depot_statement
+msgid "Consignment statement"
+msgstr "Relevé de dépôt-vente"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_mb_depot_statement_line
+msgid "Consignment statement line"
+msgstr "Ligne de relevé de dépôt-vente"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Consignor"
+msgstr "Déposant"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Consignor net if fully sold"
+msgstr "Net déposant si vente intégrale"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Correction or reversal"
+msgstr "Correction ou extourne"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__reversal_reason
+msgid "Correction/reversal reason"
+msgstr "Motif de correction ou d'extourne"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Could not assign the full reported quantity of %s."
+msgstr "Impossible de réserver la totalité de la quantité déclarée de %s."
+
+#. module: mb_depot
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_create_form
 msgid "Create Depot"
 msgstr "Créer le dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__create_draft_invoice
+msgid "Create Draft Invoice"
+msgstr "Créer la facture brouillon"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_mb_depot_create
+msgid "Create a consignment depot"
+msgstr "Créer un dépôt-vente"
 
 #. module: mb_depot
 #: model_terms:ir.actions.act_window,help:mb_depot.action_depot
@@ -49,11 +447,128 @@ msgid "Create a depot"
 msgstr "Créer un dépôt-vente"
 
 #. module: mb_depot
+#: model_terms:ir.actions.act_window,help:mb_depot.action_depot_placements
+msgid ""
+"Create a standard internal transfer and select the depot stock location\n"
+"         as its destination. Validate it through the normal Inventory workflow."
+msgstr ""
+"Créez un transfert interne standard et sélectionnez l'emplacement de stock du dépôt\n"
+"         comme destination. Validez-le avec le processus Inventaire habituel."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__create_uid
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__create_uid
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__create_uid
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__create_uid
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"Created from depot report %(reference)s for %(depot)s, effective %(date)s."
+msgstr ""
+"Créé à partir du relevé de dépôt %(reference)s pour %(depot)s, effectif le "
+"%(date)s."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__create_date
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__create_date
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__create_date
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__create_date
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_create_form
+msgid ""
+"Creates the depot's warehouse and its commission pricelist. Pieces\n"
+"          placed there stay on your books until the depositary reports them\n"
+"          sold, and a sale is made by putting this depot in the Warehouse field\n"
+"          of the quotation."
+msgstr ""
+"Crée l'entrepôt du dépôt et sa liste de prix de commission. Les pièces\n"
+"          qui y sont placées restent dans vos comptes jusqu'à ce que le dépositaire les\n"
+"          déclare vendues, et une vente se fait en indiquant ce dépôt dans le champ Entrepôt\n"
+"          du devis."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__credit_note_ids
+msgid "Credit Note"
+msgstr "Avoir"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__credit_note_count
+msgid "Credit Note Count"
+msgstr "Nombre d'avoirs"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Credit Notes"
+msgstr "Avoirs"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"Credit note %(credit)s is inside the permanent closing horizon through "
+"%(date)s (%(source)s)."
+msgstr ""
+"L'avoir %(credit)s se situe dans l'horizon de clôture définitive jusqu'au "
+"%(date)s (%(source)s)."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__currency_id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__currency_id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__currency_id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: mb_depot
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_sale_order_search
 msgid "Customer"
 msgstr "Client"
 
 #. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__date_from
+msgid "Date From"
+msgstr "Date de début"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__date_to
+msgid "Date To"
+msgstr "Date de fin"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_quant__depot_days
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
+msgid "Days held"
+msgstr "Jours de détention"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_quant__depot_days
+msgid ""
+"Days since this piece arrived at its current location. A piece that has sat "
+"unsold for months is the thing worth chasing."
+msgstr ""
+"Nombre de jours depuis l'arrivée de cette pièce à son emplacement actuel. "
+"Une pièce invendue depuis des mois est celle qu'il faut relancer."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report_line__product_uom_id
+msgid "Default unit of measure used for all stock operations."
+msgstr ""
+"Unité de mesure par défaut utilisée pour toutes les opérations de stock."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
 #: model:ir.actions.act_window,name:mb_depot.action_depot_deliveries
 #: model:ir.ui.menu,name:mb_depot.menu_depot_deliveries
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
@@ -61,13 +576,71 @@ msgid "Deliveries"
 msgstr "Livraisons"
 
 #. module: mb_depot
-#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_picking_search
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Delivery %s still requires an interactive validation choice."
+msgstr "La livraison %s exige encore un choix de validation interactif."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Delivery %s was not completed."
+msgstr "La livraison %s n'a pas été terminée."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Delivery %s was not sourced from the selected depot."
+msgstr ""
+"La livraison %s n'a pas été approvisionnée depuis le dépôt sélectionné."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__partner_id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__partner_id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_quant__depot_partner_id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__depot_partner_id
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_search
+msgid "Depositary"
+msgstr "Dépositaire"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__external_line_reference
+msgid "Depositary line reference"
+msgstr "Référence de ligne du dépositaire"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Depositary notes…"
+msgstr "Notes du dépositaire…"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_mb_depot_sale_report
+msgid "Depositary sale report"
+msgstr "Relevé de ventes du dépositaire"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_mb_depot_sale_report_line
+msgid "Depositary sale report line"
+msgstr "Ligne de relevé de ventes du dépositaire"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__depot_warehouse_id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__depot_warehouse_id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__depot_id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_picking__depot_warehouse_id
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_list
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_picking_search
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_search
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_sale_order_search
 msgid "Depot"
 msgstr "Dépôt"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Depot %(depot)s is not configured as Purchase-resale on sale."
+msgstr "Le dépôt %(depot)s n'est pas configuré en achat-revente sur vente."
 
 #. module: mb_depot
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_invoice_search
@@ -94,11 +667,99 @@ msgid "Depot Sales"
 msgstr "Dépôt-vente"
 
 #. module: mb_depot
-#: model:ir.actions.act_window,name:mb_depot.action_mb_depot_statement
-#: model:ir.ui.menu,name:mb_depot.menu_depot_statement
-#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
-msgid "Inventory & Settlement Statement"
-msgstr "État des stocks et règlement"
+#: model:ir.model.fields,field_description:mb_depot.field_account_bank_statement_line__mb_depot_delivery_date_from
+#: model:ir.model.fields,field_description:mb_depot.field_account_move__mb_depot_delivery_date_from
+msgid "Depot delivery from"
+msgstr "Livraisons du dépôt à partir du"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_account_bank_statement_line__mb_depot_delivery_date_to
+#: model:ir.model.fields,field_description:mb_depot.field_account_move__mb_depot_delivery_date_to
+msgid "Depot delivery through"
+msgstr "Livraisons du dépôt jusqu'au"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_company_form_mb_depot_closing
+msgid "Depot inventory closing"
+msgstr "Clôture d'inventaire du dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_res_company__mb_depot_stock_closed_through
+msgid "Depot inventory history closed through"
+msgstr "Historique d'inventaire du dépôt clôturé jusqu'au"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Depot location"
+msgstr "Lieu de dépôt"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_invoice_document_mb_depot
+msgid "Depot report"
+msgstr "Relevé de dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order_line__mb_depot_sale_report_line_id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_move_line__mb_depot_sale_report_line_id
+msgid "Depot report line"
+msgstr "Ligne de relevé de dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__external_reference
+msgid "Depot report reference"
+msgstr "Référence du relevé de dépôt"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Depot report reference %(reference)s already belongs to %(report)s."
+msgstr ""
+"La référence de relevé de dépôt %(reference)s appartient déjà à %(report)s."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_invoice_document_mb_depot
+msgid "Depot reports"
+msgstr "Relevés de dépôt"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Depot sale %(order)s did not produce exactly one delivery."
+msgstr "La vente en dépôt %(order)s n'a pas produit exactement une livraison."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Depot sale dates on or before"
+msgstr "Les ventes en dépôt datées du"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_account_bank_statement_line__mb_depot_sale_report_id
+#: model:ir.model.fields,field_description:mb_depot.field_account_move__mb_depot_sale_report_id
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order__mb_depot_sale_report_id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_picking__mb_depot_sale_report_id
+msgid "Depot sale report"
+msgstr "Relevé de ventes du dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_account_bank_statement_line__mb_depot_sale_report_ids
+#: model:ir.model.fields,field_description:mb_depot.field_account_move__mb_depot_sale_report_ids
+msgid "Depot sale reports"
+msgstr "Relevés de ventes du dépôt"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/sale_order.py:0
+msgid ""
+"Depot sales must invoice delivered quantities. Change the invoicing policy "
+"to Delivered quantities for: %(products)s"
+msgstr ""
+"Les ventes en dépôt doivent être facturées sur les quantités livrées. Passez"
+" la politique de facturation aux quantités livrées pour : %(products)s"
+
+#. module: mb_depot
+#: model:ir.actions.report,name:mb_depot.action_report_depot_statement
+msgid "Depot statement"
+msgstr "Relevé de dépôt"
 
 #. module: mb_depot
 #: model:ir.actions.act_window,name:mb_depot.action_depot
@@ -108,9 +769,51 @@ msgid "Depots"
 msgstr "Dépôts"
 
 #. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_account_move__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_product_product__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_res_company__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order_line__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_stock_move__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_stock_move_line__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_stock_quant__display_name
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Do not select a lot for untracked product %s."
+msgstr "Ne sélectionnez pas de lot pour le produit non suivi %s."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Document the correction or reversal reason first."
+msgstr "Documentez d'abord le motif de correction ou d'extourne."
+
+#. module: mb_depot
 #: model:ir.ui.menu,name:mb_depot.menu_depot_documents
 msgid "Documents"
 msgstr "Documents"
+
+#. module: mb_depot
+#: model:ir.model.fields.selection,name:mb_depot.selection__mb_depot_sale_report__state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__amount_net
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Due to us"
+msgstr "Nous revenant"
 
 #. module: mb_depot
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_picking_search
@@ -123,7 +826,113 @@ msgid "Effective Sale Date"
 msgstr "Date de vente effective"
 
 #. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order__mb_depot_effective_date
+#: model:ir.model.fields,field_description:mb_depot.field_stock_picking__mb_depot_effective_date
+msgid "Effective depot sale date"
+msgstr "Date effective de vente en dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_quant__depot_expected_net_value
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
+msgid "Expected net"
+msgstr "Net attendu"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_quant__depot_expected_net_value
+msgid ""
+"Expected proceeds if the on-hand quantity sells at the public price, after "
+"the depot's recorded commission."
+msgstr ""
+"Produit attendu si la quantité en stock se vend au prix public, après la "
+"commission enregistrée du dépôt."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_search
+msgid "Held over 180 days"
+msgstr "Détenu depuis plus de 180 jours"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_search
+msgid "Held over 90 days"
+msgstr "Détenu depuis plus de 90 jours"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_account_move__id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__id
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__id
+#: model:ir.model.fields,field_description:mb_depot.field_product_product__id
+#: model:ir.model.fields,field_description:mb_depot.field_res_company__id
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order__id
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order_line__id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_move__id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_move_line__id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_picking__id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_quant__id
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__activity_exception_icon
+msgid "Icon"
+msgstr "Icône"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Icône pour indiquer une activité d'exception."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__message_has_error
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: mb_depot
+#: model:ir.actions.act_window,name:mb_depot.action_mb_depot_statement
+#: model:ir.ui.menu,name:mb_depot.menu_depot_statement
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Inventory & Settlement Statement"
+msgstr "État des stocks et règlement"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__invoice_count
+msgid "Invoice Count"
+msgstr "Nombre de factures"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
 #: model:ir.actions.act_window,name:mb_depot.action_depot_invoices
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__invoice_ids
 #: model:ir.ui.menu,name:mb_depot.menu_depot_invoices
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
 msgid "Invoices"
@@ -132,8 +941,166 @@ msgstr "Factures"
 #. module: mb_depot
 #. odoo-python
 #: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Invoicing access is required to create the draft invoice."
+msgstr "L'accès à la facturation est requis pour créer la facture brouillon."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Invoicing access is required to enable draft invoice creation."
+msgstr ""
+"L'accès à la facturation est requis pour activer la création de facture "
+"brouillon."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
 msgid "Invoicing access is required to open invoices and credit notes."
-msgstr "L’accès à la facturation est requis pour ouvrir les factures et les avoirs."
+msgstr ""
+"L’accès à la facturation est requis pour ouvrir les factures et les avoirs."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_picking__is_depot_placement
+msgid "Is Depot Placement"
+msgstr "Est un dépôt de pièces"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__write_uid
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__write_uid
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__write_uid
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__write_uid
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__write_date
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__write_date
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__write_date
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__write_date
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__mb_depot_legal_structure
+msgid "Legal structure"
+msgstr "Structure juridique"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__line_ids
+msgid "Lines"
+msgstr "Lignes"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Lines can only be added to a draft depot report."
+msgstr ""
+"Des lignes ne peuvent être ajoutées qu'à un relevé de dépôt brouillon."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Lines can only be moved to a draft depot report."
+msgstr ""
+"Des lignes ne peuvent être déplacées que vers un relevé de dépôt brouillon."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__lot_name
+msgid "Lot/Serial Number"
+msgstr "Lot/numéro de série"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__lot_id
+msgid "Lot/Serial number"
+msgstr "Lot/numéro de série"
+
+#. module: mb_depot
+#: model:res.groups,name:mb_depot.group_depot_sale_manager
+msgid "Manager"
+msgstr "Manager"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__mb_depot_mandate_review_note
+msgid "Mandate accounting review note"
+msgstr "Note de revue comptable du mandat"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__mb_depot_mandate_reviewed_through
+msgid "Mandate accounting reviewed through"
+msgstr "Revue comptable du mandat jusqu'au"
+
+#. module: mb_depot
+#: model:ir.model.fields.selection,name:mb_depot.selection__mb_depot_create__legal_structure__mandate
+#: model:ir.model.fields.selection,name:mb_depot.selection__stock_warehouse__mb_depot_legal_structure__mandate
+msgid "Mandate — sale in our name"
+msgstr "Mandat — vente en notre nom"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Mark reversed"
+msgstr "Marquer comme extourné"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Échéance de mon activité"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Name, date and signature"
+msgstr "Nom, date et signature"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Name, date and signature, preceded by \"Read and approved\""
+msgstr "Nom, date et signature, précédés de « Lu et approuvé »"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "Net"
+msgstr "Net"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__net_line_amount
+msgid "Net Line Amount"
+msgstr "Montant net de la ligne"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__net_unit_price
+msgid "Net Unit Price"
+msgstr "Prix unitaire net"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Net total"
+msgstr "Total net"
 
 #. module: mb_depot
 #: model:ir.actions.act_window,name:mb_depot.action_mb_depot_create
@@ -143,9 +1110,246 @@ msgid "New Depot"
 msgstr "Nouveau dépôt"
 
 #. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "New depot sale report"
+msgstr "Nouveau relevé de ventes du dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Date limite de l'activité à venir"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__activity_summary
+msgid "Next Activity Summary"
+msgstr "Résumé de l'activité suivante"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__activity_type_id
+msgid "Next Activity Type"
+msgstr "Type d'activités à venir"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_create__legal_structure
+msgid "No default is safe: select what the signed gallery contract says."
+msgstr ""
+"Aucune valeur par défaut n'est sûre : sélectionnez ce que stipule le contrat"
+" signé avec la galerie."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "No stock move was created for %s."
+msgstr "Aucun mouvement de stock n'a été créé pour %s."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_search
+msgid "Not reserved"
+msgstr "Non réservé"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__note
+msgid "Note"
+msgstr "Note"
+
+#. module: mb_depot
+#: model_terms:ir.actions.act_window,help:mb_depot.action_depot_quant
+msgid "Nothing is out on consignment"
+msgstr "Rien n'est en dépôt-vente"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "On consignment"
+msgstr "En dépôt"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
+msgid "On hand"
+msgstr "En stock"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_sale_order__mb_depot_product_ids
+#: model:ir.model.fields,help:mb_depot.field_sale_order_line__mb_depot_product_ids
+msgid ""
+"On hand and unreserved at the depot. What the line's product domain is built"
+" from."
+msgstr ""
+"En stock et non réservé au dépôt. C'est ce qui construit le domaine produit "
+"de la ligne."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_warehouse__depot_qty
+msgid "On hand at this depot right now."
+msgstr "En stock dans ce dépôt à l'instant présent."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_quant__depot_retail_value
+msgid ""
+"On-hand quantity valued at the public sales price, independently from Odoo's"
+" accounting inventory valuation."
+msgstr ""
+"Quantité en stock valorisée au prix de vente public, indépendamment de la "
+"valorisation comptable des stocks d'Odoo."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"Only %(available)s of %(item)s is currently unreserved at this depot; "
+"%(requested)s was reported."
+msgstr ""
+"Seulement %(available)s de %(item)s est actuellement non réservé dans ce "
+"dépôt ; %(requested)s a été déclaré."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Only a Depot Sale Manager can process depot reports."
+msgstr ""
+"Seul un responsable des ventes en dépôt peut traiter les relevés de dépôt."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Only a draft depot report can be processed."
+msgstr "Seul un relevé de dépôt brouillon peut être traité."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Only a processed report can start reversal."
+msgstr "Seul un relevé traité peut démarrer une extourne."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/stock_warehouse.py:0
+msgid ""
+"Only an Accounting Administrator can attest mandate accounting reviews."
+msgstr ""
+"Seul un administrateur comptable peut attester les revues comptables de "
+"mandat."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/res_company.py:0
+msgid "Only an Accounting Administrator can close depot inventory history."
+msgstr ""
+"Seul un administrateur comptable peut clôturer l'historique d'inventaire du "
+"dépôt."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__qty_opening
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Opening"
+msgstr "Ouverture"
+
+#. module: mb_depot
 #: model:ir.ui.menu,name:mb_depot.menu_depot_operations
 msgid "Operations"
 msgstr "Opérations"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_res_company__mb_depot_stock_closed_through
+msgid ""
+"Permanent inventory-closing horizon. Depot sale reports cannot insert stock "
+"movements on or before this date."
+msgstr ""
+"Horizon de clôture définitive d'inventaire. Les relevés de ventes du dépôt "
+"ne peuvent pas insérer de mouvements de stock à cette date ou avant."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__picking_ids
+msgid "Picking"
+msgstr "Transfert"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__picking_count
+msgid "Picking Count"
+msgstr "Nombre de transferts"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__product_id
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_search
+msgid "Piece"
+msgstr "Pièce"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Pieces"
+msgstr "Pièces"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order__mb_depot_product_ids
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order_line__mb_depot_product_ids
+msgid "Pieces at the depot"
+msgstr "Pièces au dépôt"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid ""
+"Pieces entrusted on consignment. They remain the property of the\n"
+"              consignor until they are sold to the public by the consignee, who has\n"
+"              custody of them and answers for their loss or damage. The consignee\n"
+"              records the sales made and reports them to the consignor, who invoices\n"
+"              each piece sold at the retail price less the commission above. Unsold\n"
+"              pieces are returned on request. The total above is indicative and does\n"
+"              not constitute an invoice."
+msgstr ""
+"Pièces confiées en dépôt-vente. Elles restent la propriété du\n"
+"              déposant jusqu'à leur vente au public par le dépositaire, qui en assume\n"
+"              la garde et répond de leur perte ou détérioration. Le dépositaire\n"
+"              relève les ventes réalisées et les communique au déposant, qui facture\n"
+"              chaque pièce vendue au prix public diminué de la commission ci-dessus. Les\n"
+"              pièces invendues sont restituées sur demande. Le total ci-dessus est\n"
+"              indicatif et ne constitue pas une facture."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_warehouse__depot_qty
+msgid "Pieces held"
+msgstr "Pièces détenues"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid ""
+"Pieces on consignment remain the property of the consignor until they are "
+"sold."
+msgstr ""
+"Les pièces en dépôt restent la propriété du déposant jusqu'à leur vente."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid ""
+"Pieces taken back from the depot and returned to the consignor. This\n"
+"              note closes the consignee's custody of those pieces. The total above is\n"
+"              indicative and does not constitute an invoice."
+msgstr ""
+"Pièces reprises du dépôt et restituées au déposant. Le présent\n"
+"              bon solde la garde de ces pièces par le dépositaire. Le total ci-dessus est\n"
+"              indicatif et ne constitue pas une facture."
 
 #. module: mb_depot
 #: model:ir.actions.act_window,name:mb_depot.action_depot_placements
@@ -154,9 +1358,155 @@ msgid "Place Products"
 msgstr "Placer des produits"
 
 #. module: mb_depot
+#: model_terms:ir.actions.act_window,help:mb_depot.action_depot_quant
+msgid ""
+"Place pieces at a depot with an internal transfer to its location.\n"
+"         They stay ours and on our books until the depositary reports a sale."
+msgstr ""
+"Placez des pièces dans un dépôt par un transfert interne vers son emplacement.\n"
+"         Elles restent à nous et dans nos comptes jusqu'à ce que le dépositaire déclare une vente."
+
+#. module: mb_depot
 #: model_terms:ir.actions.act_window,help:mb_depot.action_depot_placements
 msgid "Place products at a depot"
 msgstr "Placer des produits dans un dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__qty_placed
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Placed"
+msgstr "Déposé"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Post a complete linked credit note for %s first."
+msgstr "Comptabilisez d'abord un avoir lié complet pour %s."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_create__code
+msgid ""
+"Prefixes the depot's transfer references. Five characters, Odoo's limit, and"
+" unique across warehouses."
+msgstr ""
+"Préfixe les références de transfert du dépôt. Cinq caractères, la limite "
+"d'Odoo, et unique parmi les entrepôts."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Print"
+msgstr "Imprimer"
+
+#. module: mb_depot
+#: model:ir.model.fields.selection,name:mb_depot.selection__mb_depot_sale_report__state__processed
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Processed"
+msgstr "Traité"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__processed_at
+msgid "Processed At"
+msgstr "Traité le"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__processed_by_id
+msgid "Processed By"
+msgstr "Traité par"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Processed depot report lines are immutable."
+msgstr "Les lignes d'un relevé de dépôt traité sont immuables."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Processed depot report lines cannot be deleted."
+msgstr ""
+"Les lignes d'un relevé de dépôt traité ne peuvent pas être supprimées."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Processed depot reports are immutable; use the reversal workflow."
+msgstr ""
+"Les relevés de dépôt traités sont immuables ; utilisez le processus "
+"d'extourne."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Processed depot reports cannot be deleted."
+msgstr "Les relevés de dépôt traités ne peuvent pas être supprimés."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__product_id
+msgid "Product"
+msgstr "Produit"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_stock_move_line
+msgid "Product Moves (Stock Move Line)"
+msgstr "Mouvements de produit (Ligne de mouvement de stock)"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_product_product
+msgid "Product Variant"
+msgstr "Variante de produit"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__available_product_ids
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report_line__available_product_ids
+msgid "Products currently on hand and unreserved at the selected depot."
+msgstr ""
+"Produits actuellement en stock et non réservés dans le dépôt sélectionné."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_quant__depot_retail_unit_price
+msgid ""
+"Public sales price. This is commercial information, not inventory cost."
+msgstr ""
+"Prix de vente public. Il s'agit d'une information commerciale, pas d'un coût"
+" de stock."
+
+#. module: mb_depot
+#: model:ir.model.fields.selection,name:mb_depot.selection__mb_depot_create__legal_structure__resale
+#: model:ir.model.fields.selection,name:mb_depot.selection__stock_warehouse__mb_depot_legal_structure__resale
+msgid "Purchase-resale on sale"
+msgstr "Achat-revente sur vente"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Qty"
+msgstr "Qté"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__quantity
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_stock_quant
+msgid "Quants"
+msgstr "Quantités"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__rating_ids
+msgid "Ratings"
+msgstr "Évaluations"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__allow_partial_reversal
+msgid "Reason documents a partial correction"
+msgstr "Le motif documente une correction partielle"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Record Sale"
+msgstr "Enregistrer une vente"
 
 #. module: mb_depot
 #: model:ir.actions.act_window,name:mb_depot.action_mb_depot_sale_report_new
@@ -165,9 +1515,215 @@ msgid "Record a Sale"
 msgstr "Enregistrer une vente"
 
 #. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_warehouse__depot_commission
+msgid ""
+"Recorded here for the statement. The figure that actually prices a sale is "
+"the depositary's pricelist."
+msgstr ""
+"Enregistré ici pour le relevé. Le chiffre qui valorise réellement une vente "
+"est la liste de prix du dépositaire."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__report_id
+msgid "Report"
+msgstr "Rapport"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__report_received_on
+msgid "Report Received On"
+msgstr "Relevé reçu le"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__reported_commission_percentage
+msgid "Reported Commission Percentage"
+msgstr "Pourcentage de commission déclaré"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__reported_public_unit_price
+msgid "Reported Public Unit Price"
+msgstr "Prix public unitaire déclaré"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Reported commission must be between 0 and 100 percent."
+msgstr "La commission déclarée doit être comprise entre 0 et 100 pour cent."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order__mb_depot_reported_net_total
+msgid "Reported net total"
+msgstr "Total net déclaré"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Reported public prices cannot be negative."
+msgstr "Les prix publics déclarés ne peuvent pas être négatifs."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order__mb_depot_reported_public_total
+msgid "Reported public total"
+msgstr "Total public déclaré"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Reported quantities must be positive."
+msgstr "Les quantités déclarées doivent être positives."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_picking__mb_depot_sale_date
+msgid ""
+"Reported sale date for the whole transfer. The date itself lives on the move"
+" lines, so a sheet of reported sales can date each piece separately; this is"
+" the shortcut for the ordinary case where one transfer stands for one "
+"reported sale."
+msgstr ""
+"Date de vente déclarée pour l'ensemble du transfert. La date elle-même se "
+"trouve sur les lignes de mouvement, de sorte qu'une feuille de ventes "
+"déclarées peut dater chaque pièce séparément ; ceci est le raccourci pour le"
+" cas ordinaire où un transfert correspond à une seule vente déclarée."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__line_ids
+msgid "Reported sales"
+msgstr "Ventes déclarées"
+
+#. module: mb_depot
 #: model:ir.ui.menu,name:mb_depot.menu_depot_reporting
 msgid "Reporting"
 msgstr "Rapports"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Required before starting a return or correction…"
+msgstr "Obligatoire avant de démarrer un retour ou une correction…"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
+msgid "Reserved"
+msgstr "Réservé"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__activity_user_id
+msgid "Responsible User"
+msgstr "Utilisateur responsable"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__amount_gross
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Retail"
+msgstr "Vente au détail"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "Retail price"
+msgstr "Prix public"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_quant__depot_retail_unit_price
+msgid "Retail unit price"
+msgstr "Prix public unitaire"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_stock_quant__depot_retail_value
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
+msgid "Retail value"
+msgstr "Valeur au prix public"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"Return %(picking)s is inside the permanent closing horizon through %(date)s "
+"(%(source)s)."
+msgstr ""
+"Le retour %(picking)s se situe dans l'horizon de clôture définitive jusqu'au"
+" %(date)s (%(source)s)."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Return Note"
+msgstr "Bon de reprise"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__return_picking_ids
+msgid "Return Picking"
+msgstr "Transfert de retour"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__return_picking_count
+msgid "Return Picking Count"
+msgstr "Nombre de transferts de retour"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Return depot sale deliveries"
+msgstr "Retourner les livraisons de ventes en dépôt"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"Return the original lot or serial for %(product)s; %(lot)s was not sold by "
+"this report."
+msgstr ""
+"Retournez le lot ou numéro de série d'origine pour %(product)s ; %(lot)s n'a"
+" pas été vendu par ce relevé."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__qty_returned
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Returned"
+msgstr "Retourné"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Returned quantity exceeds the original sale of %s."
+msgstr "La quantité retournée dépasse la vente initiale de %s."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Returns"
+msgstr "Retours"
+
+#. module: mb_depot
+#: model:ir.model.fields.selection,name:mb_depot.selection__mb_depot_sale_report__state__reversal_required
+msgid "Reversal required"
+msgstr "Extourne requise"
+
+#. module: mb_depot
+#: model:ir.model.fields.selection,name:mb_depot.selection__mb_depot_sale_report__state__reversed
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Reversed"
+msgstr "Extourné"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Reversed depot reports are immutable."
+msgstr "Les relevés de dépôt extournés sont immuables."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Erreur d'envoi SMS"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__sale_order_ids
+msgid "Sale Order"
+msgstr "Commande client"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__sale_order_count
+msgid "Sale Order Count"
+msgstr "Nombre de commandes clients"
 
 #. module: mb_depot
 #: model:ir.actions.act_window,name:mb_depot.action_mb_depot_sale_report
@@ -176,6 +1732,18 @@ msgid "Sale Reports"
 msgstr "Relevés de ventes"
 
 #. module: mb_depot
+#: model:ir.model,name:mb_depot.model_sale_order
+msgid "Sales Order"
+msgstr "Commande client"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
 #: model:ir.actions.act_window,name:mb_depot.action_depot_sale_orders
 #: model:ir.ui.menu,name:mb_depot.menu_depot_sale_orders
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
@@ -183,14 +1751,150 @@ msgid "Sales Orders"
 msgstr "Commandes clients"
 
 #. module: mb_depot
-#: model:ir.ui.menu,name:mb_depot.menu_depot_stock
-msgid "Stock"
-msgstr "Stock"
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Select a lot or serial number for %s."
+msgstr "Sélectionnez un lot ou un numéro de série pour %s."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__lot_id
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_quant_list
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Serial"
+msgstr "Numéro de série"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "Serial number"
+msgstr "Numéro de série"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"Serial number %(serial)s had not entered %(depot)s by its reported sale at "
+"%(date)s."
+msgstr ""
+"Le numéro de série %(serial)s n'était pas encore entré dans %(depot)s à la "
+"date de vente déclarée du %(date)s."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"Serial number %(serial)s left %(depot)s before its reported sale at "
+"%(date)s."
+msgstr ""
+"Le numéro de série %(serial)s a quitté %(depot)s avant sa vente déclarée du "
+"%(date)s."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Serial number %s appears more than once."
+msgstr "Le numéro de série %s apparaît plus d'une fois."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Serial-tracked product %s must have quantity one."
+msgstr ""
+"Le produit %s suivi par numéro de série doit avoir une quantité de un."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_picking__depot_warehouse_id
+msgid "Set when this transfer places pieces at a depot or brings them back."
+msgstr ""
+"Renseigné lorsque ce transfert dépose des pièces dans un dépôt ou les en "
+"reprend."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__code
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_list
+msgid "Short name"
+msgstr "Nom court"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_create__legal_structure
+msgid "Signed legal structure"
+msgstr "Structure juridique signée"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__qty_sold
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Sold"
+msgstr "Vendu"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__sold_at
+msgid "Sold At"
+msgstr "Vendu le"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_sale_order_line__mb_is_depot_order
+msgid "Sold from a depot"
+msgstr "Vendu depuis un dépôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__date_sold
+#: model:ir.model.fields,field_description:mb_depot.field_stock_move_line__mb_depot_sale_date
+#: model:ir.model.fields,field_description:mb_depot.field_stock_picking__mb_depot_sale_date
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Sold on"
+msgstr "Vendu le"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "Start reversal"
+msgstr "Démarrer l'extourne"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Start the reversal workflow first."
+msgstr "Démarrez d'abord le processus d'extourne."
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__state
+msgid "State"
+msgstr "Statut"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement_line__statement_id
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_statement_form
+msgid "Statement"
+msgstr "Relevé"
 
 #. module: mb_depot
 #: model_terms:ir.ui.view,arch_db:mb_depot.view_depot_sale_order_search
 msgid "Status"
 msgstr "Statut"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Statut basé sur les activités\n"
+"En retard : la date d'échéance est déjà dépassée\n"
+"Aujourd'hui : la date d'activité est aujourd'hui\n"
+"Planifiée : activités futures"
+
+#. module: mb_depot
+#: model:ir.ui.menu,name:mb_depot.menu_depot_stock
+msgid "Stock"
+msgstr "Stock"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_stock_move
+msgid "Stock Move"
+msgstr "Mouvement de stock"
 
 #. module: mb_depot
 #: model:ir.actions.act_window,name:mb_depot.action_depot_quant
@@ -201,12 +1905,258 @@ msgid "Stock in Depots"
 msgstr "Stock en dépôt"
 
 #. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_sale_order_line__mb_is_depot_order
+#: model:ir.model.fields,help:mb_depot.field_stock_warehouse__is_depot
+msgid ""
+"Stock we own, physically held by someone else. Internal like any warehouse, "
+"so unsold pieces stay on our balance sheet until the depositary reports a "
+"sale."
+msgstr ""
+"Du stock qui nous appartient, physiquement détenu par un tiers. Interne "
+"comme tout entrepôt, de sorte que les pièces invendues restent à notre bilan"
+" jusqu'à ce que le dépositaire déclare une vente."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "The consignee"
+msgstr "Le dépositaire"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "The consignor"
+msgstr "Le déposant"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_move_line__mb_depot_sale_date
+msgid ""
+"The date the depositary reports the piece actually sold.\n"
+"\n"
+"The line's own date is when the transfer was validated here. A gallery that reports March's sales in April would otherwise have every one of them counted as April business."
+msgstr ""
+"La date à laquelle le dépositaire déclare que la pièce a réellement été vendue.\n"
+"\n"
+"La date propre à la ligne est celle de la validation du transfert ici. Une galerie qui déclare en avril les ventes de mars verrait sinon chacune d'elles comptée comme une affaire d'avril."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_statement_line__date_sold
+msgid ""
+"The day the piece sold, as reported by the depositary. Blank when the row "
+"covers sales on more than one day."
+msgstr ""
+"Le jour où la pièce s'est vendue, tel que déclaré par le dépositaire. Vide "
+"lorsque la ligne couvre des ventes sur plusieurs jours."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/res_company.py:0
+msgid "The depot inventory closing horizon cannot be reduced."
+msgstr "L'horizon de clôture d'inventaire du dépôt ne peut pas être réduit."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "The depot must belong to the report company."
+msgstr "Le dépôt doit appartenir à la société du relevé."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"The exact available stock for %(product)s changed while the depot report was"
+" being processed."
+msgstr ""
+"Le stock disponible exact de %(product)s a changé pendant le traitement du "
+"relevé de dépôt."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "The generated depot orders could not be consolidated into one invoice."
+msgstr ""
+"Les commandes de dépôt générées n'ont pas pu être consolidées en une seule "
+"facture."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/wizards/mb_depot_statement.py:0
+msgid "The period ends before it starts."
+msgstr "La période se termine avant de commencer."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid ""
+"The reserved quantity or lot for %(product)s changed before validation."
+msgstr ""
+"La quantité réservée ou le lot de %(product)s a changé avant la validation."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/sale_order.py:0
+msgid ""
+"The selected depot is a mandate. The purchase-resale sales workflow cannot "
+"be used; invoice final customers at retail and book the gallery commission "
+"as a vendor bill."
+msgstr ""
+"Le dépôt sélectionné est en mandat. Le processus de vente achat-revente ne "
+"peut pas être utilisé ; facturez les clients finaux au prix public et "
+"comptabilisez la commission de la galerie comme une facture fournisseur."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "The selected lot does not belong to %s."
+msgstr "Le lot sélectionné n'appartient pas à %s."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_stock_warehouse__mb_depot_legal_structure
+msgid ""
+"The signed contract controls who sells to the final customer and therefore "
+"which gross turnover must be declared."
+msgstr ""
+"Le contrat signé détermine qui vend au client final et donc quel chiffre "
+"d'affaires brut doit être déclaré."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/wizards/mb_depot_statement.py:0
+msgid ""
+"This depot is a mandate. Its retail sales and commission must be booked from"
+" the gallery report; the purchase-resale statement would understate "
+"turnover."
+msgstr ""
+"Ce dépôt est en mandat. Ses ventes au détail et sa commission doivent être "
+"comptabilisées à partir du relevé de la galerie ; le relevé achat-revente "
+"sous-estimerait le chiffre d'affaires."
+
+#. module: mb_depot
+#: model:ir.model.constraint,message:mb_depot.constraint_mb_depot_sale_report_reference_unique
+msgid "This depot report reference has already been recorded for this depot."
+msgstr ""
+"Cette référence de relevé de dépôt a déjà été enregistrée pour ce dépôt."
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Today's invoice date is in a closed period."
+msgstr "La date de facture du jour se situe dans une période clôturée."
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_bon_depot_document
+msgid "Total"
+msgstr "Total"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__total_commission
+msgid "Total Commission"
+msgstr "Total des commissions"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__total_gross
+msgid "Total Gross"
+msgstr "Total brut"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_statement__total_sold
+msgid "Total Sold"
+msgstr "Total vendu"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.report_depot_statement_document
+msgid "Total retail price"
+msgstr "Total prix public"
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: mb_depot
 #: model:ir.actions.act_window,name:mb_depot.action_depot_transfers
 #: model:ir.ui.menu,name:mb_depot.menu_depot_transfers
 msgid "Transfers"
 msgstr "Transferts"
 
 #. module: mb_depot
-#: model_terms:ir.actions.act_window,help:mb_depot.action_depot_placements
-msgid "Create a standard internal transfer and select the depot stock location as its destination. Validate it through the normal Inventory workflow."
-msgstr "Créez un transfert interne standard et sélectionnez l’emplacement de stock du dépôt comme destination. Validez-le avec le processus Inventaire habituel."
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Type d'activité d'exception enregistrée."
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_statement_line__lot_name
+msgid "Unique Lot/Serial Number"
+msgstr "Lot/numéro de série unique"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report_line__product_uom_id
+msgid "Unit"
+msgstr "Unité"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "Use the depot report workflow buttons to change its state."
+msgstr ""
+"Utilisez les boutons du processus de relevé de dépôt pour changer son état."
+
+#. module: mb_depot
+#: model:ir.model,name:mb_depot.model_stock_warehouse
+msgid "Warehouse"
+msgstr "Entrepôt"
+
+#. module: mb_depot
+#: model:ir.model.fields,field_description:mb_depot.field_mb_depot_sale_report__website_message_ids
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+#. module: mb_depot
+#: model:ir.model.fields,help:mb_depot.field_mb_depot_sale_report__website_message_ids
+msgid "Website communication history"
+msgstr "Historique de communication du site web"
+
+#. module: mb_depot
+#: model_terms:ir.ui.view,arch_db:mb_depot.view_mb_depot_sale_report_form
+msgid "are permanently closed by"
+msgstr "sont définitivement clôturées par"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "depot inventory closing"
+msgstr "clôture d'inventaire du dépôt"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "global accounting lock"
+msgstr "verrou comptable global"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "hard accounting lock"
+msgstr "verrou comptable définitif"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "id"
+msgstr "id"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "sales lock"
+msgstr "verrou des ventes"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "tax return lock"
+msgstr "verrou de déclaration de TVA"
+
+#. module: mb_depot
+#. odoo-python
+#: code:addons/mb_depot/models/depot_sale_report.py:0
+msgid "untracked stock"
+msgstr "stock non suivi"

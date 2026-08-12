@@ -31,7 +31,7 @@ class MbCatalogueImport(models.TransientModel):
              "Punctuation in a code does not matter.")
     manufacturer = fields.Char(help="Restrict to one manufacturer id, e.g. mayco.")
     line_ids = fields.One2many("mb.catalogue.import.line", "wizard_id")
-    result_count = fields.Integer(compute="_compute_result_count")
+    result_count = fields.Integer(string="Results", compute="_compute_result_count")
 
     @api.depends("line_ids")
     def _compute_result_count(self):
@@ -136,11 +136,11 @@ class MbCatalogueImportLine(models.TransientModel):
 
     wizard_id = fields.Many2one("mb.catalogue.import", required=True, ondelete="cascade")
     selected = fields.Boolean(string="Import")
-    canonical_id = fields.Char(required=True)
+    canonical_id = fields.Char(string="Catalogue id", required=True)
     brand = fields.Char(string="Manufacturer", readonly=True)
     manufacturer_sku = fields.Char(string="Code", readonly=True)
     name = fields.Char(readonly=True)
-    family = fields.Char(readonly=True)
+    family = fields.Char(string="Family", readonly=True)
     firing_range = fields.Char(string="Firing", readonly=True)
     # How many shops carry it: the strongest signal that a code is the one meant,
     # and the reason the list is ordered by it.
@@ -148,7 +148,7 @@ class MbCatalogueImportLine(models.TransientModel):
     unit_price_low = fields.Float(string="From", readonly=True, digits=(12, 2))
     unit_price_high = fields.Float(string="To", readonly=True, digits=(12, 2))
     unit_price_per = fields.Selection(
-        [("l", "per litre"), ("kg", "per kg")], readonly=True)
+        [("l", "per litre"), ("kg", "per kg")], string="Price per", readonly=True)
     # Set when the workshop already has it, which is why the row is not tickable.
     product_tmpl_id = fields.Many2one(
         "product.template", string="Already imported", readonly=True)

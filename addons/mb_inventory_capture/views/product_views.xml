@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="view_company_form_inventory_capture" model="ir.ui.view">
+        <field name="name">res.company.form.inventory.capture</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Inventory image analysis" groups="base.group_system">
+                    <field name="mb_inventory_ai_enabled"/>
+                    <field name="mb_inventory_vision_primary"
+                           invisible="not mb_inventory_ai_enabled"/>
+                    <field name="mb_inventory_vision_secondary"
+                           invisible="not mb_inventory_ai_enabled"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
     <record id="view_product_normal_form_inventory_identifiers" model="ir.ui.view">
         <field name="name">product.product.form.inventory.identifiers</field>
         <field name="model">product.product</field>
@@ -23,4 +40,3 @@
         </field>
     </record>
 </odoo>
-

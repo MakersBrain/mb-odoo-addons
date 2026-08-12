@@ -23,6 +23,7 @@ class MbSumupLinkWizard(models.TransientModel):
     )
     amount_max = fields.Monetary(currency_field="currency_id", readonly=True)
     destination = fields.Selection(
+        string="Payment destination",
         selection=[
             ("sumup", "SumUp checkout"),
             ("portal", "Customer portal"),

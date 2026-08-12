@@ -282,11 +282,13 @@ class MbKilnConnection(models.Model):
             # The stored token goes: it is the most likely thing to be stale.
             self._forget_token()
             self.write({"state": "error", "last_error": str(error)})
-            _logger.warning("kiln connection %s: authentication failed", self.id)
+            _logger.warning(
+                "kiln connection %s: authentication failed", self.id)
             raise
         except MykilnError as error:
             self.write({"state": "error", "last_error": str(error)})
-            _logger.warning("kiln connection %s: %s", self.id, error)
+            _logger.warning(
+                "kiln connection %s: %s", self.id, error)
             raise
         self.write({
             "state": "ok", "last_error": False, "last_sync": fields.Datetime.now()})

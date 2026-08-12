@@ -39,10 +39,10 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 	legal_name = fields.Char(string="Legal name", required=True)
 	trade_name = fields.Char(string="Trading name")
 	legal_form = fields.Selection(
-		selection=[("ei", "Entrepreneur individuel")], required=True,
+		selection=[("ei", "Sole trader (entrepreneur individuel)")], required=True,
 		default="ei", readonly=True,
 	)
-	siren = fields.Char(string="SIREN", required=True)
+	siren = fields.Char(string="SIREN number", required=True)
 	siret = fields.Char(string="SIRET (head office)", required=True)
 	ape_code = fields.Char(string="APE / NAF code")
 	activity_description = fields.Char(string="Main activity")
@@ -60,12 +60,12 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 		"res.partner.bank", string="Professional bank account",
 		domain="[('partner_id', '=', company_partner_id)]",
 	)
-	iban = fields.Char(string="IBAN")
-	bic = fields.Char(string="BIC / SWIFT")
+	iban = fields.Char(string="Professional IBAN")
+	bic = fields.Char(string="BIC / SWIFT code")
 	tax_regime = fields.Selection(
 		selection=[
 			("unchanged", "Not managed by this module"),
-			("franchise", "Franchise en base de TVA"),
+			("franchise", "VAT exemption"),
 			("vat", "VAT liable"),
 		], required=True,
 	)
@@ -129,6 +129,9 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 			missing = []
 			siren = _digits(wizard.siren)
 			siret = _digits(wizard.siret)
+			# Hoisted out of the tuple below so string extraction cannot mistake
+			# the selection key for translatable text.
+			regime_chosen = wizard.tax_regime != "unchanged"
 			checks = [
 				(wizard.legal_name, _("legal name")),
 				(len(siren) == 9 and _luhn_is_valid(siren), _("valid SIREN")),
@@ -140,7 +143,7 @@ class L10nFrMicroSetupWizard(models.TransientModel):
 				(wizard.email, _("email")),
 				(wizard.phone, _("phone")),
 				(wizard.iban, _("professional IBAN")),
-				(wizard.tax_regime != "unchanged", _("VAT regime")),
+				(regime_chosen, _("VAT regime")),
 			]
 			for complete, label in checks:
 				if not complete:

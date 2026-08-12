@@ -1,0 +1,511 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_catalogue_sync
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/models/mb_catalogue_service.py:0
+#: code:addons/mb_catalogue_sync/wizard/mb_catalogue_import.py:0
+msgid "%(created)s created, %(updated)s updated, %(offers)s supplier prices."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,help:mb_catalogue_sync.field_mb_catalogue_import__query
+msgid ""
+"A manufacturer code or a product name: PC-20, SC74, hot tamale. Punctuation "
+"in a code does not matter."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__api_key
+msgid "API key"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__active
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__active
+msgid "Active"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__product_tmpl_id
+msgid "Already imported"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__base_url
+msgid "Base URL"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__service_id
+msgid "Catalogue"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__canonical_id
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_product__mb_canonical_id
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_template__mb_canonical_id
+msgid "Catalogue id"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model,name:mb_catalogue_sync.model_mb_catalogue_units
+msgid "Catalogue package and price conversions"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.actions.act_window,name:mb_catalogue_sync.action_mb_catalogue_service
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_service_form
+msgid "Catalogue service"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__source_id
+msgid "Catalogue source"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model,name:mb_catalogue_sync.model_mb_catalogue_supplier
+msgid "Catalogue source mapped to a vendor"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.actions.act_window,name:mb_catalogue_sync.action_mb_catalogue_supplier
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_supplier_list
+msgid "Catalogue suppliers"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid "Close"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__manufacturer_sku
+msgid "Code"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__create_uid
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__create_uid
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__create_uid
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__create_date
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__create_date
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__create_date
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__delay
+msgid "Delivery lead time"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_client__display_name
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__display_name
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__display_name
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__display_name
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__display_name
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_units__display_name
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_template__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__family
+msgid "Family"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__firing_range
+msgid "Firing"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__unit_price_low
+msgid "From"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_client__id
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__id
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__id
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__id
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__id
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_units__id
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_template__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,help:mb_catalogue_sync.field_product_product__mb_canonical_id
+#: model:ir.model.fields,help:mb_catalogue_sync.field_product_template__mb_canonical_id
+msgid "Identifier of the curated identity in the master catalogue."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__selected
+msgid "Import"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.actions.act_window,name:mb_catalogue_sync.action_mb_catalogue_import
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid "Import from catalogue"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.ui.menu,name:mb_catalogue_sync.menu_mb_catalogue_import
+msgid "Import materials"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model,name:mb_catalogue_sync.model_mb_catalogue_import
+msgid "Import materials from the master catalogue"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid "Import selected"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/wizard/mb_catalogue_import.py:0
+msgid "Imported materials"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__write_uid
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__write_uid
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__write_uid
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__write_date
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__write_date
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__write_date
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_product__mb_catalogue_synced_at
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_template__mb_catalogue_synced_at
+msgid "Last catalogue sync"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__last_import_at
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_service_form
+msgid "Last import"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__last_import_summary
+msgid "Last import summary"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__line_ids
+msgid "Line"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__manufacturer
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__brand
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_product__mb_manufacturer
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_template__mb_manufacturer
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_product_template_search_catalogue
+msgid "Manufacturer"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_product__mb_manufacturer_sku
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_product_template__mb_manufacturer_sku
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_product_template_search_catalogue
+msgid "Manufacturer code"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.actions.act_window,help:mb_catalogue_sync.action_mb_catalogue_supplier
+msgid "Map a catalogue source to a vendor"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.ui.menu,name:mb_catalogue_sync.menu_mb_catalogue_root
+msgid "Master catalogue"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model,name:mb_catalogue_sync.model_mb_catalogue_client
+msgid "Master catalogue HTTP client (read-only)"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model,name:mb_catalogue_sync.model_mb_catalogue_service
+msgid "Master catalogue service"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_product_template_list_catalogue
+msgid "Mfr code"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__name
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_service__name
+msgid "Name"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/wizard/mb_catalogue_import.py:0
+msgid "No catalogue service is configured."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model,name:mb_catalogue_sync.model_mb_catalogue_import_line
+msgid "One catalogue search result"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.actions.act_window,help:mb_catalogue_sync.action_mb_catalogue_supplier
+msgid ""
+"Only mapped sources produce supplier prices. A glaze sold by fifteen\n"
+"         shops should not put fifteen vendors in front of you."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid "PC-20, SC74, hot tamale"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:product.attribute,name:mb_catalogue_sync.attribute_pack_size
+msgid "Pack size"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__unit_price_per
+msgid "Price per"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields.selection,name:mb_catalogue_sync.selection__mb_catalogue_supplier__vat_status__exclusive
+msgid "Prices exclude VAT"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields.selection,name:mb_catalogue_sync.selection__mb_catalogue_supplier__vat_status__inclusive
+msgid "Prices include VAT"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model,name:mb_catalogue_sync.model_product_template
+msgid "Product"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__vat_status
+msgid "Published prices"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/models/mb_catalogue_service.py:0
+#: code:addons/mb_catalogue_sync/wizard/mb_catalogue_import.py:0
+msgid "Refused %(reason)s: %(count)s"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,help:mb_catalogue_sync.field_mb_catalogue_import__manufacturer
+msgid "Restrict to one manufacturer id, e.g. mayco."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__result_count
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid "Results"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid ""
+"Results are ordered by how many suppliers carry the product, because\n"
+"             a code eleven shops sell is more likely the one you mean than a code\n"
+"             one shop sells."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,help:mb_catalogue_sync.field_mb_catalogue_service__base_url
+msgid "Root URL of the catalogue read API."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import__query
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid "Search"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid ""
+"Search the master catalogue by manufacturer code or product name.\n"
+"             Punctuation in a code does not matter: <b>PC-20</b> and\n"
+"             <b>pc20</b> both find AMACO Blue Rutile."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid "Select all new"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.ui.menu,name:mb_catalogue_sync.menu_mb_catalogue_service
+msgid "Service"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__source_count
+#: model:ir.ui.menu,name:mb_catalogue_sync.menu_mb_catalogue_suppliers
+msgid "Suppliers"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.constraint,message:mb_catalogue_sync.constraint_mb_catalogue_service_base_url_unique
+msgid "That catalogue service is already configured."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.constraint,message:mb_catalogue_sync.constraint_mb_catalogue_supplier_source_unique
+msgid "That catalogue source is already mapped."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/models/mb_catalogue_service.py:0
+msgid "The catalogue returned nothing for those products."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/models/mb_catalogue_client.py:0
+msgid "The catalogue service did not answer in time."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/models/mb_catalogue_client.py:0
+msgid "The catalogue service is unreachable."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/models/mb_catalogue_client.py:0
+msgid "The catalogue service returned a malformed response."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,help:mb_catalogue_sync.field_product_product__mb_manufacturer_sku
+#: model:ir.model.fields,help:mb_catalogue_sync.field_product_template__mb_manufacturer_sku
+msgid ""
+"The maker's own code (PC-20, SC74). The only key that compares across "
+"suppliers; a shop's article number is never promoted to it."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,help:mb_catalogue_sync.field_mb_catalogue_supplier__source_id
+msgid "The source id in the catalogue, e.g. 'ceradel' or 'les-cousins'."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/wizard/mb_catalogue_import.py:0
+msgid "Tick at least one material to import."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__unit_price_high
+msgid "To"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,help:mb_catalogue_sync.field_mb_catalogue_supplier__vat_rate
+msgid ""
+"Used to convert this vendor's VAT-inclusive prices to the net price Odoo "
+"stores. Leave empty to refuse inclusive prices rather than guess."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__vat_rate
+msgid "VAT rate (%)"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_supplier__partner_id
+msgid "Vendor"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,help:mb_catalogue_sync.field_mb_catalogue_supplier__vat_status
+msgid "What this vendor's listed prices mean, when the listing does not say."
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields,field_description:mb_catalogue_sync.field_mb_catalogue_import_line__wizard_id
+msgid "Wizard"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_service_form
+msgid "https://catalogue.makersbrain.example"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#. odoo-python
+#: code:addons/mb_catalogue_sync/wizard/mb_catalogue_import.py:0
+msgid "id"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model_terms:ir.ui.view,arch_db:mb_catalogue_sync.view_mb_catalogue_import_form
+msgid "mayco, amaco - optional"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields.selection,name:mb_catalogue_sync.selection__mb_catalogue_import_line__unit_price_per__kg
+msgid "per kg"
+msgstr ""
+
+#. module: mb_catalogue_sync
+#: model:ir.model.fields.selection,name:mb_catalogue_sync.selection__mb_catalogue_import_line__unit_price_per__l
+msgid "per litre"
+msgstr ""

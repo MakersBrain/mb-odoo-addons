@@ -1,7 +1,7 @@
 {
     "name": "Makersbrain Commercial Operations - Stock",
     "summary": "Market stock planning, preparation, returns, and reconciliation",
-    "version": "19.0.2.0.0",
+    "version": "19.0.2.0.1",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
     "license": "LGPL-3",

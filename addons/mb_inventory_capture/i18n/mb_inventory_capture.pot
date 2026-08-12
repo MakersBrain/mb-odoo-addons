@@ -1,0 +1,2122 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_inventory_capture
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-12 05:38+0000\n"
+"PO-Revision-Date: 2026-08-12 05:38+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid ""
+"\n"
+"Updated %(count)s product(s)."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "%(field)s exceeds the retained evidence limit."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "%(field)s must be a lowercase UUID."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "%(field)s must be valid JSON."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid "%(product)s: already lot-tracked"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid ""
+"%(product)s: blocked (on-hand stock must be cut over with an explicit "
+"inventory adjustment and lot allocation)"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid "%(product)s: blocked (serial-tracked)"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid "%(product)s: safe for future lot tracking%(suffix)s"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "%(scheme)s must contain %(length)s digits."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid "; historical moves remain unchanged"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A cancelled capture cannot accept extraction results."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.constraint,message:mb_inventory_capture.constraint_mb_inventory_capture_capture_uuid_unique
+msgid "A capture UUID can be used only once."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A capture can only be attached to an incoming transfer."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A checksum-valid GTIN is required for online lookup."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A code cannot be added in the current capture state."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A detected code must contain 1 to 512 characters."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A detected-code polygon must be four normalized numbers."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A lot crop can only be added before extraction starts."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "A new owner and reassignment reason are required."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A product lookup cannot run in the current capture state."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A reviewed product name is required."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A scan frame must contain between one and twenty codes."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "A supplier lot is required for this tracked product."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Accept or edit the product candidate before creating it."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__decision__accepted
+msgid "Accepted"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Accepted image preview for selecting the lot area"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_needaction
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__active
+msgid "Active"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__activity_ids
+msgid "Activities"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__activity_type_icon
+msgid "Activity Type Icon"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Add at least one image before requesting extraction."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Add code"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_res_company__mb_inventory_ai_enabled
+msgid "Allow inventory image AI fallback"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Also try black-and-white high contrast for OCR"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "An applied capture cannot be cancelled."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "An applied or cancelled capture is immutable."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.constraint,message:mb_inventory_capture.constraint_mb_inventory_capture_asset_asset_uuid_unique
+msgid "An asset UUID can be used once."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.constraint,message:mb_inventory_capture.constraint_mb_inventory_capture_attempt_attempt_uuid_unique
+msgid "An extraction attempt UUID can be used only once."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.constraint,message:mb_inventory_capture.constraint_mb_inventory_capture_attempt_attempt_operation_unique
+msgid "An extraction operation can be recorded only once."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Analysis could not be queued."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_supplier_lot_migration_form
+msgid "Analyze"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Analyze images (OCR / enabled AI fallback)"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid "Analyze the selected products before applying the cutover."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__analyzed
+msgid "Analyzed"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Animated or multi-frame images are not accepted."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__res_company__mb_inventory_vision_primary__claude
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__res_company__mb_inventory_vision_secondary__claude
+msgid "Anthropic Claude"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture__state__applied
+msgid "Applied"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__applied_at
+msgid "Applied At"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__applied_by
+msgid "Applied By"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Applied decision"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__apply_expiry
+msgid "Apply Expiry"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_supplier_lot_migration_form
+msgid "Apply safe changes"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__apply_expiry
+msgid "Apply the explicitly reviewed expiry date to the native lot record."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Apply to receipt"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__asset_ids
+msgid "Asset"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__asset_uuid
+msgid "Asset Uuid"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Attach the capture to an open receipt before applying it."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__attachment_id
+msgid "Attachment"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_attachment_count
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__attempt_ids
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__attempt_id
+msgid "Attempt"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__attempt_uuid
+msgid "Attempt Uuid"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__res_company__mb_inventory_vision_primary__azure
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__res_company__mb_inventory_vision_secondary__azure
+msgid "Azure multimodal"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_attempt__kind__barcode
+msgid "Barcode"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Barcode read. Looking up product…"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Barcode saved. Checking the shared product cache…"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__brand
+msgid "Brand"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__byte_length
+msgid "Byte Length"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Camera permission was denied; use file upload."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Cancel"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture__state__cancelled
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_attempt__state__cancelled
+msgid "Cancelled"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__candidate_ids
+msgid "Candidate"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Candidate asset_id does not belong to this capture."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Candidate confidence must be between zero and one."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Candidate grounding_state is invalid."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Candidate reported_region must be four normalized numbers."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Candidate values cannot be empty."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Candidates"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Candidates can only be appended by an extraction attempt."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__capture_id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__capture_id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__capture_id
+msgid "Capture"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__capture_uuid
+msgid "Capture Uuid"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Capture assets can only be created through the sanitizer."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Capture evidence and lifecycle fields cannot be edited directly."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/company.py:0
+msgid "Choose a primary inventory vision provider first."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Choose an inventory product to map this candidate."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/company.py:0
+msgid "Choose an inventory vision provider before enabling AI fallback."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_supplier_lot_migration_form
+msgid "Close"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__company_id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__company_id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__company_id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__company_id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__company_id
+msgid "Company"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__comparison_scheme
+msgid "Comparison Scheme"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__confidence
+msgid "Confidence"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Confirm a product before applying the capture."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_asset__role__crop
+msgid "Confirmed crop"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__verification_state__conflict
+msgid "Conflict"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Create reviewed product"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__create_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__create_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__create_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__create_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__create_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__create_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__create_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__create_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__create_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__create_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__crop_rectangle
+msgid "Crop Rectangle"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Crop rotation must be 0, 90, 180 or 270 degrees."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__decision
+msgid "Decision"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Detected-code confidence must be between zero and one."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_ai_gateway__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_lookup_provider__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_product_product__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_res_company__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_stock_lot__display_name
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_stock_picking__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Drag over the visible lot/batch text, then rotate if needed."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__decision__edited
+msgid "Edited"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__ended_at
+msgid "Ended At"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Enter an unreadable barcode or GS1 value"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Every candidate must be an object."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Every detected code must be an object."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__evidence_asset_ids
+msgid "Evidence Asset"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__evidence_preview
+msgid "Evidence Preview"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Evidence images"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__kind__expiry
+msgid "Expiry"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__explanation
+msgid "Explanation"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_product_normal_form_inventory_identifiers
+msgid "External identifiers"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Extraction attempts"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Extraction attempts are immutable."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Extraction attempts can only be appended by capture services."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture__state__failed
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_attempt__state__failed
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Failed"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Failure"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__failure_code
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__failure_code
+msgid "Failure Code"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__failure_detail
+msgid "Failure Detail"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_follower_ids
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_partner_ids
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "GS1 identifiers are global and cannot be company-scoped."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__scheme__gtin_12
+msgid "GTIN 12"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__scheme__gtin_13
+msgid "GTIN 13"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__scheme__gtin_14
+msgid "GTIN 14"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__scheme__gtin_8
+msgid "GTIN 8"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__res_company__mb_inventory_vision_primary__gemini
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__res_company__mb_inventory_vision_secondary__gemini
+msgid "Google Gemini"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__grounding_state__grounded
+msgid "Grounded"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__grounding_state
+msgid "Grounding State"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__has_message
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Hold steady and fill the frame with the label."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_ai_gateway__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_lookup_provider__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_product_product__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_res_company__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_stock_lot__id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_stock_picking__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__scheme__internal
+msgid "INTERNAL"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid ""
+"Identifier identity and ownership are immutable; use the audited reassign "
+"action."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "Identifier reassigned from %(old)s to %(new)s. Reason: %(reason)s"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_picking.py:0
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_picking_form_inventory_capture
+msgid "Identify from photo"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+#: model:ir.actions.client,name:mb_inventory_capture.action_mb_inventory_capture_camera
+#: model:ir.ui.menu,name:mb_inventory_capture.menu_mb_inventory_capture_camera
+msgid "Identify incoming product"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__message_needaction
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_product_identifier__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__message_has_error
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__message_has_sms_error
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_product_identifier__message_has_error
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_product_identifier__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Image analysis was queued. Review the capture for results."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid ""
+"Images can only be added before extraction starts or the capture is applied."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_mb_inventory_capture_attempt
+msgid "Immutable inventory extraction attempt"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__input_asset_ids
+msgid "Input Asset"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__input_digests
+msgid "Input Digests"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_mb_inventory_capture_candidate
+msgid "Inventory capture candidate"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_mb_inventory_capture_lookup_provider
+msgid "Inventory capture product lookup provider"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.actions.server,name:mb_inventory_capture.ir_cron_inventory_capture_evidence_retention_ir_actions_server
+msgid "Inventory capture: purge unapplied image evidence"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_company_form_inventory_capture
+msgid "Inventory image analysis"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid ""
+"Inventory manager %(user)s created product %(product)s from reviewed "
+"candidate %(candidate)s. No stock or lot was created."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_res_company__mb_inventory_vision_secondary
+msgid "Inventory vision fallback"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_res_company__mb_inventory_vision_primary
+msgid "Inventory vision primary"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__is_current
+msgid "Is Current"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_is_follower
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Keep the barcode inside the guide."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__kind
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__kind
+msgid "Kind"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__write_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__write_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__write_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__write_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__write_uid
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__write_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__write_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__write_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__write_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__write_date
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Live scanning is unavailable; take a photo to decode it."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__lot_id
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__kind__lot
+msgid "Lot"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_asset__role__lot_detail
+msgid "Lot detail"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_stock_lot
+msgid "Lot/Serial"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__scheme__manufacturer_sku
+msgid "MANUFACTURER SKU"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "Malformed GS1 expiry date."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__manufacturer_sku
+msgid "Manufacturer Sku"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_form
+msgid "Map selected product"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__mapped_product_id
+msgid "Map to product"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_product_product__mb_identifier_ids
+msgid "Mb Identifier"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_has_error
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_ids
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__mimetype
+msgid "Mimetype"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__model
+msgid "Model"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__model_version
+msgid "Model Version"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "More light is needed."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__move_id
+msgid "Move"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__move_line_id
+msgid "Move Line"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Move closer and hold steady."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_attempt__kind__multimodal
+msgid "Multimodal AI"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__name
+msgid "Name"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_search
+msgid "Needs review"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "New"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "New capture"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "No extraction service is configured. Continue with manual review."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid ""
+"No online product match. Continue with the lot photo or enter the product "
+"manually."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid "No products are safe to update."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid "No products selected."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "No rotation"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__normalized_response
+msgid "Normalized Response"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__normalized_value
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__normalized_value
+msgid "Normalized Value"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_needaction_counter
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_has_error_counter
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__message_needaction_counter
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_product_identifier__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__message_has_error_counter
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_product_identifier__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_attempt__kind__ocr
+msgid "OCR"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_asset__role__ocr_variant
+msgid "OCR enhancement"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid ""
+"Online lookup is unavailable. Barcode saved; continue with the lot photo."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Only a product candidate can create a product."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Only a reviewed capture can be applied."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Only an inventory manager can create a reviewed product."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "Only an inventory manager can reassign an identifier."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Only genuine JPEG and PNG images are accepted."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__res_company__mb_inventory_vision_primary__openai
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__res_company__mb_inventory_vision_secondary__openai
+msgid "OpenAI"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__stock_lot__mb_supplier_lot_origin__opening_balance
+msgid "Opening balance"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__operation_key
+msgid "Operation Key"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_res_company__mb_inventory_vision_secondary
+msgid "Optional distinct fallback used only for retryable provider failures."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__pack_identity
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__pack_identity
+msgid "Pack Identity"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__parent_asset_id
+msgid "Parent Asset"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__parent_attempt_id
+msgid "Parent Attempt"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__decision__pending
+msgid "Pending"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_res_company__mb_inventory_ai_enabled
+msgid ""
+"Permit unresolved inventory-label crops to use the configured multimodal "
+"primary/secondary route. Barcode, GS1, catalogue and deterministic OCR "
+"remain active."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid ""
+"Photograph the product/front label, then add a lot-detail image if needed.\n"
+"                    Nothing changes inventory until the reviewed result is applied."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__picking_id
+msgid "Picking"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__pixel_height
+msgid "Pixel Height"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__pixel_width
+msgid "Pixel Width"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__printed_value
+msgid "Printed Value"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture__state__processing
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_attempt__state__processing
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_search
+msgid "Processing"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__product_id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__product_id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__product_id
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__product_ids
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__kind__product
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_search
+msgid "Product"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__product_conflict_acknowledged
+msgid "Product Conflict Acknowledged"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_product_product
+msgid "Product Variant"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_attempt__kind__lookup
+msgid "Product lookup"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Product lookup failed; you can keep capturing."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_picking.py:0
+msgid "Product photo capture is available only on an open receipt."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.actions.act_window,name:mb_inventory_capture.action_mb_inventory_capture
+#: model:ir.ui.menu,name:mb_inventory_capture.menu_mb_inventory_capture
+msgid "Product photo captures"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_mb_inventory_capture
+msgid "Product photo inventory capture"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_asset__role__front
+msgid "Product/front"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_supplier_lot_migration__product_ids
+msgid "Products whose future receipts must preserve supplier lots."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__proposed_expiry
+msgid "Proposed Expiry"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__proposed_lot
+msgid "Proposed Lot"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__proposed_quantity
+msgid "Proposed Quantity"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__provider
+msgid "Provider"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Provider candidate evidence is immutable."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_res_company__mb_inventory_vision_primary
+msgid "Provider name only. Credentials remain in the extraction broker."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_mb_ai_gateway
+msgid "Provider-neutral MakersBrain AI gateway"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__kind__quantity
+msgid "Quantity"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_attempt__state__queued
+msgid "Queued"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__rating_ids
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__raw_response
+msgid "Raw Response"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__raw_value
+msgid "Raw Value"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Ready - keep the barcode inside the guide."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__received_sha256
+msgid "Received Sha256"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Reduce glare or tilt the package."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Reject this read and scan again"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__decision__rejected
+msgid "Rejected"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__report
+msgid "Report"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__reported_region
+msgid "Reported Region"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__request_id
+msgid "Request"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__activity_user_id
+msgid "Responsible User"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Retake selected image"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture__state__review
+msgid "Review"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Review manually"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__reviewed_at
+msgid "Reviewed At"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__reviewed_by
+msgid "Reviewed By"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__reviewed_value
+msgid "Reviewed Value"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__role
+msgid "Role"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Rotate 180°"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Rotate 270°"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Rotate 90°"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Rotate lot text before reading"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__message_has_sms_error
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__scheme__supplier_code
+msgid "SUPPLIER CODE"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_supplier_lot_migration__eligible_product_ids
+msgid "Safe to update"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__sanitized_sha256
+msgid "Sanitized Sha256"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Sanitized evidence assets are immutable."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_mb_inventory_capture_asset
+msgid "Sanitized inventory capture image"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid ""
+"Sanitized unapplied image evidence was purged after %(days)s days; "
+"structured capture audit data was retained."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_asset__sanitizer_version
+msgid "Sanitizer Version"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__scheme
+msgid "Scheme"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__scope_key
+msgid "Scope Key"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid ""
+"Select exactly one receipt move for the confirmed product before applying."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Select exactly one receipt move line before applying this capture."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid ""
+"Several products were detected. Choose the correct product during review."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_candidate__source
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__source
+msgid "Source"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__source_record_id
+msgid "Source Record"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Start the camera to scan a barcode."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__started_at
+msgid "Started At"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__state
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__state
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_inventory_capture_search
+msgid "State"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/stock_migration.py:0
+msgid "Stock changed after analysis. Review the refreshed report."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_attempt__state__succeeded
+msgid "Succeeded"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.actions.act_window,name:mb_inventory_capture.action_mb_supplier_lot_migration
+#: model:ir.ui.menu,name:mb_inventory_capture.menu_mb_supplier_lot_migration
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture.view_mb_supplier_lot_migration_form
+msgid "Supplier lot tracking cutover"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_mb_supplier_lot_migration
+msgid "Supplier lot tracking cutover analysis"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__stock_lot__mb_supplier_lot_origin__supplier
+msgid "Supplier package"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_stock_lot__mb_supplier_lot_origin
+msgid "Supplier-lot origin"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Take photo"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "The GTIN check digit is invalid."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The asset and capture must belong to the same company."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The attachment must belong to its capture asset."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The capture is not waiting for extraction results."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The capture must be in review before creating a product."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The capture must be in review before mapping a product."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid ""
+"The confirmed product differs from the receipt line. Reconcile the line "
+"explicitly first."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "The crop could not be created."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The crop rectangle is outside the image or too small."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The crop rectangle must contain four normalized numbers."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The crop source is not part of this capture."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The decoded value must contain between 1 and 512 characters."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The enhancement option must be true or false."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The extraction result state is invalid."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The first release accepts at most two current source images."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "The identifier must contain between 1 and 255 characters."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The image must be between 1 byte and 15 MB."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/company.py:0
+msgid "The primary and fallback providers must be different."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The product lookup returned an invalid response."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The provider returned an unsupported candidate kind."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The provider returned too many candidates."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The provider returned too many detected codes."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The receipt line changed while this capture was being reviewed."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The receipt no longer exists."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The result capture_id does not match this capture."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The result references an unknown input digest."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The reviewed quantity is not numeric."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The sanitized image exceeds the 15 MB evidence limit."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The sanitized source image could not be cropped."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "The selected lot area will be analyzed first."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The source image exceeds the safe decode limit."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The source image role must be front or lot detail."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The stock move does not belong to the capture receipt."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The stock move line does not belong to the capture move."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The upload is not a safe decodable JPEG or PNG image."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "The upload is not valid base64 image data."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "This GTIN is already assigned to %s."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "This GTIN is already the primary barcode of %s."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "This browser has no camera API; use file upload."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "This capture cannot be queued for extraction."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "This identifier is already assigned to %(product)s."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.constraint,message:mb_inventory_capture.constraint_mb_product_identifier_identifier_unique
+msgid "This identifier is already assigned to another product."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.constraint,message:mb_inventory_capture.constraint_mb_inventory_capture_asset_asset_role_digest_unique
+msgid "This sanitized image is already attached in that role."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid ""
+"Turn the jar and frame both ink-jetted lines near the lower label edge."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "Turn the jar until the printed LOT or batch line is inside the guide."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid ""
+"Turn the package until LOT, BATCH, or the supplier's printed code is "
+"visible."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Turn torch off"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Turn torch on"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "Unsupported identifier scheme."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/identifier.py:0
+msgid "Unsupported or malformed GS1 application identifier."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__grounding_state__unverified
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__verification_state__unverified
+msgid "Unverified"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.js:0
+msgid "Upload failed."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Upload image"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid ""
+"Uploaded images are sanitized to remove metadata. If you request analysis,\n"
+"                    the sanitized images leave Odoo temporarily and are processed by your\n"
+"                    workshop's configured extraction provider."
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture_attempt__usage
+msgid "Usage"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Use camera"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-javascript
+#: code:addons/mb_inventory_capture/static/src/capture_action.xml:0
+msgid "Use selected area for lot reading"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_inventory_capture_candidate__grounding_state__user_confirmed_crop
+msgid "User-confirmed crop"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__verification_state
+msgid "Verification State"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields.selection,name:mb_inventory_capture.selection__mb_product_identifier__verification_state__verified
+msgid "Verified"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model,name:mb_inventory_capture.model_mb_product_identifier
+msgid "Verified product identifier"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_inventory_capture__website_message_ids
+#: model:ir.model.fields,field_description:mb_inventory_capture.field_mb_product_identifier__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: mb_inventory_capture
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_inventory_capture__website_message_ids
+#: model:ir.model.fields,help:mb_inventory_capture.field_mb_product_identifier__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "input_digests must be a non-empty array."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "operation_key is required and must be at most 255 characters."
+msgstr ""
+
+#. module: mb_inventory_capture
+#. odoo-python
+#: code:addons/mb_inventory_capture/models/inventory_capture.py:0
+msgid "parent_attempt_id does not belong to this capture."
+msgstr ""

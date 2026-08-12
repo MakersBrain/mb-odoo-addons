@@ -321,7 +321,7 @@ class TestUrssafDeclaration(TransactionCase):
 			"l10n_fr_micro_urssaf.report_urssaf_declaration", declaration.ids,
 		)
 		self.assertIn(b"URSSAF turnover declaration", html)
-		self.assertIn(b"Livre des recettes", html)
+		self.assertIn(b"Receipt book", html)
 		self.assertIn(b"Daily POS receipt summaries", html)
 		self.assertEqual(declaration._pos_daily_summaries()[0]["amount"], 12.0)
 

@@ -1,5 +1,7 @@
 /** @odoo-module **/
 
+import { _t } from "@web/core/l10n/translation";
+
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function loadRaster(url) {
@@ -7,7 +9,7 @@ export async function loadRaster(url) {
     image.crossOrigin = "same-origin";
     await new Promise((resolve, reject) => {
         image.onload = resolve;
-        image.onerror = () => reject(new Error("The rendered label image could not be loaded."));
+        image.onerror = () => reject(new Error(_t("The rendered label image could not be loaded.")));
         image.src = url;
     });
     const canvas = document.createElement("canvas");
@@ -47,7 +49,7 @@ export function encodeNiimbotRows(image) {
     // by 320 rows, and the column count remains byte-aligned.
     const cols = image.height;
     const rows = image.width;
-    if (cols % 8) throw new Error("NIIMBOT label width must resolve to a whole byte.");
+    if (cols % 8) throw new Error(_t("NIIMBOT label width must resolve to a whole byte."));
     const encoded = [];
     for (let row = 0; row < rows; row++) {
         const bytes = new Uint8Array(cols / 8);

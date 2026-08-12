@@ -33,7 +33,7 @@ Refunds go to `/v1.0/merchants/{code}/payments/{id}/refunds`, which SumUp
 acknowledges before settlement. Odoo keeps the refund pending and polls the
 authoritative transaction events before marking it done.
 """,
-    "version": "19.0.1.1.0",
+    "version": "19.0.1.1.1",
     "license": "LGPL-3",
     "category": "Accounting/Payment Providers",
     "author": "Makersbrain",

@@ -1,7 +1,7 @@
 {
     "name": "Makersbrain Commercial Operations - Depot",
     "summary": "Depot contracts, refill forecasts, rent, and profitability evidence",
-    "version": "19.0.2.0.0",
+    "version": "19.0.2.0.1",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
     "license": "LGPL-3",

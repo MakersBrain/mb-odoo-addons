@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -30,19 +30,17 @@ class ProductTemplate(models.Model):
             lambda template: template.mb_ceramics_stage in ("green", "bisque")
         ):
             if not product.is_storable:
-                raise ValidationError("Green and bisque ware must be storable products.")
+                raise ValidationError(_("Green and bisque ware must be storable products."))
             if product.tracking == "none":
-                raise ValidationError("Green and bisque ware must be tracked by lot or serial.")
+                raise ValidationError(_("Green and bisque ware must be tracked by lot or serial."))
 
     @api.constrains("mb_second_product_tmpl_id", "tracking")
     def _check_second_tracking(self):
         for product in self.filtered("mb_second_product_tmpl_id"):
             if product.mb_second_product_tmpl_id == product:
-                raise ValidationError("A product cannot be its own seconds product.")
+                raise ValidationError(_("A product cannot be its own seconds product."))
             if product.mb_second_product_tmpl_id.tracking != product.tracking:
-                raise ValidationError(
-                    "The first-quality and seconds products must use the same tracking policy."
-                )
+                raise ValidationError(_("The first-quality and seconds products must use the same tracking policy."))
 
     @api.constrains("mb_firing_min_temperature", "mb_firing_max_temperature")
     def _check_firing_range(self):
@@ -50,6 +48,4 @@ class ProductTemplate(models.Model):
             if (product.mb_firing_min_temperature and product.mb_firing_max_temperature
                     and product.mb_firing_min_temperature
                     > product.mb_firing_max_temperature):
-                raise ValidationError(
-                    "The minimum firing temperature cannot exceed the maximum."
-                )
+                raise ValidationError(_("The minimum firing temperature cannot exceed the maximum."))

@@ -92,7 +92,8 @@ class MbMarketStockPlanLine(models.Model):
                 "bom_id": bom.id,
                 "location_dest_id": destination.id,
                 "date_deadline": operation.stock_preparation_deadline or operation.planned_start,
-                "origin": _("%(operation)s / %(target)s", operation=operation.name, target=line.display_name),
+                # A source-document reference built from record names, not prose.
+                "origin": f"{operation.name} / {line.display_name}",
                 "company_id": line.company_id.id,
                 "mb_market_stock_plan_line_id": line.id,
                 "mb_commercial_operation_id": operation.id,

@@ -1,0 +1,403 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_control_bridge
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_control_bridge
+#: model:ir.model.constraint,message:mb_control_bridge.constraint_res_users_rauthy_subject_unique
+msgid "A Rauthy subject can be linked to only one Odoo user."
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.constraint,message:mb_control_bridge.constraint_mb_control_operation_receipt_operation_key_unique
+msgid "A control-plane operation key can be applied only once."
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.constraint,message:mb_control_bridge.constraint_res_users_control_user_unique
+msgid "A control-plane user can be linked to only one Odoo user."
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.constraint,message:mb_control_bridge.constraint_res_company_control_workshop_unique
+msgid "A control-plane workshop can be linked to only one company."
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_users__mb_control_role__accountant
+msgid "Accountant"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_company__mb_entitlement_status__active
+msgid "Active"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid ""
+"An unmanaged Odoo user already uses %(email)s; link it explicitly before "
+"provisioning."
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model,name:mb_control_bridge.model_mb_control_operation_receipt
+msgid "Applied control-plane operation"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__command
+msgid "Command"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model,name:mb_control_bridge.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__mb_control_user_id
+msgid "Control-plane user ID"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_control_workshop_id
+msgid "Control-plane workshop ID"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_users__mb_control_role__artisan
+msgid "Craftsperson"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__display_name
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__display_name
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_entitlement_expires_at
+msgid "Entitlement expiry"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_entitlement_limits
+msgid "Entitlement limits"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_entitlement_plan
+msgid "Entitlement plan"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_entitlement_signature
+msgid "Entitlement signature"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_entitlement_status
+msgid "Entitlement status"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_entitlement_version
+msgid "Entitlement version"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "French accounting cannot be initialized after journal items exist."
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__id
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__id
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model_terms:ir.ui.view,arch_db:mb_control_bridge.view_company_form_control_plane
+msgid "MakersBrain control plane"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model_terms:ir.ui.view,arch_db:mb_control_bridge.view_users_form_control_plane
+msgid "MakersBrain identity"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__mb_control_membership_epoch
+msgid "Membership epoch"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "OIDC client and trusted issuer are required"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__operation_key
+msgid "Operation Key"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_users__mb_control_role__owner
+msgid "Owner"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_company__mb_entitlement_status__past_due
+msgid "Past Due"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__payload_digest
+msgid "Payload Digest"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_company__mb_entitlement_status__provisioning
+msgid "Provisioning"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__mb_rauthy_subject
+msgid "Rauthy subject"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__response
+msgid "Response"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_company__mb_entitlement_status__restricted
+msgid "Restricted"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_users__mb_control_role__studio_manager
+msgid "Studio manager"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_company__mb_entitlement_status__suspended
+msgid "Suspended"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/control_operation_receipt.py:0
+msgid ""
+"The operation key was already used with a different command or payload."
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_company__mb_entitlement_status__trial
+msgid "Trial"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model,name:mb_control_bridge.model_res_users
+msgid "User"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_users__mb_control_role__viewer
+msgid "Viewer"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__mb_control_role
+msgid "Workshop role"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "a supported module cannot currently be enabled"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "a supported module is unavailable in this release"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "active must be a boolean"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "an older entitlement cannot replace the current version"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "control-plane identity links conflict"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "email must be a normalized address"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "entitlement limits must be an object"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "entitlement plan is required"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "entitlement signature is required"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "entitlement version must be a positive integer"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "membership belongs to another workshop"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "membership epoch must be a positive integer"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "module bundle belongs to another workshop"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "name is required"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "subject is invalid"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "the authorization-code OIDC module is not installed"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "the entitlement version already contains different data"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "the installed OAuth provider does not support authorization-code OIDC"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "the membership epoch already contains different data"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "this company is linked to another workshop"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "unsupported entitlement status"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "unsupported module bundle"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "unsupported workshop role"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "user_id must be a lowercase UUID"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "workshop_id must be a lowercase UUID"
+msgstr ""

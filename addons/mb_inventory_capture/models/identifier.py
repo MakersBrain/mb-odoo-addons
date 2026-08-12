@@ -49,6 +49,25 @@ def normalize_any_gtin(value):
         return None
 
 
+def expand_upc_e(value):
+    """Expand an 8-digit UPC-E (number system + payload + check) to UPC-A."""
+    digits = re.sub(r"[\s-]", "", (value or "").strip())
+    if len(digits) != 8 or not digits.isdigit() or digits[0] not in {"0", "1"}:
+        return None
+    number_system, payload, check = digits[0], digits[1:7], digits[7]
+    last = payload[5]
+    if last in "012":
+        body = number_system + payload[:2] + last + "0000" + payload[2:5]
+    elif last == "3":
+        body = number_system + payload[:3] + "00000" + payload[3:5]
+    elif last == "4":
+        body = number_system + payload[:4] + "00000" + payload[4]
+    else:
+        body = number_system + payload[:5] + "0000" + last
+    expanded = body + check
+    return expanded if normalize_any_gtin(expanded) else None
+
+
 def parse_gs1_element_string(value):
     """Parse the fixed fields and AI 10/30 from a scanner element string.
 

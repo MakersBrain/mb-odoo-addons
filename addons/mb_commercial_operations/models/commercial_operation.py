@@ -641,7 +641,8 @@ class MbCommercialOperation(models.Model):
                 raise UserError(_("Only draft or costed operations can be approved."))
             blocking = [warning[2] for warning in operation._get_planning_warnings() if warning[1] == "blocking"]
             if blocking:
-                raise ValidationError("\n".join(blocking))
+                blocking_message = "\n".join(blocking)
+                raise ValidationError(blocking_message)
             scenario = operation.primary_scenario_id
             if scenario and scenario.state == "draft":
                 scenario._approve_as_primary()
@@ -766,7 +767,7 @@ class MbCommercialCostLine(models.Model):
     calculation = fields.Selection(
         [
             ("fixed", "Fixed"), ("hour", "Per hour"), ("kilometre", "Per kilometre"),
-            ("day", "Per day"), ("revenue_percent", "% of revenue"), ("unit", "Per unit"),
+            ("day", "Per day"), ("revenue_percent", "Percentage of revenue"), ("unit", "Per unit"),
         ],
         required=True,
         default="fixed",

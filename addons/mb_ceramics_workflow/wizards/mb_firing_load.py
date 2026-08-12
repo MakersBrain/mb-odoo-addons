@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -46,7 +46,7 @@ class MbFiringLoad(models.TransientModel):
         self.ensure_one()
         firing = self.firing_id
         if firing.state != "draft":
-            raise UserError("Only a loading firing can receive work.")
+            raise UserError(_("Only a loading firing can receive work."))
         selected = self.workorder_ids
         if self.board_ids:
             contents = self.env["mb.board.content"].search([
@@ -62,15 +62,16 @@ class MbFiringLoad(models.TransientModel):
                 ("board_id", "not in", self.board_ids.ids),
             ]).board_id
             if missing_boards:
-                raise UserError(
-                    "The same firing work order also stands on: %s. Load those boards "
-                    "or split the manufacturing order first."
-                    % ", ".join(missing_boards.mapped("display_name")))
+                raise UserError(_(
+                    "The same firing work order also stands on: %(boards)s. Load "
+                    "those boards or split the manufacturing order first.",
+                    boards=", ".join(missing_boards.mapped("display_name")),
+                ))
         if not selected:
-            raise UserError("Select at least one compatible work order or board.")
+            raise UserError(_("Select at least one compatible work order or board."))
         invalid = selected - self.eligible_workorder_ids
         if invalid:
-            raise UserError("Some selected work orders are not compatible with this firing.")
+            raise UserError(_("Some selected work orders are not compatible with this firing."))
         selected.mb_assign_firing(firing)
         firing.carrier_ids = [fields.Command.link(board.id) for board in self.board_ids]
         return {"type": "ir.actions.act_window_close"}

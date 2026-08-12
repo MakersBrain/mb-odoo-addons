@@ -886,7 +886,7 @@ class MbCommercialPlanningWizardLine(models.TransientModel):
     turnover_levy_rate = fields.Float()
     product_unit_cost = fields.Monetary()
     product_cost_mode = fields.Selection(
-        [("amount", "Amount"), ("sales_percent", "% of sales excluding VAT")],
+        [("amount", "Amount"), ("sales_percent", "Percentage of sales excluding VAT")],
         required=True, default="amount",
     )
     product_cost_rate = fields.Float()

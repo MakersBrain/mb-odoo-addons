@@ -1,4 +1,4 @@
-from odoo import api, models
+from odoo import _, api, models
 
 
 class InventoryCaptureCatalogueLookup(models.AbstractModel):
@@ -27,21 +27,21 @@ class InventoryCaptureCatalogueLookup(models.AbstractModel):
             if variants:
                 for variant in variants:
                     candidates.append({
-                        "canonical_id": canonical_id,
+                        "canonical_id": f"catalogue:{canonical_id}",
                         "label": variant.display_name,
                         "product_id": variant.id,
                         "source": "makersbrain_catalogue",
                         "confidence": 1.0 if barcode else 0.85,
                         "grounded": True,
-                        "explanation": f"Verified catalogue identity {canonical_id}",
+                        "explanation": _("Verified catalogue identity %(identity)s", identity=canonical_id),
                     })
             else:
                 candidates.append({
-                    "canonical_id": canonical_id,
+                    "canonical_id": f"catalogue:{canonical_id}",
                     "label": label,
                     "source": "makersbrain_catalogue",
                     "confidence": 1.0 if barcode else 0.75,
                     "grounded": True,
-                    "explanation": "Catalogue match; import or map it before applying inventory.",
+                    "explanation": _("Catalogue match; import or map it before applying inventory."),
                 })
         return candidates

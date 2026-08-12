@@ -1,0 +1,162 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_label_pos
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_label_pos
+#: model:ir.model.fields,field_description:mb_label_pos.field_mb_label_qr_alias__display_name
+#: model:ir.model.fields,field_description:mb_label_pos.field_pos_config__display_name
+#: model:ir.model.fields,field_description:mb_label_pos.field_pos_session__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_label_pos
+#: model:ir.model,name:mb_label_pos.model_mb_label_qr_alias
+msgid "Durable Printed QR Alias"
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/scanner_enhancements.xml:0
+msgid "Flash off"
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/scanner_enhancements.xml:0
+msgid "Flash on"
+msgstr ""
+
+#. module: mb_label_pos
+#: model:ir.model.fields,field_description:mb_label_pos.field_mb_label_qr_alias__id
+#: model:ir.model.fields,field_description:mb_label_pos.field_pos_config__id
+#: model:ir.model.fields,field_description:mb_label_pos.field_pos_session__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "Label QR error"
+msgstr ""
+
+#. module: mb_label_pos
+#: model:ir.model.fields,field_description:mb_label_pos.field_pos_config__mb_label_qr_prefixes
+msgid "Mb Label Qr Prefixes"
+msgstr ""
+
+#. module: mb_label_pos
+#: model:ir.model,name:mb_label_pos.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr ""
+
+#. module: mb_label_pos
+#: model:ir.model,name:mb_label_pos.model_pos_session
+msgid "Point of Sale Session"
+msgstr ""
+
+#. module: mb_label_pos
+#: model:ir.model.fields,field_description:mb_label_pos.field_mb_label_qr_alias__pos_available_quantity
+msgid "Pos Available Quantity"
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/scanner_enhancements.xml:0
+msgid "Scan brightness"
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "The SKU in this label QR code is unknown to this Point of Sale."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/scanner_enhancements.js:0
+msgid "The camera rejected the brightness setting: %(message)s"
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/scanner_enhancements.js:0
+msgid "The camera rejected the flash setting: %(message)s"
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "The lot or serial in this label QR code does not exist."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid ""
+"The product identified by this label is not available in this Point of Sale."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "This QR code matches more than one product or identity."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "This label QR code could not be resolved."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "This label QR code has an invalid SKU/lot path."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "This label belongs to another company."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid ""
+"This legacy or newly issued QR is not cached yet. Reconnect once to validate"
+" it."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "This printed QR identity has been retired and cannot be sold."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid ""
+"This product, lot, or serial has no available stock in the POS source "
+"location."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "This serial number is already present in a draft POS order."
+msgstr ""

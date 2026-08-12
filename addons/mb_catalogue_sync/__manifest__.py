@@ -10,7 +10,7 @@ that belongs in an artisan's database. What crosses the boundary is the curated
 manufacturer identity - Mayco SC74 Hot Tamale - plus the offers of the suppliers
 this workshop actually buys from.
 """,
-    "version": "19.0.1.4.0",
+    "version": "19.0.1.4.1",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",

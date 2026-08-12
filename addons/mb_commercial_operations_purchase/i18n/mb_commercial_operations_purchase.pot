@@ -1,0 +1,215 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_commercial_operations_purchase
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_commercial_operations_purchase
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_purchase.view_commercial_operation_form_purchase
+msgid "<span>Purchases</span>"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields.selection,name:mb_commercial_operations_purchase.selection__mb_market_stock_plan_line__readiness__at_risk
+msgid "At Risk"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#. odoo-python
+#: code:addons/mb_commercial_operations_purchase/models/commercial_operation.py:0
+msgid "Choose a vendor for %(product)s."
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model,name:mb_commercial_operations_purchase.model_mb_commercial_operation
+msgid "Commercial Operation"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_purchase.report_commercial_operation_purchase
+msgid "Deadline"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_commercial_operation__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_market_stock_plan_line__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_purchase_order__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_purchase_order_line__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#. odoo-python
+#: code:addons/mb_commercial_operations_purchase/models/commercial_operation.py:0
+msgid "Draft RFQ supply awaits review and confirmation."
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#. odoo-python
+#: code:addons/mb_commercial_operations_purchase/models/commercial_operation.py:0
+msgid ""
+"Draft purchase supply proposal for commercial stock target %(target)s. "
+"Review vendor, price, and deadline before native confirmation."
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_commercial_operation__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_market_stock_plan_line__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_purchase_order__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_purchase_order_line__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields.selection,name:mb_commercial_operations_purchase.selection__mb_market_stock_plan_line__readiness__in_progress
+msgid "In Progress"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#. odoo-python
+#: code:addons/mb_commercial_operations_purchase/models/commercial_operation.py:0
+msgid "Map the assortment shortage to a concrete purchasable product first."
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model,name:mb_commercial_operations_purchase.model_mb_market_stock_plan_line
+msgid "Market Stock Target"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_purchase_order__mb_commercial_operation_id
+msgid "Mb Commercial Operation"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_purchase_order_line__mb_market_stock_plan_line_id
+msgid "Mb Market Stock Plan Line"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#. odoo-python
+#: code:addons/mb_commercial_operations_purchase/models/commercial_operation.py:0
+msgid "No purchase supply covers this shortage."
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields.selection,name:mb_commercial_operations_purchase.selection__mb_market_stock_plan_line__supply_method__purchase
+msgid "Purchase"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_market_stock_plan_line__purchase_line_ids
+msgid "Purchase Lines"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model,name:mb_commercial_operations_purchase.model_purchase_order
+msgid "Purchase Order"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model,name:mb_commercial_operations_purchase.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_commercial_operation__purchase_order_ids
+msgid "Purchase Orders"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_market_stock_plan_line__purchase_product_id
+msgid "Purchase Product"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_purchase.report_commercial_operation_purchase
+msgid "Purchase supply"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#. odoo-python
+#: code:addons/mb_commercial_operations_purchase/models/commercial_operation.py:0
+msgid "Purchase supply is confirmed."
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#. odoo-python
+#: code:addons/mb_commercial_operations_purchase/models/commercial_operation.py:0
+msgid "Purchased supply is scheduled after the preparation cutoff."
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#. odoo-python
+#: code:addons/mb_commercial_operations_purchase/models/commercial_operation.py:0
+msgid "Purchasing is complete; refresh stock availability."
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_purchase.report_commercial_operation_purchase
+msgid "RFQ / Purchase"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_market_stock_plan_line__readiness
+msgid "Readiness"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields.selection,name:mb_commercial_operations_purchase.selection__mb_market_stock_plan_line__readiness__ready_to_pick
+msgid "Ready to Pick"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,help:mb_commercial_operations_purchase.field_mb_market_stock_plan_line__purchase_product_id
+msgid ""
+"Required for a bucket; an assortment shortage is never assigned to an "
+"arbitrary SKU."
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields.selection,name:mb_commercial_operations_purchase.selection__mb_market_stock_plan_line__readiness__shortage
+msgid "Shortage"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_purchase.report_commercial_operation_purchase
+msgid "State"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields.selection,name:mb_commercial_operations_purchase.selection__mb_market_stock_plan_line__readiness__supply_confirmed
+msgid "Supply Confirmed"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_market_stock_plan_line__supply_method
+msgid "Supply Method"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields.selection,name:mb_commercial_operations_purchase.selection__mb_market_stock_plan_line__readiness__supply_proposed
+msgid "Supply Proposed"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_purchase.report_commercial_operation_purchase
+msgid "Total"
+msgstr ""
+
+#. module: mb_commercial_operations_purchase
+#: model:ir.model.fields,field_description:mb_commercial_operations_purchase.field_mb_market_stock_plan_line__vendor_id
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_purchase.report_commercial_operation_purchase
+msgid "Vendor"
+msgstr ""

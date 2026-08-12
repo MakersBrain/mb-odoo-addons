@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -42,10 +42,8 @@ class MbGlazingMaterialAllocation(models.Model):
             in allocation.session_line_id.session_id._mb_terminal_states
             for allocation in self
         ):
-            raise UserError(
-                "Materials of a completed glazing session are immutable. "
-                "Create a correcting session instead."
-            )
+            raise UserError(_("Materials of a completed glazing session are immutable. "
+                "Create a correcting session instead."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -58,10 +56,8 @@ class MbGlazingMaterialAllocation(models.Model):
             line.session_id.state in line.session_id._mb_terminal_states
             for line in lines
         ):
-            raise UserError(
-                "Materials cannot be added to a completed or cancelled glazing "
-                "session. Create a correcting session instead."
-            )
+            raise UserError(_("Materials cannot be added to a completed or cancelled glazing "
+                "session. Create a correcting session instead."))
         return super().create(vals_list)
 
     def write(self, values):
@@ -102,15 +98,15 @@ class MbGlazingMaterialAllocation(models.Model):
     def _check_allocation(self):
         for allocation in self:
             if allocation.product_id.tracking == "none":
-                raise ValidationError("Only tracked components need an exact lot allocation.")
+                raise ValidationError(_("Only tracked components need an exact lot allocation."))
             if allocation.lot_id.product_id != allocation.product_id:
-                raise ValidationError("The allocated lot belongs to another product.")
+                raise ValidationError(_("The allocated lot belongs to another product."))
             if not allocation.uom_id._has_common_reference(
                 allocation.product_id.uom_id
             ):
-                raise ValidationError("The allocation UoM is incompatible with the product UoM.")
+                raise ValidationError(_("The allocation UoM is incompatible with the product UoM."))
             if (
                 allocation.lot_id.company_id
                 and allocation.lot_id.company_id != allocation.company_id
             ):
-                raise ValidationError("The allocated lot belongs to another company.")
+                raise ValidationError(_("The allocated lot belongs to another company."))

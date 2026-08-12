@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_inventory_capture_form_catalogue_import" model="ir.ui.view">
+        <field name="name">mb.inventory.capture.form.catalogue.import</field>
+        <field name="model">mb.inventory.capture</field>
+        <field name="inherit_id" ref="mb_inventory_capture.view_mb_inventory_capture_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='candidate_ids']/list/button[@name='action_create_reviewed_product']"
+                   position="after">
+                <button name="action_import_reviewed_product" type="object"
+                        string="Import catalogue product"
+                        groups="stock.group_stock_manager"
+                        invisible="kind != 'product' or source != 'makersbrain_catalogue' or product_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

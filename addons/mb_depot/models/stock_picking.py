@@ -99,9 +99,9 @@ class StockPicking(models.Model):
         }
 
     def _get_product_price_and_data(self, product):
-        """Prix public, not cost.
+        """Retail price, not cost.
 
-        The bon de dépôt and the statement both value a placement at list price,
+        The consignment note and the statement both value a placement at list price,
         so a catalog quoting standard_price would contradict the paper the
         gallery signs.
         """

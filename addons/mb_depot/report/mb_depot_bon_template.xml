@@ -13,10 +13,10 @@
         <div class="d-flex justify-content-between align-items-end border-bottom pb-2 mb-4">
           <div>
             <h2 class="mb-0">
-              <t t-if="doc.is_depot_placement">Bon de dépôt</t>
-              <t t-else="">Bon de reprise</t>
+              <t t-if="doc.is_depot_placement">Consignment Note</t>
+              <t t-else="">Return Note</t>
             </h2>
-            <span class="text-muted">Dépôt-vente</span>
+            <span class="text-muted">Consignment</span>
           </div>
           <div class="text-end">
             <div class="fs-4 fw-bold"><span t-field="doc.name"/></div>
@@ -24,7 +24,7 @@
               <span t-field="doc.date_done" t-options='{"widget": "date"}'/>
               <t t-if="not doc.date_done">
                 <span t-field="doc.scheduled_date" t-options='{"widget": "date"}'/>
-                <span> (prévu)</span>
+                <span> (planned)</span>
               </t>
             </div>
           </div>
@@ -32,13 +32,13 @@
 
         <div class="row mb-4">
           <div class="col-6">
-            <div class="text-muted text-uppercase small fw-bold mb-1">Déposant</div>
+            <div class="text-muted text-uppercase small fw-bold mb-1">Consignor</div>
             <div class="fw-bold"><span t-field="doc.company_id.partner_id.name"/></div>
             <div t-field="doc.company_id.partner_id"
                  t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": true}'/>
           </div>
           <div class="col-6">
-            <div class="text-muted text-uppercase small fw-bold mb-1">Dépositaire</div>
+            <div class="text-muted text-uppercase small fw-bold mb-1">Consignee</div>
             <div class="fw-bold"><span t-field="partner.name"/></div>
             <div t-if="partner" t-field="depot.depot_partner_id"
                  t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": true}'/>
@@ -47,20 +47,20 @@
 
         <div class="row mb-4">
           <div class="col-4">
-            <div class="text-muted small">Lieu de dépôt</div>
+            <div class="text-muted small">Depot location</div>
             <div><span t-field="depot.name"/></div>
           </div>
           <div class="col-4">
             <div class="text-muted small">Commission</div>
             <div>
-              <t t-if="depot.depot_commission">
+              <t t-if="depot.depot_commission" t-translation="off">
                 <span t-out="'%g' % depot.depot_commission"/><span> %</span>
               </t>
-              <t t-else="">—</t>
+              <t t-else="" t-translation="off">—</t>
             </div>
           </div>
           <div class="col-4">
-            <div class="text-muted small">Pièces</div>
+            <div class="text-muted small">Pieces</div>
             <div><span t-out="int(sum(lines.mapped('quantity')))"/></div>
           </div>
         </div>
@@ -69,10 +69,10 @@
           <thead>
             <tr>
               <th class="text-start" style="width:5%;">#</th>
-              <th class="text-start" style="width:33%;">Pièce</th>
-              <th class="text-start" style="width:20%;">N° de série</th>
-              <th class="text-end" style="width:12%;">Qté</th>
-              <th class="text-end" style="width:15%;">Prix public</th>
+              <th class="text-start" style="width:33%;">Piece</th>
+              <th class="text-start" style="width:20%;">Serial number</th>
+              <th class="text-end" style="width:12%;">Qty</th>
+              <th class="text-end" style="width:15%;">Retail price</th>
               <th class="text-end" style="width:15%;">Total</th>
             </tr>
           </thead>
@@ -84,7 +84,7 @@
               </td>
               <td class="text-start">
                 <span t-field="ml.lot_id.name"/>
-                <t t-if="not ml.lot_id"><span class="text-muted">—</span></t>
+                <t t-if="not ml.lot_id" t-translation="off"><span class="text-muted">—</span></t>
               </td>
               <!-- nowrap: the quantity and its unit wrapping onto two lines is
                    what pushes a long placement onto a second page. -->
@@ -108,7 +108,7 @@
           <div class="col-5">
             <table class="table table-sm" style="width:99%;">
               <tr class="border-black o_total">
-                <td><strong>Total prix public</strong></td>
+                <td><strong>Total retail price</strong></td>
                 <td class="text-end">
                   <strong>
                     <span t-out="total"
@@ -117,14 +117,14 @@
                 </td>
               </tr>
               <tr t-if="depot.depot_commission">
-                <td class="text-muted">Commission dépositaire (<span t-out="'%g' % depot.depot_commission"/> %)</td>
+                <td class="text-muted">Consignee commission<t t-translation="off"> (<span t-out="'%g' % depot.depot_commission"/> %)</t></td>
                 <td class="text-end text-muted">
                   <span t-out="total * depot.depot_commission / 100.0"
                         t-options='{"widget": "monetary", "display_currency": currency}'/>
                 </td>
               </tr>
               <tr t-if="depot.depot_commission">
-                <td class="text-muted">Net déposant si vente intégrale</td>
+                <td class="text-muted">Consignor net if fully sold</td>
                 <td class="text-end text-muted">
                   <span t-out="total * (100.0 - depot.depot_commission) / 100.0"
                         t-options='{"widget": "monetary", "display_currency": currency}'/>
@@ -141,32 +141,32 @@
         <div class="border-top pt-2 mb-4">
           <p class="text-muted small mb-0">
             <t t-if="doc.is_depot_placement">
-              Pièces confiées en dépôt-vente. Elles restent la propriété du déposant
-              jusqu'à leur vente au public par le dépositaire, qui en assume la garde
-              et répond de leur perte ou détérioration. Le dépositaire relève les
-              ventes réalisées et les communique au déposant, qui facture chaque
-              pièce vendue au prix public diminué de la commission ci-dessus. Les
-              pièces invendues sont restituées sur demande. Le total ci-dessus est
-              indicatif et ne constitue pas une facture.
+              Pieces entrusted on consignment. They remain the property of the
+              consignor until they are sold to the public by the consignee, who has
+              custody of them and answers for their loss or damage. The consignee
+              records the sales made and reports them to the consignor, who invoices
+              each piece sold at the retail price less the commission above. Unsold
+              pieces are returned on request. The total above is indicative and does
+              not constitute an invoice.
             </t>
             <t t-else="">
-              Pièces reprises du dépôt et restituées au déposant. Le présent bon
-              solde la garde de ces pièces par le dépositaire. Le total ci-dessus est
-              indicatif et ne constitue pas une facture.
+              Pieces taken back from the depot and returned to the consignor. This
+              note closes the consignee's custody of those pieces. The total above is
+              indicative and does not constitute an invoice.
             </t>
           </p>
         </div>
 
         <div class="row mt-4">
           <div class="col-6">
-            <div class="text-muted text-uppercase small fw-bold">Le déposant</div>
-            <div class="text-muted small">Nom, date et signature</div>
+            <div class="text-muted text-uppercase small fw-bold">The consignor</div>
+            <div class="text-muted small">Name, date and signature</div>
             <div style="height:70px;"/>
             <div class="border-top"/>
           </div>
           <div class="col-6">
-            <div class="text-muted text-uppercase small fw-bold">Le dépositaire</div>
-            <div class="text-muted small">Nom, date et signature, précédés de « Lu et approuvé »</div>
+            <div class="text-muted text-uppercase small fw-bold">The consignee</div>
+            <div class="text-muted small">Name, date and signature, preceded by "Read and approved"</div>
             <div style="height:70px;"/>
             <div class="border-top"/>
           </div>

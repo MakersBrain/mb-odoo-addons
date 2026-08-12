@@ -1,0 +1,2002 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_fr_micro_urssaf
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"%(category)s is negative (%(amount).2f); obtain URSSAF treatment and enter a"
+" reasoned adjustment."
+msgstr ""
+"%(category)s est négatif (%(amount).2f) ; obtenez le traitement URSSAF "
+"applicable et saisissez un ajustement motivé."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"%(date)s: cot. %(cot)s%% × ACRE %(acre)s; CFP %(cfp)s%%; chamber "
+"%(chamber)s%%; VFL %(vfl)s%%"
+msgstr ""
+"%(date)s : cot. %(cot)s%% × ACRE %(acre)s ; CFP %(cfp)s%% ; chambre "
+"%(chamber)s%% ; VFL %(vfl)s%%"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+msgid "%(label)s end date precedes its start date."
+msgstr "La date de fin de %(label)s précède sa date de début."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "%(levy)s — %(category)s — %(rate)s%% from %(date)s"
+msgstr "%(levy)s — %(category)s — %(rate)s%% à compter du %(date)s"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "<strong>Anomalies found</strong>"
+msgstr "<strong>Anomalies détectées</strong>"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.constraint,message:l10n_fr_micro_urssaf.constraint_l10n_fr_micro_urssaf_declaration_company_period_unique
+msgid "A declaration already exists for this company and period."
+msgstr "Une déclaration existe déjà pour cette société et cette période."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.constraint,message:l10n_fr_micro_urssaf.constraint_l10n_fr_micro_urssaf_declaration_line_declaration_cate_f454f42a
+msgid "A declaration can contain one line per category."
+msgstr "Une déclaration ne peut contenir qu'une ligne par catégorie."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "A filed URSSAF declaration cannot be deleted."
+msgstr "Une déclaration URSSAF déposée ne peut pas être supprimée."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"A filed URSSAF declaration is immutable. Reset it to draft with a reason "
+"first."
+msgstr ""
+"Une déclaration URSSAF déposée est immuable. Remettez-la d'abord en "
+"brouillon en indiquant un motif."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "A levy rate cannot be negative."
+msgstr "Un taux de prélèvement ne peut pas être négatif."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "A manual declaration adjustment requires a reason."
+msgstr "Un ajustement manuel de déclaration exige un motif."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "A rate end date cannot precede its start date."
+msgstr "La date de fin d'un taux ne peut pas précéder sa date de début."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.constraint,message:l10n_fr_micro_urssaf.constraint_l10n_fr_micro_urssaf_declaration_source_company_event_unique
+msgid "A recognised event can be claimed only once."
+msgstr "Un événement constaté ne peut être revendiqué qu'une seule fois."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "A threshold end date cannot precede its start date."
+msgstr "La date de fin d'un seuil ne peut pas précéder sa date de début."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "ACRE creation-date rules cannot overlap."
+msgstr "Les règles ACRE par date de création ne peuvent pas se chevaucher."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "ACRE creations from %(date)s — %(coefficient)s payable"
+msgstr "Créations ACRE à compter du %(date)s — %(coefficient)s dû"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_setup_wizard_form
+msgid ""
+"ACRE dates and the payable coefficient are derived from the dated rule for "
+"the activity start date."
+msgstr ""
+"Les dates ACRE et le coefficient dû sont déduits de la règle datée "
+"correspondant à la date de début d'activité."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_acre_from
+msgid "ACRE from"
+msgstr "ACRE depuis le"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__acre_granted
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_acre_granted
+msgid "ACRE granted"
+msgstr "ACRE accordée"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_acre_coefficient
+msgid "ACRE payable coefficient"
+msgstr "Coefficient ACRE dû"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.actions.act_window,name:l10n_fr_micro_urssaf.action_urssaf_acre_rules
+#: model:ir.ui.menu,name:l10n_fr_micro_urssaf.menu_urssaf_acre_rules
+msgid "ACRE rules"
+msgstr "Règles ACRE"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_company_form_urssaf
+msgid "ACRE scheme"
+msgstr "Dispositif ACRE"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_acre_to
+msgid "ACRE through"
+msgstr "ACRE jusqu'au"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__accounting_responsible_id
+msgid "Accounting Responsible"
+msgstr "Responsable comptable"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_depot_sale_horizon_confirmed
+msgid ""
+"Accounting has checked that the permanent horizon includes any historical "
+"declarations that were filed and later reopened."
+msgstr ""
+"La comptabilité a vérifié que l'horizon permanent couvre les déclarations "
+"historiques qui ont été déposées puis rouvertes."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__acre_coefficient
+msgid "Acre Coefficient"
+msgstr "Coefficient ACRE"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_ids
+msgid "Activities"
+msgstr "Activités"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Indicateur d’exception d’activité"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__activity_start_date
+msgid "Activity Start Date"
+msgstr "Date de début d'activité"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_state
+msgid "Activity State"
+msgstr "Statut de l'activité"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Icône de type d'activité"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_company_form_urssaf
+msgid ""
+"After confirmation this horizon can only move forward. Previously closed "
+"dates will never become available to the depot-sale interface."
+msgstr ""
+"Après confirmation, cet horizon ne peut plus qu'avancer. Les dates déjà "
+"closes ne redeviendront jamais accessibles à l'interface de vente en dépôt."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__chamber_zone__alsace
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_chamber_zone__alsace
+msgid "Alsace departments (Bas-Rhin / Haut-Rhin)"
+msgstr "Départements alsaciens (Bas-Rhin / Haut-Rhin)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__amount
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Amount"
+msgstr "Montant"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+msgid "An ACRE grant requires start and end dates."
+msgstr "Une ACRE accordée exige des dates de début et de fin."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "An ACRE payable coefficient must be above 0 and at most 1."
+msgstr "Un coefficient ACRE dû doit être supérieur à 0 et au plus égal à 1."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "An ACRE rule end date cannot precede its start date."
+msgstr ""
+"La date de fin d'une règle ACRE ne peut pas précéder sa date de début."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_urssaf_tracking_start_confirmed
+msgid ""
+"An Accounting Administrator explicitly confirmed the first receipt date "
+"covered by Odoo."
+msgstr ""
+"Un administrateur de comptabilité a confirmé explicitement la première date "
+"d'encaissement couverte par Odoo."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/depot_sale_report.py:0
+msgid ""
+"An Accounting Administrator must confirm the permanent URSSAF depot-sale "
+"closing horizon for this company before a depot sale can be processed."
+msgstr ""
+"Un administrateur de comptabilité doit confirmer l'horizon permanent de "
+"clôture des ventes en dépôt URSSAF de cette société avant qu'une vente en "
+"dépôt puisse être traitée."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.actions.act_window,name:l10n_fr_micro_urssaf.action_urssaf_annual
+#: model:ir.ui.menu,name:l10n_fr_micro_urssaf.menu_urssaf_annual
+msgid "Annual evidence"
+msgstr "Justificatifs annuels"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"Annual evidence for %(year)s is missing; prior-year thresholds and any "
+"chamber-tax exemption cannot be decided."
+msgstr ""
+"Les justificatifs annuels de %(year)s sont manquants ; les seuils de l'année"
+" précédente et une éventuelle exonération de taxe pour frais de chambre ne "
+"peuvent pas être déterminés."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_l10n_fr_micro_urssaf_annual
+msgid "Annual micro-enterprise reference evidence"
+msgstr "Justificatif annuel de référence de la micro-entreprise"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__anomaly_text
+msgid "Anomaly Text"
+msgstr "Texte d'anomalie"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_setup_wizard_form
+msgid "Apply configuration"
+msgstr "Appliquer la configuration"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_line__category__bic_service
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__category__bic_service
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__category__bic_service
+msgid "BIC — commercial or craft services"
+msgstr "BIC — prestations commerciales ou artisanales"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_line__category__bic_goods
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__category__bic_goods
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__category__bic_goods
+msgid "BIC — sales of goods"
+msgstr "BIC — ventes de marchandises"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_line__category__bnc
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__category__bnc
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__category__bnc
+msgid "BNC — liberal activity"
+msgstr "BNC — activité libérale"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__account_journal__l10n_fr_micro_receipt_method__transfer
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__receipt_method__transfer
+msgid "Bank transfer"
+msgstr "Virement bancaire"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__blocking_anomaly
+msgid "Blocking Anomaly"
+msgstr "Anomalie bloquante"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__cfp_rate
+msgid "CFP rate (%)"
+msgstr "Taux CFP (%)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__cfp_rate_id
+msgid "CFP rule"
+msgstr "Règle CFP"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_setup_wizard_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__account_journal__l10n_fr_micro_receipt_method__card
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__receipt_method__card
+msgid "Card"
+msgstr "Carte"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__account_journal__l10n_fr_micro_receipt_method__cash
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__receipt_method__cash
+msgid "Cash"
+msgstr "Espèces"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__engine__caba
+msgid "Cash-basis journal"
+msgstr "Journal sur les encaissements"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__category
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__category
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__category
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Category"
+msgstr "Catégorie"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__cfp_amount
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__cfp_amount
+msgid "Cfp Amount"
+msgstr "Montant CFP"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__chamber_amount
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__chamber_amount
+msgid "Chamber Amount"
+msgstr "Montant de la taxe pour frais de chambre"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__chamber_kind
+msgid "Chamber Kind"
+msgstr "Type de chambre consulaire"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__chamber_zone
+msgid "Chamber Zone"
+msgstr "Zone de taxe pour frais de chambre"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__chamber_kind__cci
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_chamber_kind__cci
+msgid "Chamber of commerce (CCI)"
+msgstr "Chambre de commerce (CCI)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__chamber_kind__cma
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_chamber_kind__cma
+msgid "Chamber of trades (CMA)"
+msgstr "Chambre de métiers (CMA)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__chamber_rate
+msgid "Chamber-tax rate (%)"
+msgstr "Taux de taxe pour frais de chambre (%)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__chamber_rate_id
+msgid "Chamber-tax rule"
+msgstr "Règle de taxe pour frais de chambre"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_chamber_zone
+msgid "Chamber-tax zone"
+msgstr "Zone de taxe pour frais de chambre"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__account_journal__l10n_fr_micro_receipt_method__cheque
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__receipt_method__cheque
+msgid "Cheque"
+msgstr "Chèque"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__company_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__company_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__company_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__company_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Company activity start date is missing."
+msgstr "La date de début d'activité de la société est manquante."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__exchange_rate
+msgid "Company-currency rate"
+msgstr "Taux vers la devise de la société"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Compute / refresh"
+msgstr "Calculer / actualiser"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_annual_form
+msgid "Compute from filed evidence"
+msgstr "Calculer à partir des justificatifs déposés"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__computed_turnover
+msgid "Computed Turnover"
+msgstr "Chiffre d'affaires calculé"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_annual__source__computed
+msgid "Computed from filed evidence"
+msgstr "Calculé à partir des justificatifs déposés"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_company_form_urssaf
+msgid "Confirm permanent horizon"
+msgstr "Confirmer l'horizon permanent"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"Confirm the URSSAF tracking boundary with the setup wizard before computing "
+"declarations."
+msgstr ""
+"Confirmez la limite de suivi URSSAF avec l'assistant de configuration avant "
+"de calculer des déclarations."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_chamber_kind
+msgid "Consular chamber"
+msgstr "Chambre consulaire"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__levy__chamber
+msgid "Consular chamber tax"
+msgstr "Taxe pour frais de chambre consulaire"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__cotisation_rate
+msgid "Contribution rate (%)"
+msgstr "Taux de cotisation (%)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__cotisation_rate_id
+msgid "Contribution rule"
+msgstr "Règle de cotisation"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__cotisation_amount
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__cotisation_amount
+msgid "Cotisation Amount"
+msgstr "Montant des cotisations"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__taxpayer_kind__artisan
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_cfp_kind__artisan
+msgid "Craftsperson"
+msgstr "Artisan"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__create_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__create_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__create_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__create_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__create_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__create_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__create_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__create_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__create_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__create_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__create_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__create_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__creation_date_from
+msgid "Creation Date From"
+msgstr "Date de création à partir du"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__creation_date_to
+msgid "Creation Date To"
+msgstr "Date de création jusqu'au"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__currency_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__currency_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__currency_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__currency_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Current"
+msgstr "Période courante"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__current_turnover
+msgid "Current Turnover"
+msgstr "Chiffre d'affaires de la période"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Daily POS receipt summaries"
+msgstr "Récapitulatifs quotidiens des encaissements du point de vente"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__date_from
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__date_from
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__date_from
+msgid "Date From"
+msgstr "Date de début"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__date_to
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__date_to
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__date_to
+msgid "Date To"
+msgstr "Date de fin"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_l10n_fr_micro_urssaf_acre_rule
+msgid "Dated ACRE payable coefficient"
+msgstr "Coefficient ACRE dû, daté"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.actions.act_window,name:l10n_fr_micro_urssaf.action_urssaf_rates
+msgid "Dated levy rates"
+msgstr "Taux de prélèvement datés"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_l10n_fr_micro_urssaf_rate
+msgid "Dated micro-enterprise levy rate"
+msgstr "Taux de prélèvement daté de la micro-entreprise"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_l10n_fr_micro_urssaf_threshold
+msgid "Dated micro-enterprise thresholds"
+msgstr "Seuils datés de la micro-entreprise"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__declaration_id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__declaration_id
+msgid "Declaration"
+msgstr "Déclaration"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__declaration_line_id
+msgid "Declaration Line"
+msgstr "Ligne de déclaration"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Declare"
+msgstr "À déclarer"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__declared_turnover
+msgid "Declared Turnover"
+msgstr "Chiffre d'affaires déclaré"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_list
+msgid "Declared total"
+msgstr "Total déclaré"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_account_move_line__l10n_fr_micro_vat_operation_date
+msgid ""
+"Delivery/taxable-event date used for the VAT-franchise threshold when it "
+"cannot be derived from stock or POS."
+msgstr ""
+"Date de livraison ou du fait générateur utilisée pour le seuil de franchise "
+"en base de TVA lorsqu'elle ne peut pas être déduite du stock ou du point de "
+"vente."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_mb_depot_sale_report
+msgid "Depositary sale report"
+msgstr "Relevé de ventes du dépositaire"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_depot_sale_horizon_confirmed
+msgid "Depot sale closing horizon confirmed"
+msgstr "Horizon de clôture des ventes en dépôt confirmé"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_depot_sale_closed_through
+msgid "Depot sales permanently closed through"
+msgstr "Ventes en dépôt closes définitivement jusqu'au"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_company_form_urssaf
+msgid "Depot-sale closing horizon"
+msgstr "Horizon de clôture des ventes en dépôt"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_company_form_urssaf
+msgid "Derive ACRE dates and coefficient"
+msgstr "Déduire les dates et le coefficient ACRE"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_account_journal__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_mb_depot_sale_report__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration__state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__due_date
+msgid "Due Date"
+msgstr "Date d'échéance"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "Editable annual evidence must be marked manual and include a reason."
+msgstr ""
+"Un justificatif annuel modifiable doit être marqué manuel et comporter un "
+"motif."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__engine
+msgid "Engine"
+msgstr "Moteur"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "Enter a four-digit reference year."
+msgstr "Saisissez une année de référence à quatre chiffres."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Enter a reset reason before reopening a filed declaration."
+msgstr ""
+"Saisissez un motif de réouverture avant de rouvrir une déclaration déposée."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+msgid "Enter the activity start date before deriving ACRE."
+msgstr "Saisissez la date de début d'activité avant de déduire l'ACRE."
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_list
+msgid "Estimated levies"
+msgstr "Prélèvements estimés"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__event_key
+msgid "Event Key"
+msgstr "Clé d'événement"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__source
+msgid "Evidence source"
+msgstr "Origine du justificatif"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_account_journal__l10n_fr_micro_receipt_method
+msgid ""
+"Explicit payment-method classification used by the micro-enterprise receipt "
+"book."
+msgstr ""
+"Classement explicite du moyen de paiement utilisé par le livre des recettes "
+"de la micro-entreprise."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid ""
+"File the declaration covering 31 December before computing annual evidence."
+msgstr ""
+"Déposez la déclaration couvrant le 31 décembre avant de calculer les "
+"justificatifs annuels."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration__state__filed
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Filed"
+msgstr "Déposée"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__filed_at
+msgid "Filed At"
+msgstr "Déposée le"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__filed_by_id
+msgid "Filed By"
+msgstr "Déposée par"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Filed declaration lines are immutable."
+msgstr "Les lignes d'une déclaration déposée sont immuables."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Filed declaration lines cannot be deleted."
+msgstr "Les lignes d'une déclaration déposée ne peuvent pas être supprimées."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Filed declaration reopened: %s"
+msgstr "Déclaration déposée rouverte : %s"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Filed declaration sources are immutable."
+msgstr "Les justificatifs d'une déclaration déposée sont immuables."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Filed declaration sources cannot be deleted."
+msgstr ""
+"Les justificatifs d'une déclaration déposée ne peuvent pas être supprimés."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__levy__liberatoire
+msgid "Flat-rate income tax payment"
+msgstr "Versement libératoire"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_versement_from
+msgid "Flat-rate income tax payment from"
+msgstr "Versement libératoire depuis le"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__liberatoire_rate
+msgid "Flat-rate income tax payment rate (%)"
+msgstr "Taux de versement libératoire (%)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__liberatoire_rate_id
+msgid "Flat-rate income tax payment rule"
+msgstr "Règle de versement libératoire"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_versement_to
+msgid "Flat-rate income tax payment through"
+msgstr "Versement libératoire jusqu'au"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Freeze this declaration as filed?"
+msgstr "Figer cette déclaration comme déposée ?"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_l10n_fr_micro_urssaf_setup_wizard
+msgid "French micro-enterprise URSSAF setup"
+msgstr "Configuration URSSAF de la micro-entreprise française"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_company_form_urssaf
+msgid "French micro-enterprise — URSSAF"
+msgstr "Micro-entreprise française — URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"Goods line %(move)s / %(line)s has no provable VAT-threshold delivery date."
+msgstr ""
+"La ligne de marchandises %(move)s / %(line)s n'a pas de date de livraison "
+"prouvable pour le seuil de TVA."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_account_journal__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_account_move_line__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_mb_depot_sale_report__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_exception_icon
+msgid "Icon"
+msgstr "Icône"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Icône pour indiquer une activité d'exception."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_has_error
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__is_prior_period
+msgid "Is Prior Period"
+msgstr "Période antérieure"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_account_journal
+msgid "Journal"
+msgstr "Journal"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__write_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__write_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__write_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__write_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__write_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__write_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__write_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__write_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__write_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__write_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__write_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__write_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__levy
+msgid "Levy"
+msgstr "Prélèvement"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.ui.menu,name:l10n_fr_micro_urssaf.menu_urssaf_rates
+msgid "Levy rates"
+msgstr "Taux de prélèvement"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__taxpayer_kind__liberal
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_cfp_kind__liberal
+msgid "Liberal profession"
+msgstr "Profession libérale"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__liberatoire_amount
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__liberatoire_amount
+msgid "Liberatoire Amount"
+msgstr "Montant du versement libératoire"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__line_ids
+msgid "Line"
+msgstr "Linéaire"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"Mandate accounting has not been reviewed through %(date)s for: %(depots)s"
+msgstr ""
+"La comptabilité de mandat n'a pas été revue jusqu'au %(date)s pour : "
+"%(depots)s"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Mandatory reason before reset"
+msgstr "Motif obligatoire avant remise en brouillon"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Manual"
+msgstr "Manuelle"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__manual_adjustment
+msgid "Manual Adjustment"
+msgstr "Ajustement manuel"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__manual_adjustment_reason
+msgid "Manual Adjustment Reason"
+msgstr "Motif de l'ajustement manuel"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__manual_reason
+msgid "Manual Reason"
+msgstr "Motif manuel"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "Manual annual evidence requires a reason."
+msgstr "Un justificatif annuel manuel exige un motif."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_annual__source__manual
+msgid "Manual opening evidence"
+msgstr "Justificatif d'ouverture manuel"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Mark filed"
+msgstr "Marquer comme déposée"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__taxpayer_kind__merchant
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_cfp_kind__merchant
+msgid "Merchant"
+msgstr "Commerçant"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Method"
+msgstr "Mode"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__chamber_zone__general
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_chamber_zone__general
+msgid "Metropolitan France — general"
+msgstr "France métropolitaine — cas général"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__micro_global
+msgid "Micro Global"
+msgstr "Seuil micro global"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__micro_service
+msgid "Micro Service"
+msgstr "Seuil micro prestations"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__micro_ytd_global
+msgid "Micro Ytd Global"
+msgstr "Micro cumul annuel global"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__micro_ytd_services
+msgid "Micro Ytd Services"
+msgstr "Micro cumul annuel prestations"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_account_journal__l10n_fr_micro_receipt_method
+msgid "Micro receipt method"
+msgstr "Moyen d'encaissement micro"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.ui.menu,name:l10n_fr_micro_urssaf.menu_urssaf_root
+msgid "Micro-enterprise"
+msgstr "Micro-entreprise"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_l10n_fr_micro_urssaf_declaration
+msgid "Micro-enterprise URSSAF turnover declaration"
+msgstr "Déclaration URSSAF de chiffre d'affaires de la micro-entreprise"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_activity_start_date
+msgid "Micro-enterprise activity start"
+msgstr "Début d'activité de la micro-entreprise"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"Micro: %(global).2f / %(global_limit).2f globally; %(services).2f / "
+"%(service_limit).2f services."
+msgstr ""
+"Micro : %(global).2f / %(global_limit).2f au global ; %(services).2f / "
+"%(service_limit).2f en prestations."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__receipt_method__mixed
+msgid "Mixed POS methods"
+msgstr "Moyens de paiement mixtes en point de vente"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_depot_sale_closed_through
+msgid ""
+"Monotonic horizon advanced whenever an URSSAF declaration is filed. Depot "
+"reports cannot be backdated on or before this date, even if the declaration "
+"is later reset to draft."
+msgstr ""
+"Horizon monotone avancé à chaque dépôt d'une déclaration URSSAF. Les "
+"rapports de dépôt ne peuvent pas être antidatés à cette date ou avant, même "
+"si la déclaration est ensuite remise en brouillon."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration__periodicity__monthly
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_setup_wizard__periodicity__monthly
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_urssaf_periodicity__monthly
+msgid "Monthly"
+msgstr "Mensuel"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__chamber_zone__moselle
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_chamber_zone__moselle
+msgid "Moselle department"
+msgstr "Département de la Moselle"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Échéance de mon activité"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Date limite de l'activité à venir"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_summary
+msgid "Next Activity Summary"
+msgstr "Résumé de l'activité suivante"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_type_id
+msgid "Next Activity Type"
+msgstr "Type d'activités à venir"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+msgid "No ACRE creation-date rule applies to this activity start date."
+msgstr ""
+"Aucune règle ACRE par date de création ne s'applique à cette date de début "
+"d'activité."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "No applicable %(levy)s rate exists for %(category)s on %(date)s."
+msgstr ""
+"Aucun taux de %(levy)s applicable n'existe pour %(category)s au %(date)s."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "No threshold rule applies on the declaration end date."
+msgstr ""
+"Aucune règle de seuil ne s'applique à la date de fin de la déclaration."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_chamber_kind__none
+msgid "Not registered"
+msgstr "Non immatriculé"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Only an Accounting Administrator can adjust a declaration."
+msgstr "Seul un administrateur de comptabilité peut ajuster une déclaration."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Only an Accounting Administrator can alter declaration evidence."
+msgstr ""
+"Seul un administrateur de comptabilité peut modifier les justificatifs d'une"
+" déclaration."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+msgid "Only an Accounting Administrator can change URSSAF configuration."
+msgstr ""
+"Seul un administrateur de comptabilité peut modifier la configuration "
+"URSSAF."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/account_journal.py:0
+msgid "Only an Accounting Administrator can classify receipt journals."
+msgstr ""
+"Seul un administrateur de comptabilité peut classer les journaux "
+"d'encaissement."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+msgid "Only an Accounting Administrator can confirm the depot-sale horizon."
+msgstr ""
+"Seul un administrateur de comptabilité peut confirmer l'horizon des ventes "
+"en dépôt."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "Only an Accounting Administrator can edit annual evidence."
+msgstr ""
+"Seul un administrateur de comptabilité peut modifier les justificatifs "
+"annuels."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Only an Accounting Administrator can perform this declaration action."
+msgstr ""
+"Seul un administrateur de comptabilité peut effectuer cette action de "
+"déclaration."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "Opening annual evidence must be marked manual and include a reason."
+msgstr ""
+"Un justificatif annuel d'ouverture doit être marqué manuel et comporter un "
+"motif."
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Origin / customer"
+msgstr "Origine / client"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__origin_move_id
+msgid "Origin Move"
+msgstr "Pièce d'origine"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__account_journal__l10n_fr_micro_receipt_method__other
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__receipt_method__other
+msgid "Other / manual"
+msgstr "Autre / manuel"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "POS session(s)"
+msgstr "Session(s) du point de vente"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "POS ticket %(ticket)s / %(line)s has no URSSAF tax category."
+msgstr ""
+"Le ticket de point de vente %(ticket)s / %(line)s n'a pas de catégorie de "
+"taxe URSSAF."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__partial_id
+msgid "Partial"
+msgstr "Partiel"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__payable_coefficient
+msgid "Payable Coefficient"
+msgstr "Coefficient dû"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__periodicity
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__periodicity
+msgid "Periodicity"
+msgstr "Périodicité"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__engine__pos
+msgid "Point of Sale"
+msgstr "Point de Vente"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__pos_order_id
+msgid "Pos Order"
+msgstr "Commande PdV"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Posted sale line %(move)s / %(line)s has no URSSAF tax category."
+msgstr ""
+"La ligne de vente comptabilisée %(move)s / %(line)s n'a pas de catégorie de "
+"taxe URSSAF."
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Print filing aid"
+msgstr "Imprimer l'aide à la déclaration"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__prior_period_adjustment
+msgid "Prior Period Adjustment"
+msgstr "Ajustement de période antérieure"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"Prior year: micro %(micro).2f globally / %(services).2f services; VAT "
+"%(vat).2f globally / %(vat_services).2f services."
+msgstr ""
+"Année précédente : micro %(micro).2f au global / %(services).2f en "
+"prestations ; TVA %(vat).2f au global / %(vat_services).2f en prestations."
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Prior-period"
+msgstr "Période antérieure"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__levy__cfp
+msgid "Professional training contribution"
+msgstr "Contribution à la formation professionnelle"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_cfp_kind
+msgid "Professional training contribution status"
+msgstr "Statut au titre de la contribution à la formation professionnelle"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration__periodicity__quarterly
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_setup_wizard__periodicity__quarterly
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__res_company__l10n_fr_micro_urssaf_periodicity__quarterly
+msgid "Quarterly"
+msgstr "Trimestriel"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__rate
+msgid "Rate (%)"
+msgstr "Taux (%)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__rate_summary
+msgid "Rate Summary"
+msgstr "Récapitulatif des taux"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "Rate validity periods overlap for the same applicability key."
+msgstr ""
+"Les périodes de validité des taux se chevauchent pour la même clé "
+"d'applicabilité."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__rating_ids
+msgid "Ratings"
+msgstr "Évaluations"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"Receipt %(description)s is already claimed by draft declaration "
+"%(declaration)s."
+msgstr ""
+"L'encaissement %(description)s est déjà revendiqué par la déclaration en "
+"brouillon %(declaration)s."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__receipt_method
+msgid "Receipt Method"
+msgstr "Moyen d'encaissement"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__receipt_method_detail
+msgid "Receipt Method Detail"
+msgstr "Détail du moyen d'encaissement"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Receipt book — supporting detail"
+msgstr "Livre des recettes — détail justificatif"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__source_currency_id
+msgid "Receipt currency"
+msgstr "Devise de l'encaissement"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__description
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Receipt description"
+msgstr "Libellé de l'encaissement"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__source_ids
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__source_ids
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Receipt evidence"
+msgstr "Justificatifs d'encaissement"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"Receipt evidence and its turnover box must belong to the same declaration."
+msgstr ""
+"Un justificatif d'encaissement et sa case de chiffre d'affaires doivent "
+"appartenir à la même déclaration."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Receipt evidence category must match its turnover box."
+msgstr ""
+"La catégorie du justificatif d'encaissement doit correspondre à sa case de "
+"chiffre d'affaires."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__source_amount_currency
+msgid "Receipt foreign amount"
+msgstr "Montant de l'encaissement en devise"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Receipt method is unproven for %(description)s."
+msgstr "Le moyen d'encaissement n'est pas prouvé pour %(description)s."
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Receipt(s)"
+msgstr "Ticket(s)"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_urssaf_tracking_start_date
+msgid ""
+"Receipts before this period boundary were filed outside Odoo and are not "
+"claimed."
+msgstr ""
+"Les encaissements antérieurs à cette limite de période ont été déclarés hors"
+" d'Odoo et ne sont pas revendiqués."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__engine__reconciliation
+msgid "Receivable reconciliation"
+msgstr "Lettrage des créances clients"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_l10n_fr_micro_urssaf_declaration_source
+msgid "Recognised turnover event claimed by an URSSAF declaration"
+msgstr ""
+"Événement de chiffre d'affaires constaté revendiqué par une déclaration "
+"URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__recognition_date
+msgid "Recognition Date"
+msgstr "Date de comptabilisation"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Recognition date"
+msgstr "Date de constatation"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Reopen this filed declaration using the reason below?"
+msgstr "Rouvrir cette déclaration déposée avec le motif ci-dessous ?"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__reset_reason
+msgid "Reset Reason"
+msgstr "Motif de réouverture"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Reset the filed declaration before recomputing it."
+msgstr "Remettez la déclaration déposée en brouillon avant de la recalculer."
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Reset to draft"
+msgstr "Remettre en brouillon"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Resolve every declaration anomaly before filing."
+msgstr "Résolvez toutes les anomalies de la déclaration avant de la déposer."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_user_id
+msgid "Responsible User"
+msgstr "Utilisateur responsable"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Review VAT-franchise threshold crossing"
+msgstr "Examiner le dépassement du seuil de franchise en base de TVA"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Erreur d'envoi SMS"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.actions.act_window,name:l10n_fr_micro_urssaf.action_urssaf_setup_wizard
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_setup_wizard_form
+msgid "Set up URSSAF declarations"
+msgstr "Configurer les déclarations URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.ui.menu,name:l10n_fr_micro_urssaf.menu_urssaf_setup
+msgid "Setup wizard"
+msgstr "Assistant de configuration"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_acre_coefficient
+msgid "Share of the normal social contribution rate that remains payable."
+msgstr "Part du taux normal de cotisations sociales qui reste due."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_rate__levy__cotisation
+msgid "Social contributions"
+msgstr "Cotisations sociales"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__source_move_line_id
+msgid "Source Move Line"
+msgstr "Ligne d'écriture source"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__state
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__declaration_state
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__declaration_state
+msgid "State"
+msgstr "Statut"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Statut basé sur les activités\n"
+"En retard : la date d'échéance est déjà dépassée\n"
+"Aujourd'hui : la date d'activité est aujourd'hui\n"
+"Planifiée : activités futures"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__taxpayer_kind
+msgid "Taxpayer Kind"
+msgstr "Type de contribuable"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+msgid "The ACRE payable coefficient must be above 0 and at most 1."
+msgstr "Le coefficient ACRE dû doit être supérieur à 0 et au plus égal à 1."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "The URSSAF tracking boundary has not been explicitly confirmed."
+msgstr "La limite de suivi URSSAF n'a pas été confirmée explicitement."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "The declaration end date precedes its start date."
+msgstr "La date de fin de la déclaration précède sa date de début."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"The micro-regime ceiling has been exceeded in two consecutive years; review "
+"the mandatory regime exit."
+msgstr ""
+"Le plafond du régime micro a été dépassé deux années consécutives ; examinez"
+" la sortie obligatoire du régime."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "The next period %(following)s must begin immediately after this one."
+msgstr ""
+"La période suivante %(following)s doit commencer immédiatement après celle-"
+"ci."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "The period must start on %(expected)s, immediately after %(previous)s."
+msgstr ""
+"La période doit commencer le %(expected)s, immédiatement après %(previous)s."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+msgid "The permanent URSSAF depot-sale horizon cannot be reduced."
+msgstr ""
+"L'horizon permanent des ventes en dépôt URSSAF ne peut pas être réduit."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"The prior year exceeded a VAT-franchise base threshold; verify continued "
+"eligibility."
+msgstr ""
+"L'année précédente a dépassé un seuil de base de la franchise en base de TVA"
+" ; vérifiez le maintien de l'éligibilité."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.constraint,message:l10n_fr_micro_urssaf.constraint_l10n_fr_micro_urssaf_annual_company_year_unique
+msgid "There can be only one annual reference per company and year."
+msgstr ""
+"Il ne peut y avoir qu'une seule référence annuelle par société et par année."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__threshold_status
+msgid "Threshold Status"
+msgstr "État des seuils"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.actions.act_window,name:l10n_fr_micro_urssaf.action_urssaf_thresholds
+msgid "Threshold rules"
+msgstr "Règles de seuil"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "Threshold validity periods cannot overlap."
+msgstr "Les périodes de validité des seuils ne peuvent pas se chevaucher."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.ui.menu,name:l10n_fr_micro_urssaf.menu_urssaf_thresholds
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Thresholds"
+msgstr "Seuils"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "Thresholds from %s"
+msgstr "Seuils à compter du %s"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__total_declared
+msgid "Total Declared"
+msgstr "Total déclaré"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__total_estimated
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__total_estimated
+msgid "Total Estimated"
+msgstr "Total estimé"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Total amount"
+msgstr "Montant total"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__tracking_start_date
+msgid "Tracking Start Date"
+msgstr "Date de début de suivi"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.view_urssaf_declaration_form
+msgid "Turnover boxes"
+msgstr "Cases de chiffre d'affaires"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Turnover boxes to transcribe"
+msgstr "Cases de chiffre d'affaires à reporter"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Type d'activité d'exception enregistrée."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "URSSAF %(from)s — %(to)s"
+msgstr "URSSAF du %(from)s au %(to)s"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_accounting_responsible_id
+msgid "URSSAF accounting responsible"
+msgstr "Responsable comptable URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "URSSAF accounting responsible is missing."
+msgstr "Le responsable comptable URSSAF est manquant."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.ui.menu,name:l10n_fr_micro_urssaf.menu_urssaf_configuration
+msgid "URSSAF configuration"
+msgstr "Configuration URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "URSSAF declaration"
+msgstr "Déclaration URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "URSSAF declaration periods cannot overlap."
+msgstr "Les périodes de déclaration URSSAF ne peuvent pas se chevaucher."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_l10n_fr_micro_urssaf_declaration_line
+msgid "URSSAF declaration turnover box"
+msgstr "Case de chiffre d'affaires d'une déclaration URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.actions.act_window,name:l10n_fr_micro_urssaf.action_urssaf_declarations
+#: model:ir.ui.menu,name:l10n_fr_micro_urssaf.menu_urssaf_declarations
+msgid "URSSAF declarations"
+msgstr "Déclarations URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.actions.report,name:l10n_fr_micro_urssaf.action_report_urssaf_declaration
+msgid "URSSAF filing aid and receipt book"
+msgstr "Aide à la déclaration URSSAF et livre des recettes"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_urssaf_tracking_start_date
+msgid "URSSAF ledger tracking starts"
+msgstr "Début du suivi du registre URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_urssaf_periodicity
+msgid "URSSAF periodicity"
+msgstr "Périodicité URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_urssaf_tracking_start_confirmed
+msgid "URSSAF tracking boundary confirmed"
+msgstr "Limite de suivi URSSAF confirmée"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/res_company.py:0
+msgid "URSSAF tracking cannot start before the activity."
+msgstr "Le suivi URSSAF ne peut pas commencer avant l'activité."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "URSSAF tracking start date is missing."
+msgstr "La date de début du suivi URSSAF est manquante."
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "URSSAF turnover declaration — filing aid"
+msgstr "Déclaration URSSAF de chiffre d'affaires — aide à la déclaration"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields.selection,name:l10n_fr_micro_urssaf.selection__l10n_fr_micro_urssaf_declaration_source__receipt_method__unknown
+msgid "Unproven"
+msgstr "Non prouvé"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__urssaf_goods
+msgid "Urssaf Goods"
+msgstr "Marchandises URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__urssaf_services
+msgid "Urssaf Services"
+msgstr "Prestations URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__urssaf_total
+msgid "Urssaf Total"
+msgstr "Total URSSAF"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_rule.py:0
+msgid "Use Compute from filed evidence to create a computed annual snapshot."
+msgstr ""
+"Utilisez Calculer à partir des justificatifs déposés pour créer un cliché "
+"annuel calculé."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "Use the manager-only file or reset action to change declaration state."
+msgstr ""
+"Utilisez l'action de dépôt ou de remise en brouillon, réservée aux "
+"gestionnaires, pour changer l'état de la déclaration."
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"VAT franchise: %(global).2f (base %(global_base).2f; major "
+"%(global_major).2f); services %(services).2f (base %(service_base).2f; major"
+" %(service_major).2f)."
+msgstr ""
+"Franchise en base de TVA : %(global).2f (base %(global_base).2f ; majoré "
+"%(global_major).2f) ; prestations %(services).2f (base %(service_base).2f ; "
+"majoré %(service_major).2f)."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_account_move_line__l10n_fr_micro_vat_operation_date
+msgid "VAT threshold operation date"
+msgstr "Date d'opération pour le seuil de TVA"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__vat_global
+msgid "Vat Global"
+msgstr "TVA globale"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__vat_global_base
+msgid "Vat Global Base"
+msgstr "Seuil de base TVA global"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__vat_global_major
+msgid "Vat Global Major"
+msgstr "Seuil majoré TVA global"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__vat_service_base
+msgid "Vat Service Base"
+msgstr "Seuil de base TVA prestations"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__vat_service_major
+msgid "Vat Service Major"
+msgstr "Seuil majoré TVA prestations"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__vat_services
+msgid "Vat Services"
+msgstr "TVA prestations"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__vat_ytd_global
+msgid "Vat Ytd Global"
+msgstr "TVA cumul annuel global"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__vat_ytd_services
+msgid "Vat Ytd Services"
+msgstr "TVA cumul annuel prestations"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid ""
+"Verify the source events and switch VAT from the actual crossing date: %s"
+msgstr ""
+"Vérifiez les événements sources et basculez la TVA à compter de la date "
+"réelle de dépassement : %s"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__website_message_ids
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__website_message_ids
+msgid "Website communication history"
+msgstr "Historique de communication du site web"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_annual__year
+msgid "Year"
+msgstr "Année"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "Year-to-date thresholds"
+msgstr "Seuils en cumul annuel"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "consular-chamber"
+msgstr "chambre consulaire"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/depot_sale_report.py:0
+msgid "filed URSSAF horizon"
+msgstr "horizon URSSAF déposé"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "flat-rate income tax payment"
+msgstr "versement libératoire"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "professional-training"
+msgstr "formation professionnelle"
+
+#. module: l10n_fr_micro_urssaf
+#. odoo-python
+#: code:addons/l10n_fr_micro_urssaf/models/urssaf_declaration.py:0
+msgid "social-contribution"
+msgstr "cotisations sociales"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "to"
+msgstr "au"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "— POS session"
+msgstr "— session du point de vente"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "— due"
+msgstr "— échéance"
+
+#. module: l10n_fr_micro_urssaf
+#: model_terms:ir.ui.view,arch_db:l10n_fr_micro_urssaf.report_urssaf_declaration
+msgid "— receipt"
+msgstr "— ticket"

@@ -5,7 +5,7 @@
             <header class="o_mb_label_toolbar d-flex align-items-center gap-2 border-bottom p-2 bg-white">
                 <select class="form-select w-auto" t-on-change="onTemplateSelect" t-att-value="state.selectedTemplateId">
                     <t t-foreach="state.templates" t-as="item" t-key="item.id">
-                        <option t-att-value="item.id" t-att-selected="item.id === state.selectedTemplateId"><t t-esc="item.name"/> · v<t t-esc="item.version_number"/></option>
+                        <option t-att-value="item.id" t-att-selected="item.id === state.selectedTemplateId"><t t-esc="templateOptionLabel(item)"/></option>
                     </t>
                 </select>
                 <button class="btn btn-outline-primary" t-on-click="createTemplate">New template</button>
@@ -28,7 +28,7 @@
                         <div class="d-flex justify-content-center mb-3 gap-3">
                             <label>Zoom <input type="range" min="2" max="10" step="0.5" t-model="state.zoom"/></label>
                             <label><input type="checkbox" t-model="state.grid"/> Snap 0.5 mm</label>
-                            <span><t t-esc="template.width_mm"/> × <t t-esc="template.height_mm"/> mm · <t t-esc="template.dpi"/> dpi</span>
+                            <span><t t-esc="canvasSizeSummary"/></span>
                         </div>
                         <div class="d-flex flex-wrap justify-content-center align-items-end mb-3 gap-3">
                             <label>Preview product<select class="form-select" t-on-change="onPreviewProduct"><option value="">Sample values</option><t t-foreach="state.previewProducts" t-as="product" t-key="product.id"><option t-att-value="product.id" t-att-selected="state.previewProductId === product.id"><t t-esc="product.name"/></option></t></select></label>
@@ -42,7 +42,7 @@
                                 <select class="form-select" t-on-change="onPrinterProfile" t-att-value="selectedPrinterProfileId">
                                     <option value="custom" t-att-selected="selectedPrinterProfileId === 'custom'">Custom / manual</option>
                                     <t t-foreach="printerProfiles" t-as="profile" t-key="profile.id">
-                                        <option t-att-value="profile.id" t-att-selected="selectedPrinterProfileId === profile.id"><t t-esc="profile.label"/> · <t t-esc="profile.dpi"/> dpi</option>
+                                        <option t-att-value="profile.id" t-att-selected="selectedPrinterProfileId === profile.id"><t t-esc="printerProfileLabel(profile)"/></option>
                                     </t>
                                 </select>
                             </label>
@@ -50,7 +50,7 @@
                                 <select class="form-select" t-on-change="onMediaPreset" t-att-value="selectedMediaPresetId">
                                     <option value="" t-att-selected="!selectedMediaPresetId">Custom size</option>
                                     <t t-foreach="selectedPrinterProfile.media" t-as="media" t-key="media.id">
-                                        <option t-att-value="media.id" t-att-selected="selectedMediaPresetId === media.id"><t t-esc="media.label"/></option>
+                                        <option t-att-value="media.id" t-att-selected="selectedMediaPresetId === media.id"><t t-esc="media.label()"/></option>
                                     </t>
                                 </select>
                             </label>
@@ -125,7 +125,7 @@
                         </t>
                         <div class="d-flex flex-wrap gap-2 mt-4"><button class="btn btn-outline-secondary" t-on-click="duplicate">Duplicate</button><button class="btn btn-outline-secondary" t-on-click="() => this.reorder(1)">Bring forward</button><button class="btn btn-outline-secondary" t-on-click="() => this.reorder(-1)">Send backward</button><button class="btn btn-outline-danger" t-on-click="remove">Delete</button></div>
                         <hr/>
-                        <p class="small text-muted">Bindings: {{product.name}}, {{product.price}}, {{product.price.raw}}, {{product.default_code}}, {{product.barcode}}, {{lot.name}}, {{company.name}}, {{company.currency}}, {{qr}}, {{qr.path}}.</p><p class="small text-muted">Format filters: {{product.price|money_trim}} removes a zero-only decimal; {{product.price.raw|money}} keeps currency decimals; {{product.price.raw|fixed:1}}, |number, |upper, |lower, |title, |trim and |default:Text can be chained. Expressions: [[date]], [[time]], [[datetime]], [[iso]], [[month]], [[monthyear]], [[date|DD.MM.YY]].</p><p class="small text-muted">Shift-click multi-selects. Keyboard: arrows move 0.5 mm, Shift+arrows 0.1 mm, Ctrl+A select all, Ctrl+G group, Ctrl+Shift+G ungroup, Ctrl+D duplicate, Delete remove, Ctrl+Z/Ctrl+Y history.</p>
+                        <p class="small text-muted"><span>Bindings:</span> <span t-translation="off">{{product.name}}, {{product.price}}, {{product.price.raw}}, {{product.default_code}}, {{product.barcode}}, {{lot.name}}, {{company.name}}, {{company.currency}}, {{qr}}, {{qr.path}}.</span></p><p class="small text-muted"><span>A binding can be chained with format filters: money_trim removes a zero-only decimal, money keeps the currency decimals, and fixed sets the number of decimals. Date expressions are available too.</span> <span t-translation="off">{{product.price|money_trim}}, {{product.price.raw|money}}, {{product.price.raw|fixed:1}}, |number, |upper, |lower, |title, |trim, |default:Text — [[date]], [[time]], [[datetime]], [[iso]], [[month]], [[monthyear]], [[date|DD.MM.YY]]</span></p><p class="small text-muted">Shift-click multi-selects. Keyboard: arrows move 0.5 mm, Shift+arrows 0.1 mm, Ctrl+A select all, Ctrl+G group, Ctrl+Shift+G ungroup, Ctrl+D duplicate, Delete remove, Ctrl+Z/Ctrl+Y history.</p>
                     </t>
                     <t t-else=""><p class="text-muted">Select an element to edit its exact geometry and content.</p></t>
                 </aside>

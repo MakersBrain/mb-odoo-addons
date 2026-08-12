@@ -283,7 +283,7 @@ class MbCommercialProfitabilityScenarioLine(models.Model):
     turnover_levy_unrounded = fields.Float(compute="_compute_contribution", store=True, digits=(16, 8))
     product_unit_cost = fields.Monetary(required=True, default=0.0)
     product_cost_mode = fields.Selection(
-        [("amount", "Amount"), ("sales_percent", "% of sales excluding VAT")],
+        [("amount", "Amount"), ("sales_percent", "Percentage of sales excluding VAT")],
         required=True, default="amount",
     )
     product_cost_rate = fields.Float(digits=(16, 4))

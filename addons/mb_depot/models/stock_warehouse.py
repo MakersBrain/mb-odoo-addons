@@ -3,7 +3,7 @@ from odoo.exceptions import ValidationError
 
 
 class StockWarehouse(models.Model):
-    """A dépôt-vente is a warehouse.
+    """A consignment depot is a warehouse.
 
     It was a bare internal location outside every warehouse once, to keep an
     ordinary delivery from reserving a piece standing in a gallery. A warehouse
@@ -16,12 +16,12 @@ class StockWarehouse(models.Model):
 
     The stock stays ours either way. A warehouse's stock location is internal, so
     unsold pieces stay on our balance sheet and no revenue is recognised until
-    the depositary reports a sale, which is the legal situation of dépôt-vente.
+    the depositary reports a sale, which is the legal situation of consignment selling.
     """
     _inherit = "stock.warehouse"
 
     is_depot = fields.Boolean(
-        string="Dépôt-vente",
+        string="Consignment depot",
         help="Stock we own, physically held by someone else. Internal like any "
              "warehouse, so unsold pieces stay on our balance sheet until the "
              "depositary reports a sale.",

@@ -108,7 +108,9 @@ class PosPaymentMethod(models.Model):
             # A payment SumUp has no record of is not a payment. The caller
             # reports it as unconfirmed rather than as an error, because the
             # cashier's next move is the same either way: take the money again.
-            _logger.warning("SumUp has no transaction matching %s.", query)
+            _logger.warning(
+                "SumUp has no transaction matching %s.", query
+            )
             return {}
 
     # === POS METHODS === #

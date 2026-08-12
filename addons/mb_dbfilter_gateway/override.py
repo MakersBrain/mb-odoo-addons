@@ -21,7 +21,9 @@ def _gateway_db_filter(databases, host=None):
         return filtered
     match = _trusted_filter.fullmatch(supplied)
     if match is None:
-        _logger.warning("rejecting malformed trusted database filter")
+        _logger.warning(
+            "rejecting malformed trusted database filter"
+        )
         return []
     selected = match.group(1)
     return [database for database in filtered if database == selected]

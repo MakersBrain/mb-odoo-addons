@@ -1,0 +1,576 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_commercial_operations_stock
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "%(product)s%(lot)s differs by %(quantity)s %(uom)s."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "<strong>Source warehouse:</strong>"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "<strong>Stock reconciliation:</strong>"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "A lot or serial number can satisfy only one target in an operation."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Add at least one exact-product stock target."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.constraint,message:mb_commercial_operations_stock.constraint_mb_market_stock_allocation_positive_quantity
+msgid "Allocated quantity must be positive."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Approve the operation before preparing market stock."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Approve the operation before preparing supply."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__availability_calculated_at
+msgid "Availability Calculated At"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Check Availability"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/planning_wizard.py:0
+msgid "Choose a source warehouse before refreshing stock."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Choose a source warehouse first."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Choose a source warehouse on %(operation)s."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Close Stock"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model,name:mb_commercial_operations_stock.model_mb_commercial_operation
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_stock_picking__mb_commercial_operation_id
+msgid "Commercial Operation"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model,name:mb_commercial_operations_stock.model_mb_commercial_operation_plan_wizard_line
+msgid "Commercial Planning Product Assumption"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__company_id
+msgid "Company"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model,name:mb_commercial_operations_stock.model_mb_commercial_operation_plan_wizard
+msgid "Complete Commercial Operation Planning"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/planning_wizard.py:0
+msgid "Complete Planning"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Complete the operation before closing its stock."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model,name:mb_commercial_operations_stock.model_mb_market_stock_allocation
+msgid "Concrete Market Stock Allocation"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__allocation_ids
+msgid "Concrete Stock"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_market_stock_plan_line_form_stock
+msgid "Concrete Stock Selection"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard_line__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_stock_move__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_stock_picking__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "Forecast"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard_line__forecast_available
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__forecast_available
+msgid "Forecast Available"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__has_supply_plan
+msgid "Has Supply Plan"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard_line__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_stock_move__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_stock_picking__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__incoming_before_cutoff
+msgid "Incoming Before Cutoff"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__lot_id
+msgid "Lot"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__market_location_id
+msgid "Market Location"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields.selection,name:mb_commercial_operations_stock.selection__stock_picking__mb_commercial_stock_role__preparation
+msgid "Market Preparation"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields.selection,name:mb_commercial_operations_stock.selection__stock_picking__mb_commercial_stock_role__return
+msgid "Market Return"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model,name:mb_commercial_operations_stock.model_mb_market_stock_plan_line
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_stock_move__mb_market_stock_plan_line_id
+msgid "Market Stock Target"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_stock_picking__mb_commercial_stock_role
+msgid "Mb Commercial Stock Role"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "No concrete stock is selected for preparation."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "No market stock location is configured."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields.selection,name:mb_commercial_operations_stock.selection__mb_commercial_operation__stock_readiness__not_checked
+msgid "Not Checked"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard_line__on_hand_now
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__on_hand_now
+msgid "On Hand Now"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "On hand"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Only a Commercial Operations Manager can reopen stock reconciliation."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__operation_id
+msgid "Operation"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__outgoing_before_cutoff
+msgid "Outgoing Before Cutoff"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__plan_line_id
+msgid "Plan Line"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__preparation_picking_id
+msgid "Preparation Picking"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Prepare Market Stock"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Prepare Return"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Prepare Supply"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/planning_wizard.py:0
+msgid "Prepare commercial stock"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Prepare market stock before creating a return transfer."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Prepared, sold, scrapped, returned, and remaining stock reconcile."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__product_id
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "Product"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_allocation__quantity
+msgid "Quantity"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard_line__readiness
+msgid "Readiness"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields.selection,name:mb_commercial_operations_stock.selection__mb_commercial_operation__stock_readiness__ready
+msgid "Ready"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_plan_wizard_stock
+msgid "Refresh Stock Availability"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Refresh Supply Status"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Reopen Stock"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Reopen stock reconciliation before changing stock evidence links."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "Reserved"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard_line__reserved_now
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__reserved_now
+msgid "Reserved Now"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__return_picking_ids
+msgid "Return Transfers"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Return: %(operation)s"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Select a lot or serial number for tracked products."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Select exactly %(quantity)s tracked units for %(product)s."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields.selection,name:mb_commercial_operations_stock.selection__mb_commercial_operation__stock_readiness__shortage
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "Shortage"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard_line__shortage_qty
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__shortage_qty
+msgid "Shortage Qty"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__source_location_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard__source_location_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__source_location_id
+msgid "Source Location"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__source_warehouse_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard__source_warehouse_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__source_warehouse_id
+msgid "Source Warehouse"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_close_date
+msgid "Stock Close Date"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_close_user_id
+msgid "Stock Close User"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_closed
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__stock_closed
+msgid "Stock Closed"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Stock Differences"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_discrepancy_count
+msgid "Stock Discrepancy Count"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_forecast_qty
+msgid "Stock Forecast Qty"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model,name:mb_commercial_operations_stock.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation_plan_wizard__stock_preparation_deadline
+msgid "Stock Preparation Deadline"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_readiness
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Stock Readiness"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_reconciled
+msgid "Stock Reconciled"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.view_commercial_operation_form_stock
+msgid "Stock Reconciliation"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_reconciliation_note
+msgid "Stock Reconciliation Note"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_required_qty
+msgid "Stock Required Qty"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_commercial_operation__stock_shortage_qty
+msgid "Stock Shortage Qty"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Stock allocations are closed for this operation."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "Stock execution and reconciliation"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "Stock shortage: %(quantity)s"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "Supply"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields,field_description:mb_commercial_operations_stock.field_mb_market_stock_plan_line__supply_method
+msgid "Supply Method"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model.fields.selection,name:mb_commercial_operations_stock.selection__mb_market_stock_plan_line__supply_method__stock
+msgid "Take From Stock"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "The allocated product must match the exact-product target."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "The lot does not belong to the allocated product."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "The preparation transfer is not completed."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid ""
+"The selected market stock is not fully available. Resolve existing "
+"reservations or reduce the selection."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#. odoo-python
+#: code:addons/mb_commercial_operations_stock/models/commercial_operation.py:0
+msgid "There is no stock left at the market location to return."
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model:ir.model,name:mb_commercial_operations_stock.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "· <strong>Preparation deadline:</strong>"
+msgstr ""
+
+#. module: mb_commercial_operations_stock
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_stock.report_commercial_operation_stock
+msgid "· <strong>Preparation transfer:</strong>"
+msgstr ""

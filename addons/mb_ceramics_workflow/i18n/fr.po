@@ -1,0 +1,1675 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_ceramics_workflow
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "%(product)s allocations must total exactly %(quantity)s %(uom)s."
+msgstr ""
+"Les affectations de %(product)s doivent totaliser exactement %(quantity)s "
+"%(uom)s."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "%(product)s must be reserved in the exact bill-of-material quantity."
+msgstr ""
+"%(product)s doit être réservé dans la quantité exacte de la nomenclature."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "%(product)s requires a lot or serial number before inspection."
+msgstr "%(product)s exige un lot ou un numéro de série avant le contrôle."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_workorder.py:0
+msgid ""
+"%(program)s peaks above %(product)s's maximum firing temperature of "
+"%(maximum)s C."
+msgstr ""
+"%(program)s culmine au-dessus de la température de cuisson maximale de "
+"%(product)s, fixée à %(maximum)s C."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_workorder.py:0
+msgid ""
+"%(program)s peaks below %(product)s's minimum firing temperature of "
+"%(minimum)s C."
+msgstr ""
+"%(program)s culmine en dessous de la température de cuisson minimale de "
+"%(product)s, fixée à %(minimum)s C."
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.stock_lot_form_mb_ceramics_workflow
+msgid "<span class=\"o_stat_text\">Print WIP label</span>"
+msgstr "<span class=\"o_stat_text\">Imprimer l'étiquette d'en-cours</span>"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_board_content_positive_quantity
+msgid "A board-content quantity must be positive."
+msgstr "Une quantité de contenu de plaque doit être positive."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/session_lock.py:0
+msgid "A completed or cancelled workshop session cannot be deleted."
+msgstr "Une séance d'atelier terminée ou annulée ne peut pas être supprimée."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/session_lock.py:0
+msgid ""
+"A completed or cancelled workshop session is immutable. Create a correcting "
+"session instead."
+msgstr ""
+"Une séance d'atelier terminée ou annulée est immuable. Créez plutôt une "
+"séance de correction."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+msgid ""
+"A manufacturing order cannot be moved into or out of a completed workshop "
+"session."
+msgstr ""
+"Un ordre de fabrication ne peut pas être ajouté à une séance d'atelier "
+"terminée ni en être retiré."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "A material allocation does not match a tracked glazing component."
+msgstr ""
+"Une affectation de matière ne correspond à aucun composant d'émaillage "
+"suivi."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_production_loss_positive_quantity
+msgid "A process-loss quantity must be positive."
+msgstr "Une quantité de perte de production doit être positive."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/product_template.py:0
+msgid "A product cannot be its own seconds product."
+msgstr "Un produit ne peut pas être son propre produit de second choix."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+msgid "A serial-tracked bisque quantity must be a whole number."
+msgstr ""
+"Une quantité de biscuit suivie par numéro de série doit être un nombre "
+"entier."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "A serial-tracked inspection quantity must be a whole number."
+msgstr ""
+"Une quantité de contrôle suivie par numéro de série doit être un nombre "
+"entier."
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_bisque_inspection_view_form
+msgid "Accept bisque stock"
+msgstr "Accepter le stock de biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__accepted_quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__accepted_quantity
+msgid "Accepted Quantity"
+msgstr "Quantité acceptée"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+msgid ""
+"Accepted and process-loss quantities must equal the selected green ware."
+msgstr ""
+"Les quantités acceptées et les pertes de production doivent égaler le cru "
+"sélectionné."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__bisque_location_id
+msgid "Accepted bisque location"
+msgstr "Emplacement du biscuit accepté"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid "Add at least one blank output."
+msgstr "Ajoutez au moins une ébauche en sortie."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_glazing_material_allocation_positive_quantity
+msgid "An allocated material quantity must be positive."
+msgstr "Une quantité de matière affectée doit être positive."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__available_quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__available_quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__available_quantity
+msgid "Available Quantity"
+msgstr "Quantité disponible"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__bisque_lot_id
+msgid "Bisque Lot"
+msgstr "Lot de biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__bisque_product_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__bisque_product_id
+msgid "Bisque Product"
+msgstr "Produit biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.actions.act_window,name:mb_ceramics_workflow.mb_bisque_stock_action
+#: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_bisque_stock
+msgid "Bisque Stock"
+msgstr "Stock de biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_production__mb_workflow_kind__bisque
+msgid "Bisque production"
+msgstr "Production de biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_bisque_session_line
+msgid "Bisque session selection"
+msgstr "Sélection de la séance de biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__source_location_id
+msgid "Bisque stock location"
+msgstr "Emplacement de stock du biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__product_template__mb_ceramics_stage__bisque
+msgid "Bisque ware"
+msgstr "Pièces biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__blank_lot_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__blank_lot_id
+msgid "Blank Lot"
+msgstr "Lot d'ébauches"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__blank_product_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__blank_product_id
+msgid "Blank Product"
+msgstr "Produit ébauche"
+
+#. module: mb_ceramics_workflow
+#: model:ir.actions.act_window,name:mb_ceramics_workflow.mb_blank_stock_action
+#: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_blank_stock
+msgid "Blank Stock"
+msgstr "Stock d'ébauches"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_throwing_session_line_positive_quantity
+msgid "Blank and clay quantities must be positive."
+msgstr "Les quantités d'ébauches et de terre doivent être positives."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_production__mb_workflow_kind__throwing
+msgid "Blank production"
+msgstr "Production d'ébauches"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__board_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__board_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__board_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__board_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__board_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__board_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__board_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__board_id
+msgid "Board"
+msgstr "Plaque"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_board_content_ids
+msgid "Board history"
+msgstr "Historique de la plaque"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__board_ids
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__mb_board_ids
+msgid "Boards"
+msgstr "Plaques"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__bom_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__bom_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__bom_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__bom_id
+msgid "Bom"
+msgstr "Nomenclature"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_bisque_inspection_view_form
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_firing_load_view_form
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_inspection_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_throwing_session__state__cancel
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_production_view_form_mb_ceramics_workflow
+msgid "Ceramics"
+msgstr "Céramique"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_bisque_session
+msgid "Ceramics bisque preparation session"
+msgstr "Séance de préparation du biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_finishing_session
+msgid "Ceramics finishing session"
+msgstr "Séance de finition céramique"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_glazing_session
+msgid "Ceramics glazing session"
+msgstr "Séance d'émaillage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_production_loss
+msgid "Ceramics production loss"
+msgstr "Perte de production céramique"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_product__mb_ceramics_stage
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_template__mb_ceramics_stage
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__mb_ceramics_stage
+msgid "Ceramics stage"
+msgstr "Étape céramique"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_throwing_session
+msgid "Ceramics throwing session"
+msgstr "Séance de tournage"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.stock_lot_form_mb_ceramics_workflow
+msgid "Ceramics trace"
+msgstr "Traçabilité céramique"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/stock_lot.py:0
+msgid "Ceramics trace - %(lot)s"
+msgstr "Traçabilité céramique - %(lot)s"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "Choose the internal location that receives seconds."
+msgstr "Choisissez l'emplacement interne qui reçoit les seconds choix."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__clay_lot_id
+msgid "Clay Lot"
+msgstr "Lot de terre"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__clay_product_id
+msgid "Clay Product"
+msgstr "Produit terre"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__clay_quantity
+msgid "Clay Quantity"
+msgstr "Quantité de terre"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid "Clay used for throwing must be tracked by lot."
+msgstr "La terre utilisée pour le tournage doit être suivie par lot."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__company_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+msgid "Complete every bisque operation before inspection."
+msgstr "Terminez chaque opération de biscuit avant le contrôle."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "Complete every operation before final inspection."
+msgstr "Terminez chaque opération avant le contrôle final."
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_inspection_view_form
+msgid "Complete inspection"
+msgstr "Terminer le contrôle"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_ceramics_session_mixin
+msgid "Completed ceramics session integrity"
+msgstr "Intégrité des séances céramiques terminées"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_ceramics_session_line_mixin
+msgid "Completed ceramics session line integrity"
+msgstr "Intégrité des lignes de séance céramique terminée"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "Configure a seconds product before recording seconds."
+msgstr ""
+"Configurez un produit de second choix avant d'enregistrer des seconds choix."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__create_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__create_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_board_content__state__current
+msgid "Current"
+msgstr "En cours"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_package__mb_current_board_content_ids
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_board_view_form
+msgid "Current WIP"
+msgstr "En-cours actuel"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_board_content.py:0
+msgid "Current board quantities cannot exceed the manufacturing quantity."
+msgstr ""
+"Les quantités actuelles sur plaque ne peuvent pas dépasser la quantité de "
+"fabrication."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__current_workorder_id
+msgid "Current operation"
+msgstr "Opération en cours"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__damp_location_id
+msgid "Damp Location"
+msgstr "Emplacement de la boîte humide"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__date
+msgid "Date"
+msgstr "Date"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__date_loaded
+msgid "Date Loaded"
+msgstr "Date d'enfournement"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__date_unloaded
+msgid "Date Unloaded"
+msgstr "Date de défournement"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_ceramics_session_line_mixin__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_ceramics_session_mixin__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_workorder__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_template__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_package__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_bisque_session__state__done
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_finishing_session__state__done
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_glazing_session__state__done
+msgid "Done"
+msgstr "Terminé"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_bisque_session__state__draft
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_finishing_session__state__draft
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_glazing_session__state__draft
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_throwing_session__state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__eligible_workorder_ids
+msgid "Eligible Workorder"
+msgstr "Ordre de travail éligible"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+msgid "Every bisque firing operation must be unloaded before inspection."
+msgstr ""
+"Chaque opération de cuisson biscuit doit être défournée avant le contrôle."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "Every firing operation must be unloaded before inspection."
+msgstr "Chaque opération de cuisson doit être défournée avant le contrôle."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_glazing_material_allocation
+msgid "Exact tracked material allocation for glazing"
+msgstr "Affectation exacte de matière suivie pour l'émaillage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__finished_location_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__finished_location_id
+msgid "Finished Location"
+msgstr "Emplacement des pièces finies"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__finished_product_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__finished_product_id
+msgid "Finished Product"
+msgstr "Produit fini"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__destination_location_id
+msgid "Finished Products Location"
+msgstr "Emplacements des produits finis"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__product_template__mb_ceramics_stage__finished
+msgid "Finished ware"
+msgstr "Pièces finies"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_production__mb_workflow_kind__finishing
+msgid "Finishing (legacy)"
+msgstr "Finition (historique)"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_finishing_session_line
+msgid "Finishing session selection"
+msgstr "Sélection de la séance de finition"
+
+#. module: mb_ceramics_workflow
+#: model:ir.actions.act_window,name:mb_ceramics_workflow.mb_finishing_session_action
+msgid "Finishing sessions"
+msgstr "Séances de finition"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__firing_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__firing_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__firing_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__firing_id
+msgid "Firing"
+msgstr "Cuisson"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__mb_firing_ids
+msgid "Firings"
+msgstr "Cuissons"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid ""
+"First-quality, second and process-loss quantities must equal selected "
+"blanks."
+msgstr ""
+"Les quantités de premier choix, de second choix et de perte de production "
+"doivent égaler les ébauches sélectionnées."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__material_location_id
+msgid "Glaze/material location"
+msgstr "Emplacement des émaux et matières"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_production__mb_workflow_kind__glazing
+msgid "Glazing"
+msgstr "Émaillage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_glazing_session_line
+msgid "Glazing session selection"
+msgstr "Sélection de la séance d'émaillage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__green_lot_id
+msgid "Green Lot"
+msgstr "Lot de cru"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__green_product_id
+msgid "Green Product"
+msgstr "Produit cru"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/product_template.py:0
+msgid "Green and bisque ware must be storable products."
+msgstr "Les pièces crues et biscuit doivent être des produits stockables."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/product_template.py:0
+msgid "Green and bisque ware must be tracked by lot or serial."
+msgstr ""
+"Les pièces crues et biscuit doivent être suivies par lot ou par numéro de "
+"série."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "Green stock and accepted bisque stock need different locations."
+msgstr ""
+"Le stock de cru et le stock de biscuit accepté doivent occuper des "
+"emplacements différents."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__product_template__mb_ceramics_stage__green
+msgid "Green ware"
+msgstr "Pièces crues"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_board_view_form
+msgid "History"
+msgstr "Historique"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_ceramics_session_line_mixin__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_ceramics_session_mixin__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_workorder__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_template__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_package__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_bisque_session__state__progress
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_finishing_session__state__progress
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_glazing_session__state__progress
+msgid "In progress"
+msgstr "En cours"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_production_view_form_mb_ceramics_workflow
+msgid "Inspect bisque"
+msgstr "Contrôler le biscuit"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_bisque_inspection_view_form
+msgid "Inspect bisque firing"
+msgstr "Contrôler la cuisson biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_bisque_inspection
+msgid "Inspect bisque firing output"
+msgstr "Contrôler la sortie de cuisson biscuit"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "Inspection quantities cannot be negative."
+msgstr "Les quantités de contrôle ne peuvent pas être négatives."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_firing
+msgid "Kiln firing"
+msgstr "Cuisson au four"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__write_uid
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__write_date
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: mb_ceramics_workflow
+#: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_finishing_session
+msgid "Legacy Finish Blanks"
+msgstr "Ébauches de finition historiques"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/session_lock.py:0
+msgid ""
+"Lines of a completed or cancelled workshop session are immutable. Create a "
+"correcting session instead."
+msgstr ""
+"Les lignes d'une séance d'atelier terminée ou annulée sont immuables. Créez "
+"plutôt une séance de correction."
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_firing_load_view_form
+msgid "Load"
+msgstr "Charger"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_firing_load
+msgid "Load compatible ware into a kiln firing"
+msgstr "Enfourner des pièces compatibles dans une cuisson"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_firing.py:0
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_firing_load_view_form
+msgid "Load kiln"
+msgstr "Enfourner"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_firing_form_workflow
+msgid "Load ware"
+msgstr "Enfourner les pièces"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,help:mb_ceramics_workflow.field_mb_bisque_inspection__destination_location_id
+msgid "Location where the system will stock the finished products."
+msgstr "Emplacement où le système stockera les produits finis."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__loss_operation_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__loss_operation_id
+msgid "Loss Operation"
+msgstr "Opération de la perte"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__loss_quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__loss_quantity
+msgid "Loss Quantity"
+msgstr "Quantité perdue"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__loss_reason
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__loss_reason
+msgid "Loss Reason"
+msgstr "Motif de la perte"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__mb_loss_ids
+msgid "Losses"
+msgstr "Pertes"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__lot_id
+msgid "Lot"
+msgstr "Lot"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "Lot %(lot)s of %(product)s does not have enough available stock."
+msgstr "Le lot %(lot)s de %(product)s n'a pas assez de stock disponible."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_stock_lot
+msgid "Lot/Serial"
+msgstr "Lot/série"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mrp_production
+msgid "Manufacturing Order"
+msgstr "Ordre de fabrication"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__production_ids
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__production_ids
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__production_ids
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__production_ids
+msgid "Manufacturing orders"
+msgstr "Ordres de fabrication"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__mb_related_lot_ids
+msgid "Material and output lots"
+msgstr "Lots de matière et de sortie"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_material_allocation.py:0
+msgid ""
+"Materials cannot be added to a completed or cancelled glazing session. "
+"Create a correcting session instead."
+msgstr ""
+"Aucune matière ne peut être ajoutée à une séance d'émaillage terminée ou "
+"annulée. Créez plutôt une séance de correction."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_material_allocation.py:0
+msgid ""
+"Materials of a completed glazing session are immutable. Create a correcting "
+"session instead."
+msgstr ""
+"Les matières d'une séance d'émaillage terminée sont immuables. Créez plutôt "
+"une séance de correction."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_product__mb_firing_max_temperature
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_template__mb_firing_max_temperature
+msgid "Maximum firing temperature"
+msgstr "Température de cuisson maximale"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_bisque_inspected
+msgid "Mb Bisque Inspected"
+msgstr "Biscuit contrôlé"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_bisque_session_id
+msgid "Mb Bisque Session"
+msgstr "Séance de biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_finishing_session_id
+msgid "Mb Finishing Session"
+msgstr "Séance de finition"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__mb_firing_count
+msgid "Mb Firing Count"
+msgstr "Nombre de cuissons"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_glazing_session_id
+msgid "Mb Glazing Session"
+msgstr "Séance d'émaillage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_inspected
+msgid "Mb Inspected"
+msgstr "Contrôlé"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_throwing_session_id
+msgid "Mb Throwing Session"
+msgstr "Séance de tournage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_workflow_kind
+msgid "Mb Workflow Kind"
+msgstr "Type de flux"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_product__mb_firing_min_temperature
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_template__mb_firing_min_temperature
+msgid "Minimum firing temperature"
+msgstr "Température de cuisson minimale"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid "New"
+msgstr "Nouveau"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__note
+msgid "Note"
+msgstr "Note"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_board_content.py:0
+msgid "Odoo did not create the expected split manufacturing order."
+msgstr "Odoo n'a pas créé l'ordre de fabrication scindé attendu."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_firing.py:0
+#: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
+msgid "Only a loading firing can receive work."
+msgstr "Seule une cuisson en cours d'enfournement peut recevoir du travail."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_board_content.py:0
+msgid "Only current board content can be split."
+msgstr "Seul le contenu actuel d'une plaque peut être scindé."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_board_content.py:0
+msgid "Only current board content can be transferred."
+msgstr "Seul le contenu actuel d'une plaque peut être transféré."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_material_allocation.py:0
+msgid "Only tracked components need an exact lot allocation."
+msgstr ""
+"Seuls les composants suivis nécessitent une affectation de lot exacte."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__operation_id
+msgid "Operation"
+msgstr "Opération"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__line_ids
+msgid "Outputs"
+msgstr "Sorties"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_stock_package
+msgid "Package"
+msgstr "Colis"
+
+#. module: mb_ceramics_workflow
+#: model:ir.actions.act_window,name:mb_ceramics_workflow.mb_bisque_session_action
+#: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_bisque_session
+msgid "Prepare Bisque"
+msgstr "Préparer le biscuit"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_bisque_session_view_form
+msgid "Prepare bisque"
+msgstr "Préparer le biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__previous_content_id
+msgid "Previous Content"
+msgstr "Contenu précédent"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/stock_lot.py:0
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_production_view_form_mb_ceramics_workflow
+msgid "Print WIP label"
+msgstr "Imprimer l'étiquette d'en-cours"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_throwing_session_view_form
+msgid "Print label"
+msgstr "Imprimer l'étiquette"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_loss_ids
+msgid "Process losses"
+msgstr "Pertes de production"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_product_template
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__product_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__product_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__product_id
+msgid "Product"
+msgstr "Produit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__production_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__production_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__production_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__production_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__production_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__production_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__production_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__production_id
+msgid "Production"
+msgstr "Production"
+
+#. module: mb_ceramics_workflow
+#: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_production_loss
+msgid "Production Losses"
+msgstr "Pertes de production"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_production_loss.py:0
+msgid "Production loss is immutable and cannot be deleted."
+msgstr "Une perte de production est immuable et ne peut pas être supprimée."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_production_loss.py:0
+msgid "Production loss is immutable; create a correcting entry instead."
+msgstr ""
+"Une perte de production est immuable ; créez plutôt une écriture de "
+"correction."
+
+#. module: mb_ceramics_workflow
+#: model:ir.actions.act_window,name:mb_ceramics_workflow.mb_production_loss_action
+msgid "Production losses"
+msgstr "Pertes de production"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__mb_production_ids
+msgid "Productions"
+msgstr "Productions"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__quantity
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__quantity
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__selected_quantity
+msgid "Quantity To Produce"
+msgstr "Quantité à produire"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__raw_move_id
+msgid "Raw Move"
+msgstr "Mouvement de composant"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__reason
+msgid "Reason"
+msgstr "Motif"
+
+#. module: mb_ceramics_workflow
+#: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_throwing_session
+msgid "Record Throwing"
+msgstr "Enregistrer le tournage"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid "Record the throwing output before printing its label."
+msgstr "Enregistrez la sortie de tournage avant d'imprimer son étiquette."
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_throwing_session_view_form
+msgid "Record throwing"
+msgstr "Enregistrer le tournage"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "Record why the pieces were lost."
+msgstr "Indiquez pourquoi les pièces ont été perdues."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_throwing_session__state__done
+msgid "Recorded"
+msgstr "Enregistré"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_board_content__state__removed
+msgid "Removed"
+msgstr "Supprimé"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid "Reusable blank products must be tracked by lot."
+msgstr "Les produits d'ébauche réutilisables doivent être suivis par lot."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__second_product_id
+msgid "Second Product"
+msgstr "Produit de second choix"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__second_quantity
+msgid "Second Quantity"
+msgstr "Quantité de second choix"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__seconds_location_id
+msgid "Seconds Location"
+msgstr "Emplacement des seconds choix"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_product__mb_second_product_tmpl_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_template__mb_second_product_tmpl_id
+msgid "Seconds product"
+msgstr "Produit de second choix"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "Select at least one bisque lot."
+msgstr "Sélectionnez au moins un lot de biscuit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
+msgid "Select at least one compatible work order or board."
+msgstr "Sélectionnez au moins un ordre de travail ou une plaque compatible."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
+msgid "Select at least one damp-box blank."
+msgstr "Sélectionnez au moins une ébauche en boîte humide."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "Select at least one green-ware lot."
+msgstr "Sélectionnez au moins un lot de pièces crues."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__line_ids
+msgid "Selected bisque ware"
+msgstr "Pièces biscuit sélectionnées"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__line_ids
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__selected_quantity
+msgid "Selected blanks"
+msgstr "Ébauches sélectionnées"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__line_ids
+msgid "Selected green ware"
+msgstr "Pièces crues sélectionnées"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,help:mb_ceramics_workflow.field_product_product__mb_second_product_tmpl_id
+#: model:ir.model.fields,help:mb_ceramics_workflow.field_product_template__mb_second_product_tmpl_id
+msgid "Sellable product used when inspection downgrades this article."
+msgstr "Produit vendable utilisé lorsque le contrôle déclasse cet article."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__session_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__session_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__session_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__session_id
+msgid "Session"
+msgstr "Session"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__session_line_id
+msgid "Session Line"
+msgstr "Ligne de séance"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
+msgid "Some selected work orders are not compatible with this firing."
+msgstr ""
+"Certains ordres de travail sélectionnés ne sont pas compatibles avec cette "
+"cuisson."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__source_location_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__source_location_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__source_location_id
+msgid "Source Location"
+msgstr "Emplacement d'origine"
+
+#. module: mb_ceramics_workflow
+#: model:ir.actions.act_window,name:mb_ceramics_workflow.mb_glazing_session_action
+#: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_glazing_session
+msgid "Start Glazing"
+msgstr "Démarrer l'émaillage"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_glazing_session_view_form
+msgid "Start glazing"
+msgstr "Démarrer l'émaillage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__state
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__state
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__state
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__state
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__state
+msgid "State"
+msgstr "Statut"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_finishing_session_view_form
+msgid "Take blanks for finishing"
+msgstr "Prendre des ébauches pour la finition"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_material_allocation.py:0
+msgid "The allocated lot belongs to another company."
+msgstr "Le lot affecté appartient à une autre société."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_material_allocation.py:0
+msgid "The allocated lot belongs to another product."
+msgstr "Le lot affecté appartient à un autre produit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_material_allocation.py:0
+msgid "The allocation UoM is incompatible with the product UoM."
+msgstr ""
+"L'unité de mesure de l'affectation est incompatible avec celle du produit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "The bill of materials does not produce this article."
+msgstr "La nomenclature ne produit pas cet article."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "The bill of materials does not produce this bisque ware."
+msgstr "La nomenclature ne produit pas cette pièce biscuit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid "The bill of materials does not produce this blank."
+msgstr "La nomenclature ne produit pas cette ébauche."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid ""
+"The bill of materials of %(product)s does not consume the selected bisque "
+"ware."
+msgstr ""
+"La nomenclature de %(product)s ne consomme pas les pièces biscuit "
+"sélectionnées."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
+msgid ""
+"The bill of materials of %(product)s does not consume the selected blank."
+msgstr ""
+"La nomenclature de %(product)s ne consomme pas l'ébauche sélectionnée."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid ""
+"The bill of materials of %(product)s does not consume the selected clay."
+msgstr "La nomenclature de %(product)s ne consomme pas la terre sélectionnée."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid ""
+"The bill of materials of %(product)s does not consume the selected green "
+"ware."
+msgstr ""
+"La nomenclature de %(product)s ne consomme pas les pièces crues "
+"sélectionnées."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "The bisque bill of materials does not consume the green ware."
+msgstr "La nomenclature de biscuit ne consomme pas les pièces crues."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "The bisque lot belongs to another product."
+msgstr "Le lot de biscuit appartient à un autre produit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+msgid "The bisque order needs manual review before completion."
+msgstr ""
+"L'ordre de biscuit nécessite une révision manuelle avant d'être terminé."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+msgid "The bisque order needs manual review before its loss can be scrapped."
+msgstr ""
+"L'ordre de biscuit nécessite une révision manuelle avant que sa perte puisse"
+" être mise au rebut."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
+msgid "The blank lot belongs to another product."
+msgstr "Le lot d'ébauches appartient à un autre produit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_board_content.py:0
+msgid "The board and manufacturing order must share a company."
+msgstr ""
+"La plaque et l'ordre de fabrication doivent appartenir à la même société."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "The board, locations and bisque session must share a company."
+msgstr ""
+"La plaque, les emplacements et la séance de biscuit doivent appartenir à la "
+"même société."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "The board, locations and glazing session must share a company."
+msgstr ""
+"La plaque, les emplacements et la séance d'émaillage doivent appartenir à la"
+" même société."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid "The clay lot must belong to the selected clay product."
+msgstr "Le lot de terre doit appartenir au produit terre sélectionné."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_board_content.py:0
+msgid "The current operation must belong to the manufacturing order."
+msgstr "L'opération en cours doit appartenir à l'ordre de fabrication."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid ""
+"The exact %(product)s lot could not be reserved; no substitute was used."
+msgstr ""
+"Le lot exact de %(product)s n'a pas pu être réservé ; aucun substitut n'a "
+"été utilisé."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "The exact selected green lot could not be reserved."
+msgstr "Le lot de cru sélectionné n'a pas pu être réservé exactement."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/product_template.py:0
+msgid ""
+"The first-quality and seconds products must use the same tracking policy."
+msgstr ""
+"Le produit de premier choix et le produit de second choix doivent utiliser "
+"la même politique de suivi."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "The glazing bill of materials does not consume the bisque ware."
+msgstr "La nomenclature d'émaillage ne consomme pas les pièces biscuit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "The green lot belongs to another product."
+msgstr "Le lot de cru appartient à un autre produit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_production_loss.py:0
+msgid "The loss firing must be the operation's firing."
+msgstr "La cuisson de la perte doit être celle de l'opération."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_production_loss.py:0
+msgid "The loss operation must belong to its manufacturing order."
+msgstr "L'opération de la perte doit appartenir à son ordre de fabrication."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+msgid ""
+"The manufactured loss is not available in the destination location for "
+"scrapping."
+msgstr ""
+"La perte fabriquée n'est pas disponible dans l'emplacement de destination "
+"pour être mise au rebut."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "The manufacturing order needs manual review before completion."
+msgstr ""
+"L'ordre de fabrication nécessite une révision manuelle avant d'être terminé."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/product_template.py:0
+msgid "The minimum firing temperature cannot exceed the maximum."
+msgstr "La température de cuisson minimale ne peut pas dépasser la maximale."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
+msgid ""
+"The same firing work order also stands on: %(boards)s. Load those boards or "
+"split the manufacturing order first."
+msgstr ""
+"Le même ordre de travail de cuisson repose aussi sur : %(boards)s. Enfournez"
+" ces plaques ou scindez d'abord l'ordre de fabrication."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_glazing_session_line_positive_quantity
+msgid "The selected bisque quantity must be positive."
+msgstr "La quantité de biscuit sélectionnée doit être positive."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
+msgid "The selected blank lot does not have enough available stock."
+msgstr "Le lot d'ébauches sélectionné n'a pas assez de stock disponible."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_finishing_session_line_positive_quantity
+msgid "The selected blank quantity must be positive."
+msgstr "La quantité d'ébauches sélectionnée doit être positive."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid "The selected clay lot does not have enough available stock."
+msgstr "Le lot de terre sélectionné n'a pas assez de stock disponible."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "The selected green lot does not have enough available stock."
+msgstr "Le lot de cru sélectionné n'a pas assez de stock disponible."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_bisque_session_line_positive_quantity
+msgid "The selected green-ware quantity must be positive."
+msgstr "La quantité de pièces crues sélectionnée doit être positive."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "The selected input must be bisque ware."
+msgstr "L'entrée sélectionnée doit être une pièce biscuit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "The selected input must be green ware."
+msgstr "L'entrée sélectionnée doit être une pièce crue."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "The selected output must be bisque ware."
+msgstr "La sortie sélectionnée doit être une pièce biscuit."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "The selected output must be finished ware."
+msgstr "La sortie sélectionnée doit être une pièce finie."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
+msgid "The selected products, lot and bisque session must share a company."
+msgstr ""
+"Les produits, le lot et la séance de biscuit sélectionnés doivent appartenir"
+" à la même société."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
+msgid "The selected products, lot and glazing session must share a company."
+msgstr ""
+"Les produits, le lot et la séance d'émaillage sélectionnés doivent "
+"appartenir à la même société."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
+msgid "The throwing order needs manual manufacturing review."
+msgstr "L'ordre de tournage nécessite une révision manuelle de fabrication."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_board_content.py:0
+msgid "There is no other quantity to keep on the original order."
+msgstr "Il n'y a pas d'autre quantité à conserver sur l'ordre d'origine."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+msgid "This bisque manufacturing order has already been closed."
+msgstr "Cet ordre de fabrication de biscuit a déjà été clôturé."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+msgid "This manufacturing order has already been closed."
+msgstr "Cet ordre de fabrication a déjà été clôturé."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_throwing_session_line
+msgid "Throwing session output"
+msgstr "Sortie de séance de tournage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.actions.act_window,name:mb_ceramics_workflow.mb_throwing_session_action
+msgid "Throwing sessions"
+msgstr "Séances de tournage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__allocation_ids
+msgid "Tracked glaze and material lots"
+msgstr "Lots d'émail et de matière suivis"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_inspection_view_form
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_production_view_form_mb_ceramics_workflow
+msgid "Unload and inspect"
+msgstr "Défourner et contrôler"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_inspection
+msgid "Unload and inspect finished ceramics"
+msgstr "Défourner et contrôler les céramiques finies"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__uom_id
+msgid "Uom"
+msgstr "Unité de mesure"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__user_id
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_package__mb_board_content_ids
+msgid "WIP history"
+msgstr "Historique des en-cours"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/stock_lot.py:0
+msgid "WIP labels are available only for green or bisque ware."
+msgstr ""
+"Les étiquettes d'en-cours ne sont disponibles que pour les pièces crues ou "
+"biscuit."
+
+#. module: mb_ceramics_workflow
+#: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_board
+msgid "Ware Boards"
+msgstr "Plaques"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mb_board_content
+msgid "Ware board WIP content"
+msgstr "Contenu en-cours d'une plaque"
+
+#. module: mb_ceramics_workflow
+#: model:ir.actions.act_window,name:mb_ceramics_workflow.mb_board_action
+msgid "Ware boards"
+msgstr "Plaques"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mb_board_content.py:0
+msgid "Ware may only be assigned to a reusable package."
+msgstr "Des pièces ne peuvent être affectées qu'à un colis réutilisable."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mrp_workorder
+msgid "Work Order"
+msgstr "Ordre de travail"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__workorder_ids
+msgid "Work orders"
+msgstr "Ordres de travail"

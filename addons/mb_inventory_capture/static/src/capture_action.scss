@@ -7,4 +7,33 @@
 .o_mb_inventory_capture img {
     max-height: 32rem;
 }
+.o_mb_inventory_capture .ratio {
+    position: relative;
+}
 
+.o_mb_inventory_capture .o_mb_scan_guide {
+    position: absolute;
+    inset: 34% 12%;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+}
+
+.o_mb_inventory_capture .o_mb_crop_surface {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    cursor: crosshair;
+    touch-action: none;
+    user-select: none;
+}
+
+.o_mb_inventory_capture .o_mb_crop_selection {
+    position: absolute;
+    border: 3px solid var(--o-brand-primary, #714b67);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}

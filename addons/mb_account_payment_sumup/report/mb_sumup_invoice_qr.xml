@@ -19,9 +19,9 @@
                     </p>
                 </div>
                 <div class="d-inline lh-sm" t-if="mb_sumup_qr">
-                    <p class="fw-bold mb-0">Payer par carte</p>
+                    <p class="fw-bold mb-0">Pay by card</p>
                     <p class="text-muted fst-italic">
-                        Scannez ce code<br/>pour payer par SumUp
+                        Scan this code<br/>to pay with SumUp
                     </p>
                 </div>
             </div>

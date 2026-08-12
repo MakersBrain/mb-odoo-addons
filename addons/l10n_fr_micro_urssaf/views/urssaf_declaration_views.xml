@@ -5,7 +5,7 @@
 		<field name="model">l10n.fr.micro.urssaf.declaration</field>
 		<field name="arch" type="xml">
 			<list decoration-success="state == 'filed'" decoration-danger="blocking_anomaly">
-				<field name="name"/><field name="company_id" groups="base.group_multi_company"/><field name="periodicity"/><field name="due_date"/><field name="total_declared" sum="Total"/><field name="total_estimated" sum="Estimated"/><field name="blocking_anomaly"/><field name="state" widget="badge"/>
+				<field name="name"/><field name="company_id" groups="base.group_multi_company"/><field name="periodicity"/><field name="due_date"/><field name="total_declared" sum="Declared total"/><field name="total_estimated" sum="Estimated levies"/><field name="blocking_anomaly"/><field name="state" widget="badge"/>
 			</list>
 		</field>
 	</record>
@@ -38,7 +38,7 @@
 							</field>
 						</page>
 						<page string="Receipt evidence">
-							<field name="source_ids" readonly="1"><list create="0" delete="0"><field name="recognition_date"/><field name="origin_move_id"/><field name="description"/><field name="category"/><field name="amount" sum="Total"/><field name="source_currency_id" optional="hide"/><field name="source_amount_currency" optional="hide"/><field name="exchange_rate" optional="hide"/><field name="is_prior_period"/><field name="receipt_method"/><field name="receipt_method_detail"/><field name="engine"/></list></field>
+							<field name="source_ids" readonly="1"><list create="0" delete="0"><field name="recognition_date"/><field name="origin_move_id"/><field name="description"/><field name="category"/><field name="amount" sum="Total amount"/><field name="source_currency_id" optional="hide"/><field name="source_amount_currency" optional="hide"/><field name="exchange_rate" optional="hide"/><field name="is_prior_period"/><field name="receipt_method"/><field name="receipt_method_detail"/><field name="engine"/></list></field>
 						</page>
 						<page string="Thresholds"><group><field name="micro_ytd_global"/><field name="micro_ytd_services"/><field name="vat_ytd_global"/><field name="vat_ytd_services"/><field name="threshold_status" nolabel="1"/></group></page>
 					</notebook>

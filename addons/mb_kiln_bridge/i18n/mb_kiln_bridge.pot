@@ -1,0 +1,398 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_kiln_bridge
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-11 22:41+0000\n"
+"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "%s has no password set."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "%s programme(s) read from the controller."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__active
+msgid "Active"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__store_raw_payload
+msgid ""
+"Attach the provider's own JSON to each firing. Roughly 82 KB each, so about "
+"6 MB for a full myKiln history. Worth it while the integration is young; "
+"switch it off once the normalized fields are trusted."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_progress
+msgid "Backfill %"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_offset
+msgid "Backfill Offset"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_page_size
+msgid "Backfill Page Size"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_state
+msgid "Backfill State"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__backfill_total
+msgid "Backfill Total"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__base_url
+msgid "Base Url"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__company_id
+msgid "Company"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__backfill_state__done
+msgid "Complete"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__state__ok
+msgid "Connected"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "Connection failed: %s"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Credentials"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln__display_name
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__state__error
+msgid "Failing"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__firing_count
+msgid "Firing Count"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__firing_limit
+msgid "Firing Limit"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__backfill_page_size
+msgid ""
+"Firings listed per provider call during backfill. Kept small because the "
+"listing endpoint degrades badly with page size, while fetching each firing's"
+" detail and samples is cheap."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "History import"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__program_scan_limit
+msgid ""
+"How many recent firings the Refresh programmes button looks through to find "
+"each controller slot. Only the newest firing per slot is fetched in full, so"
+" this is one listing call plus one call per programme found."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__firing_limit
+msgid ""
+"How many recent firings the routine poll pulls. Small on purpose: history is"
+" the backfill's job, not the cron's."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln__id
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Import full history"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__sync_programs
+msgid ""
+"Keep each kiln's programmes in step with the controller as firings come in. "
+"The provider has no programme library to read, so a programme is learned "
+"from the firings that ran it - which means this costs nothing beyond the "
+"firings already imported."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__store_raw_payload
+msgid "Keep provider payload"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model,name:mb_kiln_bridge.model_mb_kiln
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__kiln_ids
+msgid "Kiln"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__kiln_count
+msgid "Kiln Count"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.actions.server,name:mb_kiln_bridge.ir_cron_mb_kiln_backfill_ir_actions_server
+msgid "Kiln bridge: backfill history"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.actions.server,name:mb_kiln_bridge.ir_cron_mb_kiln_sync_ir_actions_server
+msgid "Kiln bridge: import firings"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.actions.act_window,name:mb_kiln_bridge.mb_kiln_connection_action
+#: model:ir.ui.menu,name:mb_kiln_bridge.menu_mb_kiln_connection
+msgid "Kiln connections"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model,name:mb_kiln_bridge.model_mb_kiln_connection
+msgid "Kiln provider connection"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Kilns"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__last_error
+msgid "Last Error"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__last_sync
+msgid "Last Sync"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Last run"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid ""
+"Make, model and chamber are read from the\n"
+"                                provider on every sync; the name and everything\n"
+"                                about how the workshop uses the kiln are left\n"
+"                                alone. Open a kiln to see its programmes."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__name
+msgid "Name"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__state__draft
+msgid "Never connected"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__backfill_state__idle
+msgid "Not started"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__password
+msgid "Password"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__program_count
+msgid "Program Count"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__program_scan_limit
+msgid "Program Scan Limit"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "Programmes refreshed"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__provider
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Provider"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__provider_token
+msgid "Provider Token"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__provider_token_at
+msgid "Provider Token At"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln__connection_id
+msgid "Provider connection"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__provider__rohde_mykiln
+msgid "ROHDE myKiln"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Read each kiln's programmes back from its controller"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__sync_programs
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Refresh programmes"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields.selection,name:mb_kiln_bridge.selection__mb_kiln_connection__backfill_state__running
+msgid "Running"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__timeout
+msgid ""
+"Seconds to wait on one provider call. Measured against myKiln, a listing of "
+"fifty firings took twenty-two seconds and was slower than one of two "
+"hundred, so this is generous by design."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__state
+msgid "State"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Stop backfill"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln_connection__password
+msgid "Stored in this database. Restricted to manufacturing managers."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Sync now"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "Test connection"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,help:mb_kiln_bridge.field_mb_kiln__connection_id
+msgid ""
+"The connection this kiln was imported through. Clearing it leaves the kiln "
+"and its firings in place; they are ours, not the provider's."
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid ""
+"This imports every firing the provider holds, a page at a time in the "
+"background. Continue?"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__timeout
+msgid "Timeout"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model:ir.model.fields,field_description:mb_kiln_bridge.field_mb_kiln_connection__username
+msgid "Username"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#: model_terms:ir.ui.view,arch_db:mb_kiln_bridge.mb_kiln_connection_view_form
+msgid "myKiln"
+msgstr ""
+
+#. module: mb_kiln_bridge
+#. odoo-python
+#: code:addons/mb_kiln_bridge/models/mb_kiln_connection.py:0
+msgid "myKiln did not answer"
+msgstr ""

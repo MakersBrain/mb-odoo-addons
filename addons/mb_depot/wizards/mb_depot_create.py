@@ -19,7 +19,7 @@ REQUIRED_FEATURES = [
 
 class MbDepotCreate(models.TransientModel):
     _name = "mb.depot.create"
-    _description = "Create a dépôt-vente"
+    _description = "Create a consignment depot"
 
     partner_id = fields.Many2one(
         comodel_name="res.partner",
@@ -97,7 +97,7 @@ class MbDepotCreate(models.TransientModel):
     def _default_to_invoicing_on_delivery(self):
         """Storable sale products invoice on delivered quantities.
 
-        Under dépôt-vente the piece is sold when the depositary says it is, and
+        Under consignment the piece is sold when the depositary says it is, and
         the transfer out of the depot is the record of that. Invoicing on
         ordered quantities lets a gallery be billed the moment the order is
         confirmed, which is before the movement that legally triggers the

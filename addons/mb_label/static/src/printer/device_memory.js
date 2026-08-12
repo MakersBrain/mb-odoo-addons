@@ -1,5 +1,7 @@
 /** @odoo-module **/
 
+import { _t } from "@web/core/l10n/translation";
+
 const ADAPTER_KEY = "mb_label.last_printer_adapter";
 const DEVICE_KEY_PREFIX = "mb_label.last_ble_device.";
 
@@ -36,7 +38,7 @@ export async function selectBluetoothDevice(adapterId, requestOptions, {
 	storage,
 	forceChooser = false,
 } = {}) {
-	if (!bluetooth) throw new Error("Web Bluetooth is unavailable in this browser.");
+	if (!bluetooth) throw new Error(_t("Web Bluetooth is unavailable in this browser."));
 	const key = `${DEVICE_KEY_PREFIX}${adapterId}`;
 	if (!forceChooser && typeof bluetooth.getDevices === "function") {
 		try {

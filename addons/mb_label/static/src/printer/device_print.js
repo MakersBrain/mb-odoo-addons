@@ -1,6 +1,7 @@
 /** @odoo-module **/
 
 import { Component, onWillStart, useState } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardActionServiceProps } from "@web/webclient/actions/action_service";
@@ -26,10 +27,10 @@ export class LabelDevicePrint extends Component {
             continuous: false, dither: "threshold", diagnostic: "",
             phomemoModels: [],
             ditherModes: [
-                ["threshold", "Threshold (sharp)"],
-                ["floyd-steinberg", "Floyd-Steinberg (photo)"],
-                ["atkinson", "Atkinson (light)"],
-                ["ordered", "Ordered pattern"],
+                ["threshold", _t("Threshold (sharp)")],
+                ["floyd-steinberg", _t("Floyd-Steinberg (photo)")],
+                ["atkinson", _t("Atkinson (light)")],
+                ["ordered", _t("Ordered pattern")],
             ],
             adapters: printerAdapters().map((item) => ({
                 id: item.id, label: item.label, available: item.available?.() !== false,
@@ -58,6 +59,27 @@ export class LabelDevicePrint extends Component {
                 phomemoModels: phomemo?.models?.() || [],
             });
         });
+    }
+
+    get jobSummary() {
+        return _t("%(width)s × %(height)s mm · %(dpi)s dpi · %(copies)s copies", {
+            width: this.state.job.width_mm,
+            height: this.state.job.height_mm,
+            dpi: this.state.job.dpi,
+            copies: this.state.job.copies,
+        });
+    }
+
+    get sendSummary() {
+        return this.state.printedCount === 1
+            ? _t("1 successful send in this window")
+            : _t("%(count)s successful sends in this window", { count: this.state.printedCount });
+    }
+
+    phomemoModelLabel(model) {
+        return model.ble
+            ? _t("%(name)s · %(dpi)s dpi", { name: model.name, dpi: model.dpi })
+            : _t("%(name)s · %(dpi)s dpi · USB only", { name: model.name, dpi: model.dpi });
     }
 
     selectAdapter(event) {
@@ -115,10 +137,10 @@ export class LabelDevicePrint extends Component {
             });
             await this.orm.call("mb.label.print.job", "mark_printed", [[this.state.job.id], this.state.adapter]);
             this.state.printedCount++;
-            this.notification.add("The label was sent. This window remains open for repeat printing.", { type: "success" });
+            this.notification.add(_t("The label was sent. This window remains open for repeat printing."), { type: "success" });
         } catch (error) {
             const cancelled = error?.name === "NotFoundError";
-            if (!cancelled) this.notification.add(error.message || "Printing failed.", { type: "danger", sticky: true });
+            if (!cancelled) this.notification.add(error.message || _t("Printing failed."), { type: "danger", sticky: true });
         } finally {
             this.state.busy = false;
         }
@@ -131,9 +153,9 @@ export class LabelDevicePrint extends Component {
         this.state.diagnostic = "";
         try {
             this.state.diagnostic = await adapter.testConnection(this.phomemoOptions());
-            this.notification.add("Printer connection is healthy.", { type: "success" });
+            this.notification.add(_t("Printer connection is healthy."), { type: "success" });
         } catch (error) {
-            this.state.diagnostic = error.message || "Connection test failed.";
+            this.state.diagnostic = error.message || _t("Connection test failed.");
             this.notification.add(this.state.diagnostic, { type: "danger", sticky: true });
         } finally {
             this.state.busy = false;
@@ -147,11 +169,14 @@ export class LabelDevicePrint extends Component {
         try {
             const result = await adapter.testPrint(this.phomemoOptions());
             this.notification.add(
-                `Test pattern sent (${result.bytes} bytes, ${(result.ink * 100).toFixed(1)}% ink).`,
+                _t("Test pattern sent: %(bytes)s bytes, %(ink)s ink coverage.", {
+                    bytes: result.bytes,
+                    ink: `${(result.ink * 100).toFixed(1)}%`,
+                }),
                 { type: "success" }
             );
         } catch (error) {
-            this.notification.add(error.message || "Test print failed.", {
+            this.notification.add(error.message || _t("Test print failed."), {
                 type: "danger", sticky: true,
             });
         } finally {

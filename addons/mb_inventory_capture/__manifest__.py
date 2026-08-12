@@ -7,13 +7,13 @@ identifiers, retain append-only extraction evidence, and apply only a human
 confirmed product and supplier lot to a draft incoming receipt. External OCR
 and multimodal providers remain behind the Makersbrain control plane.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
     "depends": [
         "mail",
-        "mb_control_bridge",
+        "mb_ai_bridge",
         "mb_workshop_base",
         "product_expiry",
         "purchase_stock",
@@ -33,7 +33,7 @@ and multimodal providers remain behind the Makersbrain control plane.
         "web.assets_backend": [
             "mb_inventory_capture/static/src/**/*",
         ],
-        "web.qunit_suite_tests": [
+        "web.assets_unit_tests": [
             "mb_inventory_capture/static/tests/**/*",
         ],
     },

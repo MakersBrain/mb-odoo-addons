@@ -4,7 +4,7 @@ from odoo.exceptions import UserError
 
 class MbDepotStatement(models.TransientModel):
     _name = "mb.depot.statement"
-    _description = "Dépôt-vente statement"
+    _description = "Consignment statement"
 
     depot_id = fields.Many2one(
         comodel_name="stock.warehouse",
@@ -195,7 +195,7 @@ class MbDepotStatement(models.TransientModel):
 
 class MbDepotStatementLine(models.TransientModel):
     _name = "mb.depot.statement.line"
-    _description = "Dépôt-vente statement line"
+    _description = "Consignment statement line"
     _order = "product_id, lot_name"
 
     statement_id = fields.Many2one(

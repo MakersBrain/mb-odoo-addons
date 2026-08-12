@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.float_utils import float_compare
 
@@ -55,13 +55,13 @@ class MbBoardContent(models.Model):
     def _check_content(self):
         for content in self:
             if content.board_id.package_type_id.package_use != "reusable":
-                raise ValidationError("Ware may only be assigned to a reusable package.")
+                raise ValidationError(_("Ware may only be assigned to a reusable package."))
             if (content.board_id.company_id
                     and content.board_id.company_id != content.production_id.company_id):
-                raise ValidationError("The board and manufacturing order must share a company.")
+                raise ValidationError(_("The board and manufacturing order must share a company."))
             if (content.current_workorder_id
                     and content.current_workorder_id.production_id != content.production_id):
-                raise ValidationError("The current operation must belong to the manufacturing order.")
+                raise ValidationError(_("The current operation must belong to the manufacturing order."))
             current = self.search([
                 ("production_id", "=", content.production_id.id),
                 ("state", "=", "current"),
@@ -71,8 +71,7 @@ class MbBoardContent(models.Model):
                     total,
                     content.production_id.product_qty,
                     precision_rounding=content.production_id.product_uom_id.rounding) > 0:
-                raise ValidationError(
-                    "Current board quantities cannot exceed the manufacturing quantity.")
+                raise ValidationError(_("Current board quantities cannot exceed the manufacturing quantity."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -93,7 +92,7 @@ class MbBoardContent(models.Model):
         self.ensure_one()
         board.ensure_one()
         if self.state != "current":
-            raise UserError("Only current board content can be transferred.")
+            raise UserError(_("Only current board content can be transferred."))
         self.action_remove()
         replacement = self.create({
             "board_id": board.id,
@@ -108,12 +107,12 @@ class MbBoardContent(models.Model):
         """Move this complete board line to its own Odoo 19 MO backorder."""
         self.ensure_one()
         if self.state != "current":
-            raise UserError("Only current board content can be split.")
+            raise UserError(_("Only current board content can be split."))
         production = self.production_id
         remaining = production.product_qty - self.quantity
         if float_compare(
                 remaining, 0, precision_rounding=production.product_uom_id.rounding) <= 0:
-            raise UserError("There is no other quantity to keep on the original order.")
+            raise UserError(_("There is no other quantity to keep on the original order."))
         previous_operation = self.current_workorder_id.operation_id
         split = production._split_productions(
             amounts={production: [remaining, self.quantity]},
@@ -122,7 +121,7 @@ class MbBoardContent(models.Model):
         )
         deferred = (split - production)[:1]
         if not deferred:
-            raise UserError("Odoo did not create the expected split manufacturing order.")
+            raise UserError(_("Odoo did not create the expected split manufacturing order."))
         deferred_operation = deferred.workorder_ids.filtered(
             lambda workorder: workorder.operation_id == previous_operation)[:1]
         self.write({

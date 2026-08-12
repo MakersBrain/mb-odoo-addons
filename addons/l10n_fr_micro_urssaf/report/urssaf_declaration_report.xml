@@ -12,18 +12,18 @@
 				<table class="table table-sm"><thead><tr><th>Category</th><th class="text-end">Current</th><th class="text-end">Prior-period</th><th class="text-end">Manual</th><th class="text-end">Declare</th><th class="text-end">Estimated levies</th></tr></thead><tbody>
 					<tr t-foreach="o.line_ids" t-as="line"><td><span t-field="line.category"/></td><td class="text-end"><span t-field="line.current_turnover"/></td><td class="text-end"><span t-field="line.prior_period_adjustment"/></td><td class="text-end"><span t-field="line.manual_adjustment"/><div t-if="line.manual_adjustment_reason" class="small" t-field="line.manual_adjustment_reason"/></td><td class="text-end"><strong t-field="line.declared_turnover"/></td><td class="text-end"><span t-field="line.total_estimated"/><div class="small" style="white-space: pre-line" t-field="line.rate_summary"/></td></tr>
 				</tbody></table>
-				<div t-if="o.anomaly_text" class="alert alert-danger"><strong>Anomalies</strong><div style="white-space: pre-line" t-field="o.anomaly_text"/></div>
+				<div t-if="o.anomaly_text" class="alert alert-danger"><strong>Anomalies found</strong><div style="white-space: pre-line" t-field="o.anomaly_text"/></div>
 				<h3>Year-to-date thresholds</h3><div style="white-space: pre-line" t-field="o.threshold_status"/>
 				<t t-set="pos_summaries" t-value="o._pos_daily_summaries()"/>
 				<t t-if="pos_summaries">
 					<h3>Daily POS receipt summaries</h3>
-					<table class="table table-sm"><thead><tr><th>Date</th><th>Method</th><th>Category</th><th>Session(s)</th><th>Ticket(s)</th><th class="text-end">Amount</th></tr></thead><tbody>
+					<table class="table table-sm"><thead><tr><th>Recognition date</th><th>Method</th><th>Category</th><th>POS session(s)</th><th>Receipt(s)</th><th class="text-end">Amount</th></tr></thead><tbody>
 						<tr t-foreach="pos_summaries" t-as="summary"><td><span t-out="summary['date']"/></td><td><span t-out="summary['method']"/></td><td><span t-out="summary['category']"/></td><td><span t-out="summary['sessions']"/></td><td><span t-out="summary['tickets']"/></td><td class="text-end"><span t-out="summary['amount']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td></tr>
 					</tbody></table>
 				</t>
-				<h3>Livre des recettes — supporting detail</h3>
-				<table class="table table-sm"><thead><tr><th>Date</th><th>Origin / customer</th><th>Description</th><th>Category</th><th>Method</th><th class="text-end">Amount</th></tr></thead><tbody>
-					<tr t-foreach="o.source_ids.sorted(key=lambda s: (s.recognition_date, s.id))" t-as="source"><t t-set="pos_order" t-value="source.sudo().pos_order_id"/><td><span t-field="source.recognition_date"/></td><td><span t-field="source.origin_move_id.partner_id"/><span t-if="source.origin_move_id"> — <span t-field="source.origin_move_id"/></span><span t-if="pos_order"> — session <span t-field="pos_order.session_id"/> — ticket <span t-out="pos_order.display_name"/></span></td><td><span t-field="source.description"/></td><td><span t-field="source.category"/></td><td><span t-field="source.receipt_method"/><span t-if="source.receipt_method_detail"> — <span t-field="source.receipt_method_detail"/></span></td><td class="text-end"><span t-field="source.amount"/><div class="small" t-if="source.source_currency_id"><span t-field="source.source_amount_currency"/> @ <span t-field="source.exchange_rate"/></div></td></tr>
+				<h3>Receipt book — supporting detail</h3>
+				<table class="table table-sm"><thead><tr><th>Recognition date</th><th>Origin / customer</th><th>Receipt description</th><th>Category</th><th>Method</th><th class="text-end">Amount</th></tr></thead><tbody>
+					<tr t-foreach="o.source_ids.sorted(key=lambda s: (s.recognition_date, s.id))" t-as="source"><t t-set="pos_order" t-value="source.sudo().pos_order_id"/><td><span t-field="source.recognition_date"/></td><td><span t-field="source.origin_move_id.partner_id"/><span t-if="source.origin_move_id"> — <span t-field="source.origin_move_id"/></span><span t-if="pos_order"> — POS session <span t-field="pos_order.session_id"/> — receipt <span t-out="pos_order.display_name"/></span></td><td><span t-field="source.description"/></td><td><span t-field="source.category"/></td><td><span t-field="source.receipt_method"/><span t-if="source.receipt_method_detail"> — <span t-field="source.receipt_method_detail"/></span></td><td class="text-end"><span t-field="source.amount"/><div class="small" t-if="source.source_currency_id"><span t-field="source.source_amount_currency"/> @ <span t-field="source.exchange_rate"/></div></td></tr>
 				</tbody></table>
 			</div>
 		</t></t></t>

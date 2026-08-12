@@ -17,7 +17,10 @@
                     <button class="btn btn-primary" t-on-click="startCamera"
                             t-att-disabled="state.busy">Use camera</button>
                     <button class="btn btn-secondary" t-on-click="() => fileInput.el.click()"
-                            t-att-disabled="state.busy">Upload image</button>
+                            t-att-disabled="state.busy">
+                        <t t-if="state.uploadedRoles.includes(state.role)">Retake selected image</t>
+                        <t t-else="">Upload image</t>
+                    </button>
                     <select class="form-select w-auto" t-model="state.role">
                         <option value="front">Product/front</option>
                         <option value="lot_detail">Lot detail</option>
@@ -28,12 +31,50 @@
                 </div>
                 <div class="ratio ratio-4x3 bg-dark mb-3" t-att-class="{'d-none': !state.cameraActive}">
                     <video t-ref="video" autoplay="autoplay" playsinline="playsinline" muted="muted"/>
+                    <div class="o_mb_scan_guide" aria-hidden="true"/>
                 </div>
-                <button t-if="state.cameraActive" class="btn btn-primary mb-3"
-                        t-on-click="takePhoto" t-att-disabled="state.busy">Take photo</button>
+                <div t-if="state.cameraActive" class="d-flex gap-2 mb-2">
+                    <button class="btn btn-primary" t-on-click="takePhoto"
+                            t-att-disabled="state.busy">Take photo</button>
+                    <button t-if="state.torchAvailable" class="btn btn-outline-light"
+                            t-on-click="toggleTorch">
+                        <t t-if="state.torchOn">Turn torch off</t><t t-else="">Turn torch on</t>
+                    </button>
+                </div>
+                <div t-if="state.cameraActive" class="alert py-2 mb-3"
+                     t-att-class="state.lookupState === 'found' ? 'alert-success' : 'alert-secondary'"
+                     role="status" aria-live="polite">
+                    <span t-esc="state.scanHint"/>
+                </div>
                 <div t-if="state.previewUrl" class="mb-3">
-                    <img t-att-src="state.previewUrl" class="img-fluid rounded"
-                         alt="Sanitized upload preview"/>
+                    <p class="small text-muted mb-1">Drag over the visible lot/batch text, then rotate if needed.</p>
+                    <div class="o_mb_crop_surface rounded"
+                         t-on-pointerdown="onCropPointerDown"
+                         t-on-pointermove="onCropPointerMove"
+                         t-on-pointerup="onCropPointerUp"
+                         t-on-pointercancel="onCropPointerUp">
+                        <img t-att-src="state.previewUrl" class="img-fluid d-block"
+                             draggable="false" alt="Accepted image preview for selecting the lot area"/>
+                        <div class="o_mb_crop_selection" t-att-style="cropStyle" aria-hidden="true"/>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                        <button class="btn btn-outline-primary" t-on-click="createLotCrop"
+                                t-att-disabled="state.busy || state.cropReady">
+                            Use selected area for lot reading
+                        </button>
+                        <select class="form-select w-auto" t-model="state.cropRotation"
+                                aria-label="Rotate lot text before reading">
+                            <option value="0">No rotation</option>
+                            <option value="90">Rotate 90°</option>
+                            <option value="180">Rotate 180°</option>
+                            <option value="270">Rotate 270°</option>
+                        </select>
+                        <label class="form-check align-self-center mb-0">
+                            <input type="checkbox" class="form-check-input"
+                                   t-model="state.enhanceCrop"/>
+                            <span class="form-check-label">Also try black-and-white high contrast for OCR</span>
+                        </label>
+                    </div>
                 </div>
                 <div class="input-group mb-3">
                     <input class="form-control" t-model="state.manualCode"
@@ -48,6 +89,10 @@
                         <code t-esc="code.rawValue"/><span t-esc="code.format"/>
                     </li>
                 </ul>
+                <button t-if="state.cameraActive &amp;&amp; state.decoded.length"
+                        class="btn btn-outline-secondary mb-3" t-on-click="scanAgain">
+                    Reject this read and scan again
+                </button>
                 <div class="d-flex gap-2">
                     <button class="btn btn-primary" t-on-click="analyzeImages"
                             t-att-disabled="state.busy || !state.uploaded">

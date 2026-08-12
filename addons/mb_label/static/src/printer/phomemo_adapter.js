@@ -5,6 +5,7 @@
 // transport or re-chunk its writes here; that was the source of the M110
 // regression this port is intended to avoid.
 
+import { _t } from "@web/core/l10n/translation";
 import { loadRaster } from "./raster";
 import { registerPrinterAdapter } from "./printer_registry";
 import { BLETransport } from "./phomymo/ble";
@@ -110,10 +111,10 @@ export function assertRasterFitsDevice(image, device) {
     const usedDots = device.rotated ? image.height : image.width;
     const availableDots = device.widthBytes * 8;
     if (usedDots > availableDots) {
-        throw new Error(
-            `The selected paper uses ${usedDots} dots across the head, but ${device.name} `
-            + `has ${availableDots}. Select the correct model or paper size.`
-        );
+        throw new Error(_t(
+            "The selected paper uses %(used)s dots across the print head, but %(device)s has %(available)s. Select the correct model or paper size.",
+            { used: usedDots, device: device.name, available: availableDots }
+        ));
     }
 }
 
@@ -176,7 +177,7 @@ async function printImage(link, image, settings, onProgress = () => {}) {
     // the printer feeds without burning. This is exactly Ateliera's fix.
     const device = resolveDevice(settings.model, deviceName);
     if (!reachableOverBle(device)) {
-        throw new Error(`${device.name} requires USB and cannot use Web Bluetooth.`);
+        throw new Error(_t("%(device)s requires USB and cannot use Web Bluetooth.", { device: device.name }));
     }
     assertRasterFitsDevice(image, device);
     const printerModel = device.id;
@@ -234,7 +235,7 @@ export async function testPrintPhomemo(options = {}) {
 
 registerPrinterAdapter({
     id: "phomemo",
-    label: "Phomemo (Ateliera transport)",
+    label: _t("Phomemo (Ateliera transport)"),
     available: () => BLETransport.isAvailable(),
     models: phomemoModels,
     settings: loadPhomemoSettings,

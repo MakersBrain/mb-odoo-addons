@@ -4,24 +4,47 @@ Odoo 19 receipt workflow for identifying a product and preserving the supplier
 lot from one or two package photographs. No stock record changes until a user
 reviews the candidates and presses **Apply to receipt**.
 
+The addon uses the shared `mb_ai_bridge` for typed, idempotent, descriptor-only
+job submission and callback metadata validation. Inventory-specific evidence,
+candidates, review and stock writes remain here; provider HTTP clients and keys
+remain in the control-plane extraction broker.
+
 ## Current development baseline
 
 - Browser decoding uses the native Barcode Detection API where available and
   Odoo 19's pinned ZXing 0.21.3 fallback (Apache-2.0) elsewhere.
-- The current camera action takes a still image (or accepts an uploaded file),
-  uploads its sanitized rendition, and then decodes that accepted file. It does
-  not yet scan live frames or perform progressive online product lookup.
+- Chrome's built-in foundation-model APIs are not used for scanning: they do not
+  currently support Android/iOS and do not replace deterministic barcode/OCR
+  evidence. Browser capability detection keeps this workflow portable.
+- The camera samples downscaled frames in a Web Worker, reports simple
+  light/glare/sharpness guidance, and accepts a checksum-valid barcode after two
+  matching recent reads. A generation ID rejects stale lookup responses; the
+  camera remains open for lot framing. Still-image upload and ZXing remain the
+  fallback.
 - Uploads accept genuine JPEG/PNG files up to 15 MB and a 50 MP safe decode
   bound. Odoo applies EXIF orientation, downsizes to at most 12 MP, strips all
   metadata by re-encoding, and persists only that sanitized rendition.
+- A user can select and rotate a lot-text crop and optionally create a linked
+  grayscale/autocontrast/threshold PNG. Both follow evidence retention; only the
+  derivative is added to deterministic OCR, while paid multimodal analysis keeps
+  the reviewed color crop and current front-label context. Retaking one role
+  supersedes its current image and derived crops without deleting audit evidence.
 - Local primary/alternate GTIN and GS1 AI 01/10/17/30 resolution runs first.
 - The optional `mb_inventory_capture_catalogue` glue addon performs read-only
   exact GTIN or text lookup in the Makersbrain ceramics catalogue.
+- An unknown checksum-valid GTIN can progress to the broker's UPCitemDB adapter.
+  The shared PostgreSQL cache is keyed by provider/schema/GTIN-14, coalesces
+  concurrent misses, and retains only normalized review candidates (30-day
+  positive and 24-hour negative defaults).
 - The control plane queues OCR using UUID/digest descriptors only. Its
   document-extraction broker pulls the sanitized bytes, verifies SHA-256,
   length, and MIME type, and fixes Azure models to `prebuilt-read` or
   `prebuilt-invoice`. After retrieving a successful result, the broker calls
   Azure's Delete Analyze Result endpoint before returning normalized data.
+- Identical enqueue retries return the original operation ID. Normalized OCR and
+  multimodal callback commands are durably checkpointed before delivery, so an
+  uncertain callback is replayed with the identical operation key, attempt ID
+  and payload instead of re-running a completed provider stage.
 - If the tenant enables `inventory-ai-fallback`, a separately configured
   multimodal endpoint may return strict candidate JSON. Its product suggestions
   remain unverified until grounded by a provider lookup. A lot is machine-grounded
@@ -39,33 +62,24 @@ Document Intelligence. Azure Vision is not provisioned unless a controlled
 benchmark shows a material advantage over the existing development Document
 Intelligence resource.
 
-## Target v19 processing
+## Remaining v19 processing work
 
-The following behavior is planned and must not be treated as present in the
-current Owl action:
+The following refinement remains release-gated and must not be treated as
+present in the current Owl action:
 
-- sample downscaled luminance frames in a Web Worker while keeping the preview
-  responsive;
-- accept a checksum-valid barcode only after matching reads in two recent frames;
-- show local digits and product resolution first, then catalogue/cache/online
-  states, with a scan-generation ID that discards stale responses;
-- keep the camera open so product lookup and lot framing can proceed concurrently;
-- rotate/rectify barcode-context and text regions, run bounded in-memory
-  grayscale/CLAHE/sharpened/threshold variants through deterministic OCR, and ask
-  for a closer detail photo when quality is insufficient; and
-- send only one selected color lot crop by default, or at most two independently
-  useful sanitized assets, to an enabled multimodal provider. Live video frames
-  are never continuously uploaded.
+- automatically locate/rectify barcode-context and text regions, select among
+  measured OCR variants, and ask for a closer detail photo when quality is
+  insufficient. Live video frames are never continuously uploaded.
 
-The product-lookup target is local Odoo, Makersbrain catalogue, shared cache, then
-an approved external adapter such as UPCitemDB. Positive entries default to 30
+The product-lookup chain is local Odoo, Makersbrain catalogue, shared cache, then
+the optional UPCitemDB adapter. Positive entries default to 30
 days, negative entries to 24 hours, and concurrent misses for the same
 provider/schema/GTIN are coalesced. UPCitemDB data is review-only; raw responses,
 offers, descriptions and third-party images are not retained.
 
 ## Multimodal providers
 
-The target broker contract supports Azure-hosted multimodal models, Google
+The broker contract supports Azure-hosted multimodal models, Google
 Gemini, OpenAI and Anthropic Claude through separate capability-compatible
 adapters. Azure Document Intelligence remains a deterministic OCR adapter. A
 tenant may configure zero or more AI adapters, with one benchmark-approved primary
@@ -80,8 +94,10 @@ control-plane database or Odoo; Odoo's compatibility `raw_response` field contai
 only a bounded redacted status such as `{"retained": false}`. A valid `unknown`
 response is not a reason to cascade to another paid model.
 
-Provider credentials, model pins, region/retention policy, quotas and primary/
-secondary order belong only to the extraction broker. Consult the official
+Provider credentials, model pins, region/retention policy and quotas belong only
+to the extraction broker. A company may choose the names of one configured
+primary and one distinct fallback; the broker validates that route and remains
+the only component holding credentials. Consult the official
 [Gemini image](https://ai.google.dev/gemini-api/docs/image-understanding),
 [Gemini structured-output](https://ai.google.dev/gemini-api/docs/structured-output),
 [OpenAI vision](https://developers.openai.com/api/docs/guides/images-vision),
@@ -98,11 +114,17 @@ The tenant Odoo process receives:
   environment secret and never stored in an Odoo model;
 - `MB_CONTROL_API_URL`: internal control API base URL.
 
+Each company must also explicitly enable **Allow AI fallback for inventory
+photos** and choose an available primary/optional fallback before the broker may
+call a multimodal provider. Local barcode/GS1, OCR, crop, lookup and manual review
+continue to work when it is disabled.
+
 The extraction broker alone receives provider credentials. See
 `control-plane/deploy/release-contract.json` for the currently implemented
 environment contract. Provider-specific Azure-hosted multimodal, Gemini, OpenAI
-and Claude configuration must be added there and in `../makersbrain-infra` only
-when its adapter and benchmark route are approved.
+and Claude settings are defined there. Add only the approved provider's secret
+delivery and development endpoint to `../makersbrain-infra`; create an Azure
+Vision endpoint only if the benchmark shows it is needed.
 
 Unapplied sanitized images are deleted after 30 days by default. Override with
 the system parameter `mb_inventory_capture.unapplied_image_retention_days`
@@ -143,6 +165,8 @@ result and stores neither provider response bodies nor image bytes.
 
 Use `tools/benchmark_azure_inventory_preprocessing.py` for controlled
 grayscale, high-contrast, and black-and-white comparisons on explicitly named
-samples. These are OCR-only in-memory derivatives; they never replace the
-sanitized color evidence. The six-image pilot found no lot-recall improvement
-from blind full-frame enhancement, so production must not enable it by default.
+samples. Benchmark derivatives are in-memory. The application can persist one
+explicitly requested crop derivative as traceable OCR evidence, but it never
+replaces the sanitized color crop or enters the paid multimodal request. The
+six-image pilot found no lot-recall improvement from blind full-frame
+enhancement, so production does not enable it by default.

@@ -2,8 +2,11 @@
 <odoo>
 	<template id="report_invoice_document_franchise_mention" inherit_id="account.report_invoice_document">
 		<xpath expr="//p[@name='taxes_legal_notes']" position="after">
+			<!-- The mention is French statutory wording. It is printed verbatim in
+			     every language, so extraction must not offer it for translation. -->
 			<p t-if="o.l10n_fr_micro_franchise_invoice and is_html_empty(o.taxes_legal_notes)"
-				name="l10n_fr_micro_franchise_mention" class="mb-2">
+				name="l10n_fr_micro_franchise_mention" class="mb-2"
+				t-translation="off">
 				TVA non applicable, article 293 B du CGI
 			</p>
 		</xpath>

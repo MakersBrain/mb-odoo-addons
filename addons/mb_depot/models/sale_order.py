@@ -167,7 +167,8 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     mb_depot_sale_report_line_id = fields.Many2one(
-        "mb.depot.sale.report.line", copy=False, readonly=True, index=True,
+        "mb.depot.sale.report.line", string="Depot report line",
+        copy=False, readonly=True, index=True,
     )
 
     # Related rather than reached through `parent.` in the line's domain: the
