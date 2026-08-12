@@ -25,6 +25,15 @@ __pycache__/
 .venv/
 .ruff_cache/
 
+# Generated pages. brand/build-pages.py inlines ~190 KB of base64 font into
+# each of these, so committing them would put a quarter-megabyte diff in the
+# history on every rebuild while adding nothing that is not already tracked.
+# Every input is in the tree — the .src.html, brand/tokens.css, brand/ui.css and
+# brand/fonts — so a clean checkout rebuilds them offline with one command.
+brand/style-guide.html
+brand/design-chart.html
+landing/index.html
+
 # Editor and OS noise.
 .idea/
 .vscode/
