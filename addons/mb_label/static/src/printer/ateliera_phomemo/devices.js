@@ -2,13 +2,18 @@
 
 // Mechanically transpiled from ateliera-app/apps/mobile/src/lib/label/devices.ts.
 // Keep this table synchronized with Ateliera; it is the shared Phomemo model source.
+//
+// Two fields of the upstream table are dropped here on purpose: `group` and
+// `description` hold French prose, nothing in this addon reads either, and a
+// French literal in source is exactly what the translation catalogues exist to
+// prevent. If a device ever needs a description on screen, add it as an English
+// string wrapped in `_t()` at the point of use rather than restoring the field —
+// re-transpiling must not bring them back.
 
 const BUILTIN_DEVICES = [
   {
     id: "p12",
     name: "P12 / P12 Pro",
-    group: "Rubans",
-    description: "\xC9tiqueteuse ruban continu 12 mm",
     protocol: "p12",
     widthBytes: 12,
     dpi: 203,
@@ -24,8 +29,6 @@ const BUILTIN_DEVICES = [
   {
     id: "a30",
     name: "A30",
-    group: "Rubans",
-    description: "Ruban continu 12-15 mm, impression plus rapide",
     protocol: "p12",
     widthBytes: 15,
     dpi: 203,
@@ -41,8 +44,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m02",
     name: "M02 / M02S / M02X",
-    group: "S\xE9rie M02",
-    description: "Imprimante de poche 48 mm, papier continu",
     protocol: "m02",
     widthBytes: 48,
     dpi: 203,
@@ -58,8 +59,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m02-pro",
     name: "M02 Pro",
-    group: "S\xE9rie M02",
-    description: "Imprimante de poche 53 mm, 300 dpi",
     protocol: "m02",
     widthBytes: 78,
     dpi: 300,
@@ -75,8 +74,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m03",
     name: "M03",
-    group: "S\xE9rie M03",
-    description: "Imprimante \xE0 stickers 53 mm",
     protocol: "m-series",
     widthBytes: 54,
     dpi: 203,
@@ -92,8 +89,6 @@ const BUILTIN_DEVICES = [
   {
     id: "t02",
     name: "T02",
-    group: "S\xE9rie T02",
-    description: "Imprimante \xE0 stickers 48 mm",
     protocol: "m-series",
     widthBytes: 48,
     dpi: 203,
@@ -109,8 +104,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m04s-53",
     name: "M04S - papier 53 mm",
-    group: "S\xE9rie M04",
-    description: "300 dpi, largeur r\xE9glable, r\xE9gl\xE9e sur 53 mm",
     protocol: "m04",
     widthBytes: 75,
     dpi: 300,
@@ -126,8 +119,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m04s-80",
     name: "M04S - papier 80 mm",
-    group: "S\xE9rie M04",
-    description: "300 dpi, largeur r\xE9glable, r\xE9gl\xE9e sur 80 mm",
     protocol: "m04",
     widthBytes: 112,
     dpi: 300,
@@ -143,8 +134,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m04s-110",
     name: "M04S - papier 110 mm",
-    group: "S\xE9rie M04",
-    description: "300 dpi, largeur r\xE9glable, r\xE9gl\xE9e sur 110 mm",
     protocol: "m04",
     widthBytes: 154,
     dpi: 300,
@@ -160,8 +149,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m110",
     name: "M110 / M120",
-    group: "S\xE9rie M110",
-    description: "\xC9tiqueteuse \xE9troite 48 mm",
     protocol: "m110",
     widthBytes: 48,
     dpi: 203,
@@ -184,8 +171,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m110s",
     name: "M110S",
-    group: "S\xE9rie M110",
-    description: "\xC9tiqueteuse \xE9troite 48 mm, rouleau cal\xE9 \xE0 droite",
     protocol: "m110",
     widthBytes: 48,
     dpi: 203,
@@ -201,8 +186,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m200",
     name: "M200",
-    group: "S\xE9rie M200",
-    description: "\xC9tiqueteuse 75 mm",
     protocol: "m-series",
     widthBytes: 76,
     dpi: 203,
@@ -218,8 +201,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m250",
     name: "M250",
-    group: "S\xE9rie M200",
-    description: "\xC9tiqueteuse 75 mm, t\xEAte de 72 octets",
     protocol: "m-series",
     widthBytes: 72,
     dpi: 203,
@@ -235,8 +216,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m220",
     name: "M220",
-    group: "S\xE9rie M200",
-    description: "\xC9tiqueteuse large 75 mm, rouleau cal\xE9 \xE0 droite",
     protocol: "m-series",
     widthBytes: 72,
     dpi: 203,
@@ -252,8 +231,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m221",
     name: "M221",
-    group: "S\xE9rie M200",
-    description: "\xC9tiqueteuse large 75 mm, rouleau centr\xE9",
     protocol: "m-series",
     widthBytes: 72,
     dpi: 203,
@@ -269,8 +246,6 @@ const BUILTIN_DEVICES = [
   {
     id: "m260",
     name: "M260",
-    group: "S\xE9rie M200",
-    description: "\xC9tiqueteuse large 72 mm",
     protocol: "m-series",
     widthBytes: 72,
     dpi: 203,
@@ -286,8 +261,6 @@ const BUILTIN_DEVICES = [
   {
     id: "pm241",
     name: "PM-241-BT",
-    group: "S\xE9rie PM-241",
-    description: "\xC9tiquettes d'exp\xE9dition 102 mm (USB)",
     protocol: "tspl",
     widthBytes: 102,
     dpi: 203,
@@ -303,8 +276,6 @@ const BUILTIN_DEVICES = [
   {
     id: "d-series",
     name: "D30 / D35 / D50 / D110 / Q30 / Q30S",
-    group: "S\xE9rie D",
-    description: "Mini-\xE9tiqueteuses, protocole pivot\xE9",
     protocol: "d-series",
     widthBytes: null,
     dpi: 203,

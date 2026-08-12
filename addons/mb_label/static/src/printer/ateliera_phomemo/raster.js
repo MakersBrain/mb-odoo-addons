@@ -1,13 +1,12 @@
 /** @odoo-module **/
 
 // Mechanically transpiled from ateliera-app/apps/mobile/src/lib/label/raster.ts.
+//
+// Upstream's `DITHER_LABELS` map is dropped here on purpose: it holds French
+// prose, nothing in this addon imports it, and the dither labels users actually
+// see live in device_print.js where they are wrapped in `_t()`. Re-transpiling
+// must not bring it back.
 
-const DITHER_LABELS = {
-  threshold: "Seuil (net)",
-  "floyd-steinberg": "Floyd-Steinberg (photo)",
-  atkinson: "Atkinson (doux)",
-  ordered: "Trame ordonn\xE9e"
-};
 const BLACK_LEVEL = 160;
 function toGrayscale(image) {
   const { data, width, height } = image;
@@ -200,7 +199,6 @@ function padRows(raster, rows) {
 }
 export {
   BLACK_LEVEL,
-  DITHER_LABELS,
   pack,
   padRows,
   rotateRaster,
