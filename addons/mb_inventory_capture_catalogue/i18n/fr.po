@@ -23,14 +23,26 @@ msgstr ""
 "d'appliquer l'inventaire."
 
 #. module: mb_inventory_capture_catalogue
+#: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_candidate__display_name
 #: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_lookup_provider__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
 
 #. module: mb_inventory_capture_catalogue
+#: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_candidate__id
 #: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_lookup_provider__id
 msgid "ID"
 msgstr "ID"
+
+#. module: mb_inventory_capture_catalogue
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture_catalogue.view_inventory_capture_form_catalogue_import
+msgid "Import catalogue product"
+msgstr "Importer le produit du catalogue"
+
+#. module: mb_inventory_capture_catalogue
+#: model:ir.model,name:mb_inventory_capture_catalogue.model_mb_inventory_capture_candidate
+msgid "Inventory capture candidate"
+msgstr "Candidat de capture de stock"
 
 #. module: mb_inventory_capture_catalogue
 #: model:ir.model,name:mb_inventory_capture_catalogue.model_mb_inventory_capture_lookup_provider
@@ -59,7 +71,8 @@ msgstr "Seul un responsable des stocks peut importer un produit vérifié."
 #. odoo-python
 #: code:addons/mb_inventory_capture_catalogue/models/inventory_capture_candidate.py:0
 msgid "The capture must be in review before importing a product."
-msgstr "La capture doit être en cours de vérification avant d'importer un produit."
+msgstr ""
+"La capture doit être en cours de vérification avant d'importer un produit."
 
 #. module: mb_inventory_capture_catalogue
 #. odoo-python

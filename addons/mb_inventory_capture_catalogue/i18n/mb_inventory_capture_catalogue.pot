@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0-20260803\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-12 11:55+0000\n"
-"PO-Revision-Date: 2026-08-12 11:55+0000\n"
+"POT-Creation-Date: 2026-08-12 12:30+0000\n"
+"PO-Revision-Date: 2026-08-12 12:30+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -22,13 +22,25 @@ msgid "Catalogue match; import or map it before applying inventory."
 msgstr ""
 
 #. module: mb_inventory_capture_catalogue
+#: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_candidate__display_name
 #: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_lookup_provider__display_name
 msgid "Display Name"
 msgstr ""
 
 #. module: mb_inventory_capture_catalogue
+#: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_candidate__id
 #: model:ir.model.fields,field_description:mb_inventory_capture_catalogue.field_mb_inventory_capture_lookup_provider__id
 msgid "ID"
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#: model_terms:ir.ui.view,arch_db:mb_inventory_capture_catalogue.view_inventory_capture_form_catalogue_import
+msgid "Import catalogue product"
+msgstr ""
+
+#. module: mb_inventory_capture_catalogue
+#: model:ir.model,name:mb_inventory_capture_catalogue.model_mb_inventory_capture_candidate
+msgid "Inventory capture candidate"
 msgstr ""
 
 #. module: mb_inventory_capture_catalogue

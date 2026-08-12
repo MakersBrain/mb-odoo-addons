@@ -25,11 +25,17 @@ odoo() { docker exec "$CONTAINER" odoo "$@"; }
 
 join_commas() { local IFS=,; echo "$*"; }
 
+# The exporter runs as uid 100 inside the container and writes through the bind
+# mount, so it needs write permission on the directory to create a catalogue and
+# on the file itself to overwrite one. A fresh clone or a branch checkout leaves
+# the POT owned by the host user at 0644, which is why the file mode is set here
+# and not only the directory's.
 ensure_i18n_dirs() {
     local module
     for module in "$@"; do
         mkdir -p "$REPO/addons/$module/i18n"
         chmod 777 "$REPO/addons/$module/i18n"
+        chmod a+w "$REPO/addons/$module/i18n/$module.pot" 2>/dev/null || true
     done
 }
 
