@@ -55,6 +55,23 @@ class TestCommercialOperations(TransactionCase):
         self.assertEqual(operation.task_id.mb_commercial_operation_id, operation)
         self.assertEqual(operation.task_id.date_deadline, operation.planned_end)
 
+    def test_batched_operation_create_applies_datetime_defaults(self):
+        operations = self.env["mb.commercial.operation"].create([
+            {"name": "Defaulted A", "partner_id": self.partner.id},
+            {"name": "Defaulted B", "partner_id": self.partner.id},
+        ])
+
+        self.assertEqual(len(operations), 2)
+        self.assertTrue(all(operations.mapped("planned_start")))
+        self.assertTrue(all(operations.mapped("planned_end")))
+        self.assertTrue(all(operations.mapped("project_id")))
+        self.assertTrue(all(operations.mapped("task_id")))
+        for operation in operations:
+            self.assertEqual(
+                operation.planned_end - operation.planned_start,
+                timedelta(hours=7),
+            )
+
     def test_unsaved_operation_has_zero_actual_profit(self):
         operation = self.env["mb.commercial.operation"].new({})
 
@@ -86,6 +103,25 @@ class TestCommercialOperations(TransactionCase):
         self.assertEqual(first.state, "approved")
         self.assertTrue(first.operation_id)
         self.assertTrue(first.task_id)
+
+    def test_closing_contract_occurrence_keeps_shared_project_active(self):
+        contract = self.env["mb.commercial.contract"].create({
+            "partner_id": self.partner.id,
+            "company_id": self.company.id,
+            "date_start": fields.Date.today(),
+            "rent_billing_method": "information",
+        })
+        obligation = self.env["mb.commercial.obligation"].create({
+            "name": "Shared-project visit",
+            "contract_id": contract.id,
+            "date_start": contract.date_start,
+        })
+        occurrence = obligation.occurrence_ids[:1]
+        occurrence.action_approve()
+        occurrence.operation_id.action_done()
+        occurrence.operation_id.with_user(self.manager).action_financial_close()
+
+        self.assertTrue(contract.project_id.active)
 
     def test_approved_occurrence_is_immutable(self):
         contract = self.env["mb.commercial.contract"].create({
@@ -436,8 +472,11 @@ class TestCommercialOperations(TransactionCase):
         operation.with_user(self.manager).action_financial_close()
         self.assertEqual(operation.state, "financially_closed")
         self.assertTrue(operation.documents_complete)
+        self.assertFalse(operation.project_id.active)
         with self.assertRaises(UserError):
             operation.planned_end += timedelta(days=1)
+        operation.with_user(self.manager).action_reopen()
+        self.assertTrue(operation.project_id.active)
 
     def test_travel_quote_incomplete_requires_acknowledgement_and_revisions(self):
         connector = self.env["mb.tollquote.connector"].create({

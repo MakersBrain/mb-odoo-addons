@@ -195,7 +195,9 @@ class MbCommercialOperation(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        records = self.browse()
+        prepared_vals = []
+        project_indexes = []
+        project_vals = []
         for original_vals in vals_list:
             vals = dict(original_vals)
             if vals.get("name", _("New")) == _("New"):
@@ -205,12 +207,14 @@ class MbCommercialOperation(models.Model):
             company = self.env["res.company"].browse(
                 vals.get("company_id") or self.env.company.id
             )
+            vals["planned_start"] = vals.get("planned_start") or fields.Datetime.now()
             if not vals.get("planned_end"):
                 vals["planned_end"] = fields.Datetime.add(
-                    vals.get("planned_start") or fields.Datetime.now(), hours=7,
+                    vals["planned_start"], hours=7,
                 )
             if not vals.get("project_id"):
-                project = self.env["project.project"].with_company(company).create({
+                project_indexes.append(len(prepared_vals))
+                project_vals.append({
                     "name": vals["name"],
                     "company_id": company.id,
                     "partner_id": vals.get("partner_id"),
@@ -219,12 +223,20 @@ class MbCommercialOperation(models.Model):
                     "date_start": fields.Datetime.to_datetime(vals["planned_start"]).date(),
                     "date": fields.Datetime.to_datetime(vals["planned_end"]).date(),
                 })
+            prepared_vals.append(vals)
+
+        if project_vals:
+            projects = self.env["project.project"].create(project_vals)
+            for index, project in zip(project_indexes, projects, strict=True):
                 if not project.account_id:
-                    project._create_analytic_account()
-                vals["project_id"] = project.id
-            record = super().create([vals])
-            if not record.task_id:
-                task = self.env["project.task"].with_company(record.company_id).create({
+                    project.with_company(project.company_id)._create_analytic_account()
+                prepared_vals[index]["project_id"] = project.id
+
+        records = super().create(prepared_vals)
+        operations_without_tasks = records.filtered(lambda operation: not operation.task_id)
+        if operations_without_tasks:
+            tasks = self.env["project.task"].create([
+                {
                     "name": record.name,
                     "project_id": record.project_id.id,
                     "company_id": record.company_id.id,
@@ -233,9 +245,11 @@ class MbCommercialOperation(models.Model):
                     "date_deadline": record.planned_end,
                     "allocated_hours": record.planned_work_hours,
                     "mb_commercial_operation_id": record.id,
-                })
+                }
+                for record in operations_without_tasks
+            ])
+            for record, task in zip(operations_without_tasks, tasks, strict=True):
                 record.with_context(mb_operation_sync=True).task_id = task
-            records |= record
         return records
 
     def write(self, vals):
@@ -307,7 +321,10 @@ class MbCommercialOperation(models.Model):
 
     @api.depends(
         "task_id.timesheet_ids.amount", "analytic_evidence_ids.amount",
-        "account_move_ids.line_ids.balance", "direct_account_move_ids.line_ids.balance",
+        "account_move_ids.state", "account_move_ids.amount_untaxed_signed",
+        "account_move_ids.line_ids.balance", "direct_account_move_ids.state",
+        "direct_account_move_ids.amount_untaxed_signed",
+        "direct_account_move_ids.line_ids.balance",
     )
     def _compute_actual_profit(self):
         for operation in self:
@@ -491,7 +508,13 @@ class MbCommercialOperation(models.Model):
             warnings.append(("missing_stock_targets", "warning", _("No stock targets are planned.")))
         for line in self.stock_plan_line_ids.filtered(lambda target: target.blocking_note):
             warnings.append(("stock_target_blocked", "blocking", line.blocking_note))
-        if self._get_user_conflict() and not self.conflict_acknowledged:
+        prefetched_conflicts = self.env.context.get("mb_user_conflicts")
+        conflict = (
+            self.browse(prefetched_conflicts.get(self.id))
+            if prefetched_conflicts is not None
+            else self._get_user_conflict()
+        )
+        if conflict and not self.conflict_acknowledged:
             warnings.append((
                 "responsible_user_conflict", "blocking",
                 _("A responsible person is assigned to an overlapping operation."),
@@ -526,8 +549,15 @@ class MbCommercialOperation(models.Model):
         "primary_scenario_id.travel_estimate_id.state",
     )
     def _compute_planning_warnings(self):
+        conflicts = self._get_user_conflicts()
+        conflict_ids = {
+            record_id: conflict.id or False
+            for record_id, conflict in conflicts.items()
+        }
         for operation in self:
-            warnings = operation._get_planning_warnings()
+            warnings = operation.with_context(
+                mb_user_conflicts=conflict_ids
+            )._get_planning_warnings()
             operation.planning_warning_count = len(warnings)
             operation.planning_blocking_warning_count = len([
                 warning for warning in warnings if warning[1] == "blocking"
@@ -536,11 +566,14 @@ class MbCommercialOperation(models.Model):
                 f"[{severity.upper()}] {message}" for _code, severity, message in warnings
             )
 
-    @api.depends("documents_expected", "account_move_ids.state", "account_move_ids.payment_state")
+    @api.depends(
+        "documents_expected", "account_move_ids.state", "account_move_ids.payment_state",
+        "direct_account_move_ids.state", "direct_account_move_ids.payment_state",
+    )
     def _compute_financial_status(self):
         settled_states = {"paid", "in_payment", "reversed"}
         for operation in self:
-            documents = operation.account_move_ids
+            documents = operation.account_move_ids | operation.direct_account_move_ids
             operation.documents_complete = (
                 not operation.documents_expected
                 or bool(documents) and all(move.state == "posted" for move in documents)
@@ -552,20 +585,41 @@ class MbCommercialOperation(models.Model):
 
     def _get_user_conflict(self):
         self.ensure_one()
-        if not self.user_ids:
-            return self.browse()
-        return self.search([
-            ("id", "!=", self.id),
-            ("company_id", "=", self.company_id.id),
+        return self._get_user_conflicts().get(self.id, self.browse())
+
+    def _get_user_conflicts(self):
+        """Return one overlapping operation per record with a single search."""
+        conflicts = {operation.id: self.browse() for operation in self}
+        operations = self.filtered(
+            lambda operation: operation.user_ids
+            and operation.planned_start and operation.planned_end
+        )
+        if not operations:
+            return conflicts
+        candidates = self.sudo().search([
+            ("company_id", "in", operations.company_id.ids),
             ("state", "not in", ["cancelled", "financially_closed"]),
-            ("user_ids", "in", self.user_ids.ids),
-            ("planned_start", "<", self.planned_end),
-            ("planned_end", ">", self.planned_start),
-        ], limit=1)
+            ("user_ids", "in", operations.user_ids.ids),
+            ("planned_start", "<", max(operations.mapped("planned_end"))),
+            ("planned_end", ">", min(operations.mapped("planned_start"))),
+        ])
+        for operation in operations:
+            operation_user_ids = set(operation.user_ids.ids)
+            conflict = candidates.filtered(lambda candidate,
+                    current=operation, current_user_ids=operation_user_ids: (
+                candidate.id != current.id
+                and candidate.company_id.id == current.company_id.id
+                and candidate.planned_start < current.planned_end
+                and candidate.planned_end > current.planned_start
+                and current_user_ids.intersection(candidate.user_ids.ids)
+            ))[:1]
+            conflicts[operation.id] = conflict
+        return conflicts
 
     def _check_user_conflicts(self):
+        conflicts_by_operation = self._get_user_conflicts()
         for operation in self.filtered("user_ids"):
-            conflicts = operation._get_user_conflict()
+            conflicts = conflicts_by_operation.get(operation.id, self.browse())
             if conflicts and not operation.conflict_acknowledged:
                 raise ValidationError(_(
                     "%(operation)s overlaps %(conflict)s for an assigned person. "
@@ -694,7 +748,12 @@ class MbCommercialOperation(models.Model):
                 "financial_close_date": fields.Date.context_today(operation),
                 "financial_close_user_id": self.env.user.id,
             })
-            operation.project_id.active = False
+            project = operation.project_id
+            open_siblings = project.mb_commercial_operation_ids.filtered(
+                lambda sibling: sibling.state not in ("financially_closed", "cancelled")
+            )
+            if project.mb_commercial_kind != "contract" and not open_siblings:
+                project.active = False
         return True
 
     def action_reopen(self):
@@ -720,7 +779,8 @@ class MbCommercialOperation(models.Model):
                     "state": "draft", "approved_by_id": False, "approved_at": False,
                 })
                 operation.write({"primary_scenario_id": revision_scenario.id})
-            operation.project_id.active = True
+            if operation.project_id.mb_commercial_kind != "contract":
+                operation.project_id.active = True
             operation.message_post(body=_("Operation reopened by %(user)s.", user=self.env.user.display_name))
         return True
 

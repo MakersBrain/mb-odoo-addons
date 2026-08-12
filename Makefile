@@ -11,19 +11,14 @@ ODOO    := $(COMPOSE) exec -T odoo odoo
 DB_NAME ?= makersbrain
 DISPOSABLE_DB ?= mb_scratch
 
-# Every addon in this repository, in dependency order. Odoo resolves the order
-# itself, but writing it down means `make install` on an empty database is one
-# command and the reader can see the addon families from SPEC.md.
-MODULES := mb_workshop_base,mb_label,mb_label_pos,mb_ceramics_firing,mb_ceramics_workflow,mb_kiln_bridge,\
-mb_catalogue_sync,mb_control_bridge,mb_ai_bridge,mb_invoice_capture,mb_inventory_capture,mb_inventory_capture_catalogue,mb_depot,mb_payment_sumup,\
-mb_pos_sumup,mb_account_payment_sumup,l10n_fr_micro_enterprise,l10n_fr_micro_urssaf
-MODULES := $(MODULES),mb_commercial_operations,mb_commercial_operations_stock,mb_commercial_operations_depot,\
-mb_commercial_operations_mrp,mb_commercial_operations_purchase,mb_commercial_operations_fleet,\
-mb_commercial_operations_expense,mb_commercial_operations_sale,mb_commercial_operations_pos,\
-mb_commercial_operations_urssaf
+# Discover every addon from its manifest so local and CI coverage cannot drift
+# when a module is added. Odoo resolves dependency order itself.
+ADDON_MANIFESTS := $(wildcard addons/*/__manifest__.py)
+ADDONS := $(sort $(notdir $(patsubst %/,%,$(dir $(ADDON_MANIFESTS)))))
 empty :=
 space := $(empty) $(empty)
-MODULES_ARG := $(subst $(space),,$(MODULES))
+comma := ,
+MODULES_ARG := $(subst $(space),$(comma),$(ADDONS))
 
 # Which tests run. `--test-enable` alone would also run the tests of every
 # dependency Odoo pulls in — all of mail, stock, account and point_of_sale —
@@ -34,13 +29,8 @@ MODULES_ARG := $(subst $(space),,$(MODULES))
 # Override to narrow:  make test TAGS=/mb_label
 # Down to one class:   make test TAGS=/mb_label:TestLabel
 # Or one method:       make test TAGS=/mb_label:TestLabel.test_qr_collision
-TAGS ?= /mb_workshop_base,/mb_label,/mb_label_pos,/mb_ceramics_firing,/mb_ceramics_workflow,/mb_kiln_bridge,\
-/mb_catalogue_sync,/mb_control_bridge,/mb_ai_bridge,/mb_invoice_capture,/mb_inventory_capture,/mb_inventory_capture_catalogue,/mb_depot,/mb_payment_sumup,\
-/mb_pos_sumup,/mb_account_payment_sumup,/l10n_fr_micro_enterprise,/l10n_fr_micro_urssaf
-TAGS := $(TAGS),/mb_commercial_operations,/mb_commercial_operations_stock,\
-/mb_commercial_operations_depot,/mb_commercial_operations_mrp,/mb_commercial_operations_purchase,\
-/mb_commercial_operations_fleet,/mb_commercial_operations_expense,/mb_commercial_operations_sale,\
-/mb_commercial_operations_pos
+TAGS ?= $(addprefix /,$(ADDONS))
+TAGS_ARG := $(subst $(space),$(comma),$(TAGS))
 
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \
@@ -110,7 +100,7 @@ configure-ui: ## Apply the streamlined artisan app-switcher layout
 test: ## Install MODULES on a fresh disposable database and run their tests
 	@$(MAKE) --no-print-directory reset-poc
 	$(ODOO) -d $(DISPOSABLE_DB) -i $(MODULES_ARG) \
-		--test-tags "$(subst $(space),,$(TAGS))" \
+		--test-tags "$(TAGS_ARG)" \
 		--stop-after-init --http-port=0 --gevent-port=0 --log-level=test
 
 check: lint i18n-check ## Everything CI runs that needs no container

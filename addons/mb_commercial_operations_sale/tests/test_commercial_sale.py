@@ -89,8 +89,12 @@ class TestCommercialSale(TransactionCase):
 
         invoice = order._create_invoices()
         invoice.invoice_date = fields.Date.today()
+        operation.documents_expected = True
+        self.assertFalse(operation.documents_complete)
+        self.assertEqual(operation.actual_revenue, 0.0)
         invoice.action_post()
         self.assertEqual(invoice.mb_commercial_operation_id, operation)
+        self.assertTrue(operation.documents_complete)
         product_line = invoice.invoice_line_ids.filtered(lambda line: line.display_type == "product")
         self.assertEqual(
             product_line.analytic_distribution,
