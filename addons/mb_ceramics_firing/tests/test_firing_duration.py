@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+from odoo import fields
+from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase, tagged
 
 
@@ -94,6 +96,50 @@ class TestFiringDuration(TransactionCase):
             product=self.product, quantity=41, unit=self.product.uom_id)
         self.assertEqual(with_qty.cycle_number, 2)
         self.assertEqual(with_qty.time_total, 48 * 60)
+
+    def test_planned_firing_earmarks_then_loads_ready_work(self):
+        operation = self._operation()
+        production = self.env["mrp.production"].create({
+            "product_id": self.product.id,
+            "product_qty": 1,
+            "product_uom_id": self.product.uom_id.id,
+            "bom_id": self.bom.id,
+        })
+        production.action_confirm()
+        workorder = production.workorder_ids.filtered(
+            lambda wo: wo.operation_id == operation
+        )
+        start = fields.Datetime.now() + timedelta(days=3)
+        firing = self.env["mb.firing"].create({
+            "kiln_id": self.kiln.id,
+            "program_id": self.program.id,
+            "kind": "glaze",
+            "date_planned_start": start,
+        })
+        workorder.mb_plan_firing(firing)
+        self.assertEqual(workorder.mb_firing_planned_id, firing)
+        self.assertFalse(workorder.mb_firing_id)
+        self.assertEqual(firing.date_planned_end, start + timedelta(hours=11))
+        self.assertEqual(firing.date_planned_unload, start + timedelta(hours=24))
+        firing.action_load()
+        self.assertEqual(firing.state, "draft")
+        self.assertFalse(workorder.mb_firing_planned_id)
+        self.assertEqual(workorder.mb_firing_id, firing)
+
+    def test_planned_firing_rejects_overlapping_cooling_window(self):
+        start = fields.Datetime.now() + timedelta(days=5)
+        values = {
+            "kiln_id": self.kiln.id,
+            "program_id": self.program.id,
+            "kind": "glaze",
+            "date_planned_start": start,
+        }
+        self.env["mb.firing"].create(values)
+        with self.assertRaises(ValidationError):
+            self.env["mb.firing"].create({
+                **values,
+                "date_planned_start": start + timedelta(hours=12),
+            })
 
 
 @tagged("post_install", "-at_install")

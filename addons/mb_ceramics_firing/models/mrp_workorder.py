@@ -17,6 +17,40 @@ class MrpWorkorder(models.Model):
              "work orders from several manufacturing orders, and each work "
              "order sits in exactly one firing.",
     )
+    mb_firing_planned_id = fields.Many2one(
+        "mb.firing", string="Planned firing", index=True, copy=False,
+        ondelete="set null", check_company=True,
+        help="Earmarked kiln slot. This is not physical loading evidence.",
+    )
+    mb_firing_missed_reason = fields.Text(copy=False, readonly=True)
+
+    def _mb_validate_planned_firing(self, firing=None):
+        for workorder in self:
+            slot = firing or workorder.mb_firing_planned_id
+            if not slot:
+                continue
+            operation = workorder.operation_id
+            if slot.state != "planned":
+                raise ValidationError(_("Work can only be earmarked for a planned firing."))
+            if workorder.company_id != slot.company_id:
+                raise ValidationError(_("The work order and firing must belong to one company."))
+            if workorder.workcenter_id != slot.kiln_id.workcenter_id:
+                raise ValidationError(_(
+                    "%s is planned on another kiln work centre.", workorder.display_name,
+                ))
+            if not operation or operation.mb_kiln_program_id != slot.program_id:
+                raise ValidationError(_(
+                    "%s does not use the planned kiln programme.", workorder.display_name,
+                ))
+            if slot.program_id.kind != slot.kind:
+                raise ValidationError(_("The work order and firing kinds are incompatible."))
+        return True
+
+    def mb_plan_firing(self, firing):
+        firing.ensure_one()
+        self._mb_validate_planned_firing(firing)
+        self.write({"mb_firing_planned_id": firing.id})
+        return True
 
     def _mb_validate_firing(self, firing=None):
         """One operation may only enter the physical load it was planned for."""
@@ -69,6 +103,17 @@ class MrpWorkorder(models.Model):
         return True
 
     def write(self, values):
+        previous_planned = self.mapped("mb_firing_planned_id")
+        if "mb_firing_planned_id" in values and not self.env.context.get(
+            "mb_firing_terminal_cleanup"
+        ):
+            terminal = self.mapped("mb_firing_planned_id").filtered(
+                lambda firing: firing.state in firing._TERMINAL_STATES
+            )
+            if terminal:
+                raise ValidationError(_(
+                    "A planned link cannot be changed on a terminal firing."
+                ))
         if "mb_firing_id" in values:
             terminal = self.mapped("mb_firing_id").filtered(
                 lambda firing: firing.state in firing._TERMINAL_STATES)
@@ -78,6 +123,9 @@ class MrpWorkorder(models.Model):
                 ))
         previous = self.mapped("mb_firing_id")
         result = super().write(values)
+        if "mb_firing_planned_id" in values:
+            planned = previous_planned | self.mapped("mb_firing_planned_id")
+            planned.filtered(lambda firing: firing.state == "planned")._mb_replan_slot()
         if "mb_firing_id" in values:
             (previous | self.mapped("mb_firing_id"))._mb_sync_group_duration()
             for workorder in self.filtered(lambda order: not order.mb_firing_id):
@@ -89,3 +137,7 @@ class MrpWorkorder(models.Model):
     @api.constrains("mb_firing_id", "workcenter_id", "operation_id")
     def _check_mb_firing_id(self):
         self.filtered("mb_firing_id")._mb_validate_firing()
+
+    @api.constrains("mb_firing_planned_id", "workcenter_id", "operation_id")
+    def _check_mb_firing_planned_id(self):
+        self.filtered("mb_firing_planned_id")._mb_validate_planned_firing()

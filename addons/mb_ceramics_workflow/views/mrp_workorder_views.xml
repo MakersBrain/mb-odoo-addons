@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mrp_workorder_form_mb_recipe_documents" model="ir.ui.view">
+        <field name="name">mrp.workorder.form.mb.recipe.documents</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_form_view_inherit" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_mb_recipe_documents" type="object"
+                        class="oe_stat_button" icon="fa-paperclip">
+                    <div class="o_stat_info"><span class="o_stat_text">Recipe documents</span></div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -25,6 +25,7 @@
                         <field name="mb_board_ids" widget="many2many_tags" />
                         <field name="mb_related_lot_ids" widget="many2many_tags" />
                         <field name="mb_loss_ids" />
+                        <field name="mb_bom_revision_id" />
                     </group>
                 </page>
             </xpath>

@@ -6,6 +6,7 @@ from . import mb_glazing_session
 from . import mb_glazing_material_allocation
 from . import mb_production_loss
 from . import mb_throwing_session
+from . import mrp_bom
 from . import mrp_production
 from . import mrp_workorder
 from . import mb_firing

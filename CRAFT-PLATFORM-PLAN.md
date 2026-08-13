@@ -244,6 +244,10 @@ can bound the extraction cost.
 
 ## 4. Planned firings
 
+**Implemented in 19.0.3.0.0.** The implementation keeps planned intent on
+`mb_firing_planned_id`, physical loading on `mb_firing_id`, and kiln capacity on
+the lead work order's native `leave_id`.
+
 This is the real gap, and no OCA module addresses it.
 
 `mb_ceramics_firing/models/mrp_workorder.py` refuses any work order that is not
@@ -287,12 +291,12 @@ Split what is currently one `draft` state into intent and contents.
    have their earmark cleared atomically, with a missed-load reason and message
    on both firing and manufacturing order. They may then be explicitly assigned
    to a successor firing; no terminal firing retains stale planned links.
-5. Replan manufacturing toward the slot explicitly. Set the earmarked firing
-   work order's planned start to `date_planned_start`, invoke Odoo's native work
-   order replanning so predecessors schedule backward, and repeat whenever the
-   kiln, programme or planned date changes. Conflicts are surfaced to the user;
-   the plan must never silently write predecessor dates without native capacity
-   checks.
+5. Replan manufacturing toward the slot explicitly. Odoo 19's native work-order
+   scheduler is forward-only, so derive an MO start from predecessor durations,
+   invoke native forward replanning from that date, verify every predecessor
+   finishes before `date_planned_start`, and then pin the earmarked firing work
+   order to the slot. Repeat whenever the kiln, programme or planned date
+   changes. Capacity or predecessor conflicts are surfaced to the user.
 6. Use the lead firing work order's native `leave_id` as the single capacity
    reservation for the shared physical load. Create or move that reservation to
    the planned window and remove fellow work-order reservations, as
@@ -317,6 +321,8 @@ nothing else.
 
 ## 5. Four OCA modules worth reimplementing
 
+**Implemented locally in 19.0.3.0.0.** No AGPL addon is a runtime dependency.
+
 All four are AGPL-3, so all four are read-and-rewrite, never a dependency.
 Ranked by what they would actually add here.
 
@@ -333,6 +339,8 @@ Ranked by what they would actually add here.
    successor revision; predecessors become historical/withdrawn without losing
    visibility; and each manufacturing order and produced glaze lot retains the
    exact revision used. The mark-done gate validates that immutable link.
+   Purchased glaze lots remain supplier artifacts: their release relies on lot
+   identity and migration evidence, not a nonexistent internal BoM revision.
 3. **`mrp_production_back_to_draft`** (currently present on 19.0). The undo an artisan
    reaches for. Small enough to rewrite locally; the care needed is
    what it does to a manufacturing order whose work orders are already in a
@@ -353,7 +361,10 @@ to Odoo 19 where `lot_producing_id` became `lot_producing_ids`, and says so.
    and a recipe that can be approved.
 3. Section 4. The largest of these and the one that changes what the workshop
    can do rather than how it is filed.
-4. Section 3, only when a second craft exists.
+4. Section 5 items 3 and 4 — safe correction before work begins, and recipe
+   documents visible from every work order.
+5. Section 3 only after a second real craft supplies the extraction trigger and
+   migration fixtures.
 
 **Not doing: field-service's granularity.** Its current 32 `fieldservice*`
 addons are a cost OCA pays because field service serves many industries. This

@@ -9,6 +9,10 @@ class StockLot(models.Model):
     mb_ceramics_stage = fields.Selection(
         related="product_id.product_tmpl_id.mb_ceramics_stage"
     )
+    mb_bom_revision_id = fields.Many2one(
+        "mrp.bom", string="Recipe revision", copy=False, readonly=True,
+        ondelete="restrict", check_company=True,
+    )
 
     mb_production_ids = fields.Many2many(
         "mrp.production", compute="_compute_mb_ceramics_trace", string="Productions")

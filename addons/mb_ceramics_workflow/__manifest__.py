@@ -9,7 +9,7 @@ reusable boards while no stock quant exists, loads compatible work orders into
 shared kiln firings, records yield loss and seconds, and exposes firing-aware lot
 genealogy without replacing Odoo's stock identity.
 """,
-    "version": "19.0.2.1.0",
+    "version": "19.0.3.0.0",
     "license": "LGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "Makersbrain",
@@ -37,7 +37,9 @@ genealogy without replacing Odoo's stock identity.
         "views/mb_board_views.xml",
         "views/mb_production_loss_views.xml",
         "views/product_template_views.xml",
+        "views/mrp_bom_views.xml",
         "views/mrp_production_views.xml",
+        "views/mrp_workorder_views.xml",
         "views/stock_lot_views.xml",
         "wizards/mb_firing_load_views.xml",
         "wizards/mb_inspection_views.xml",

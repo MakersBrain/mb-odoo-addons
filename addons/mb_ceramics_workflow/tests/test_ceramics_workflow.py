@@ -58,9 +58,10 @@ class TestCeramicsWorkflow(TransactionCase):
         cls.glaze = cls._product("AMACO PC test glaze", tracking="lot")
         cls.glaze.categ_id = cls.glaze_cost_category
         cls.glaze_additive = cls._product("Glaze additive")
+        cls.glaze_water = cls._product("Glaze water")
         if cls.ceramics_cost_category:
             (cls.clay | cls.blank | cls.bisque_product | cls.article | cls.second
-             | cls.glaze_additive).categ_id = cls.ceramics_cost_category
+             | cls.glaze_additive | cls.glaze_water).categ_id = cls.ceramics_cost_category
         cls.clay.standard_price = 2
         cls.glaze.standard_price = 4
         cls.glaze_additive.standard_price = 1
@@ -83,6 +84,28 @@ class TestCeramicsWorkflow(TransactionCase):
         cls.env["stock.quant"]._update_available_quantity(
             cls.glaze_additive, cls.stock, 10
         )
+        cls.env["stock.quant"]._update_available_quantity(
+            cls.glaze_water, cls.stock, 10
+        )
+        cls.glaze_recipe = cls.env["mrp.bom"].create({
+            "product_tmpl_id": cls.glaze.product_tmpl_id.id,
+            "product_qty": 1,
+            "mb_is_glaze_recipe": True,
+            "bom_line_ids": [
+                Command.create({
+                    "product_id": cls.glaze_additive.id,
+                    "mb_quantity_mode": "dry_percent",
+                    "mb_formula_percent": 100,
+                }),
+                Command.create({
+                    "product_id": cls.glaze_water.id,
+                    "mb_quantity_mode": "water_percent",
+                    "mb_formula_percent": 50,
+                }),
+            ],
+        })
+        cls.glaze_recipe.action_mb_approve_recipe()
+        (cls.glaze_lot_a | cls.glaze_lot_b).mb_bom_revision_id = cls.glaze_recipe
         cls.clay_lot = cls.env["stock.lot"].create({
             "name": "CLAY-2026-08",
             "product_id": cls.clay.id,
@@ -330,6 +353,7 @@ class TestCeramicsWorkflow(TransactionCase):
             "kiln_id": self.kiln.id,
             "program_id": program.id,
             "kind": program.kind,
+            "state": "draft",
         })
         loader = self.env["mb.firing.load"].create({
             "firing_id": firing.id,
@@ -489,6 +513,7 @@ class TestCeramicsWorkflow(TransactionCase):
             "kiln_id": self.kiln.id,
             "program_id": self.glaze_program.id,
             "kind": "glaze",
+            "state": "draft",
         })
         with self.assertRaises(ValidationError):
             workorder.mb_assign_firing(wrong)
@@ -654,6 +679,7 @@ class TestCeramicsWorkflow(TransactionCase):
             "kiln_id": self.kiln.id,
             "program_id": self.bisque_program.id,
             "kind": "bisque",
+            "state": "draft",
         })
 
         self.env["mb.firing.load"].create({
@@ -811,3 +837,65 @@ class TestCeramicsWorkflow(TransactionCase):
         product = self._product("Untracked green candidate")
         with self.assertRaises(ValidationError):
             product.product_tmpl_id.mb_ceramics_stage = "green"
+
+    def test_glaze_formula_uses_dry_weight_as_water_denominator(self):
+        dry = self.glaze_recipe.bom_line_ids.filtered(
+            lambda line: line.mb_quantity_mode == "dry_percent"
+        )
+        water = self.glaze_recipe.bom_line_ids.filtered(
+            lambda line: line.mb_quantity_mode == "water_percent"
+        )
+        self.assertEqual(dry.product_qty, 1.0)
+        self.assertEqual(water.product_qty, 0.5)
+
+    def test_approved_recipe_is_immutable_and_revision_is_linked(self):
+        with self.assertRaises(UserError):
+            self.glaze_recipe.bom_line_ids[:1].write({"mb_formula_percent": 90})
+        action = self.glaze_recipe.action_mb_new_recipe_revision()
+        successor = self.env["mrp.bom"].browse(action["res_id"])
+        self.assertEqual(self.glaze_recipe.mb_recipe_state, "historical")
+        self.assertEqual(successor.mb_recipe_state, "draft")
+        self.assertEqual(successor.mb_previous_revision_id, self.glaze_recipe)
+        self.assertEqual(successor.mb_revision, self.glaze_recipe.mb_revision + 1)
+
+    def test_manufacturing_order_snapshots_approved_recipe(self):
+        production = self.env["mrp.production"].create({
+            "product_id": self.glaze.id,
+            "product_qty": 1,
+            "product_uom_id": self.glaze.uom_id.id,
+            "bom_id": self.glaze_recipe.id,
+        })
+        production.action_confirm()
+        self.assertEqual(production.mb_bom_revision_id, self.glaze_recipe)
+
+    def test_confirmed_unstarted_order_can_return_to_draft(self):
+        production = self.env["mrp.production"].create({
+            "product_id": self.blank.id,
+            "product_qty": 1,
+            "product_uom_id": self.blank.uom_id.id,
+            "bom_id": self.throw_bom.id,
+        })
+        production.action_confirm()
+        production.action_mb_return_to_draft()
+        self.assertEqual(production.state, "draft")
+        self.assertTrue(all(move.state == "draft" for move in production.move_raw_ids))
+
+    def test_recipe_documents_are_available_from_every_work_order(self):
+        attachment = self.env["ir.attachment"].create({
+            "name": "firing-sheet.pdf",
+            "res_model": "mrp.bom",
+            "res_id": self.finish_bom.id,
+            "raw": b"firing sheet",
+        })
+        production = self.env["mrp.production"].create({
+            "product_id": self.article.id,
+            "product_qty": 1,
+            "product_uom_id": self.article.uom_id.id,
+            "bom_id": self.finish_bom.id,
+        })
+        production.action_confirm()
+        for workorder in production.workorder_ids:
+            action = workorder.action_mb_recipe_documents()
+            self.assertIn(attachment.id, self.env["ir.attachment"].search(
+                action["domain"]
+            ).ids)

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mrp_bom_form_mb_glaze_recipe" model="ir.ui.view">
+        <field name="name">mrp.bom.form.mb.glaze.recipe</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_mb_recipe_documents" type="object"
+                        class="oe_stat_button" icon="fa-paperclip">
+                    <field name="mb_document_count" widget="statinfo" string="Documents" />
+                </button>
+            </xpath>
+            <xpath expr="//form/sheet" position="before">
+                <header invisible="not mb_is_glaze_recipe">
+                    <button name="action_mb_approve_recipe" type="object" string="Approve"
+                            class="oe_highlight" invisible="mb_recipe_state != 'draft'" />
+                    <button name="action_mb_new_recipe_revision" type="object"
+                            string="New revision" invisible="mb_recipe_state != 'approved'" />
+                    <button name="action_mb_withdraw_recipe" type="object"
+                            string="Withdraw" invisible="mb_recipe_state != 'approved'" />
+                    <field name="mb_recipe_state" widget="statusbar"
+                           statusbar_visible="draft,approved,historical,withdrawn" />
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='code']" position="after">
+                <field name="mb_is_glaze_recipe" />
+                <field name="mb_revision" invisible="not mb_is_glaze_recipe" />
+                <field name="mb_previous_revision_id" invisible="not mb_previous_revision_id" />
+                <field name="mb_approved_at" invisible="not mb_approved_at" />
+                <field name="mb_approved_by_id" invisible="not mb_approved_by_id" />
+            </xpath>
+            <xpath expr="//field[@name='bom_line_ids']/list/field[@name='product_qty']" position="before">
+                <field name="mb_quantity_mode" optional="show" />
+                <field name="mb_formula_percent" optional="show"
+                       invisible="mb_quantity_mode == 'fixed'" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

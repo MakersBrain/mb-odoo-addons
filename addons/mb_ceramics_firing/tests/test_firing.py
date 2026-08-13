@@ -14,6 +14,7 @@ class TestFiring(TransactionCase):
         cls.firing = cls.env["mb.firing"].create({
             "kiln_id": cls.kiln.id,
             "kind": "glaze",
+            "state": "draft",
         })
 
     def test_sequence_names_the_firing(self):
@@ -54,6 +55,7 @@ class TestFiring(TransactionCase):
             "kind": "bisque",
             "provider": "rohde_mykiln",
             "external_id": "mykiln-4417",
+            "state": "done",
         }
         self.env["mb.firing"].create(values)
         with self.assertRaises(Exception):
@@ -79,6 +81,7 @@ class TestFiring(TransactionCase):
             self.env["mb.firing"].create({
                 "kiln_id": other_kiln.id,
                 "company_id": self.env.company.id,
+                "state": "draft",
             })
 
         user = new_test_user(

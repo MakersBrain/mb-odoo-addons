@@ -6,6 +6,9 @@
         <field name="inherit_id" ref="mrp.mrp_production_form_view" />
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
+                <button name="action_mb_return_to_draft" type="object"
+                        string="Return to draft"
+                        invisible="state not in ('confirmed', 'cancel')" />
                 <button name="action_mb_inspect" type="object" string="Unload and inspect"
                         class="oe_highlight"
                         invisible="mb_workflow_kind not in ('glazing', 'finishing') or state in ('done', 'cancel')" />
@@ -14,6 +17,13 @@
                         invisible="mb_workflow_kind != 'bisque' or state in ('done', 'cancel')" />
                 <button name="action_mb_print_wip_label" type="object" string="Print WIP label"
                         invisible="mb_workflow_kind != 'bisque' or not mb_bisque_inspected" />
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_mb_recipe_documents" type="object"
+                        class="oe_stat_button" icon="fa-paperclip"
+                        invisible="not bom_id">
+                    <div class="o_stat_info"><span class="o_stat_text">Recipe documents</span></div>
+                </button>
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Ceramics" invisible="not mb_workflow_kind">
@@ -25,6 +35,7 @@
                         <field name="mb_glazing_session_id" />
                         <field name="mb_inspected" />
                         <field name="mb_bisque_inspected" />
+                        <field name="mb_bom_revision_id" />
                     </group>
                     <field name="mb_board_content_ids" readonly="1">
                         <list>

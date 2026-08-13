@@ -9,7 +9,7 @@ class MbFiring(models.Model):
     _name = "mb.firing"
     _description = "Kiln firing"
     _inherit = ["mail.thread"]
-    _order = "date_start desc, id desc"
+    _order = "date_planned_start desc, date_start desc, id desc"
     _check_company_auto = True
 
     _INTERNAL_WRITE_TOKEN = object()
@@ -31,13 +31,14 @@ class MbFiring(models.Model):
     )
     state = fields.Selection(
         selection=[
+            ("planned", "Planned"),
             ("draft", "Loading"),
             ("firing", "Firing"),
             ("cooling", "Cooling"),
             ("done", "Unloaded"),
             ("cancel", "Cancelled"),
         ],
-        default="draft",
+        default="planned",
         required=True,
         tracking=True,
     )
@@ -51,6 +52,12 @@ class MbFiring(models.Model):
         string="Work orders",
         help="Work orders from any number of manufacturing orders. A kiln is "
              "filled because firing is expensive, so a load mixes them.",
+    )
+    planned_workorder_ids = fields.One2many(
+        comodel_name="mrp.workorder",
+        inverse_name="mb_firing_planned_id",
+        string="Planned work orders",
+        help="Lightweight earmarks for work expected to be ready for this kiln slot.",
     )
     production_ids = fields.Many2many(
         comodel_name="mrp.production",
@@ -66,6 +73,16 @@ class MbFiring(models.Model):
              "cannot hold a label before firing.",
     )
 
+    date_planned_start = fields.Datetime(
+        string="Planned start", tracking=True, default=fields.Datetime.now,
+    )
+    date_planned_end = fields.Datetime(
+        string="Planned firing end", compute="_compute_planned_dates", store=True,
+    )
+    date_planned_unload = fields.Datetime(
+        string="Earliest planned unload", compute="_compute_planned_dates", store=True,
+    )
+    missed_load_note = fields.Text(copy=False, readonly=True)
     date_start = fields.Datetime(tracking=True)
     date_end = fields.Datetime(tracking=True)
     cooling_end = fields.Datetime(
@@ -145,6 +162,51 @@ class MbFiring(models.Model):
         "unique (provider, external_id, company_id)",
         "A provider firing may only be imported once.",
     )
+
+    @api.depends(
+        "date_planned_start", "program_id.firing_hours", "program_id.cooling_hours",
+    )
+    def _compute_planned_dates(self):
+        for firing in self:
+            if not firing.date_planned_start or not firing.program_id:
+                firing.date_planned_end = False
+                firing.date_planned_unload = False
+                continue
+            firing.date_planned_end = firing.date_planned_start + timedelta(
+                hours=firing.program_id.firing_hours
+            )
+            firing.date_planned_unload = firing.date_planned_end + timedelta(
+                hours=firing.program_id.cooling_hours
+            )
+
+    @api.constrains(
+        "state", "kiln_id", "program_id", "kind", "date_planned_start",
+        "workorder_ids",
+    )
+    def _check_planned_slot(self):
+        for firing in self.filtered(lambda item: item.state == "planned"):
+            if not firing.kiln_id or not firing.program_id or not firing.date_planned_start:
+                raise ValidationError(_(
+                    "A planned firing needs a kiln, programme, firing kind and start date."
+                ))
+            if firing.workorder_ids:
+                raise ValidationError(_(
+                    "A planned firing cannot contain physically loaded work orders."
+                ))
+            overlap = self.search([
+                ("id", "!=", firing.id),
+                ("kiln_id", "=", firing.kiln_id.id),
+                ("state", "in", ("planned", "draft", "firing", "cooling")),
+                ("date_planned_start", "<", firing.date_planned_unload),
+                ("date_planned_unload", ">", firing.date_planned_start),
+            ], limit=1)
+            if overlap:
+                raise ValidationError(_(
+                    "Kiln %(kiln)s is already occupied by %(firing)s during this "
+                    "planned firing and cooling window.",
+                    kiln=firing.kiln_id.display_name,
+                    firing=overlap.display_name,
+                ))
 
     @api.constrains("kiln_id", "program_id", "kind", "company_id", "workorder_ids")
     def _check_load_compatibility(self):
@@ -244,7 +306,9 @@ class MbFiring(models.Model):
             if values.get("name", _("New")) == _("New"):
                 values["name"] = self.env["ir.sequence"].next_by_code(
                     "mb.firing") or _("New")
-        return super().create(vals_list)
+        firings = super().create(vals_list)
+        firings.filtered(lambda firing: firing.state == "planned")._mb_replan_slot()
+        return firings
 
     def _mb_internal(self):
         """Return a recordset whose write authority cannot be forged by RPC."""
@@ -267,9 +331,21 @@ class MbFiring(models.Model):
                 "A completed or cancelled firing is immutable. Record a new "
                 "firing or use the provider synchronisation path."
             ))
+        planning_changed = bool(
+            {
+                "kiln_id", "program_id", "kind", "date_planned_start",
+                "planned_workorder_ids",
+            } & set(values)
+        )
         result = super().write(values)
         if "workorder_ids" in values:
             self._mb_sync_group_duration()
+        if planning_changed:
+            self.filtered(lambda firing: firing.state == "planned")._mb_replan_slot()
+        if values.get("state") in self._TERMINAL_STATES:
+            self.planned_workorder_ids.with_context(
+                mb_firing_terminal_cleanup=True
+            ).write({"mb_firing_planned_id": False})
         return result
 
     def unlink(self):
@@ -315,6 +391,128 @@ class MbFiring(models.Model):
                     "date_to": lead.leave_id.date_from + timedelta(minutes=minutes),
                 })
                 (workorders - lead).mapped("leave_id").unlink()
+
+    def _mb_replan_slot(self):
+        """Use Odoo planning, then pin the firing operation to this shared slot."""
+        for firing in self:
+            orders = firing.planned_workorder_ids.filtered(
+                lambda wo: wo.state in ("blocked", "ready")
+            )
+            for production in orders.production_id:
+                production_id = production.id
+                firing_orders = orders.filtered(
+                    lambda wo, production_id=production_id:
+                    wo.production_id.id == production_id
+                )
+                firing_sequence = min(firing_orders.mapped("sequence"))
+                predecessor_minutes = sum(
+                    (production.workorder_ids - firing_orders).filtered(
+                        lambda wo, firing_sequence=firing_sequence:
+                        wo.sequence < firing_sequence
+                        and wo.state in ("blocked", "ready")
+                    ).mapped("duration_expected")
+                )
+                production.with_context(force_date=True).write({
+                    "date_start": firing.date_planned_start
+                    - timedelta(minutes=predecessor_minutes),
+                })
+                production._plan_workorders(replan=True)
+                firing_order_ids = set(firing_orders.ids)
+                planned_start = firing.date_planned_start
+                late_predecessors = production.workorder_ids.filtered(
+                    lambda wo,
+                    firing_order_ids=firing_order_ids,
+                    firing_sequence=firing_sequence,
+                    planned_start=planned_start:
+                    wo.id not in firing_order_ids
+                    and wo.sequence < firing_sequence
+                    and wo.state in ("blocked", "ready")
+                    and wo.date_finished
+                    and wo.date_finished > planned_start
+                )
+                if late_predecessors:
+                    raise ValidationError(_(
+                        "The predecessors of %(orders)s cannot finish before kiln "
+                        "slot %(slot)s: %(predecessors)s",
+                        orders=", ".join(firing_orders.mapped("display_name")),
+                        slot=firing.display_name,
+                        predecessors=", ".join(late_predecessors.mapped("display_name")),
+                    ))
+            firing._mb_reserve_slot()
+
+    def _mb_reserve_slot(self):
+        """One native work-order leave represents one physical kiln occupation."""
+        for firing in self:
+            orders = (firing.workorder_ids | firing.planned_workorder_ids).filtered(
+                lambda wo: wo.state in ("blocked", "ready")
+            ).sorted("id")
+            if not orders or not firing.program_id or not firing.date_planned_start:
+                continue
+            lead = orders[:1]
+            occupied_minutes = (
+                firing.program_id.firing_hours + firing.program_id.cooling_hours
+            ) * 60.0
+            for order in orders:
+                order.with_context(bypass_duration_calculation=True).write({
+                    "duration_expected": occupied_minutes if order == lead else 0.0,
+                })
+            (orders - lead).mapped("leave_id").unlink()
+            lead.write({
+                "date_start": firing.date_planned_start,
+                "date_finished": firing.date_planned_unload,
+            })
+            conflicts = lead._get_conflicted_workorder_ids().get(lead.id, [])
+            external = self.env["mrp.workorder"].browse(conflicts) - orders
+            if external:
+                raise ValidationError(_(
+                    "The kiln slot conflicts with: %s",
+                    ", ".join(external.mapped("display_name")),
+                ))
+
+    def action_load(self):
+        """Turn ready earmarks into physical contents and record missed work."""
+        for firing in self:
+            if firing.state != "planned":
+                raise UserError(_("Only a planned firing can enter loading."))
+            ready = firing.planned_workorder_ids.filtered(lambda wo: wo.state == "ready")
+            missed = firing.planned_workorder_ids - ready
+            # Enter Loading before assigning physical contents. The transition
+            # and assignments share this transaction, but every ORM constraint
+            # still sees a valid state.
+            firing._mb_internal().write({"state": "draft"})
+            if ready:
+                ready.write({
+                    "mb_firing_planned_id": False,
+                    "mb_firing_id": firing.id,
+                })
+            if missed:
+                reason = _(
+                    "Missed %(firing)s because these operations were not ready: %(orders)s",
+                    firing=firing.display_name,
+                    orders=", ".join(missed.mapped("display_name")),
+                )
+                missed.write({
+                    "mb_firing_planned_id": False,
+                    "mb_firing_missed_reason": reason,
+                })
+                firing._mb_internal().write({"missed_load_note": reason})
+                firing.message_post(body=reason)
+                for production in missed.production_id:
+                    production.message_post(body=reason)
+            firing._mb_sync_group_duration()
+        return True
+
+    def action_cancel(self):
+        for firing in self:
+            if firing.state not in ("planned", "draft"):
+                raise UserError(_("Only a planned or loading firing can be cancelled."))
+            orders = firing.workorder_ids | firing.planned_workorder_ids
+            orders.mapped("leave_id").unlink()
+            firing.workorder_ids.write({"mb_firing_id": False})
+            firing.planned_workorder_ids.write({"mb_firing_planned_id": False})
+            firing._mb_internal().write({"carrier_ids": [fields.Command.clear()]})
+            firing._mb_internal().write({"state": "cancel"})
+        return True
 
     def action_start(self):
         for firing in self:

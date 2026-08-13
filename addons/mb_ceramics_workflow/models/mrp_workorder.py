@@ -5,6 +5,12 @@ from odoo.exceptions import ValidationError
 class MrpWorkorder(models.Model):
     _inherit = "mrp.workorder"
 
+    def action_mb_recipe_documents(self):
+        self.ensure_one()
+        if not self.production_id.bom_id:
+            raise ValidationError(_("This work order has no bill of materials."))
+        return self.production_id.bom_id.action_mb_recipe_documents()
+
     def _mb_validate_firing(self, firing=None):
         result = super()._mb_validate_firing(firing)
         for workorder in self:

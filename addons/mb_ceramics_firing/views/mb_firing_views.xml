@@ -10,6 +10,7 @@
                 <field name="kind" />
                 <field name="program_name" />
                 <field name="date_start" />
+                <field name="date_planned_start" />
                 <field name="cooling_end" />
                 <field name="peak_temperature" />
                 <field name="cooling_interrupted" optional="show" />
@@ -24,10 +25,14 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button name="action_load" type="object" string="Begin loading"
+                            class="oe_highlight" invisible="state != 'planned'" />
                     <button
                         name="action_start" type="object" string="Start firing"
                         class="oe_highlight" invisible="state != 'draft'"
                     />
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state not in ('planned', 'draft')" />
                     <button
                         name="action_finish" type="object" string="Finish firing"
                         class="oe_highlight" invisible="state != 'firing'"
@@ -56,6 +61,9 @@
                             />
                         </group>
                         <group string="Schedule">
+                            <field name="date_planned_start" />
+                            <field name="date_planned_end" readonly="1" />
+                            <field name="date_planned_unload" readonly="1" />
                             <field name="date_start" />
                             <field name="date_end" />
                             <field name="cooling_end" />
@@ -86,7 +94,20 @@
                         <field name="cooling_interrupted" />
                         <field name="interruption_reason" />
                     </group>
+                    <group string="Missed load" invisible="not missed_load_note">
+                        <field name="missed_load_note" />
+                    </group>
                     <notebook>
+                        <page string="Planned work orders" name="planned_workorders">
+                            <field name="planned_workorder_ids">
+                                <list>
+                                    <field name="name" />
+                                    <field name="production_id" />
+                                    <field name="state" />
+                                    <field name="mb_firing_missed_reason" optional="hide" />
+                                </list>
+                            </field>
+                        </page>
                         <page string="Boards" name="carriers">
                             <field name="carrier_ids" />
                         </page>

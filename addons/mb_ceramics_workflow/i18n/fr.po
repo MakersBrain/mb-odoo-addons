@@ -15,12 +15,29 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_bom_line__mb_quantity_mode__dry_percent
+msgid "% of dry batch"
+msgstr "% du poids sec"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "%(code)s R%(revision)s"
+msgstr "%(code)s Rév. %(revision)s"
+
+#. module: mb_ceramics_workflow
 #. odoo-python
 #: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
 msgid "%(product)s allocations must total exactly %(quantity)s %(uom)s."
 msgstr ""
 "Les affectations de %(product)s doivent totaliser exactement %(quantity)s "
 "%(uom)s."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "%(product)s already has approved recipe %(recipe)s."
+msgstr "%(product)s possède déjà la recette approuvée %(recipe)s."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
@@ -58,9 +75,35 @@ msgstr ""
 "%(product)s, fixée à %(minimum)s C."
 
 #. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+msgid "%s can return to draft only while confirmed or cancelled."
+msgstr "%s ne peut revenir au brouillon que s’il est confirmé ou annulé."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+msgid "%s cannot be completed without its exact approved recipe revision."
+msgstr "%s ne peut pas être terminé sans la révision exacte et approuvée de sa recette."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+msgid ""
+"%s cannot return to draft because work has started or entered a physical "
+"firing."
+msgstr "%s ne peut pas revenir au brouillon car le travail a commencé ou est entré dans une cuisson physique."
+
+#. module: mb_ceramics_workflow
 #: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.stock_lot_form_mb_ceramics_workflow
 msgid "<span class=\"o_stat_text\">Print WIP label</span>"
 msgstr "<span class=\"o_stat_text\">Imprimer l'étiquette d'en-cours</span>"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_production_view_form_mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_workorder_form_mb_recipe_documents
+msgid "<span class=\"o_stat_text\">Recipe documents</span>"
+msgstr "<span class=\"o_stat_text\">Documents de recette</span>"
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_board_content_positive_quantity
@@ -85,6 +128,18 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "A formula percentage must be greater than zero."
+msgstr "Un pourcentage de formule doit être supérieur à zéro."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "A glaze formula needs at least one ingredient."
+msgstr "Une formule d’émail nécessite au moins un ingrédient."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
 #: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
 msgid ""
 "A manufacturing order cannot be moved into or out of a completed workshop "
@@ -100,6 +155,12 @@ msgid "A material allocation does not match a tracked glazing component."
 msgstr ""
 "Une affectation de matière ne correspond à aucun composant d'émaillage "
 "suivi."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "A new revision can only follow an approved glaze recipe."
+msgstr "Une nouvelle révision ne peut succéder qu’à une recette d’émail approuvée."
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_production_loss_positive_quantity
@@ -165,11 +226,39 @@ msgid "An allocated material quantity must be positive."
 msgstr "Une quantité de matière affectée doit être positive."
 
 #. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_bom_form_mb_glaze_recipe
+msgid "Approve"
+msgstr "Approuver"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_bom__mb_recipe_state__approved
+msgid "Approved"
+msgstr "Approuvé"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid ""
+"Approved recipe revisions are immutable. Create a new revision instead of "
+"editing: %s"
+msgstr "Les révisions de recette approuvées sont immuables. Créez une nouvelle révision au lieu de modifier : %s"
+
+#. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__available_quantity
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__available_quantity
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__available_quantity
 msgid "Available Quantity"
 msgstr "Quantité disponible"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mrp_bom
+msgid "Bill of Material"
+msgstr "Nomenclature"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mrp_bom_line
+msgid "Bill of Material Line"
+msgstr "Ligne de nomenclature"
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__bisque_lot_id
@@ -266,6 +355,11 @@ msgstr "Plaques"
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__bom_id
 msgid "Bom"
 msgstr "Nomenclature"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mrp_bom_byproduct
+msgid "Byproduct"
+msgstr "Sous-produit"
 
 #. module: mb_ceramics_workflow
 #: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_bisque_inspection_view_form
@@ -505,13 +599,22 @@ msgstr "Date de défournement"
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom_byproduct__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom_line__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_routing_workcenter__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_workorder__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_template__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_package__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_bom_form_mb_glaze_recipe
+msgid "Documents"
+msgstr "Documents"
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_bisque_session__state__done
@@ -525,8 +628,17 @@ msgstr "Terminé"
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_finishing_session__state__draft
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_glazing_session__state__draft
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_throwing_session__state__draft
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_bom__mb_recipe_state__draft
 msgid "Draft"
 msgstr "Brouillon"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid ""
+"Dry ingredient percentages must total 100%%; this formula totals "
+"%(total).4f%%."
+msgstr "Les pourcentages d’ingrédients secs doivent totaliser 100 %% ; cette formule totalise %(total).4f %%."
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__eligible_workorder_ids
@@ -547,9 +659,20 @@ msgid "Every firing operation must be unloaded before inspection."
 msgstr "Chaque opération de cuisson doit être défournée avant le contrôle."
 
 #. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "Every glaze formula ingredient must be a dry or water percentage: %s"
+msgstr "Chaque ingrédient de la formule d’émail doit être un pourcentage sec ou d’eau : %s"
+
+#. module: mb_ceramics_workflow
 #: model:ir.model,name:mb_ceramics_workflow.model_mb_glazing_material_allocation
 msgid "Exact tracked material allocation for glazing"
 msgstr "Affectation exacte de matière suivie pour l'émaillage"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,help:mb_ceramics_workflow.field_mrp_bom__mb_is_glaze_recipe
+msgid "Express dry ingredients and water as percentages of dry batch weight."
+msgstr "Exprime les ingrédients secs et l’eau en pourcentage du poids sec du lot."
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__finished_location_id
@@ -612,6 +735,34 @@ msgstr ""
 "doivent égaler les ébauches sélectionnées."
 
 #. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_bom_line__mb_quantity_mode__fixed
+msgid "Fixed quantity"
+msgstr "Quantité fixe"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom_line__mb_formula_percent
+msgid "Formula %"
+msgstr "% de formule"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid ""
+"Formula ingredients must use units compatible with the dry batch unit: %s"
+msgstr "Les ingrédients de formule doivent utiliser des unités compatibles avec l’unité du poids sec : %s"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "Formula quantities are derived from their percentage."
+msgstr "Les quantités de formule sont dérivées de leur pourcentage."
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__mb_is_glaze_recipe
+msgid "Glaze formula"
+msgstr "Formule d’émail"
+
+#. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__material_location_id
 msgid "Glaze/material location"
 msgstr "Emplacement des émaux et matières"
@@ -664,6 +815,11 @@ msgid "Green ware"
 msgstr "Pièces crues"
 
 #. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_bom__mb_recipe_state__historical
+msgid "Historical"
+msgstr "Historique"
+
+#. module: mb_ceramics_workflow
 #: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_board_view_form
 msgid "History"
 msgstr "Historique"
@@ -686,13 +842,22 @@ msgstr "Historique"
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom_byproduct__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom_line__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_routing_workcenter__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_workorder__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_product_template__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_package__id
 msgid "ID"
 msgstr "ID"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,help:mb_ceramics_workflow.field_mrp_production__mb_bom_revision_id
+msgid "Immutable glaze recipe revision used for this manufacturing order."
+msgstr "Révision immuable de la recette d’émail utilisée pour cet ordre de fabrication."
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_bisque_session__state__progress
@@ -853,6 +1018,14 @@ msgid "Manufacturing Order"
 msgstr "Ordre de fabrication"
 
 #. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+msgid ""
+"Manufacturing order %(order)s needs an approved glaze recipe; %(recipe)s is "
+"%(state)s."
+msgstr "L’ordre de fabrication %(order)s nécessite une recette d’émail approuvée ; %(recipe)s est à l’état %(state)s."
+
+#. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__production_ids
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__production_ids
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__production_ids
@@ -892,6 +1065,16 @@ msgid "Maximum firing temperature"
 msgstr "Température de cuisson maximale"
 
 #. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__mb_approved_at
+msgid "Mb Approved At"
+msgstr "Approuvée le"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__mb_approved_by_id
+msgid "Mb Approved By"
+msgstr "Approuvée par"
+
+#. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_bisque_inspected
 msgid "Mb Bisque Inspected"
 msgstr "Biscuit contrôlé"
@@ -900,6 +1083,11 @@ msgstr "Biscuit contrôlé"
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_bisque_session_id
 msgid "Mb Bisque Session"
 msgstr "Séance de biscuit"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__mb_document_count
+msgid "Mb Document Count"
+msgstr "Nombre de documents"
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_finishing_session_id
@@ -920,6 +1108,16 @@ msgstr "Séance d'émaillage"
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_inspected
 msgid "Mb Inspected"
 msgstr "Contrôlé"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom_line__mb_quantity_mode
+msgid "Mb Quantity Mode"
+msgstr "Mode de quantité"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__mb_revision
+msgid "Mb Revision"
+msgstr "Révision"
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_throwing_session_id
@@ -955,6 +1153,11 @@ msgid "New"
 msgstr "Nouveau"
 
 #. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_bom_form_mb_glaze_recipe
+msgid "New revision"
+msgstr "Nouvelle révision"
+
+#. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__note
 msgid "Note"
 msgstr "Note"
@@ -967,10 +1170,22 @@ msgstr "Odoo n'a pas créé l'ordre de fabrication scindé attendu."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "Only a draft recipe can be approved."
+msgstr "Seule une recette au brouillon peut être approuvée."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
 #: code:addons/mb_ceramics_workflow/models/mb_firing.py:0
 #: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
 msgid "Only a loading firing can receive work."
 msgstr "Seule une cuisson en cours d'enfournement peut recevoir du travail."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "Only an approved recipe can be withdrawn."
+msgstr "Seule une recette approuvée peut être retirée."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
@@ -983,6 +1198,12 @@ msgstr "Seul le contenu actuel d'une plaque peut être scindé."
 #: code:addons/mb_ceramics_workflow/models/mb_board_content.py:0
 msgid "Only current board content can be transferred."
 msgstr "Seul le contenu actuel d'une plaque peut être transféré."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "Only glaze formulas use recipe approval."
+msgstr "Seules les formules d’émail utilisent l’approbation de recette."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
@@ -1023,6 +1244,11 @@ msgid "Previous Content"
 msgstr "Contenu précédent"
 
 #. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__mb_previous_revision_id
+msgid "Previous revision"
+msgstr "Révision précédente"
+
+#. module: mb_ceramics_workflow
 #. odoo-python
 #: code:addons/mb_ceramics_workflow/models/stock_lot.py:0
 #: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_production_view_form_mb_ceramics_workflow
@@ -1038,6 +1264,12 @@ msgstr "Imprimer l'étiquette"
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_loss_ids
 msgid "Process losses"
 msgstr "Pertes de production"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+msgid "Produced lots already carry a different recipe revision: %s"
+msgstr "Les lots produits portent déjà une autre révision de recette : %s"
 
 #. module: mb_ceramics_workflow
 #: model:ir.model,name:mb_ceramics_workflow.model_product_template
@@ -1115,6 +1347,31 @@ msgid "Reason"
 msgstr "Motif"
 
 #. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "Recipe documents"
+msgstr "Documents de recette"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "Recipe lifecycle fields can only be changed by their actions."
+msgstr "Les champs du cycle de vie d’une recette ne peuvent être modifiés que par leurs actions."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_bom_revision_id
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__mb_bom_revision_id
+msgid "Recipe revision"
+msgstr "Révision de recette"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__mb_recipe_state
+msgid "Recipe status"
+msgstr "Statut de la recette"
+
+#. module: mb_ceramics_workflow
 #: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_throwing_session
 msgid "Record Throwing"
 msgstr "Enregistrer le tournage"
@@ -1146,6 +1403,11 @@ msgstr "Enregistré"
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_board_content__state__removed
 msgid "Removed"
 msgstr "Supprimé"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_production_view_form_mb_ceramics_workflow
+msgid "Return to draft"
+msgstr "Revenir au brouillon"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
@@ -1267,6 +1529,11 @@ msgstr "Démarrer l'émaillage"
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__state
 msgid "State"
 msgstr "Statut"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__mb_successor_revision_ids
+msgid "Successor revisions"
+msgstr "Révisions suivantes"
 
 #. module: mb_ceramics_workflow
 #: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_finishing_session_view_form
@@ -1487,6 +1754,12 @@ msgstr "La température de cuisson minimale ne peut pas dépasser la maximale."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+msgid "The recipe revision snapshot on %s cannot be replaced."
+msgstr "La révision de recette figée sur %s ne peut pas être remplacée."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
 #: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
 msgid ""
 "The same firing work order also stands on: %(boards)s. Load those boards or "
@@ -1582,6 +1855,14 @@ msgstr "Il n'y a pas d'autre quantité à conserver sur l'ordre d'origine."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+msgid ""
+"These glaze lots have no approved recipe revision, so %(order)s cannot be "
+"released as food contact: %(lots)s"
+msgstr "Ces lots d’émail n’ont pas de révision de recette approuvée ; %(order)s ne peut donc pas être libéré pour le contact alimentaire : %(lots)s"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
 #: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
 msgid "This bisque manufacturing order has already been closed."
 msgstr "Cet ordre de fabrication de biscuit a déjà été clôturé."
@@ -1591,6 +1872,18 @@ msgstr "Cet ordre de fabrication de biscuit a déjà été clôturé."
 #: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
 msgid "This manufacturing order has already been closed."
 msgstr "Cet ordre de fabrication a déjà été clôturé."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_production.py:0
+msgid "This manufacturing order has no bill of materials."
+msgstr "Cet ordre de fabrication n’a pas de nomenclature."
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_workorder.py:0
+msgid "This work order has no bill of materials."
+msgstr "Cet ordre de travail n’a pas de nomenclature."
 
 #. module: mb_ceramics_workflow
 #: model:ir.model,name:mb_ceramics_workflow.model_mb_throwing_session_line
@@ -1665,6 +1958,26 @@ msgid "Ware may only be assigned to a reusable package."
 msgstr "Des pièces ne peuvent être affectées qu'à un colis réutilisable."
 
 #. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_bom_line__mb_quantity_mode__water_percent
+msgid "Water % of dry batch"
+msgstr "% d’eau sur poids sec"
+
+#. module: mb_ceramics_workflow
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mrp_bom_form_mb_glaze_recipe
+msgid "Withdraw"
+msgstr "Retirer"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_bom__mb_recipe_state__withdrawn
+msgid "Withdrawn"
+msgstr "Retirée"
+
+#. module: mb_ceramics_workflow
+#: model:ir.model,name:mb_ceramics_workflow.model_mrp_routing_workcenter
+msgid "Work Center Usage"
+msgstr "Utilisation du poste de travail"
+
+#. module: mb_ceramics_workflow
 #: model:ir.model,name:mb_ceramics_workflow.model_mrp_workorder
 msgid "Work Order"
 msgstr "Ordre de travail"
@@ -1673,3 +1986,9 @@ msgstr "Ordre de travail"
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__workorder_ids
 msgid "Work orders"
 msgstr "Ordres de travail"
+
+#. module: mb_ceramics_workflow
+#. odoo-python
+#: code:addons/mb_ceramics_workflow/models/mrp_bom.py:0
+msgid "res_model"
+msgstr "Modèle de ressource"

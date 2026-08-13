@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0-20260803\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-11 22:41+0000\n"
-"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"POT-Creation-Date: 2026-08-13 22:19+0000\n"
+"PO-Revision-Date: 2026-08-13 22:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -61,6 +61,18 @@ msgstr ""
 
 #. module: mb_ceramics_firing
 #. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "%s does not use the planned kiln programme."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "%s is planned on another kiln work centre."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
 #: code:addons/mb_ceramics_firing/models/mb_firing.py:0
 msgid "A completed or cancelled firing cannot be deleted."
 msgstr ""
@@ -98,6 +110,24 @@ msgstr ""
 #. module: mb_ceramics_firing
 #: model:ir.model.constraint,message:mb_ceramics_firing.constraint_mb_kiln_provider_device_uniq
 msgid "A kiln may only be bound once to a given provider device."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "A planned firing cannot contain physically loaded work orders."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "A planned firing needs a kiln, programme, firing kind and start date."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "A planned link cannot be changed on a terminal firing."
 msgstr ""
 
 #. module: mb_ceramics_firing
@@ -161,6 +191,11 @@ msgid "Attachment Count"
 msgstr ""
 
 #. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Begin loading"
+msgstr ""
+
+#. module: mb_ceramics_firing
 #: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__kind__bisque
 #: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_kiln_program__kind__bisque
 msgid "Bisque"
@@ -174,6 +209,11 @@ msgstr ""
 #. module: mb_ceramics_firing
 #: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__carrier_ids
 msgid "Boards loaded"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Cancel"
 msgstr ""
 
 #. module: mb_ceramics_firing
@@ -298,6 +338,16 @@ msgstr ""
 msgid ""
 "Earliest moment the load may be unloaded and labelled. Not the same moment "
 "the manufacturing order is marked done."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__date_planned_unload
+msgid "Earliest planned unload"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mrp_workorder__mb_firing_planned_id
+msgid "Earmarked kiln slot. This is not physical loading evidence."
 msgstr ""
 
 #. module: mb_ceramics_firing
@@ -545,6 +595,14 @@ msgid "Kiln"
 msgstr ""
 
 #. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid ""
+"Kiln %(kiln)s is already occupied by %(firing)s during this planned firing "
+"and cooling window."
+msgstr ""
+
+#. module: mb_ceramics_firing
 #: model:ir.model,name:mb_ceramics_firing.model_mb_firing
 msgid "Kiln firing"
 msgstr ""
@@ -596,6 +654,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__write_date
 #: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program_segment__write_date
 msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,help:mb_ceramics_firing.field_mb_firing__planned_workorder_ids
+msgid "Lightweight earmarks for work expected to be ready for this kiln slot."
 msgstr ""
 
 #. module: mb_ceramics_firing
@@ -661,6 +724,11 @@ msgid "Maximum temperature"
 msgstr ""
 
 #. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_workorder__mb_firing_missed_reason
+msgid "Mb Firing Missed Reason"
+msgstr ""
+
+#. module: mb_ceramics_firing
 #: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__measured_hours
 msgid "Measured (hours)"
 msgstr ""
@@ -673,6 +741,22 @@ msgstr ""
 #. module: mb_ceramics_firing
 #: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__message_ids
 msgid "Messages"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Missed %(firing)s because these operations were not ready: %(orders)s"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__missed_load_note
+msgid "Missed Load Note"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Missed load"
 msgstr ""
 
 #. module: mb_ceramics_firing
@@ -755,6 +839,18 @@ msgid "Only a loading firing can be started."
 msgstr ""
 
 #. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Only a planned firing can enter loading."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "Only a planned or loading firing can be cancelled."
+msgstr ""
+
+#. module: mb_ceramics_firing
 #: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
 msgid "Open early"
 msgstr ""
@@ -781,6 +877,32 @@ msgstr ""
 #. module: mb_ceramics_firing
 #: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__pieces_per_load
 msgid "Pieces per load"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields.selection,name:mb_ceramics_firing.selection__mb_firing__state__planned
+msgid "Planned"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mrp_workorder__mb_firing_planned_id
+msgid "Planned firing"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__date_planned_end
+msgid "Planned firing end"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__date_planned_start
+msgid "Planned start"
+msgstr ""
+
+#. module: mb_ceramics_firing
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_firing__planned_workorder_ids
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_firing_view_form
+msgid "Planned work orders"
 msgstr ""
 
 #. module: mb_ceramics_firing
@@ -1061,6 +1183,12 @@ msgid ""
 msgstr ""
 
 #. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid "The kiln slot conflicts with: %s"
+msgstr ""
+
+#. module: mb_ceramics_firing
 #: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_view_form
 msgid ""
 "The make, model and chamber above are read from the\n"
@@ -1117,6 +1245,14 @@ msgid ""
 msgstr ""
 
 #. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mb_firing.py:0
+msgid ""
+"The predecessors of %(orders)s cannot finish before kiln slot %(slot)s: "
+"%(predecessors)s"
+msgstr ""
+
+#. module: mb_ceramics_firing
 #: model:ir.model.fields,help:mb_ceramics_firing.field_mb_kiln_program__name
 msgid ""
 "The programme label exactly as the provider reports it, such as 'Programme "
@@ -1168,6 +1304,18 @@ msgid ""
 "The start of the firing these segments were read from. The controller "
 "reports a programme as it ran, so the most recent firing is the most current"
 " profile."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "The work order and firing kinds are incompatible."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "The work order and firing must belong to one company."
 msgstr ""
 
 #. module: mb_ceramics_firing
@@ -1301,6 +1449,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
 msgid "Work can only be added while a firing is loading."
+msgstr ""
+
+#. module: mb_ceramics_firing
+#. odoo-python
+#: code:addons/mb_ceramics_firing/models/mrp_workorder.py:0
+msgid "Work can only be earmarked for a planned firing."
 msgstr ""
 
 #. module: mb_ceramics_firing
