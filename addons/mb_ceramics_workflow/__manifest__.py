@@ -9,12 +9,18 @@ reusable boards while no stock quant exists, loads compatible work orders into
 shared kiln firings, records yield loss and seconds, and exposes firing-aware lot
 genealogy without replacing Odoo's stock identity.
 """,
-    "version": "19.0.2.0.4",
+    "version": "19.0.2.1.0",
     "license": "LGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "Makersbrain",
     "depends": [
+        # The menu spine and the continuous calendar.
         "mb_workshop_base",
+        # mb_clay_body_id, the material taxonomy and the seeded work centres the
+        # sessions are named after. Split out of mb_workshop_base in 19.0.2.0.0.
+        "mb_ceramics_base",
+        # The food-contact gate a finished session eventually has to pass.
+        "mb_ceramics_compliance",
         "mb_ceramics_firing",
         "mb_label",
         "mrp",

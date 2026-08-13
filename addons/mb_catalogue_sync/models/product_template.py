@@ -34,15 +34,15 @@ _logger = logging.getLogger(__name__)
 # A family this addon has never heard of lands on the parent category rather than
 # nowhere, so it is visible and correctable instead of silently uncategorised.
 FAMILY_CATEGORY = {
-    "glaze": "mb_workshop_base.categ_glaze",
-    "underglaze": "mb_workshop_base.categ_underglaze",
-    "engobe": "mb_workshop_base.categ_engobe",
-    "clay_body": "mb_workshop_base.categ_clay_body",
-    "stain": "mb_workshop_base.categ_stain",
-    "oxide": "mb_workshop_base.categ_oxide",
-    "raw_material": "mb_workshop_base.categ_raw_material",
+    "glaze": "mb_ceramics_base.categ_glaze",
+    "underglaze": "mb_ceramics_base.categ_underglaze",
+    "engobe": "mb_ceramics_base.categ_engobe",
+    "clay_body": "mb_ceramics_base.categ_clay_body",
+    "stain": "mb_ceramics_base.categ_stain",
+    "oxide": "mb_ceramics_base.categ_oxide",
+    "raw_material": "mb_ceramics_base.categ_raw_material",
 }
-FAMILY_FALLBACK = "mb_workshop_base.categ_ceramic_materials"
+FAMILY_FALLBACK = "mb_ceramics_base.categ_ceramic_materials"
 
 
 class ProductTemplate(models.Model):

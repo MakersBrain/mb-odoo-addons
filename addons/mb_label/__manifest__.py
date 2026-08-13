@@ -2,11 +2,14 @@
     "name": "Makersbrain Label Studio",
     "summary": "Design, version, render and print product and piece labels.",
     "description": "Versioned thermal-label design and product/lot printing.",
-    "version": "19.0.1.1.4",
+    "version": "19.0.1.2.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
-    "depends": ["mb_workshop_base", "web"],
+    # This 19.0.1.2.0 release drops mb_workshop_base. The dependency was nominal:
+    # no XML ID, field or group was used, and the menus already hang from Stock.
+    # See CRAFT-PLATFORM-PLAN.md section 2.
+    "depends": ["stock", "web"],
     "external_dependencies": {
         "python": ["qrcode", "reportlab"],
     },

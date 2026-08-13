@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="menu_mb_migration_test"
+        name="Migration tests"
+        parent="mb_workshop_base.menu_mb_workshop_configuration"
+        action="mb_migration_test_action"
+        sequence="90"
+    />
+</odoo>

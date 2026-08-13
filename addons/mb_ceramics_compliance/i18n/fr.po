@@ -1,0 +1,330 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_ceramics_compliance
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_ceramics_compliance
+#. odoo-python
+#: code:addons/mb_ceramics_compliance/models/product_template.py:0
+msgid ""
+"%s is a food-contact article and must be tracked by lot or serial number. "
+"Article 17 of Regulation 1935/2004 requires the business it was supplied to "
+"be identifiable, and an untracked product cannot answer that."
+msgstr ""
+"%s est un article destiné au contact alimentaire et doit être suivi par lot "
+"ou par numéro de série. L'article 17 du règlement 1935/2004 exige que "
+"l'entreprise à laquelle il a été fourni soit identifiable, ce qu'un produit "
+"non suivi ne permet pas."
+
+#. module: mb_ceramics_compliance
+#. odoo-python
+#: code:addons/mb_ceramics_compliance/models/product_template.py:0
+msgid ""
+"%s is not intended for food contact, so 84/500/EEC does not reach it and it "
+"has no migration limit class."
+msgstr ""
+"%s n'est pas destiné au contact alimentaire : la directive 84/500/CEE ne s'y"
+" applique pas et il n'a donc pas de classe de limite de migration."
+
+#. module: mb_ceramics_compliance
+#. odoo-python
+#: code:addons/mb_ceramics_compliance/models/mrp_production.py:0
+msgid ""
+"%s produces a food-contact article and needs a lot number before it can be "
+"marked done."
+msgstr ""
+"%s produit un article destiné au contact alimentaire et nécessite un numéro "
+"de lot avant de pouvoir être marqué comme fait."
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__cadmium_result
+msgid "Cadmium migration"
+msgstr "Migration de cadmium"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields.selection,name:mb_ceramics_compliance.selection__mb_migration_test__migration_limit_class__cat3
+#: model:ir.model.fields.selection,name:mb_ceramics_compliance.selection__product_template__mb_migration_limit_class__cat3
+msgid "Cooking ware; storage vessels over 3 litres"
+msgstr "Ustensiles de cuisson ; récipients de stockage de plus de 3 litres"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_stock_lot__mb_glaze_lot_ids
+msgid ""
+"Derived from the manufacturing order's consumed components. Not stored: Odoo"
+" already keeps this on the move lines, and a copy would be a second answer "
+"to the one question a regulator asks."
+msgstr ""
+"Déduit des composants consommés par l'ordre de fabrication. Non stocké : "
+"Odoo conserve déjà l'information sur les lignes de mouvement, et une copie "
+"constituerait une seconde réponse à la seule question que pose un "
+"contrôleur."
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mrp_production__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_template__display_name
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_stock_lot__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_product__mb_food_contact
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_template__mb_food_contact
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_stock_lot__mb_food_contact
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_compliance.product_template_form_view_mb_food_contact
+msgid "Food contact"
+msgstr "Contact alimentaire"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_stock_lot__mb_migration_passed
+msgid "For a glaze lot, whether it has a passing lead and cadmium test."
+msgstr ""
+"Pour un lot d'émail, indique s'il dispose d'un essai plomb et cadmium "
+"conforme."
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__lot_id
+msgid "Glaze lot"
+msgstr "Lot d'émail"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_stock_lot__mb_glaze_lot_ids
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_compliance.view_production_lot_form_mb_workshop
+msgid "Glaze lots consumed"
+msgstr "Lots d'émail consommés"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__id
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mrp_production__id
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_template__id
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_stock_lot__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_product_product__mb_food_contact
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_product_template__mb_food_contact
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_stock_lot__mb_food_contact
+msgid ""
+"Intended to come into contact with foodstuffs. This is the only reason an "
+"article is tracked, and it is what brings 84/500/EEC migration limits and a "
+"declaration of compliance into scope."
+msgstr ""
+"Destiné à entrer en contact avec des denrées alimentaires. C'est la seule "
+"raison pour laquelle un article est suivi, et c'est ce qui rend applicables "
+"les limites de migration de la directive 84/500/CEE et la déclaration de "
+"conformité."
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_product__mb_label_food_warning
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_template__mb_label_food_warning
+msgid "Label carries food warning"
+msgstr "Étiquette portant la mention d'usage non alimentaire"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__laboratory
+msgid "Laboratory"
+msgstr "Laboratoire"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__report_ids
+msgid "Laboratory report"
+msgstr "Rapport de laboratoire"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model,name:mb_ceramics_compliance.model_mb_migration_test
+msgid "Lead and cadmium migration test (84/500/EEC)"
+msgstr "Essai de migration de plomb et de cadmium (84/500/CEE)"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__lead_result
+msgid "Lead migration"
+msgstr "Migration de plomb"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model,name:mb_ceramics_compliance.model_stock_lot
+msgid "Lot/Serial"
+msgstr "Lot/série"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model,name:mb_ceramics_compliance.model_mrp_production
+msgid "Manufacturing Order"
+msgstr "Ordre de fabrication"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__product_id
+msgid "Material"
+msgstr "Matière"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__migration_limit_class
+msgid "Migration Limit Class"
+msgstr "Classe de limite de migration"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_product__mb_migration_limit_class
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_template__mb_migration_limit_class
+msgid "Migration limit class"
+msgstr "Classe de limite de migration"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_stock_lot__mb_migration_passed
+msgid "Migration test passed"
+msgstr "Essai de migration conforme"
+
+#. module: mb_ceramics_compliance
+#: model:ir.actions.act_window,name:mb_ceramics_compliance.mb_migration_test_action
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_stock_lot__mb_migration_test_ids
+#: model:ir.ui.menu,name:mb_ceramics_compliance.menu_mb_migration_test
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_compliance.view_production_lot_form_mb_workshop
+msgid "Migration tests"
+msgstr "Essais de migration"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields.selection,name:mb_ceramics_compliance.selection__mb_migration_test__migration_limit_class__cat1
+#: model:ir.model.fields.selection,name:mb_ceramics_compliance.selection__product_template__mb_migration_limit_class__cat1
+msgid "Non-fillable, or fillable with internal depth up to 25 mm"
+msgstr ""
+"Non remplissable, ou remplissable avec une profondeur interne inférieure ou "
+"égale à 25 mm"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__note
+msgid "Note"
+msgstr "Note"
+
+#. module: mb_ceramics_compliance
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_compliance.mb_migration_test_view_form
+msgid "Notes"
+msgstr "Notes"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields.selection,name:mb_ceramics_compliance.selection__mb_migration_test__migration_limit_class__cat2
+#: model:ir.model.fields.selection,name:mb_ceramics_compliance.selection__product_template__mb_migration_limit_class__cat2
+msgid "Other fillable articles"
+msgstr "Autres articles remplissables"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__passed
+msgid "Passed"
+msgstr "Conforme"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model,name:mb_ceramics_compliance.model_product_template
+msgid "Product"
+msgstr "Produit"
+
+#. module: mb_ceramics_compliance
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_compliance.mb_migration_test_view_form
+msgid "Report"
+msgstr "Rapport"
+
+#. module: mb_ceramics_compliance
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_compliance.mb_migration_test_view_form
+msgid "Result"
+msgstr "Résultat"
+
+#. module: mb_ceramics_compliance
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_compliance.mb_migration_test_view_form
+msgid "Sample"
+msgstr "Échantillon"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_product_product__mb_tableware_form
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_product_template__mb_tableware_form
+msgid ""
+"Shaped like an article for food use. A decorative plate is still a plate to "
+"whoever buys it, so the label has to say what it is not."
+msgstr ""
+"De la forme d'un article à usage alimentaire. Une assiette décorative reste "
+"une assiette pour qui l'achète : l'étiquette doit donc préciser ce qu'elle "
+"n'est pas."
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_product__mb_tableware_form
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_product_template__mb_tableware_form
+msgid "Tableware form"
+msgstr "Forme d'article de table"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,field_description:mb_ceramics_compliance.field_mb_migration_test__test_date
+msgid "Test Date"
+msgstr "Date de l'essai"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_mb_migration_test__migration_limit_class
+msgid ""
+"The article geometry the sample was tested as. The limits differ by class, "
+"so a result is only meaningful alongside it."
+msgstr ""
+"La géométrie d'article retenue pour l'essai de l'échantillon. Les limites "
+"diffèrent selon la classe : un résultat n'a de sens qu'accompagné de celle-"
+"ci."
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_mb_migration_test__passed
+msgid ""
+"The laboratory's verdict, as issued. Not derived from the figures above, "
+"because the limits in force are the lab's to apply."
+msgstr ""
+"Le verdict du laboratoire, tel qu'il a été émis. Il n'est pas déduit des "
+"valeurs ci-dessus, car c'est au laboratoire d'appliquer les limites en "
+"vigueur."
+
+#. module: mb_ceramics_compliance
+#. odoo-python
+#: code:addons/mb_ceramics_compliance/models/mrp_production.py:0
+msgid ""
+"These glaze lots have no passing migration test, so %(order)s cannot be "
+"released as food contact: %(lots)s"
+msgstr ""
+"Ces lots d'émail n'ont pas d'essai de migration conforme : %(order)s ne peut"
+" donc pas être libéré en contact alimentaire : %(lots)s"
+
+#. module: mb_ceramics_compliance
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_product_product__mb_migration_limit_class
+#: model:ir.model.fields,help:mb_ceramics_compliance.field_product_template__mb_migration_limit_class
+msgid ""
+"Which set of lead and cadmium limits applies under 84/500/EEC. Named a class"
+" rather than a category because categ_id already means something else, and "
+"the two are unrelated."
+msgstr ""
+"Quel jeu de limites de plomb et de cadmium s'applique au titre de la "
+"directive 84/500/CEE. Appelée classe plutôt que catégorie parce que categ_id"
+" désigne déjà autre chose, sans rapport."

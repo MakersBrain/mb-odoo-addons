@@ -67,7 +67,7 @@ KNOWN_EXTERNAL = {
     "account", "account_edi_ubl_cii", "account_payment", "base", "l10n_fr_account",
     "fleet", "hr_expense", "hr_timesheet", "maintenance", "mail", "mrp", "mrp_account",
     "payment", "point_of_sale", "product", "product_expiry", "project", "project_hr_expense", "project_mrp",
-    "project_purchase", "project_stock_account", "purchase", "purchase_stock",
+    "project_purchase", "project_stock_account", "purchase", "purchase_stock", "resource",
     "sale_management", "sale_project", "sale_timesheet", "stock_account",
     "sale", "sale_stock", "stock", "uom", "web",
     # OCA, vendored and optional.

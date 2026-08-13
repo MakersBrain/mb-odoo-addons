@@ -5,13 +5,15 @@ from odoo.exceptions import UserError
 # a material-type field of our own: a second taxonomy disagrees with the first
 # the moment anyone edits either.
 #
-# These moved here from mb_catalogue_sync in 19.0.1.2.0. A compliance gate must
-# not depend on having installed a connector to a catalogue service, and this one
-# used to - it silently checked less when that addon was absent.
+# The taxonomy moved out of mb_catalogue_sync in 19.0.1.2.0 and settled in
+# mb_ceramics_base in 19.0.2.0.0. A compliance gate must not depend on having
+# installed a connector to a catalogue service, and this one used to - it
+# silently checked less when that addon was absent. mb_ceramics_base is seed
+# data with nothing behind it, so the gate is always enforceable.
 GLAZE_CATEGORY_REFS = (
-    "mb_workshop_base.categ_glaze",
-    "mb_workshop_base.categ_underglaze",
-    "mb_workshop_base.categ_engobe",
+    "mb_ceramics_base.categ_glaze",
+    "mb_ceramics_base.categ_underglaze",
+    "mb_ceramics_base.categ_engobe",
 )
 
 
@@ -21,8 +23,8 @@ class MrpProduction(models.Model):
     def _mb_glaze_categories(self):
         """Categories whose products are surface materials.
 
-        This addon's own data, so the records are always there. `raise_if_not_
-        found=False` is kept for the one case that remains: a database mid-
+        A dependency's seed data, so the records are always there.
+        `raise_if_not_found=False` is kept for the one case that remains: a database mid-
         upgrade, where the model is loaded before the new data file has been
         applied. A missing category then weakens this run rather than breaking
         the upgrade, and the next one is complete.

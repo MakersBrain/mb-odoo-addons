@@ -1,0 +1,50 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_ceramics_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-13 20:57+0000\n"
+"PO-Revision-Date: 2026-08-13 20:57+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_ceramics_base
+#: model_terms:ir.ui.view,arch_db:mb_ceramics_base.product_template_form_view_mb_ceramics
+msgid "Ceramics"
+msgstr ""
+
+#. module: mb_ceramics_base
+#: model:ir.model.fields,field_description:mb_ceramics_base.field_product_product__mb_clay_body_id
+#: model:ir.model.fields,field_description:mb_ceramics_base.field_product_template__mb_clay_body_id
+msgid "Clay body"
+msgstr ""
+
+#. module: mb_ceramics_base
+#: model:ir.model.fields,field_description:mb_ceramics_base.field_product_template__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_ceramics_base
+#: model:ir.model.fields,field_description:mb_ceramics_base.field_product_template__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_ceramics_base
+#: model:ir.model,name:mb_ceramics_base.model_product_template
+msgid "Product"
+msgstr ""
+
+#. module: mb_ceramics_base
+#: model:ir.model.fields,help:mb_ceramics_base.field_product_product__mb_clay_body_id
+#: model:ir.model.fields,help:mb_ceramics_base.field_product_template__mb_clay_body_id
+msgid ""
+"The body this piece is made from, as the material product itself rather than"
+" a code, so it joins to the master catalogue."
+msgstr ""

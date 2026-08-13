@@ -28,7 +28,7 @@
         <field name="target">new</field>
     </record>
     <menuitem id="menu_mb_supplier_lot_migration" name="Supplier lot tracking cutover"
-              parent="mb_workshop_base.menu_mb_ceramics_stock_quality"
+              parent="mb_workshop_base.menu_mb_workshop_stock_quality"
               action="action_mb_supplier_lot_migration" sequence="40"
               groups="stock.group_stock_manager"/>
 </odoo>

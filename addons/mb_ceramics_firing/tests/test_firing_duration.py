@@ -66,7 +66,7 @@ class TestFiringDuration(TransactionCase):
         self.assertEqual(operation.time_cycle_manual, 90.0)
 
     def test_an_operation_without_a_programme_is_untouched(self):
-        bench = self.env.ref("mb_workshop_base.mb_workcenter_throwing")
+        bench = self.env.ref("mb_ceramics_base.mb_workcenter_throwing")
         operation = self.env["mrp.routing.workcenter"].create({
             "name": "Throwing",
             "bom_id": self.bom.id,

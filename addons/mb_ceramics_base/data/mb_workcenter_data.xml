@@ -9,35 +9,6 @@
     <data noupdate="1">
 
         <!--
-          A work centre is a resource you queue for, and the working calendar is
-          what says when the queue moves. The workshop calendar is right for
-          anything a person does and wrong for everything else: a kiln fires
-          overnight and a board dries over a weekend, and on a nine-to-five
-          calendar Odoo fragments a fourteen-hour firing across three days.
-
-          UTC, deliberately. Nothing on this calendar keeps office hours, so a
-          local timezone would only introduce a daylight-saving discontinuity
-          into durations that are physical and absolute.
-        -->
-        <record id="mb_calendar_continuous" model="resource.calendar">
-            <field name="name">Continuous (24/7)</field>
-            <field name="tz">UTC</field>
-            <field
-                name="attendance_ids"
-                eval="[
-                    (5, 0, 0),
-                    (0, 0, {'name': 'Monday', 'dayofweek': '0', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
-                    (0, 0, {'name': 'Tuesday', 'dayofweek': '1', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
-                    (0, 0, {'name': 'Wednesday', 'dayofweek': '2', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
-                    (0, 0, {'name': 'Thursday', 'dayofweek': '3', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
-                    (0, 0, {'name': 'Friday', 'dayofweek': '4', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
-                    (0, 0, {'name': 'Saturday', 'dayofweek': '5', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
-                    (0, 0, {'name': 'Sunday', 'dayofweek': '6', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
-                ]"
-            />
-        </record>
-
-        <!--
           Three families, because the questions asked of them differ. Forming
           load is labour and answers "can I take this order". Firing load is
           equipment and energy and answers "when does this leave". Surface sits
@@ -133,7 +104,7 @@
             <field name="code">DRY</field>
             <field name="sequence">50</field>
             <field name="tag_ids" eval="[(4, ref('mb_workcenter_tag_waiting'))]" />
-            <field name="resource_calendar_id" ref="mb_calendar_continuous" />
+            <field name="resource_calendar_id" ref="mb_workshop_base.mb_calendar_continuous" />
             <field name="costs_hour">0.0</field>
         </record>
 

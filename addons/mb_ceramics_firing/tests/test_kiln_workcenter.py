@@ -30,7 +30,7 @@ class TestKilnWorkcenter(TransactionCase):
 
     def test_kiln_workcenter_is_tagged_firing(self):
         kiln = self.env["mb.kiln"].create({"name": "Skutt KM1027"})
-        tag = self.env.ref("mb_workshop_base.mb_workcenter_tag_firing")
+        tag = self.env.ref("mb_ceramics_base.mb_workcenter_tag_firing")
         self.assertIn(tag, kiln.workcenter_id.tag_ids)
 
     def test_existing_records_are_left_alone(self):
@@ -102,18 +102,18 @@ class TestKilnWorkcenter(TransactionCase):
 class TestSeededWorkcenters(TransactionCase):
     def test_the_bench_is_seeded(self):
         for external_id in (
-            "mb_workshop_base.mb_workcenter_throwing",
-            "mb_workshop_base.mb_workcenter_handbuilding",
-            "mb_workshop_base.mb_workcenter_trimming",
-            "mb_workshop_base.mb_workcenter_assembly",
-            "mb_workshop_base.mb_workcenter_glazing",
-            "mb_workshop_base.mb_workcenter_decorating",
+            "mb_ceramics_base.mb_workcenter_throwing",
+            "mb_ceramics_base.mb_workcenter_handbuilding",
+            "mb_ceramics_base.mb_workcenter_trimming",
+            "mb_ceramics_base.mb_workcenter_assembly",
+            "mb_ceramics_base.mb_workcenter_glazing",
+            "mb_ceramics_base.mb_workcenter_decorating",
         ):
             self.assertTrue(self.env.ref(external_id).active, external_id)
 
     def test_drying_costs_nothing_and_blocks_nobody(self):
         """Drying is a wait, so it must not report load or consume cost."""
-        drying = self.env.ref("mb_workshop_base.mb_workcenter_drying")
+        drying = self.env.ref("mb_ceramics_base.mb_workcenter_drying")
         self.assertEqual(drying.costs_hour, 0.0)
         self.assertEqual(
             drying.resource_calendar_id,

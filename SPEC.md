@@ -1,6 +1,6 @@
 # MakersBrain Odoo addon specification
 
-- Status: **describes what is built**, 9 August 2026
+- Status: **living specification of what is built**, updated 13 August 2026
 - Target: Odoo 19 Community, one PostgreSQL database per artisan
 - Licence: LGPL-3 throughout, deliberately (see [Licence boundary](#licence-boundary))
 
@@ -16,12 +16,17 @@ e-invoicing research, the control plane — and is not superseded here.
 identity, which this specification depends on and does not restate.
 
 A module is listed here only if its code exists. Nothing below is planned work.
+This is not a frozen contract: it evolves when operational experience, Odoo
+best practice, or an applicable industry standard yields a better design. Such
+changes require an explicit rationale, migration impact, and verification; they
+are not specification violations merely because an earlier edition differed.
 
 ## Contents
 
 - [The module set](#the-module-set)
 - [Cross-cutting rules](#cross-cutting-rules)
-- [Workshop foundation](#workshop-foundation) — `mb_workshop_base`, `mb_brand`
+- [Workshop foundation](#workshop-foundation) — `mb_workshop_base`, `mb_ceramics_base`,
+  `mb_ceramics_compliance`, `mb_brand`
 - [Labels and piece identity](#labels-and-piece-identity) — `mb_label`, `mb_label_pos`
 - [Firing](#firing) — `mb_ceramics_firing`, `mb_ceramics_workflow`, `mb_kiln_bridge`
 - [Materials](#materials) — `mb_catalogue_sync`
@@ -40,14 +45,18 @@ that sells at a market but owns no kiln installs the label branch and none of
 the firing branch.
 
 ```text
-stock, mrp
-└── mb_workshop_base ─────── food-contact identity, work centres, 24/7 calendar
-    ├── mb_label ─────────── web
-    │   └── mb_label_pos ─── point_of_sale
-    ├── mb_ceramics_firing ─ mrp, maintenance
-    │   ├── mb_ceramics_workflow ─ throwing, boards, inspection, genealogy
-    │   └── mb_kiln_bridge ─ ROHDE myKiln connector
-    └── mb_catalogue_sync ── product, purchase, uom
+stock, web
+└── mb_label ─────────────── label design, versions, QR aliases, printing
+    └── mb_label_pos ─────── point_of_sale
+
+stock, resource, sale, web
+└── mb_workshop_base ─────── menu spine, 24/7 calendar, supplier-lot policy
+    └── mb_ceramics_base ─── material and ware taxonomy, work centres, clay body
+        ├── mb_ceramics_compliance ─ 84/500/EEC, migration tests, mark-done gate
+        ├── mb_ceramics_firing ─ mrp, maintenance
+        │   ├── mb_ceramics_workflow ─ throwing, boards, inspection, genealogy
+        │   └── mb_kiln_bridge ─ ROHDE myKiln connector
+        └── mb_catalogue_sync ── product, purchase, uom
 
 stock, sale_stock
 └── mb_depot ─────────────── dépôt-vente
@@ -75,7 +84,9 @@ project, account, hr_timesheet
 
 | Addon | Version | Owns | Live state |
 | --- | --- | --- | --- |
-| `mb_workshop_base` | 19.0.1.4.1 | Food-contact declaration, derived tracking, migration tests, seeded work centres, continuous calendar | installed |
+| `mb_workshop_base` | 19.0.2.0.0 | Menu spine, continuous calendar, supplier-lot policy, priced product selectors | installed |
+| `mb_ceramics_base` | 19.0.1.0.0 | Material and finished-ware taxonomy, seeded work centres, clay body | installed |
+| `mb_ceramics_compliance` | 19.0.1.0.0 | Food-contact declaration, derived tracking, migration tests, the mark-done gate | installed |
 | `mb_label` | 19.0.1.0.0 | Label templates and immutable versions, QR aliases, deterministic renderer, Owl editor, print jobs, BLE printer adapters | installed |
 | `mb_label_pos` | 19.0.1.0.0 | Bounded alias projection into POS, QR resolution, fall-through to native barcodes | installed |
 | `mb_ceramics_firing` | 19.0.2.0.0 | `mb.firing` as the kiln load, kiln records, controller programmes and segments, cooling hold, work-centre creation | installed |
@@ -103,7 +114,7 @@ models do; nothing implements a tenant discriminator of its own.
 **Odoo owns inventory identity.** `product.product` and `stock.lot` are the only
 piece identities. `tracking = 'serial'` is a unique piece, `tracking = 'lot'` is
 a batch, untracked is a product-only article. No addon invents a parallel
-identity model. `mb_workshop_base` derives `tracking` from the food-contact
+identity model. `mb_ceramics_compliance` derives `tracking` from the food-contact
 declaration rather than leaving it as an unexplained setting.
 
 **Odoo's `barcode` stays an ordinary barcode.** EAN, UPC and internal references
@@ -135,12 +146,16 @@ verifies `smp-status` against the SumUp transactions endpoint.
 `_inherit`, `patch()`, `_load_pos_data_models()`, `pos.load.mixin`, registries
 and services. `mb_label_pos/README.md` enumerates the POS seams used.
 
-**Licence boundary.** Every addon is LGPL-3. AGPL-3 OCA modules may be
+### Licence boundary
+
+Every addon is LGPL-3. AGPL-3 OCA modules may be
 recommended but never declared as a dependency — `mb_depot` documents the one
 case (`sale_order_global_stock_route`) and degrades to manual route selection
 without it.
 
-**Migration scripts start at first release, not before.** Nothing here is
+### Migration scripts start at first release, not before
+
+Nothing here is
 released and no artisan database exists, so a version bump today is free: the
 development and demonstration databases are rebuilt from `make bootstrap` and
 the seed scripts, not migrated. Version numbers still move, because they are how
@@ -154,30 +169,122 @@ needs a script.
 **The exception is a record that moves between modules**, which needs a script
 whether or not anything is released, because the loss is not recoverable by
 reinstalling. Odoo's end-of-load cleanup deletes the `ir.model.data` rows a
-module no longer accounts for, and takes the records with them. Three scripts
-exist for exactly this and nothing else:
+module no longer accounts for, and takes the records with them. Three
+cross-module transfer scripts exist for this:
 
 | Script | Moved |
 | --- | --- |
-| `mb_ceramics_firing/19.0.1.1.0/post-migrate.py` | — |
 | `mb_ceramics_firing/19.0.1.2.0/pre-migrate.py` | `mb.kiln.program` out of `mb_kiln_bridge` |
 | `mb_workshop_base/19.0.1.2.0/pre-migrate.py` | the eight material categories out of `mb_catalogue_sync` |
+| `mb_workshop_base/19.0.2.0.0/pre-migrate.py` | the whole ceramics half of the base into `mb_ceramics_base` and `mb_ceramics_compliance`, and three menu IDs renamed in place |
 
 Each reassigns `module` on the affected rows in a pre-migrate on the addon that
 loads first, which turns a drop-and-recreate into a move. Each is one-shot: after
 it runs the source rows are gone and a re-run matches nothing.
 
+Other migrations in the repository backfill or normalize records in place and
+are documented by their own module/version; they are not ownership transfers.
+
+The split migration treats pre-existing successor IDs explicitly. Two IDs that
+already point to the same record are collapsed. IDs with the same name that
+point to different records abort the upgrade and name the conflict; they are not
+left for end-of-load cleanup to resolve destructively. Odoo-generated field and
+selection IDs are safe without an exhaustive manual list because successor
+reflection gives the same metadata record another owner before stale-ID cleanup.
+
 ## Workshop foundation
 
 ### `mb_workshop_base`
 
-Depends on `stock`, `mrp`. The root of the ceramics tree.
+Depends on `stock`, `resource`, `sale`, `web`. The craft-neutral floor, and
+since 19.0.2.0.0 that is all it is.
 
-**Food contact is a property of the finished article.** Directive 84/500/EEC
-applies to ceramic articles intended for food contact and to nothing else, so a
-mug carries lead and cadmium limits and a decorative plate carries none.
-`mb_food_contact` is declared on `product.template` and `tracking` is derived
-from it, so the traceability setting always has a stated reason.
+Until then it was also the ceramics vertical, which meant `mb_label`,
+`mb_inventory_capture` and `mb_catalogue_sync` — none of which has any interest
+in tableware — could not be installed without a ceramic food-contact
+regulation. `mb_label` used nothing in it at all. The split, its migration and
+the rule it follows are in [CRAFT-PLATFORM-PLAN.md](CRAFT-PLATFORM-PLAN.md)
+section 2: a module sits here only if a leatherworker would install it
+unchanged.
+
+**The menu spine and its label are neutral.** Production, Stock & Quality and
+Configuration are the same three questions in any workshop, so
+`menu_mb_workshop_root` and its three children are declared here under
+"Workshop". Vertical addons add entries beneath it but do not overwrite shared
+data; installing two verticals cannot make load order choose the app name. The
+three child IDs were `menu_mb_ceramics_*` until 19.0.2.0.0 and were renamed in
+place. The root keeps its ID because `scripts/configure_app_visibility.py`
+names it.
+
+**`mb_calendar_continuous`** is the 24/7 `resource.calendar` everything
+unattended runs on. UTC deliberately: nothing on it keeps office hours, so a
+local timezone would only put a daylight-saving discontinuity into durations
+that are physical and absolute. It stayed here rather than moving with the kiln
+because a dye bath, a tanning pit and a lumber drier want it for the same reason.
+
+**`mb_supplier_lot_required`** says a purchased material must retain the
+supplier's physical batch in Odoo lot traceability, and derives `tracking` from
+that. Independent of food contact, and now independent in the dependency graph
+too, which is what `mb_inventory_capture` needed.
+
+**Priced product selectors.** Quotation lines pick from an autocomplete showing a
+name and no price. The active pricelist's price is appended to the display name
+through context keys, so nothing else changes.
+
+12 test methods, including identical and divergent conflicts for both handovers
+and menu renames.
+
+### `mb_ceramics_base`
+
+Depends on `mb_workshop_base`, `mrp`. The ceramics vertical's floor: what a
+ceramics workshop is configured with before anything else is installed.
+
+**No material-type field.** Material families are `product.category`, defined in
+`data/mb_material_categories.xml`: ceramic materials, and under it glazes,
+underglazes, engobes, clay bodies, stains, oxides and raw materials. A second
+taxonomy disagrees with the first the moment anyone edits either.
+
+They moved out of `mb_catalogue_sync` in 19.0.1.2.0, on the finding that the
+families are not the catalogue's, and out of `mb_workshop_base` in 19.0.2.0.0,
+on the finding that they are not craft-neutral. A workshop that never imports
+anything still buys glaze and still owes a migration test on the food-contact
+ware it makes with it — so leaving the taxonomy in the importer put the
+`button_mark_done` gate behind an optional connector, and its docstring admitted
+it silently checked less without one. `mb_catalogue_sync` maps onto the taxonomy
+rather than owning it, and `mb_ceramics_compliance` reads it to enforce.
+
+**No design model.** A piece with its own price gets its own product record.
+Design-level grouping uses `product.tag`, which is native, unique by name,
+filterable and already carries `visible_to_customers`.
+
+**Work centres are seeded, not modelled.** Throwing, handbuilding, trimming,
+assembly, glazing and decorating are plain `mrp.workcenter` records under
+`noupdate="1"`, so the artisan owns them after install. One per contended
+resource, not one per craft skill. Drying is a wait: no hourly cost, and
+capacity past anything a batch reaches, or it puts phantom load on the shop
+floor. It runs on `mb_workshop_base.mb_calendar_continuous`, as the kiln does.
+
+**`mb_clay_body_id`** points at the material product itself rather than a code,
+so it joins to the master catalogue — the same reasoning as the categories.
+
+**The shared app name stays neutral.** This addon hangs ceramic entries under
+the workshop spine without rewriting its root. A future vertical can coexist in
+the same database without last-loaded-wins menu data.
+
+4 test methods.
+
+### `mb_ceramics_compliance`
+
+Depends on `mb_ceramics_base`, `mrp`, `stock`. Directive 84/500/EEC, and nothing
+else.
+
+**Food contact is a property of the finished article.** The directive applies to
+ceramic articles intended for food contact and to nothing else, so a mug carries
+lead and cadmium limits and a decorative plate carries none. `mb_food_contact`
+is declared on `product.template` and `tracking` is derived from it, so the
+traceability setting always has a stated reason. A migration limit class is
+refused on an article not intended for food, and a decorative article in a
+tableware form carries a label warning saying what it is not.
 
 **`mb.migration.test`** holds a laboratory's lead and cadmium migration result
 against a *glaze lot*, not against the ware: one result covers every article made
@@ -186,32 +293,13 @@ derived from the figures, because the limits in force on the test date are the
 lab's to apply. The migration limit class, the figures and the report attachments
 are kept so the verdict stays auditable.
 
-**No design model.** A piece with its own price gets its own product record.
-Design-level grouping uses `product.tag`, which is native, unique by name,
-filterable and already carries `visible_to_customers`.
+**The gate is at `button_mark_done`.** A food-contact order needs a lot number
+before it can be closed, and every glaze lot it consumed needs a passing
+migration test. Which consumed lots are glaze is answered by
+`mb_ceramics_base`'s categories, which is seed data with no connector behind it,
+so the gate is always enforceable.
 
-**No material-type field.** Material families are `product.category`, defined
-here in `data/mb_material_categories.xml`: ceramic materials, and under it
-glazes, underglazes, engobes, clay bodies, stains, oxides and raw materials. A
-second taxonomy disagrees with the first the moment anyone edits either.
-
-They moved here from `mb_catalogue_sync` in 19.0.1.2.0, on the finding that the
-families are not the catalogue's. A workshop that never imports anything still
-buys glaze and still owes a migration test on the food-contact ware it makes
-with it — so leaving the taxonomy in the importer put the `button_mark_done`
-compliance gate behind an optional connector, and its docstring admitted it
-silently checked less without one. `mb_catalogue_sync` now depends on this addon
-and maps onto the taxonomy rather than owning it.
-
-**Work centres are seeded, not modelled.** Throwing, handbuilding, trimming,
-assembly, glazing and decorating are plain `mrp.workcenter` records under
-`noupdate="1"`, so the artisan owns them after install. One per contended
-resource, not one per craft skill. Drying is a wait: no hourly cost, and
-capacity past anything a batch reaches, or it puts phantom load on the shop
-floor. `mb_calendar_continuous` is the 24/7 calendar everything unattended runs
-on, the kiln first among them.
-
-5 test methods.
+6 test methods.
 
 ### `mb_brand`
 
@@ -263,7 +351,10 @@ something an Odoo test method can see.
 
 ### `mb_label`
 
-Depends on `mb_workshop_base`, `web`. Declared as an application; the only one.
+Depends on `stock`, `web`. Declared as an application; the only one. It depended
+on `mb_workshop_base` until 19.0.1.2.0 and used nothing in it — no XML ID, no
+field, no group — so a database that only prints labels no longer carries a
+ceramic food-contact regulation.
 
 Three layers, deliberately separate:
 
@@ -364,7 +455,9 @@ minted during an open session require a reload, and the module says so.
 
 ### `mb_ceramics_firing`
 
-Depends on `mb_workshop_base`, `mrp`, `maintenance`.
+Depends on `mb_workshop_base`, `mb_ceramics_base`, `mrp`, `maintenance`. Not on
+`mb_ceramics_compliance`: a firing is a physical event whether or not the ware
+in it is meant for food.
 
 **A firing is not a work order, and Odoo will not let it be one.**
 `mrp.workorder.production_id` is `required=True`, so a work order belongs to
@@ -416,9 +509,9 @@ sampled every thirty seconds is about 1,400 points, never read point by point.
 Peak temperature and hold time are queried and constrained, so they are fields;
 the trace is evidence, so it is an attachment.
 
-The only addon carrying migration scripts: `19.0.1.1.0/post-migrate.py` and
+This addon carries `19.0.1.1.0/post-migrate.py` and
 `19.0.1.2.0/pre-migrate.py`, the latter for the programme model moving here from
-`mb_kiln_bridge`.
+`mb_kiln_bridge`. Other addons also carry migrations for their own data changes.
 
 39 test methods.
 
@@ -468,7 +561,7 @@ scanning and an optional raw-payload store for debugging.
 
 ### `mb_catalogue_sync`
 
-Depends on `mb_workshop_base`, `product`, `purchase`, `uom`, `stock`. Reads the
+Depends on `mb_ceramics_base`, `product`, `purchase`, `uom`, `stock`. Reads the
 cross-tenant ceramics catalogue service; never writes back.
 
 **Status: undecided.** Nothing depends on it, no product in the live database
@@ -494,7 +587,7 @@ Materials are stocked products (`is_storable`), not service lines: a ceramic
 material is bought, held and consumed.
 
 **Catalogue families map onto the taxonomy, they do not define it.** The
-`product.category` records live in `mb_workshop_base`; this addon translates a
+`product.category` records live in `mb_ceramics_base`; this addon translates a
 family name onto one of them and writes `categ_id` only where it is empty. A
 family it has never heard of lands on the parent category rather than nowhere,
 so it is visible and correctable instead of silently uncategorised. Before
@@ -794,7 +887,9 @@ Test methods on disk, by module:
 
 | Module | Server | Hoot | Migrations |
 | --- | ---: | ---: | --- |
-| `mb_workshop_base` | 5 | — | — |
+| `mb_workshop_base` | 12 | — | 2 |
+| `mb_ceramics_base` | 4 | — | — |
+| `mb_ceramics_compliance` | 6 | — | — |
 | `mb_label` | 19 | 10 | — |
 | `mb_label_pos` | 11 | 7 | — |
 | `mb_ceramics_firing` | 39 | — | 2 |
@@ -831,14 +926,14 @@ Checked once by hand, on 7 August 2026, and worth repeating whenever the
 question comes up again: installing the other ten addons **without**
 `mb_catalogue_sync` gives 175 tests, 0 failed, 0 errors, and the three glaze
 categories the food-contact gate reads are present and owned by
-`mb_workshop_base`. The importer is removable.
+`mb_ceramics_base` since 19.0.2.0.0. The importer is removable.
 
 The category migration was tested the same day against a database built from the
 pre-split commit, with a product filed under `mb_catalogue_sync.categ_glaze`:
 
 | Check | Result |
 | --- | --- |
-| After upgrade, categories owned by | `mb_workshop_base`, all 8 |
+| After upgrade, categories owned by | `mb_workshop_base`, all 8 — and `mb_ceramics_base` after the 19.0.2.0.0 script |
 | Category records named `categ_*` | 8 — no duplicates |
 | The product's `categ_id` | unchanged, same record, now re-owned |
 | Re-running the upgrade | no-op, still 8 |
@@ -882,13 +977,16 @@ Ordered by consequence, not by effort.
 5. **Unofficial myKiln API.** No contract, no versioning. The connector is
    isolated and stops on auth or schema failure, which is the mitigation; there
    is no warning.
-6. **`mb_depot` does not depend on `mb_workshop_base`**, so a database can hold
-   consignment stock without the food-contact identity that gives products
+6. **`mb_depot` does not depend on `mb_ceramics_compliance`**, so a database can
+   hold consignment stock without the food-contact identity that gives products
    their tracking rules. Unlike the catalogue case this may well be right —
    consignment is about where a piece is, not what it is made of — but it should
-   be decided rather than inherited.
+   be decided rather than inherited. The 19.0.2.0.0 split narrowed the question:
+   what `mb_depot` would be opting into is now a named compliance addon rather
+   than something called a base.
 7. **`mb_catalogue_sync`'s future is undecided.** Nothing depends on it, no
    product carries a catalogue identity and no import has ever run; the
    catalogue service it reads is a separate deliverable. The 19.0.1.3.0 split
-   moved the material taxonomy into `mb_workshop_base` so that dropping the
-   importer is now a self-contained decision with nothing else at stake.
+   moved the material taxonomy into `mb_workshop_base`, and 19.0.2.0.0 moved it
+   on to `mb_ceramics_base`, so that dropping the importer is now a
+   self-contained decision with nothing else at stake.

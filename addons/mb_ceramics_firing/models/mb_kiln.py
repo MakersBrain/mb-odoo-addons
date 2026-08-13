@@ -172,7 +172,7 @@ class MbKiln(models.Model):
         company_id = values.get("company_id") or self.env.company.id
         calendar = self._continuous_calendar(company_id)
         tag = self.env.ref(
-            "mb_workshop_base.mb_workcenter_tag_firing", raise_if_not_found=False)
+            "mb_ceramics_base.mb_workcenter_tag_firing", raise_if_not_found=False)
         workcenter_values = {
             "name": values.get("name"),
             "company_id": company_id,

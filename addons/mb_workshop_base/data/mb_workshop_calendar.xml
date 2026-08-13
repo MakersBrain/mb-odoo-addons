@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!--
+          A work centre is a resource you queue for, and the working calendar is
+          what says when the queue moves. The workshop calendar is right for
+          anything a person does and wrong for everything else: a kiln fires
+          overnight and a board dries over a weekend, and on a nine-to-five
+          calendar Odoo fragments a fourteen-hour firing across three days.
+
+          Nothing about that is ceramic, which is why this record stayed here
+          when the work centres that use it moved to `mb_ceramics_base` in
+          19.0.2.0.0. A dye bath, a tanning pit and a lumber drier all want the
+          same calendar for the same reason.
+
+          UTC, deliberately. Nothing on this calendar keeps office hours, so a
+          local timezone would only introduce a daylight-saving discontinuity
+          into durations that are physical and absolute.
+        -->
+        <record id="mb_calendar_continuous" model="resource.calendar">
+            <field name="name">Continuous (24/7)</field>
+            <field name="tz">UTC</field>
+            <field
+                name="attendance_ids"
+                eval="[
+                    (5, 0, 0),
+                    (0, 0, {'name': 'Monday', 'dayofweek': '0', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Tuesday', 'dayofweek': '1', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Wednesday', 'dayofweek': '2', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Thursday', 'dayofweek': '3', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Friday', 'dayofweek': '4', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Saturday', 'dayofweek': '5', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                    (0, 0, {'name': 'Sunday', 'dayofweek': '6', 'hour_from': 0.0, 'hour_to': 24.0, 'day_period': 'full_day'}),
+                ]"
+            />
+        </record>
+    </data>
+</odoo>

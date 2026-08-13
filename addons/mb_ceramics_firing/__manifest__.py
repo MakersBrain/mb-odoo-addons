@@ -87,14 +87,19 @@ the trace is evidence, so it is an attachment. Peak temperature is not only a
 schedule detail - an under-fired glaze is a less mature glaze, and lead release
 rises with immaturity.
 """,
-    "version": "19.0.2.0.3",
+    "version": "19.0.2.1.0",
     "license": "LGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "Makersbrain",
     "depends": [
-        # mb.firing gathers work orders, and the lot it produces carries the
-        # compliance payload declared there.
+        # The menu spine, and mb_calendar_continuous - which every kiln work
+        # centre runs on, because a firing is unattended and overnight.
         "mb_workshop_base",
+        # The seeded work centres and the Firing tag a kiln is created with.
+        # Split out of mb_workshop_base in 19.0.2.0.0; the compliance half of
+        # that module is deliberately not depended on here, because a firing is
+        # a physical event whether or not the ware is meant for food.
+        "mb_ceramics_base",
         # mrp.workorder, mrp.workcenter and the routing a firing operation sits on.
         "mrp",
         # A kiln is equipment that needs servicing - elements, thermocouples -

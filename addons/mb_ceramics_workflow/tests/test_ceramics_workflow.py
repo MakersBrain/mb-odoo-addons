@@ -31,7 +31,7 @@ class TestCeramicsWorkflow(TransactionCase):
             "product.category"
         ]._fields
         cls.ceramics_cost_category = False
-        cls.glaze_cost_category = cls.env.ref("mb_workshop_base.categ_glaze")
+        cls.glaze_cost_category = cls.env.ref("mb_ceramics_base.categ_glaze")
         if cls.costing_available:
             cls.ceramics_cost_category = cls.env["product.category"].create({
                 "name": "Ceramics FIFO test",
@@ -40,7 +40,7 @@ class TestCeramicsWorkflow(TransactionCase):
             })
             cls.glaze_cost_category = cls.env["product.category"].create({
                 "name": "Glaze FIFO test",
-                "parent_id": cls.env.ref("mb_workshop_base.categ_glaze").id,
+                "parent_id": cls.env.ref("mb_ceramics_base.categ_glaze").id,
                 "property_cost_method": "fifo",
                 "property_valuation": "periodic",
             })
@@ -138,22 +138,22 @@ class TestCeramicsWorkflow(TransactionCase):
             })],
         })
         cls.decorate_op = cls._operation(
-            "Decorate", cls.env.ref("mb_workshop_base.mb_workcenter_decorating")
+            "Decorate", cls.env.ref("mb_ceramics_base.mb_workcenter_decorating")
         )
         cls.dry_op = cls._operation(
-            "Dry", cls.env.ref("mb_workshop_base.mb_workcenter_drying"), cls.decorate_op
+            "Dry", cls.env.ref("mb_ceramics_base.mb_workcenter_drying"), cls.decorate_op
         )
         cls.bisque_op = cls._operation(
             "Bisque firing", cls.kiln.workcenter_id, cls.dry_op, cls.bisque_program
         )
         cls.glaze_op = cls._operation(
-            "Glaze", cls.env.ref("mb_workshop_base.mb_workcenter_glazing"), cls.bisque_op
+            "Glaze", cls.env.ref("mb_ceramics_base.mb_workcenter_glazing"), cls.bisque_op
         )
         cls.glaze_fire_op = cls._operation(
             "Glaze firing", cls.kiln.workcenter_id, cls.glaze_op, cls.glaze_program
         )
         cls.inspect_op = cls._operation(
-            "Inspect", cls.env.ref("mb_workshop_base.mb_workcenter_decorating"),
+            "Inspect", cls.env.ref("mb_ceramics_base.mb_workcenter_decorating"),
             cls.glaze_fire_op,
         )
         cls.bisque_bom = cls.env["mrp.bom"].create({
@@ -167,12 +167,12 @@ class TestCeramicsWorkflow(TransactionCase):
         })
         cls.bisque_prepare_op = cls._operation(
             "Decorate green ware",
-            cls.env.ref("mb_workshop_base.mb_workcenter_decorating"),
+            cls.env.ref("mb_ceramics_base.mb_workcenter_decorating"),
             bom=cls.bisque_bom,
         )
         cls.bisque_dry_op = cls._operation(
             "Dry green ware",
-            cls.env.ref("mb_workshop_base.mb_workcenter_drying"),
+            cls.env.ref("mb_ceramics_base.mb_workcenter_drying"),
             cls.bisque_prepare_op,
             bom=cls.bisque_bom,
         )
@@ -204,7 +204,7 @@ class TestCeramicsWorkflow(TransactionCase):
         })
         cls.glazing_apply_op = cls._operation(
             "Apply glaze",
-            cls.env.ref("mb_workshop_base.mb_workcenter_glazing"),
+            cls.env.ref("mb_ceramics_base.mb_workcenter_glazing"),
             bom=cls.glazing_bom,
         )
         cls.glazing_fire_op = cls._operation(
@@ -216,7 +216,7 @@ class TestCeramicsWorkflow(TransactionCase):
         )
         cls.glazing_inspect_op = cls._operation(
             "Final inspection",
-            cls.env.ref("mb_workshop_base.mb_workcenter_decorating"),
+            cls.env.ref("mb_ceramics_base.mb_workcenter_decorating"),
             cls.glazing_fire_op,
             bom=cls.glazing_bom,
         )
@@ -513,7 +513,7 @@ class TestCeramicsWorkflow(TransactionCase):
 
     def test_food_contact_release_requires_tested_glaze_lot(self):
         glaze_product = self._product("Food-contact clear glaze", tracking="lot")
-        glaze_product.categ_id = self.env.ref("mb_workshop_base.categ_glaze")
+        glaze_product.categ_id = self.env.ref("mb_ceramics_base.categ_glaze")
         glaze_lot = self.env["stock.lot"].create({
             "name": "GLAZE-TEST-01",
             "product_id": glaze_product.id,

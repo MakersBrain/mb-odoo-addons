@@ -10,7 +10,7 @@ that belongs in an artisan's database. What crosses the boundary is the curated
 manufacturer identity - Mayco SC74 Hot Tamale - plus the offers of the suppliers
 this workshop actually buys from.
 """,
-    "version": "19.0.1.4.1",
+    "version": "19.0.1.5.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",
@@ -19,8 +19,11 @@ this workshop actually buys from.
         # not defined here on purpose: a workshop that never imports anything
         # still buys glaze and still owes a migration test on the food-contact
         # ware it makes with it, so a compliance gate must not sit behind a
-        # connector. See mb_workshop_base/data/mb_material_categories.xml.
-        "mb_workshop_base",
+        # connector. See mb_ceramics_base/data/mb_material_categories.xml.
+        #
+        # mb_ceramics_base rather than mb_workshop_base since 19.0.2.0.0: the
+        # taxonomy is ceramic and the base is not.
+        "mb_ceramics_base",
         "product",
         "purchase",
         "uom",

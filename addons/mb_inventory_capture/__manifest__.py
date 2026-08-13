@@ -7,7 +7,7 @@ identifiers, retain append-only extraction evidence, and apply only a human
 confirmed product and supplier lot to a draft incoming receipt. External OCR
 and multimodal providers remain behind the Makersbrain control plane.
 """,
-    "version": "19.0.1.0.1",
+    "version": "19.0.1.1.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "Makersbrain",

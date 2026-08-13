@@ -1,34 +1,36 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
+    <!--
+      The menu spine, including its neutral "Workshop" label, is the same for
+      every craft. Vertical addons hang their entries under these three menus
+      without overwriting the shared root.
+
+      The IDs were menu_mb_ceramics_* until 19.0.2.0.0, in a module that no
+      longer holds anything ceramic. menu_mb_workshop_root keeps its ID because
+      scripts/configure_app_visibility.py names it.
+    -->
     <menuitem
         id="menu_mb_workshop_root"
-        name="Ceramics"
+        name="Workshop"
         web_icon="stock,static/description/icon.png"
         sequence="55"
     />
     <menuitem
-        id="menu_mb_ceramics_production"
+        id="menu_mb_workshop_production"
         name="Production"
         parent="menu_mb_workshop_root"
         sequence="10"
     />
     <menuitem
-        id="menu_mb_ceramics_stock_quality"
+        id="menu_mb_workshop_stock_quality"
         name="Stock &amp; Quality"
         parent="menu_mb_workshop_root"
         sequence="20"
     />
     <menuitem
-        id="menu_mb_ceramics_configuration"
+        id="menu_mb_workshop_configuration"
         name="Configuration"
         parent="menu_mb_workshop_root"
-        sequence="90"
-    />
-    <menuitem
-        id="menu_mb_migration_test"
-        name="Migration tests"
-        parent="menu_mb_ceramics_configuration"
-        action="mb_migration_test_action"
         sequence="90"
     />
 </odoo>

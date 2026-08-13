@@ -158,12 +158,12 @@
     </record>
 
     <menuitem id="menu_mb_inventory_capture_camera" name="Identify incoming product"
-              parent="mb_workshop_base.menu_mb_ceramics_stock_quality"
+              parent="mb_workshop_base.menu_mb_workshop_stock_quality"
               action="action_mb_inventory_capture_camera" sequence="25"
               groups="stock.group_stock_user"/>
 
     <menuitem id="menu_mb_inventory_capture" name="Product photo captures"
-              parent="mb_workshop_base.menu_mb_ceramics_stock_quality"
+              parent="mb_workshop_base.menu_mb_workshop_stock_quality"
               action="action_mb_inventory_capture" sequence="30"
               groups="stock.group_stock_user"/>
 </odoo>
