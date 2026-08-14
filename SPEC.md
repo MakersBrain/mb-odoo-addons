@@ -26,7 +26,7 @@ are not specification violations merely because an earlier edition differed.
 - [The module set](#the-module-set)
 - [Cross-cutting rules](#cross-cutting-rules)
 - [Workshop foundation](#workshop-foundation) — `mb_workshop_base`, `mb_ceramics_base`,
-  `mb_ceramics_compliance`, `mb_brand`
+  `mb_ceramics_compliance`, `mb_brand`, `mb_workshop_pos`
 - [Labels and piece identity](#labels-and-piece-identity) — `mb_label`, `mb_label_pos`
 - [Firing](#firing) — `mb_ceramics_firing`, `mb_ceramics_workflow`, `mb_kiln_bridge`
 - [Materials](#materials) — `mb_catalogue_sync`
@@ -57,6 +57,9 @@ stock, resource, sale, web
         │   ├── mb_ceramics_workflow ─ throwing, boards, inspection, genealogy
         │   └── mb_kiln_bridge ─ ROHDE myKiln connector
         └── mb_catalogue_sync ── product, purchase, uom
+
+point_of_sale, account
+└── mb_workshop_pos ──────── the workshop's one POS counter
 
 stock, sale_stock
 └── mb_depot ─────────────── dépôt-vente
@@ -97,6 +100,7 @@ project, account, hr_timesheet
 | `mb_payment_sumup` | 19.0.1.0.0 | SumUp hosted checkout provider, return and webhook routes, polling cron, refunds | **uninstalled** |
 | `mb_pos_sumup` | 19.0.1.0.0 | POS payment through the SumUp app URL scheme on the same phone | **uninstalled** |
 | `mb_account_payment_sumup` | 19.0.1.0.0 | Invoice-bound checkout link and printed QR code | **uninstalled** |
+| `mb_workshop_pos` | 19.0.1.0.0 | The default POS counter, seeded when a company gains a chart of accounts | installed |
 | `l10n_fr_micro_enterprise` | 19.0.2.1.0 | Franchise-en-base tax preparation, regime switching, Factur-X exemption codes | installed |
 
 Live state is `ir_module_module` in the `odoo` database of the running stack.
@@ -346,6 +350,39 @@ Deliberately not done: the app switcher, list and form views keep Odoo's layout.
 No test methods: the addon ships no Python and no translatable strings, and what
 it does assert — that the bundles compile with the brand values in them — is not
 something an Odoo test method can see.
+
+### `mb_workshop_pos`
+
+Depends on `point_of_sale` and `account`. Ships one `pos.config` per company and
+nothing else: no model of its own, no view, no menu.
+
+**What it prevents.** Odoo 19 replaces the `pos.config` kanban with
+`pos_config_kanban_view`, which paints "Choose your store" whenever the list is
+empty — Clothes, Furniture, Bakery, Restaurant, Bar, Retail. Every provisioned
+workshop has Point of Sale installed, because `mb_control_bridge` depends on it
+for the cashier groups, and none shipped a config. So the app opened on a
+shop-type quiz whose Restaurant and Bar cards call `install_pos_restaurant()` —
+`button_immediate_install()` on `pos_restaurant` — and put table management and a
+kitchen display into a ceramics studio on one click.
+
+**Odoo's own code makes the counter.** A `pos.config` cannot be written as XML
+data: it needs a sale journal, a cash journal and the Cash, Card and Customer
+Account payment methods, all company-specific and none existing before a chart
+of accounts. `_mb_ensure_default_counter` therefore calls
+`load_onboarding_retail_scenario(with_demo_data=False)` — the Retail card without
+the click — which names the config after the company.
+
+**It waits for the chart of accounts.** A workshop is initialised by `odoo
+--init` against a database whose company has no country; the French chart is
+loaded afterwards, by `mb_control_bridge`'s `_mb_bootstrap_french_accounting`. So
+the seam is `account.chart.template.try_loading`, which that bootstrap and the
+`l10n_fr_micro_enterprise` setup wizard both go through, with `post_init_hook`
+covering databases whose accounting already exists. Seeding is idempotent and
+never raises: a missing counter costs a shop-type screen, while an exception
+would abort loading a chart of accounts.
+
+Databases provisioned before this addon joined the `--init` set keep their
+module set and need it installed explicitly.
 
 ## Labels and piece identity
 
