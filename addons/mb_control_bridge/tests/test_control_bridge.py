@@ -1,3 +1,5 @@
+import base64
+import hashlib
 import uuid
 from unittest.mock import patch
 
@@ -5,6 +7,7 @@ from odoo.addons.base.models.ir_module import IrModuleModule
 from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
 
+from ..controllers.auth import credential_matches
 from ..controllers.login import should_redirect_to_makersbrain
 
 
@@ -103,6 +106,43 @@ class TestControlBridge(TransactionCase):
             ("country_id", "=", self.env.ref("base.fr").id),
         ]))
 
+    def test_tenant_bootstrap_stores_only_the_bridge_credential_hash(self):
+        if "auth.oauth.provider" not in self.env:
+            self.skipTest("optional auth_oauth module is not installed")
+        required = {"flow", "token_endpoint", "jwks_uri", "client_secret"}
+        if not required.issubset(self.env["auth.oauth.provider"]._fields):
+            self.skipTest("authorization-code OIDC provider is unavailable")
+        workshop = str(uuid.uuid4())
+        token = "A" * 64
+        self.company.write({"mb_control_workshop_id": workshop})
+
+        self.company.mb_bootstrap_tenant({
+            "workshop_id": workshop,
+            "oidc_client_id": f"makersbrain-odoo-{workshop}",
+            "oidc_issuer": "https://identity.example.test",
+            "bridge_token": token,
+        })
+
+        self.assertEqual(
+            self.company.mb_control_bridge_token_hash,
+            hashlib.sha256(token.encode()).hexdigest(),
+        )
+        self.assertNotEqual(self.company.mb_control_bridge_token_hash, token)
+
+    def test_global_bridge_credential_is_valid_only_before_tenant_bootstrap(self):
+        tenant_token = "T" * 64
+        global_token = "G" * 64
+        tenant_hash = hashlib.sha256(tenant_token.encode()).hexdigest()
+
+        self.assertTrue(credential_matches(global_token, "", global_token, True))
+        self.assertFalse(credential_matches(tenant_token, "", global_token, True))
+        self.assertTrue(
+            credential_matches(tenant_token, tenant_hash, global_token, True)
+        )
+        self.assertFalse(
+            credential_matches(global_token, tenant_hash, global_token, True)
+        )
+
     def test_same_epoch_cannot_change_authority(self):
         self.Users.mb_reconcile_membership(self.membership())
         with self.assertRaises(ValidationError):
@@ -133,6 +173,70 @@ class TestControlBridge(TransactionCase):
             self.Users.mb_reconcile_membership(self.membership(
                 user_id=str(uuid.uuid4()), epoch=2
             ))
+
+    def test_erasure_replay_anonymizes_identity_and_is_idempotent(self):
+        self.company.mb_control_workshop_id = self.workshop_id
+        self.Users.mb_reconcile_membership(self.membership())
+        user = self.Users.search([("mb_control_user_id", "=", self.user_id)])
+        partner = user.partner_id
+        subject_key = str(uuid.uuid4())
+        payload = {
+            "workshop_id": self.workshop_id,
+            "user_id": self.user_id,
+            "subject_key": subject_key,
+        }
+
+        first = self.Users.mb_replay_erasure(payload)
+        replay = self.Users.mb_replay_erasure(payload)
+        user = self.Users.with_context(active_test=False).browse(user.id)
+
+        self.assertTrue(first["applied"])
+        self.assertTrue(replay["already_erased"])
+        self.assertFalse(user.active)
+        self.assertFalse(user.mb_control_user_id)
+        self.assertFalse(user.mb_rauthy_subject)
+        self.assertEqual(user.login, f"erased+{subject_key}@invalid")
+        self.assertFalse(partner.email)
+        self.assertFalse(partner.phone)
+
+    def test_privacy_export_is_tenant_bound_and_includes_related_attachments(self):
+        self.company.mb_control_workshop_id = self.workshop_id
+        self.Users.mb_reconcile_membership(self.membership())
+        user = self.Users.search([("mb_control_user_id", "=", self.user_id)])
+        attachments = self.env["ir.attachment"].sudo()
+        attachments.create({
+            "name": "subject-proof.txt",
+            "res_model": "res.partner",
+            "res_id": user.partner_id.id,
+            "type": "binary",
+            "datas": base64.b64encode(b"subject content"),
+            "mimetype": "text/plain",
+        })
+        unrelated = self.env["res.partner"].sudo().create({"name": "Unrelated"})
+        attachments.create({
+            "name": "unrelated.txt",
+            "res_model": "res.partner",
+            "res_id": unrelated.id,
+            "type": "binary",
+            "datas": base64.b64encode(b"must not leak"),
+            "mimetype": "text/plain",
+        })
+
+        result = self.Users.mb_export_personal_data({
+            "workshop_id": self.workshop_id,
+            "user_id": self.user_id,
+        })
+
+        self.assertTrue(result["found"])
+        self.assertEqual(result["user_id"], self.user_id)
+        names = {item["name"] for item in result["attachments"]}
+        self.assertIn("subject-proof.txt", names)
+        self.assertNotIn("unrelated.txt", names)
+        with self.assertRaises(ValidationError):
+            self.Users.mb_export_personal_data({
+                "workshop_id": str(uuid.uuid4()),
+                "user_id": self.user_id,
+            })
 
     def test_entitlements_are_monotonic(self):
         payload = {
@@ -190,3 +294,43 @@ class TestControlBridge(TransactionCase):
         immediate_install.assert_not_called()
         self.assertTrue(result["applied"])
         self.assertEqual(result["status"], "scheduled")
+
+    def test_module_restriction_blocks_writes_and_retains_historical_reads(self):
+        self.company.mb_control_workshop_id = self.workshop_id
+        owned_models = self.env["ir.model.data"].sudo().search([
+            ("module", "=", "mb_ceramics_firing"), ("model", "=", "ir.model")
+        ])
+        if not owned_models:
+            self.skipTest("the post-install firing models are not loaded")
+        payload = {
+            "workshop_id": self.workshop_id,
+            "module_key": "firings",
+            "modules": ["mb_ceramics_firing"],
+            "reason": "entitlement_inactive",
+        }
+        first = self.company.mb_restrict_module_bundle(payload)
+        replay = self.company.mb_restrict_module_bundle(payload)
+        policy = self.env["mb.control.capability.policy"].sudo().search([
+            ("workshop_id", "=", self.workshop_id), ("module_key", "=", "firings")
+        ])
+
+        self.assertTrue(first["applied"])
+        self.assertFalse(replay["applied"])
+        self.assertTrue(first["write_blocked"])
+        self.assertTrue(first["historical_read_retained"])
+        self.assertTrue(policy.rule_ids)
+        self.assertTrue(all(policy.rule_ids.mapped("global")))
+        self.assertFalse(any(policy.rule_ids.mapped("perm_read")))
+        self.assertTrue(all(policy.rule_ids.mapped("perm_write")))
+        self.assertTrue(all(policy.rule_ids.mapped("perm_create")))
+        self.assertTrue(all(policy.rule_ids.mapped("perm_unlink")))
+        rule_ids = policy.rule_ids.ids
+
+        enabled = self.company.mb_enable_module_bundle({
+            "workshop_id": self.workshop_id,
+            "module_key": "firings",
+            "modules": ["mb_ceramics_firing"],
+        })
+        self.assertTrue(enabled["restriction_removed"])
+        self.assertFalse(policy.exists())
+        self.assertFalse(self.env["ir.rule"].sudo().browse(rule_ids).exists())

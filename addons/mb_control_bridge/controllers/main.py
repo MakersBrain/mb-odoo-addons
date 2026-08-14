@@ -36,7 +36,7 @@ class ControlPlaneBridge(http.Controller):
     )
     def bootstrap_tenant(self):
         try:
-            authenticate_control_request()
+            authenticate_control_request(allow_initial_bootstrap=True)
             body = json_body()
             operation_key = body.pop("operation_key", None)
             if not operation_key:
@@ -107,6 +107,34 @@ class ControlPlaneBridge(http.Controller):
             return _json_error(error)
 
     @http.route(
+        "/mb_control/v1/privacy/erasure-replay",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
+    def replay_erasure(self):
+        try:
+            authenticate_control_request()
+            body = json_body()
+            operation_key = body.pop("operation_key", None)
+            if not operation_key:
+                raise BadRequest("operation_key is required")
+            digest = payload_digest(body)
+            receipts = request.env["mb.control.operation.receipt"].sudo()
+            existing = receipts.for_replay(operation_key, "privacy.erasure_replay", digest)
+            if existing:
+                return request.make_json_response(existing.response)
+            result = request.env["res.users"].sudo().mb_replay_erasure(body)
+            receipts.record(operation_key, "privacy.erasure_replay", digest, result)
+            return request.make_json_response(result)
+        except Exception as error:
+            if not isinstance(error, (HTTPException, ValidationError)):
+                _logger.exception("erasure replay failed")
+            return _json_error(error)
+
+    @http.route(
         "/mb_control/v1/entitlements/apply",
         type="http",
         auth="public",
@@ -162,4 +190,50 @@ class ControlPlaneBridge(http.Controller):
         except Exception as error:
             if not isinstance(error, (HTTPException, ValidationError)):
                 _logger.exception("module enable failed")
+            return _json_error(error)
+
+    @http.route(
+        "/mb_control/v1/modules/restrict",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
+    def restrict_modules(self):
+        try:
+            authenticate_control_request()
+            body = json_body()
+            operation_key = body.pop("operation_key", None)
+            if not operation_key:
+                raise BadRequest("operation_key is required")
+            digest = payload_digest(body)
+            receipts = request.env["mb.control.operation.receipt"].sudo()
+            existing = receipts.for_replay(operation_key, "module.restrict", digest)
+            if existing:
+                return request.make_json_response(existing.response)
+            result = request.env.company.sudo().mb_restrict_module_bundle(body)
+            receipts.record(operation_key, "module.restrict", digest, result)
+            return request.make_json_response(result)
+        except Exception as error:
+            if not isinstance(error, (HTTPException, ValidationError)):
+                _logger.exception("module restriction failed")
+            return _json_error(error)
+
+    @http.route(
+        "/mb_control/v1/privacy/export",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
+    def export_personal_data(self):
+        try:
+            authenticate_control_request()
+            result = request.env["res.users"].sudo().mb_export_personal_data(json_body())
+            return request.make_json_response(result)
+        except Exception as error:
+            if not isinstance(error, (HTTPException, ValidationError)):
+                _logger.exception("privacy export failed")
             return _json_error(error)

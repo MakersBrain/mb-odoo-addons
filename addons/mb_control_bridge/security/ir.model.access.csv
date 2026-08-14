@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_control_receipt_system,mb.control.operation.receipt system,model_mb_control_operation_receipt,base.group_system,1,0,0,0
+access_capability_policy_system,mb.control.capability.policy system,model_mb_control_capability_policy,base.group_system,1,0,0,0

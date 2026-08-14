@@ -1,3 +1,4 @@
+import hashlib
 import re
 
 from odoo import _, fields, models
@@ -25,6 +26,12 @@ class ResCompany(models.Model):
 
     mb_control_workshop_id = fields.Char(
         string="Control-plane workshop ID", copy=False, readonly=True, index=True
+    )
+    mb_control_bridge_token_hash = fields.Char(
+        string="Control-plane tenant credential hash",
+        copy=False,
+        readonly=True,
+        groups="base.group_system",
     )
     mb_entitlement_version = fields.Integer(
         string="Entitlement version", default=0, readonly=True, copy=False
@@ -55,12 +62,15 @@ class ResCompany(models.Model):
         workshop_id = str(payload.get("workshop_id", "")).lower()
         client_id = str(payload.get("oidc_client_id", "")).strip()
         issuer = str(payload.get("oidc_issuer", "")).rstrip("/")
+        bridge_token = str(payload.get("bridge_token", ""))
         if not UUID_RE.fullmatch(workshop_id):
             raise ValidationError(_("workshop_id must be a lowercase UUID"))
         if self.mb_control_workshop_id and self.mb_control_workshop_id != workshop_id:
             raise ValidationError(_("this company is linked to another workshop"))
         if not client_id or not issuer.startswith(("https://", "http://rauthy.localhost:")):
             raise ValidationError(_("OIDC client and trusted issuer are required"))
+        if not 48 <= len(bridge_token) <= 128 or not bridge_token.isalnum():
+            raise ValidationError(_("a high-entropy tenant bridge credential is required"))
         if "auth.oauth.provider" not in self.env:
             raise ValidationError(_("the authorization-code OIDC module is not installed"))
         provider_model = self.env["auth.oauth.provider"].sudo()
@@ -89,7 +99,10 @@ class ResCompany(models.Model):
             provider = provider_model.create(values)
         if new_workshop:
             self._mb_bootstrap_french_accounting()
-        self.mb_control_workshop_id = workshop_id
+        self.write({
+            "mb_control_workshop_id": workshop_id,
+            "mb_control_bridge_token_hash": hashlib.sha256(bridge_token.encode()).hexdigest(),
+        })
         self._mb_configure_login_policy(provider)
         return {"applied": True, "workshop_id": workshop_id, "provider_id": provider.id}
 
@@ -147,6 +160,13 @@ class ResCompany(models.Model):
         )
         if invalid:
             raise ValidationError(_("a supported module cannot currently be enabled"))
+        policy = self.env["mb.control.capability.policy"].sudo().search([
+            ("workshop_id", "=", workshop_id), ("module_key", "=", module_key)
+        ], limit=1)
+        restriction_removed = bool(policy)
+        if policy:
+            policy.rule_ids.unlink()
+            policy.unlink()
         pending = records.filtered(lambda module: module.state == "uninstalled")
         if pending:
             # Only schedule the native module operation here. Immediate module
@@ -161,7 +181,15 @@ class ResCompany(models.Model):
             "status": "scheduled" if scheduled else "installed",
             "module_key": module_key,
             "modules": list(expected),
+            "restriction_removed": restriction_removed,
         }
+
+    def mb_restrict_module_bundle(self, payload):
+        self.ensure_one()
+        return self.env["mb.control.capability.policy"].restrict(self, payload)
+
+    def mb_expected_module_bundle(self, module_key):
+        return MODULE_BUNDLES.get(module_key)
 
     def mb_apply_entitlement(self, payload):
         self.ensure_one()

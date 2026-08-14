@@ -11,21 +11,38 @@ TOKEN_ENV = "MB_CONTROL_BRIDGE_TOKEN"
 MAX_BODY_BYTES = 26 * 1024 * 1024
 
 
-def authenticate_control_request():
+def credential_matches(supplied, expected_hash, bootstrap_token, allow_initial_bootstrap):
+    if expected_hash:
+        supplied_hash = hashlib.sha256(supplied.encode()).hexdigest()
+        return hmac.compare_digest(supplied_hash, expected_hash)
+    if allow_initial_bootstrap and bootstrap_token:
+        return hmac.compare_digest(supplied.encode(), bootstrap_token.encode())
+    return False
+
+
+def authenticate_control_request(allow_initial_bootstrap=False):
     """Authenticate one internal control-plane request.
 
-    The shared value is injected into the tenant container. It is never stored
-    in an Odoo model, job payload or log. A reverse proxy may add mTLS later;
-    this check remains the application-level tenant credential.
+    Normal requests are checked against the selected tenant database's
+    high-entropy credential verifier. The shared environment value is accepted
+    only for the first bootstrap, before that verifier exists. Plaintext tenant
+    credentials are never stored in an Odoo model, receipt or log.
     """
-    expected = os.environ.get(TOKEN_ENV, "")
-    if not expected:
-        raise ServiceUnavailable("control-plane bridge is not configured")
     header = request.httprequest.headers.get("Authorization", "")
     scheme, separator, supplied = header.partition(" ")
     if separator != " " or scheme.lower() != "bearer" or not supplied:
         raise Unauthorized("a bearer service credential is required")
-    if not hmac.compare_digest(supplied.encode(), expected.encode()):
+    company = request.env.company.sudo()
+    expected_hash = company.mb_control_bridge_token_hash or ""
+    bootstrap_token = os.environ.get(TOKEN_ENV, "")
+    if not expected_hash and allow_initial_bootstrap and not bootstrap_token:
+        raise ServiceUnavailable("control-plane bootstrap credential is not configured")
+    if not expected_hash and not allow_initial_bootstrap:
+        raise ServiceUnavailable("tenant bridge credential is not provisioned")
+    valid = credential_matches(
+        supplied, expected_hash, bootstrap_token, allow_initial_bootstrap
+    )
+    if not valid:
         raise Unauthorized("invalid service credential")
 
 
