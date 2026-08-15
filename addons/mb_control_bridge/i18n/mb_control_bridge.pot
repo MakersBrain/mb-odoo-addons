@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Project-Id-Version: Odoo Server 19.0-20260810\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-11 22:41+0000\n"
-"PO-Revision-Date: 2026-08-11 22:41+0000\n"
+"POT-Creation-Date: 2026-08-15 20:18+0000\n"
+"PO-Revision-Date: 2026-08-15 20:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,12 @@ msgstr ""
 #. module: mb_control_bridge
 #: model:ir.model.constraint,message:mb_control_bridge.constraint_res_users_rauthy_subject_unique
 msgid "A Rauthy subject can be linked to only one Odoo user."
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.constraint,message:mb_control_bridge.constraint_mb_control_capability_policy_policy_unique
+msgid ""
+"A capability has only one control-plane enforcement policy per workshop."
 msgstr ""
 
 #. module: mb_control_bridge
@@ -69,6 +75,16 @@ msgid "Companies"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model,name:mb_control_bridge.model_mb_control_capability_policy
+msgid "Control-plane capability enforcement policy"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_control_bridge_token_hash
+msgid "Control-plane tenant credential hash"
+msgstr ""
+
+#. module: mb_control_bridge
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__mb_control_user_id
 msgid "Control-plane user ID"
 msgstr ""
@@ -84,20 +100,28 @@ msgid "Craftsperson"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__create_uid
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__create_date
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__create_date
 msgid "Created on"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__display_name
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__display_name
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__display_name
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__enforced_at
+msgid "Enforced At"
 msgstr ""
 
 #. module: mb_control_bridge
@@ -132,11 +156,18 @@ msgstr ""
 
 #. module: mb_control_bridge
 #. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "Erased data subject"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
 #: code:addons/mb_control_bridge/models/res_company.py:0
 msgid "French accounting cannot be initialized after journal items exist."
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__id
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__id
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__id
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__id
@@ -144,11 +175,13 @@ msgid "ID"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__write_uid
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__write_date
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__write_date
 msgid "Last Updated on"
 msgstr ""
@@ -166,6 +199,16 @@ msgstr ""
 #. module: mb_control_bridge
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__mb_control_membership_epoch
 msgid "Membership epoch"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__module_key
+msgid "Module Key"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__modules
+msgid "Modules"
 msgstr ""
 
 #. module: mb_control_bridge
@@ -205,13 +248,29 @@ msgid "Rauthy subject"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__reason
+msgid "Reason"
+msgstr ""
+
+#. module: mb_control_bridge
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__response
 msgid "Response"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields.selection,name:mb_control_bridge.selection__mb_control_capability_policy__state__restricted
 #: model:ir.model.fields.selection,name:mb_control_bridge.selection__res_company__mb_entitlement_status__restricted
 msgid "Restricted"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__rule_ids
+msgid "Rule"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__state
+msgid "State"
 msgstr ""
 
 #. module: mb_control_bridge
@@ -247,8 +306,25 @@ msgid "Viewer"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__workshop_id
+msgid "Workshop"
+msgstr ""
+
+#. module: mb_control_bridge
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_users__mb_control_role
 msgid "Workshop role"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "a bounded restriction reason is required"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "a high-entropy tenant bridge credential is required"
 msgstr ""
 
 #. module: mb_control_bridge
@@ -273,6 +349,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_company.py:0
 msgid "an older entitlement cannot replace the current version"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "capability policy belongs to another workshop"
 msgstr ""
 
 #. module: mb_control_bridge
@@ -314,6 +396,18 @@ msgstr ""
 #. module: mb_control_bridge
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "erasure belongs to another workshop"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "erasure identifiers must be lowercase UUIDs"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
 msgid "membership belongs to another workshop"
 msgstr ""
 
@@ -338,13 +432,49 @@ msgstr ""
 #. module: mb_control_bridge
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "privacy export belongs to another workshop"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "privacy export identifiers must be lowercase UUIDs"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
 msgid "subject is invalid"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "the %(model)s subject export exceeds %(limit)s records"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "the Odoo subject export exceeds the secure export limit"
 msgstr ""
 
 #. module: mb_control_bridge
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_company.py:0
 msgid "the authorization-code OIDC module is not installed"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "the capability exposes no enforceable owned model"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "the capability is already restricted differently"
 msgstr ""
 
 #. module: mb_control_bridge
@@ -369,6 +499,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_company.py:0
 msgid "this company is linked to another workshop"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "unsupported capability policy"
 msgstr ""
 
 #. module: mb_control_bridge
