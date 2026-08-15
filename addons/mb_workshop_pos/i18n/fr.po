@@ -13,3 +13,25 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_workshop_pos
+#: model:ir.model,name:mb_workshop_pos.model_account_chart_template
+msgid "Account Chart Template"
+msgstr "Modèle de plan comptable"
+
+#. module: mb_workshop_pos
+#: model:ir.model.fields,field_description:mb_workshop_pos.field_account_chart_template__display_name
+#: model:ir.model.fields,field_description:mb_workshop_pos.field_pos_config__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: mb_workshop_pos
+#: model:ir.model.fields,field_description:mb_workshop_pos.field_account_chart_template__id
+#: model:ir.model.fields,field_description:mb_workshop_pos.field_pos_config__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_workshop_pos
+#: model:ir.model,name:mb_workshop_pos.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr "Configuration du point de vente"

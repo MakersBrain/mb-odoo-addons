@@ -17,3 +17,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_brand
+#: model_terms:ir.ui.view,arch_db:mb_brand.mb_brand_login_layout
+msgid "<span>MakersBrain</span>"
+msgstr "<span>MakersBrain</span>"
+
+#. module: mb_brand
+#: model_terms:ir.ui.view,arch_db:mb_brand.mb_brand_login_layout
+msgid "MakersBrain"
+msgstr "MakersBrain"

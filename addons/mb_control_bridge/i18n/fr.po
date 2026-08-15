@@ -413,3 +413,139 @@ msgstr "user_id doit être un UUID en minuscules"
 #: code:addons/mb_control_bridge/models/res_users.py:0
 msgid "workshop_id must be a lowercase UUID"
 msgstr "workshop_id doit être un UUID en minuscules"
+
+#. module: mb_control_bridge
+#: model:ir.model.constraint,message:mb_control_bridge.constraint_mb_control_capability_policy_policy_unique
+msgid ""
+"A capability has only one control-plane enforcement policy per workshop."
+msgstr ""
+"Une capacité n'a qu'une seule politique d'application du plan de contrôle "
+"par atelier."
+
+#. module: mb_control_bridge
+#: model:ir.model,name:mb_control_bridge.model_mb_control_capability_policy
+msgid "Control-plane capability enforcement policy"
+msgstr "Politique d'application des capacités du plan de contrôle"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_control_bridge_token_hash
+msgid "Control-plane tenant credential hash"
+msgstr "Empreinte du secret de locataire du plan de contrôle"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__enforced_at
+msgid "Enforced At"
+msgstr "Appliqué le"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "Erased data subject"
+msgstr "Personne concernée effacée"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__module_key
+msgid "Module Key"
+msgstr "Clé de module"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__modules
+msgid "Modules"
+msgstr "Modules"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__reason
+msgid "Reason"
+msgstr "Motif"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__rule_ids
+msgid "Rule"
+msgstr "Règle"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__state
+msgid "State"
+msgstr "État"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__workshop_id
+msgid "Workshop"
+msgstr "Atelier"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "a bounded restriction reason is required"
+msgstr "un motif de restriction délimité est requis"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "a high-entropy tenant bridge credential is required"
+msgstr "un secret de passerelle locataire à forte entropie est requis"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "capability policy belongs to another workshop"
+msgstr "la politique de capacité appartient à un autre atelier"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "erasure belongs to another workshop"
+msgstr "l'effacement appartient à un autre atelier"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "erasure identifiers must be lowercase UUIDs"
+msgstr "les identifiants d'effacement doivent être des UUID en minuscules"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "privacy export belongs to another workshop"
+msgstr "l'export de données personnelles appartient à un autre atelier"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "privacy export identifiers must be lowercase UUIDs"
+msgstr ""
+"les identifiants d'export de données personnelles doivent être des UUID en "
+"minuscules"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "the %(model)s subject export exceeds %(limit)s records"
+msgstr ""
+"l'export de la personne concernée pour %(model)s dépasse %(limit)s "
+"enregistrements"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_users.py:0
+msgid "the Odoo subject export exceeds the secure export limit"
+msgstr ""
+"l'export de la personne concernée Odoo dépasse la limite d'export sécurisé"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "the capability exposes no enforceable owned model"
+msgstr "la capacité n'expose aucun modèle propre applicable"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "the capability is already restricted differently"
+msgstr "la capacité est déjà restreinte différemment"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/capability_policy.py:0
+msgid "unsupported capability policy"
+msgstr "politique de capacité non prise en charge"

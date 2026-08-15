@@ -22,13 +22,34 @@
     "    texts    exact literals that stay English everywhere, such as barcode",
     "             symbology names and device model names."
   ],
-
   "_global": {
     "_verified_against_odoo": [
-      "Alias", "Code", "Configuration", "Copies", "Date", "Destination",
-      "Documents", "Format", "ID", "Journal", "Lot", "Manager", "Messages",
-      "Note", "Notes", "Orientation", "Plan", "Portrait", "Production",
-      "Productions", "Route", "Session", "Source", "Total", "Type", "km"
+      "Alias",
+      "Code",
+      "Configuration",
+      "Copies",
+      "Date",
+      "Destination",
+      "Documents",
+      "Format",
+      "ID",
+      "Journal",
+      "Lot",
+      "Manager",
+      "Messages",
+      "Note",
+      "Notes",
+      "Orientation",
+      "Plan",
+      "Portrait",
+      "Production",
+      "Productions",
+      "Route",
+      "Session",
+      "Source",
+      "Total",
+      "Type",
+      "km"
     ],
     "identical": [
       "Alias",
@@ -77,27 +98,23 @@
       "km"
     ]
   },
-
   "l10n_fr_micro_enterprise": {
     "identical": [
       "32.99Z",
       "Factur-x/XRechnung CII 2.2.0"
     ]
   },
-
   "mb_payment_sumup": {
     "identical": [
       "SumUp"
     ]
   },
-
   "mb_commercial_operations": {
     "identical": [
       "h",
       "Source / date"
     ]
   },
-
   "mb_commercial_operations_urssaf": {
     "identical": [
       "URSSAF",
@@ -105,7 +122,6 @@
       "VFL"
     ]
   },
-
   "mb_ceramics_firing": {
     "identical": [
       "Programme",
@@ -115,28 +131,24 @@
       "ROHDE myKiln"
     ]
   },
-
   "mb_kiln_bridge": {
     "identical": [
       "ROHDE myKiln",
       "myKiln"
     ]
   },
-
   "mb_catalogue_sync": {
     "identical": [
       "PC-20, SC74, hot tamale",
       "https://catalogue.makersbrain.example"
     ]
   },
-
   "mb_depot": {
     "identical": [
       "%(partner)s (-%(pct)s%%)",
       "Commission (%)"
     ]
   },
-
   "mb_inventory_capture": {
     "identical": [
       "Anthropic Claude",
@@ -149,13 +161,11 @@
       "OpenAI"
     ]
   },
-
   "mb_invoice_capture": {
     "identical": [
       "Azure Document Intelligence"
     ]
   },
-
   "mb_label": {
     "identical": [
       "%(name)s · v%(version)s",
@@ -175,5 +185,16 @@
         "NIIMBOT D110 family"
       ]
     }
+  },
+  "mb_brand": {
+    "identical": [
+      "MakersBrain",
+      "<span>MakersBrain</span>"
+    ]
+  },
+  "mb_control_bridge": {
+    "identical": [
+      "Modules"
+    ]
   }
 }
