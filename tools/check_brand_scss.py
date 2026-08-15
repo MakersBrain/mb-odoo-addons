@@ -51,7 +51,7 @@ def resolve(subpath: str) -> pathlib.Path:
             f"run `npm install` in {WEB.relative_to(ROOT)}. Skipping.",
             file=sys.stderr,
         )
-        raise SystemExit(0)
+        raise SystemExit(0) from None
     return pathlib.Path(out)
 
 
