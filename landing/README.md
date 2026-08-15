@@ -3,13 +3,18 @@
 The marketing site for makersbrain.app. One self-contained file.
 
 ```sh
-python3 brand/build-pages.py    # writes landing/index.html from index.src.html
+make landing    # writes landing/index.html from index.src.html
 ```
 
 `index.html` is a build artefact — edit `index.src.html`. The build inlines the
-fonts and the real `brand/tokens.css` and `brand/ui.css`, so the page has zero
-external requests and cannot drift from the product's own design system.
+fonts and the real `tokens.css` and `ui.css` out of `@makersbrain/brand`, so the
+page has zero external requests and cannot drift from the product's own design
+system: it renders with the same stylesheet the control plane ships, and the
+version it was built against is stamped in a comment at the top of the output.
 Deploying is copying one file.
+
+The design system is a dependency of `control-plane/web`, so `npm install`
+there is what makes this build possible.
 
 ## What it claims, and why each claim is safe
 

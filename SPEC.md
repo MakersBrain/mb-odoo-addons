@@ -341,7 +341,9 @@ Fonts are self-hosted: Bitter and IBM Plex Sans, both SIL OFL, in
 `static/src/fonts`. A webfont CDN would put a third party in the request path of
 every page load.
 
-The values mirror `brand/tokens.css`; `brand/design-chart.html` documents what
+The values mirror `tokens.css` in `@makersbrain/brand`, and `make brand-check`
+fails if one of them no longer exists in that package; the design chart in that
+repository documents what
 they mean. SCSS cannot read CSS custom properties at compile time, so the mirror
 is maintained by hand and a change belongs upstream in the tokens first.
 

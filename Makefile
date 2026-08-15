@@ -34,7 +34,7 @@ TAGS_ARG := $(subst $(space),$(comma),$(TAGS))
 
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \
-        test check lint format oca reset-poc brand-sync brand-check
+        test check lint format oca reset-poc brand-check landing
 
 help: ## Show available targets
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  %-12s %s\n", $$1, $$2}'
@@ -106,11 +106,15 @@ test: ## Install MODULES on a fresh disposable database and run their tests
 check: lint i18n-check brand-check ## Everything CI runs that needs no container
 	python3 tools/check_addons.py
 
-brand-sync: ## Copy brand/tokens.css and brand/ui.css into the control-plane web app
-	python3 tools/sync_brand.py
+# The design system is `@makersbrain/brand`, a dependency of control-plane/web.
+# It used to live here as brand/ and be copied into its consumers; there is
+# nothing left to copy, and the only hand-maintained mirror is the Odoo SCSS,
+# which cannot read CSS custom properties at compile time.
+brand-check: ## Fail if the Odoo SCSS mirror has fallen behind the brand package
+	python3 tools/check_brand_scss.py
 
-brand-check: ## Fail if a brand stylesheet edit never reached its consumers
-	python3 tools/sync_brand.py --check
+landing: ## Rebuild landing/index.html from the brand package
+	python3 tools/build_landing.py
 
 # polib comes through uv rather than a checked-in requirements file: nothing
 # here is a Python package, so there is no install step to hang a dependency on.

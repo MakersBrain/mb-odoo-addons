@@ -25,13 +25,11 @@ __pycache__/
 .venv/
 .ruff_cache/
 
-# Generated pages. brand/build-pages.py inlines ~190 KB of base64 font into
-# each of these, so committing them would put a quarter-megabyte diff in the
-# history on every rebuild while adding nothing that is not already tracked.
-# Every input is in the tree — the .src.html, brand/tokens.css, brand/ui.css and
-# brand/fonts — so a clean checkout rebuilds them offline with one command.
-brand/style-guide.html
-brand/design-chart.html
+# Generated page. tools/build_landing.py inlines ~190 KB of base64 font into
+# it, so committing it would put a quarter-megabyte diff in the history on
+# every rebuild while adding nothing that is not already tracked. Every input
+# is either in the tree (index.src.html) or in @makersbrain/brand, so a clean
+# checkout rebuilds it offline with one command.
 landing/index.html
 
 # Editor and OS noise.

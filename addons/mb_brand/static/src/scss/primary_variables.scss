@@ -4,9 +4,15 @@
 // assignment here wins against core's `!default` further down the bundle.
 // Nothing in this addon may use a selector where a variable exists.
 //
-// Values come from brand/tokens.css. Keep them in step by hand: SCSS cannot
-// read CSS custom properties at compile time, so there is no way to make this
-// file derive from the tokens rather than mirror them.
+// Values come from tokens.css in @makersbrain/brand. Keep them in step by hand:
+// SCSS cannot read CSS custom properties at compile time, so there is no way to
+// make this file derive from the tokens rather than mirror them.
+//
+// `make brand-check` fails if any colour here no longer exists anywhere in that
+// package's palette, which catches the case where a token moved upstream and
+// nobody carried it into this bundle. It cannot catch a value that is still in
+// the palette but is now the wrong token for its slot -- that is what the
+// comment naming each source token, below, is for.
 
 // ---------------------------------------------------------------------------
 // Colour
