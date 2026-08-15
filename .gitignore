@@ -32,6 +32,13 @@ __pycache__/
 # checkout rebuilds it offline with one command.
 landing/index.html
 
+# Generated Odoo import scripts. scripts/import_shop_catalogue.py writes the
+# code it feeds to `odoo shell` here before running it, so a run can be read
+# back afterwards - but each file inlines that run's whole payload, which makes
+# it an artifact of a run rather than an input to one. The inputs are the
+# catalogue dump and the script that generated this.
+build/imports/
+
 # Editor and OS noise.
 .idea/
 .vscode/
