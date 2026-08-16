@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_delivery_carrier_form_mb_runtime" model="ir.ui.view">
+        <field name="name">delivery.carrier.form.mb.runtime</field>
+        <field name="model">delivery.carrier</field>
+        <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='provider_details']" position="inside">
+                <field name="mb_provider_code" groups="base.group_system"
+                       invisible="not mb_provider_code" readonly="1"/>
+                <field name="mb_provider_service_code" groups="base.group_system"
+                       invisible="not mb_provider_code"/>
+                <field name="mb_provider_enabled" groups="base.group_system"
+                       invisible="not mb_provider_code"/>
+                <field name="mb_credential_state" groups="base.group_system"
+                       invisible="not mb_provider_code" readonly="1"/>
+                <field name="mb_label_format" groups="base.group_system"
+                       invisible="not mb_provider_code"/>
+                <field name="mb_secret_ref" groups="base.group_system"
+                       invisible="not mb_provider_code" readonly="1"/>
+                <field name="mb_subscription_id" groups="base.group_system"
+                       invisible="not mb_provider_code" readonly="1"/>
+                <field name="mb_last_error" groups="base.group_system"
+                       invisible="not mb_last_error" readonly="1"/>
+                <button name="action_mb_test_connection" type="object"
+                        string="Test connection" class="btn-secondary"
+                        groups="base.group_system"
+                        invisible="not mb_provider_code or not mb_secret_ref"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_picking_form_mb_carrier_shipments" model="ir.ui.view">
+        <field name="name">stock.picking.form.mb.carrier.shipments</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Provider Shipments" invisible="not mb_carrier_shipment_ids">
+                    <field name="mb_carrier_shipment_ids" readonly="1">
+                        <list>
+                            <field name="name"/>
+                            <field name="state"/>
+                            <field name="provider_ref"/>
+                            <field name="tracking_number"/>
+                            <field name="last_error"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

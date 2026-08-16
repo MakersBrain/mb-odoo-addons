@@ -1,0 +1,1135 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_webshop_carrier_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-16 20:37+0000\n"
+"PO-Revision-Date: 2026-08-16 20:37+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.actions.report,print_report_name:mb_webshop_carrier_base.action_report_local_handover
+msgid "'Local handover worksheet - %s' % object.date"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__delivery_carrier__mb_label_format__10x15
+msgid "10 × 15 cm PDF"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "<strong>Carrier:</strong>"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid ""
+"<strong>Not a carrier-accepted manifest.</strong> This document is an "
+"internal checklist for parcels handed over on"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.constraint,message:mb_webshop_carrier_base.constraint_mb_carrier_shipment_idempotency_unique
+msgid "A carrier operation can create only one shipment."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/controllers/pickup.py:0
+msgid "A carrier pickup-point address cannot be edited."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/manifest.py:0
+msgid ""
+"A handover worksheet may include only label-ready outbound shipments for its"
+" carrier and company."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/sale_order.py:0
+msgid "A pickup address requires its matching delivery method."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.constraint,message:mb_webshop_carrier_base.constraint_mb_carrier_pickup_point_cache_unique
+msgid "A pickup point occurs once in a carrier search result."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.constraint,message:mb_webshop_carrier_base.constraint_mb_carrier_shipment_provider_ref_unique
+msgid "A provider shipment reference can be linked only once."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.constraint,message:mb_webshop_carrier_base.constraint_mb_carrier_webhook_event_event_unique
+msgid "A provider webhook event is accepted only once."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "A public HTTPS web base URL is required to suspend carrier webhooks."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.constraint,message:mb_webshop_carrier_base.constraint_mb_carrier_public_rate_bucket_unique
+msgid "A rate-limit bucket is unique."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/pickup_point.py:0
+msgid "A valid delivery country and postal code are required."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__delivery_carrier__mb_label_format__a4
+msgid "A4 PDF"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__delivery_carrier__mb_label_format__a5
+msgid "A5 PDF"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__attempts
+msgid "Attempts"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_request_log__outcome__auth
+msgid "Authentication error"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__awaiting_document
+msgid "Awaiting document"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,help:mb_webshop_carrier_base.field_mb_carrier_request_log__diagnostic
+msgid "Bounded code/message without credentials or customer data."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__operation__cancel
+msgid "Cancel"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__cancel_pending
+msgid "Cancellation queued"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__cancelled
+msgid "Cancelled"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__carrier_id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__carrier_id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__carrier_id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__carrier_id
+msgid "Carrier"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/stock_picking.py:0
+msgid "Carrier cancellation queued."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "Carrier credentials could not be resolved."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_mb_carrier_manifest
+msgid "Carrier handover manifest"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Carrier label purchase accepted."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/stock_picking.py:0
+msgid "Carrier label purchase queued."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_mb_carrier_public_rate
+msgid "Carrier public-route rate-limit bucket"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "Carrier secret resolution is not configured on this server."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "Carrier secret resolution is unavailable."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/sale_order.py:0
+msgid "Choose a valid pickup point for this delivery method."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__city
+msgid "City"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__code
+msgid "Code"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__company_id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__company_id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__company_id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__company_id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__company_id
+msgid "Company"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__completed_at
+msgid "Completed At"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
+msgid "Confirm absent"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
+msgid "Confirm cancelled"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
+msgid "Confirm still active"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "Connection failed: %s"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_mb_control_capability_policy
+msgid "Control-plane capability enforcement policy"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__correlation_id
+msgid "Correlation"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__count
+msgid "Count"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__country_id
+msgid "Country"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__operation__create
+msgid "Create"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,website_form_label:mb_webshop_carrier_base.model_res_partner
+msgid "Create a Customer"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__create_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__create_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__create_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__create_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__create_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__create_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__create_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__create_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__create_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__create_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__date
+msgid "Date"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__diagnostic
+msgid "Diagnostic"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__direction
+msgid "Direction"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_control_capability_policy__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_company__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_partner__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_sale_order__display_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_stock_picking__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__distance_m
+msgid "Distance M"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__document_id
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_webhook_event__kind__document
+msgid "Document"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__document_ref
+msgid "Document Ref"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__document_ids
+msgid "Documents"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_webhook_event__state__done
+msgid "Done"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_manifest__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_mb_carrier_shipment
+msgid "Durable carrier shipment journal"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_mb_carrier_webhook_event
+msgid "Durable carrier webhook inbox"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__duration_ms
+msgid "Duration Ms"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__event_key
+msgid "Event Key"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__exact_price
+msgid "Exact Price"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_manifest__state__failed
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__failed
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_webhook_event__state__failed
+msgid "Failed"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__fetched_at
+msgid "Fetched At"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "Handed over"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.actions.act_window,name:mb_webshop_carrier_base.action_mb_carrier_manifests
+#: model:ir.ui.menu,name:mb_webshop_carrier_base.menu_mb_carrier_manifests
+msgid "Handover Worksheets"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "Handover signature: ____________________________________"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__http_status
+msgid "Http Status"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_control_capability_policy__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_company__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_partner__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_sale_order__id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_stock_picking__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__idempotency_key
+msgid "Idempotency Key"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__key_hash
+msgid "Key Hash"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__kind
+msgid "Kind"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__label_ready
+msgid "Label ready"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__last_error
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__last_error
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__last_error
+msgid "Last Error"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__last_event_at
+msgid "Last Event At"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__write_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__write_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__write_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__write_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__write_uid
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__write_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__write_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__write_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__write_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__write_date
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__latitude
+msgid "Latitude"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.actions.report,name:mb_webshop_carrier_base.action_report_local_handover
+msgid "Local Handover Worksheet"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "Local handover worksheet"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/manifest.py:0
+msgid "Local handover worksheet %(date)s"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/manifest.py:0
+msgid "Local handover worksheet - %(date)s.pdf"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__longitude
+msgid "Longitude"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.actions.server,name:mb_webshop_carrier_base.ir_cron_carrier_webhook_health_ir_actions_server
+msgid "MakersBrain: check carrier webhook health"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.actions.server,name:mb_webshop_carrier_base.ir_cron_carrier_shipments_ir_actions_server
+msgid "MakersBrain: process carrier shipments"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.actions.server,name:mb_webshop_carrier_base.ir_cron_carrier_webhooks_ir_actions_server
+msgid "MakersBrain: process carrier webhook inbox"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.actions.server,name:mb_webshop_carrier_base.ir_cron_carrier_retention_ir_actions_server
+msgid "MakersBrain: purge transient carrier data"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_credential_state
+msgid "Mb Credential State"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_label_format
+msgid "Mb Label Format"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_last_error
+msgid "Mb Last Error"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_partner__mb_pickup_provider
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_users__mb_pickup_provider
+msgid "Mb Pickup Provider"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_partner__mb_pickup_ref
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_users__mb_pickup_ref
+msgid "Mb Pickup Ref"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_partner__mb_pickup_service
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_users__mb_pickup_service
+msgid "Mb Pickup Service"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_provider_code
+msgid "Mb Provider Code"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_provider_enabled
+msgid "Mb Provider Enabled"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_secret_ref
+msgid "Mb Secret Ref"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_subscription_id
+msgid "Mb Subscription"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid ""
+"Merchant confirmed that no provider shipment exists; retry is now available."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Merchant verified the cancellation in the provider portal."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__name
+msgid "Name"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__next_attempt_at
+msgid "Next Attempt At"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "No external credential is configured for %s."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/sale_order.py:0
+msgid "No pick-up points are available for this delivery address."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "No provider shipment exists for this transfer."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__occurred_at
+msgid "Occurred At"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Only a definitely failed operation can be retried."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Only an unknown cancellation can be resolved this way."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Only an unknown creation outcome can be reconciled."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Only an unknown creation outcome can be resolved this way."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__opening_hours
+msgid "Opening Hours"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__operation
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__operation
+msgid "Operation"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__direction__outbound
+msgid "Outbound"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__outcome
+msgid "Outcome"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__parcel_index
+msgid "Parcel Index"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "Parcel count:"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__picking_id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__picking_id
+msgid "Picking"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/pickup_point.py:0
+msgid "Pickup points are temporarily unavailable."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_manifest_form
+msgid "Print local worksheet"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_mb_carrier_request_log
+msgid "Privacy-sanitized carrier request log"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__processed_at
+msgid "Processed At"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_webhook_event__state__processing
+msgid "Processing"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__delivery_carrier__mb_credential_state__production
+msgid "Production"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__provider_code
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__provider_code
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__provider_code
+msgid "Provider Code"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__provider_ref
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__provider_ref
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__provider_ref
+msgid "Provider Ref"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.actions.act_window,name:mb_webshop_carrier_base.action_mb_carrier_shipments
+#: model:ir.ui.menu,name:mb_webshop_carrier_base.menu_mb_carrier_shipments
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_picking_form_mb_carrier_shipments
+msgid "Provider Shipments"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Provider cancellation confirmed."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "Provider reference"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_provider_service_code
+msgid "Provider service code"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_stock_picking__mb_carrier_shipment_ids
+msgid "Provider shipments"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__query_country_id
+msgid "Query Country"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__query_zip
+msgid "Query Zip"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__draft
+msgid "Queued"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_manifest__state__ready
+msgid "Ready"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_webhook_event__state__received
+msgid "Received"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "Recipient"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
+msgid "Reconcile"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_webhook_event__state__retry
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
+msgid "Retry"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__direction__return
+msgid "Return"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "Return-label purchase queued."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__route
+msgid "Route"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/manifest.py:0
+msgid "Select at least one label-ready shipment."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__service_code
+msgid "Service Code"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__shipment_id
+msgid "Shipment"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__shipment_ids
+msgid "Shipments"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_delivery_carrier
+msgid "Shipping Methods"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model,name:mb_webshop_carrier_base.model_mb_carrier_pickup_point
+msgid "Short-lived carrier pickup-point cache"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_manifest__state
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__state
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__state
+msgid "State"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__street
+msgid "Street"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__submitted_at
+msgid "Submitted At"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__submitting
+msgid "Submitting"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__subscription_id
+msgid "Subscription"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_request_log__outcome__success
+msgid "Success"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__delivery_carrier__mb_credential_state__test
+msgid "Test"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_delivery_carrier_form_mb_runtime
+msgid "Test connection"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/webhook_event.py:0
+msgid "The carrier label document is ready."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid ""
+"The carrier operation failed. Review the shipment journal before retrying."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid ""
+"The carrier operation has an unknown outcome. Verify it with the provider "
+"before retrying."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/sale_order.py:0
+msgid "The pickup point country is unavailable."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "The pickup-point code is invalid."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/sale_order.py:0
+msgid "The pickup-point selection is invalid."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "The provider and service code must be configured."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "The provider has not accepted this shipment yet."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "The provider rejected the credentials."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/sale_order.py:0
+msgid "The selected pickup point is no longer available."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/sale_order.py:0
+msgid "The selected pickup point is stale or invalid."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/controllers/pickup.py:0
+msgid "The shopping cart is unavailable."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "The webhook validation secret is unavailable."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/sale_order.py:0
+msgid "This delivery service does not use pickup points."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_manifest_form
+msgid "This is a local handover worksheet, not a carrier-accepted manifest."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "This provider cannot reconcile an ambiguous purchase automatically."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "This shipping provider does not support return labels."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "This shipping provider is disabled."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "This workshop is not linked to the control plane."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/pickup_point.py:0
+msgid "Too many pickup-point requests. Please wait a minute."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_webhook_event__kind__tracking
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "Tracking"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__tracking_number
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__tracking_number
+msgid "Tracking Number"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__tracking_url
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__tracking_url
+msgid "Tracking Url"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+#: model:ir.model,name:mb_webshop_carrier_base.model_stock_picking
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "Transfer"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_request_log__outcome__transient
+msgid "Transient error"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_request_log__outcome__unavailable
+msgid "Unavailable"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__delivery_carrier__mb_credential_state__unconfigured
+msgid "Unconfigured"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_request_log__outcome__unknown
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__unknown
+msgid "Unknown outcome"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Use provider reconciliation for this shipment."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_request_log__outcome__validation
+msgid "Validation error"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
+msgid ""
+"Verify in the provider portal first. Confirm only when no shipment or charge"
+" exists; this enables a new purchase."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
+msgid ""
+"Verify in the provider portal first. Confirm that this shipment is "
+"cancelled."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
+msgid ""
+"Verify in the provider portal first. This enables a cancellation retry."
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_public_rate__window_start
+msgid "Window Start"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__delivery_carrier__mb_label_format__zpl
+msgid "ZPL"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__zip
+msgid "Zip"
+msgstr ""
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
+msgid "· <strong>Company:</strong>"
+msgstr ""

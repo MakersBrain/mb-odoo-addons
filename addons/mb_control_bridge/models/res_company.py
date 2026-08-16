@@ -23,6 +23,7 @@ MODULE_BUNDLES = {
     "invoice-capture": ("mb_invoice_capture",),
     "inventory-capture": ("mb_inventory_capture",),
     "webshop": ("mb_webshop",),
+    "shipping-boxtal": ("mb_webshop_carrier_base", "mb_webshop_carrier_boxtal"),
 }
 
 

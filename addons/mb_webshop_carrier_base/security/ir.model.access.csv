@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mb_carrier_shipment_user,carrier shipment user,model_mb_carrier_shipment,stock.group_stock_user,1,0,0,0
+access_mb_carrier_shipment_manager,carrier shipment manager,model_mb_carrier_shipment,stock.group_stock_manager,1,1,1,0
+access_mb_carrier_pickup_manager,carrier pickup manager,model_mb_carrier_pickup_point,stock.group_stock_manager,1,0,0,0
+access_mb_carrier_request_log_system,carrier request log system,model_mb_carrier_request_log,base.group_system,1,0,0,0
+access_mb_carrier_manifest_user,carrier manifest user,model_mb_carrier_manifest,stock.group_stock_user,1,0,0,0
+access_mb_carrier_manifest_manager,carrier manifest manager,model_mb_carrier_manifest,stock.group_stock_manager,1,1,1,0
+access_mb_carrier_webhook_system,carrier webhook system,model_mb_carrier_webhook_event,base.group_system,1,0,0,0
+access_mb_carrier_public_rate_system,carrier public rate system,model_mb_carrier_public_rate,base.group_system,1,0,0,0

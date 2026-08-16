@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_delivery_carrier_form_mb_boxtal" model="ir.ui.view">
+        <field name="name">delivery.carrier.form.mb.boxtal</field>
+        <field name="model">delivery.carrier</field>
+        <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='provider_details']" position="inside">
+                <group string="Boxtal" invisible="delivery_type != 'mb_boxtal'">
+                    <field name="mb_boxtal_use_locations"/>
+                    <field name="mb_boxtal_length_cm"/>
+                    <field name="mb_boxtal_width_cm"/>
+                    <field name="mb_boxtal_height_cm"/>
+                    <field name="mb_boxtal_content_category"/>
+                    <field name="mb_boxtal_content_description"/>
+                    <field name="mb_boxtal_commercial_readiness_confirmed"
+                           invisible="not prod_environment"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

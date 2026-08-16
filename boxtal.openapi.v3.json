@@ -1,0 +1,2465 @@
+{
+    "info": {
+        "title": "API v3",
+        "version": "3.1.0",
+        "description": "## Introduction\n\nL'API v3 fournit des opérations et des ressources pour :\n- rechercher des points colis à proximité d'une adresse donnée pour un ensemble de réseaux ou d'offres de transport ;\n- définir une expédition et commander une offre d'expédition ;\n- récupérer les étiquettes d'expédition générées ;\n- récupérer les événements de suivi des colis.\n\nL'API utilise le format JSON.\n\nLes webhooks sont utilisés pour fournir des étiquettes d'expédition et des informations de suivi. Pour utiliser les webhooks, vous devez d'abord y souscrire : consultez la section Souscription pour plus d'informations.\n\n## Environnements\n\nPour utiliser l'API en mode test, vous devez créer un compte sur notre [environnement de test](https://redirect.boxtal.build/iam/app-redirect/register?app=developer&profile=default&language=fr) et utiliser l'URL du serveur de test.\n\nLes commandes créées en mode test ne seront pas facturées, contrairement à celles créées en mode production.\n\n## Protocole\n\nL'API nécessite que toutes les communications soient sécurisées à l'aide de TLS v1.2.\n\nLes requêtes effectuées via HTTP ou sans authentification appropriée échoueront.\n\n## Authentification\n\nPour utiliser cette API, vous devez d'abord créer une application API v3 sur notre application développeur.\n\nLors de la création de l'application API v3, vous obtiendrez une clé d'accès et une clé secrète que vous pourrez utiliser pour vous authentifier à l'aide du endpoint d'authentification ci-dessous, ce qui vous permettra d'obtenir un access token à validité limitée à utiliser avec les endpoints.\n\nVous pouvez également utiliser votre clé d'accès et votre clé secrète pour vous authentifier sur tous les endpoints en mode basic auth.\n\n## Webhooks\n\nCette API utilise des webhooks pour vous informer d'événements spécifiques liés aux commandes d'expédition.\n\n### Souscription\n\nPour utiliser les webhooks, vous devez d'abord créer des souscriptions (voir les endpoints associés) pour chaque type d'événement que vous souhaitez suivre.\n\nLorsque vous souscrivez à un type d'événement, chaque fois qu'un événement de ce type se produit, une requête sera envoyée à l'URL que vous avez fournie lors de la souscription.\n\nUne souscription effectuée avec une application API v3 ne recevra que les événements liés aux commandes d'expédition créées via la même application.\n\n### Protocole\n\nLes callbacks seront effectués à l'aide de la méthode HTTP POST (et du protocole https).\n\n### Authentification des webhooks\n\nLa requête contiendra un en-tête `x-bxt-signature`, avec une valeur égale à l'encodage HMAC SHA256 du JSON contenu dans le corps de la requête, en utilisant la clé de validation du webhook liée à votre souscription comme secret.\nNous vous recommandons vivement de l'utiliser pour authentifier les requêtes.\n\n### Format\n\nVeuillez consulter la spécification des callbacks sur le endpoint POST /shipping-order pour les formats des événements.\n\n### Réponse et nouvelles tentatives\n\nLorsque vous recevez une requête, vous devez répondre avec le code d'état HTTP standard (2xx pour succès) en moins de 2 secondes.\n\nTout autre code entraînera un processus de nouvelle tentative :\n- 3 tentatives toutes les 60 secondes : t0 + 60s, t0 + 120s, t0 + 180s\n- 3 tentatives toutes les heures : t0 + 1h, t0 + 2h, t0 + 3h\n- 1 tentative après 6h : t0 + 6h\n- 1 tentative après 12h : t0 + 12h\n- 1 tentative après 24h : t0 + 24h\n\nAprès ces 10 tentatives, l'événement serait rejeté.\n\n### Types d'événements\n\nIl existe 2 types d'événements :\n- lorsqu'un document d'expédition est créé ;\n- lorsque le suivi d'une expédition a changé.\n\n## Gestion d'erreur\n\nEn cas d'erreur du client ou du serveur, la réponse contiendra respectivement le standard 4xx ou 5xx,\naccompagné d'un corps JSON bien formé décrivant le problème (par exemple, un champ obligatoire a été omis, un problème de paiement, aucune offre n'a été trouvée, etc.).\n\n### HTTP Status Codes\n\n|Code|Raison|Description|\n|----|------|-----------|\n|200|OK|La demande a réussi|\n|400|Bad Request|Requête dont la syntaxe ou le contenu est invalide|\n|401|Unauthorized|L'authentification est requise et a échoué|\n|422|Unprocessable Entity|La requête est fonctionnellement invalide (par exemple, l´élément demandé n'existe pas)|\n|5xx|Server Error|Une erreur interne liée à la plateforme Boxtal|\n\n### Codes d'erreur\n\n|Valeur|Description|\n|----|-----------|\n|BAD_REQUEST|Le serveur ne peut pas comprendre ou traiter la requête en raison d'une erreur côté client|\n|INTERNAL_SERVER_ERROR|Le serveur a rencontré un problème inattendu qui l'empêche de répondre à la requête|\n|ValidationException|Erreur de validation|\n|ValidationException.NotNull|Erreur de validation, ne doit pas être nul|\n|ValidationException.NotBlank|Erreur de validation, ne doit pas être vide|\n|ValidationException.ValidParcelPointNetwork|Le champ searchNetworks n'est pas parmi les valeurs indiquées|\n|ValidationException.InvalidFormat|Format invalide|\n|ValidationException.TooShort|Une valeur plus longue est attendue|\n|InvalidPaymentException|Problème de paiement|\n|InvalidRequestException|Erreur dans les paramètres|\n|NoPackageTrackingFoundException|Le suivi n'est pas encore disponible ou la commande n'a pas pu être trouvée|\n|NoShippingDocumentException|Les documents d'expédition ne sont pas encore disponibles ou la commande n'a pas pu être trouvée|\n|NoShippingOfferException|Aucune offre n'a été trouvée|\n|RequestValidationException|Champs manquants ou invalides|\n|ShippingOrderNotFoundException|La commande n'a pas pu être trouvée|\n|SubscriptionNotFoundException|La suppression a échoué ou la souscription n'a pas pu être trouvée|\n|UnexpectedException|Exception non qualifiée|\n"
+    },
+    "tags": [
+        {
+            "name": "Authentification"
+        },
+        {
+            "name": "Commande d'expédition"
+        },
+        {
+            "name": "Catégorie de contenu"
+        },
+        {
+            "name": "Point de proximité"
+        },
+        {
+            "name": "Souscription"
+        }
+    ],
+    "paths": {
+        "/iam/account-app/token": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "fournit un access token temporaire qui peut être utilisé pour tous les autres endpoints. Vous pouvez vous authentifier sur ce endpoint via basic auth.",
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "expiresIn": {
+                                            "type": "integer",
+                                            "example": 3600,
+                                            "description": "temps restant jusqu'à l'expiration en secondes"
+                                        },
+                                        "tokenType": {
+                                            "type": "string",
+                                            "example": "Bearer",
+                                            "description": "type du token (Bearer)"
+                                        },
+                                        "accessToken": {
+                                            "type": "string",
+                                            "example": "gaergaerg.gaergaerg.gaergaerg",
+                                            "description": "token JWT"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "succès"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "text": {
+                                                        "enum": [
+                                                            "Unauthorized"
+                                                        ],
+                                                        "type": "string"
+                                                    },
+                                                    "severity": {
+                                                        "enum": [
+                                                            "ERROR"
+                                                        ],
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Authentification invalide"
+                    }
+                },
+                "operationId": "GET token"
+            }
+        },
+        "/shipping/v3.1/parcel-point": {
+            "get": {
+                "tags": [
+                    "Point de proximité"
+                ],
+                "summary": "Récupérer les points de proximité",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ParcelPointSearchResponse"
+                                }
+                            }
+                        },
+                        "description": "La recherche a été exécutée avec succès"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "UnexpectedException",
+                                                "parameters": null
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Champs manquants ou invalides"
+                    }
+                },
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "number",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 4
+                    },
+                    {
+                        "in": "query",
+                        "name": "street",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "boulevard des capucines"
+                    },
+                    {
+                        "in": "query",
+                        "name": "city",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Paris"
+                    },
+                    {
+                        "in": "query",
+                        "name": "postalCode",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 75009,
+                        "description": "code postal de l'emplacement de référence"
+                    },
+                    {
+                        "in": "query",
+                        "name": "state",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "code ISO à 2 lettres de l'état si pertinent pour le pays"
+                    },
+                    {
+                        "in": "query",
+                        "name": "countryIsoCode",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "FR",
+                        "required": true,
+                        "description": "Code ISO à 2 lettres du pays de l'emplacement de référence"
+                    },
+                    {
+                        "in": "query",
+                        "name": "searchNetworks",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/ParcelPointNetworksEnum"
+                            }
+                        },
+                        "example": [
+                            "MONR",
+                            "UPSE"
+                        ],
+                        "description": "Tableau de réseaux de points de proximité"
+                    }
+                ],
+                "description": "Cette méthode vous donne la possibilité d'obtenir les points de proximité autour d'une adresse donnée.\n",
+                "operationId": "getNearbyParcelPoints"
+            }
+        },
+        "/shipping/v3.1/subscription": {
+            "get": {
+                "tags": [
+                    "Souscription"
+                ],
+                "summary": "lister les souscriptions",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubscriptionListResponse"
+                                }
+                            }
+                        },
+                        "description": "succès"
+                    }
+                },
+                "operationId": "listSubscriptions"
+            },
+            "post": {
+                "tags": [
+                    "Souscription"
+                ],
+                "summary": "créer une nouvelle souscription",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubscriptionResponse"
+                                }
+                            }
+                        },
+                        "description": "La souscription a été créée avec succès"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "ValidationException",
+                                                "parameters": [
+                                                    {
+                                                        "code": "ValidationException.NotNull",
+                                                        "field": "eventType"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Champs manquants ou invalides"
+                    }
+                },
+                "operationId": "createSubscription",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Subscription"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/shipping/v3.1/shipping-order": {
+            "post": {
+                "tags": [
+                    "Commande d'expédition"
+                ],
+                "summary": "créer et commander une nouvelle expédition",
+                "callbacks": {
+                    "Notification de suivi": {
+                        "https://votre.url.de.callback.suivi": {
+                            "post": {
+                                "responses": {
+                                    "200": {
+                                        "description": "succès"
+                                    },
+                                    "422": {
+                                        "description": "échec"
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "in": "header",
+                                        "name": "x-bxt-signature",
+                                        "schema": {
+                                            "type": "string"
+                                        },
+                                        "required": true,
+                                        "description": "Un codage HMAC SHA256 du JSON contenu dans le corps de la requête, utilisant la clé de validation du webhook liée à la souscription comme secret.\nNous vous recommandons vivement de l'utiliser pour authentifier les requêtes.\n"
+                                    }
+                                ],
+                                "requestBody": {
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "$ref": "#/components/schemas/WebhookEventPayload"
+                                            },
+                                            "example": {
+                                                "id": "event-1d18909c941516f345da1c73af82a468",
+                                                "type": "TRACKING_CHANGED",
+                                                "payload": {
+                                                    "trackings": [
+                                                        {
+                                                            "status": "ANNOUNCED",
+                                                            "history": [
+                                                                {
+                                                                    "status": "ANNOUNCED",
+                                                                    "isFinal": false,
+                                                                    "message": "Réception des données",
+                                                                    "trackingDateTime": "2025-01-02 08:00:00"
+                                                                }
+                                                            ],
+                                                            "isFinal": false,
+                                                            "message": "Réception des données",
+                                                            "packageId": "966998xx",
+                                                            "trackingNumber": "966998xx",
+                                                            "trackingDateTime": "2025-01-02 08:00:00",
+                                                            "packageExternalId": "null,",
+                                                            "packageTrackingUrl": "https://www.mondialrelay.fr/suivi-de-colis/?NumeroExpedition=96699xx&CodePostal=94220"
+                                                        }
+                                                    ]
+                                                },
+                                                "timestamp": "2024-02-23T21:15:28+0100",
+                                                "shippingOrderId": "2440000000MONR4IA8FR",
+                                                "shipmentExternalId": "ABC1234"
+                                            }
+                                        }
+                                    },
+                                    "required": true
+                                }
+                            }
+                        }
+                    },
+                    "Génération de document": {
+                        "https://votre.url.de.callback.document": {
+                            "post": {
+                                "responses": {
+                                    "200": {
+                                        "description": "succès"
+                                    },
+                                    "422": {
+                                        "description": "échec"
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "in": "header",
+                                        "name": "x-bxt-signature",
+                                        "schema": {
+                                            "type": "string"
+                                        },
+                                        "required": true,
+                                        "description": "Un codage HMAC SHA256 du JSON contenu dans le corps de la requête, utilisant la clé de validation du webhook liée à la souscription comme secret.\nNous vous recommandons vivement de l'utiliser pour authentifier les requêtes.\n"
+                                    }
+                                ],
+                                "requestBody": {
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "$ref": "#/components/schemas/WebhookEventPayload"
+                                            },
+                                            "example": {
+                                                "id": "event-1d18909c941516f345da1c73af82a468",
+                                                "type": "DOCUMENT_CREATED",
+                                                "payload": {
+                                                    "documents": [
+                                                        {
+                                                            "url": "https://document.boxtal.com/shipping-label/2440000050CHRP4xxxxx_bordereau.pdf?Expires=1711226314&Signature=xxxxxx&Key-Pair-Id=xxxx",
+                                                            "type": "LABEL",
+                                                            "format": "PDF_A4"
+                                                        }
+                                                    ]
+                                                },
+                                                "timestamp": "2024-02-23T21:15:28+0100",
+                                                "shippingOrderId": "2440000000MONR4IA8FR",
+                                                "shipmentExternalId": "ABC1234"
+                                            }
+                                        }
+                                    },
+                                    "required": true
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateShippingOrderResponse"
+                                }
+                            }
+                        },
+                        "description": "La commande d'expédition a été créée avec succès"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "ValidationException",
+                                                "parameters": [
+                                                    {
+                                                        "code": "ValidationException.NotNull",
+                                                        "field": "shipment.fromAddress"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Champs de la commande d'expédition non valides ou manquants"
+                    }
+                },
+                "description": "Permet de créer une commande d'expédition. Afin de recevoir vos documents d'expédition ou vos informations de suivi, vous devrez souscrire aux webhooks dédiés.",
+                "operationId": "createShippingOrder",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateShippingOrderRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/shipping/v3.1/content-category": {
+            "get": {
+                "tags": [
+                    "Catégorie de contenu"
+                ],
+                "summary": "Récupérer la liste des catégories de contenu",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContentCategoryListResponse"
+                                }
+                            }
+                        },
+                        "description": "lister les différentes catégories de contenu qui peuvent être utilisées dans le champ content de l'expédition"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "language",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "fr"
+                    }
+                ],
+                "operationId": "listContentCategories"
+            }
+        },
+        "/shipping/v3.1/subscription/{id}": {
+            "put": {
+                "tags": [
+                    "Souscription"
+                ],
+                "summary": "Mettre à jour une souscription",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubscriptionResponse"
+                                }
+                            }
+                        },
+                        "description": "La souscription a été mise à jour"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "ValidationException",
+                                                "parameters": [
+                                                    {
+                                                        "code": "ValidationException.NotNull",
+                                                        "field": "eventType"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Champs manquants ou invalides"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "id de la souscription"
+                    }
+                ],
+                "operationId": "updateSubscription",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Subscription"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Souscription"
+                ],
+                "summary": "Supprimer une souscription",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SubscriptionResponse"
+                                        }
+                                    ],
+                                    "example": {
+                                        "status": 200,
+                                        "content": {
+                                            "id": "123",
+                                            "appId": "app-cda02e2bec10616f0d847291b8ac1ea3",
+                                            "status": "INACTIVE",
+                                            "createdAt": "2024-09-12T23:11:35+02:00",
+                                            "eventType": "DOCUMENT_CREATED",
+                                            "callbackUrl": "https://any.url",
+                                            "webhookSecret": "***"
+                                        },
+                                        "timestamp": "2024-09-11T23:11:35+02:00"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "La souscription a été mise à jour"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "SubscriptionNotFoundException",
+                                                "parameters": null
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "La suppression a échoué ou la souscription n'a pas pu être trouvée"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "id de la souscription"
+                    }
+                ],
+                "operationId": "deleteSubscription"
+            }
+        },
+        "/shipping/v3.1/shipping-order/{id}": {
+            "get": {
+                "tags": [
+                    "Commande d'expédition"
+                ],
+                "summary": "Permet de récupérer une commande d'expédition.",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ShippingOrderResponse"
+                                }
+                            }
+                        },
+                        "description": "La commande d'expédition a été récupérée avec succès"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "ShippingOrderNotFoundException",
+                                                "parameters": null
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "La commande n'a pas pu être trouvée"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "id de la commande d'expédition"
+                    }
+                ],
+                "operationId": "getShippingOrder"
+            },
+            "delete": {
+                "tags": [
+                    "Commande d'expédition"
+                ],
+                "summary": "Annuler une commande d'expédition",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ShippingOrderResponse"
+                                        }
+                                    ],
+                                    "example": {
+                                        "status": 200,
+                                        "content": {
+                                            "id": "2440000050MONR4IA9FR",
+                                            "status": "CANCELLED",
+                                            "shipmentId": "195853",
+                                            "deliveryPriceExclTax": null,
+                                            "estimatedDeliveryDate": "2024-02-29",
+                                            "insurancePriceExclTax": null,
+                                            "expectedTakingOverDate": "2024-02-23"
+                                        },
+                                        "timestamp": "2024-02-23T21:27:17+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "La commande d'expédition a été annulée avec succès"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "InvalidRequestException",
+                                                "parameters": null
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "La commande n'a pas pu être annulée"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "id de la commande d'expédition"
+                    }
+                ],
+                "operationId": "cancelShippingOrder"
+            }
+        },
+        "/shipping/v3.2/parcel-point-by-network": {
+            "get": {
+                "tags": [
+                    "Point de proximité"
+                ],
+                "summary": "Récupérer les points de proximité en filtrant par réseaux",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ParcelPointSearchResponseV2"
+                                }
+                            }
+                        },
+                        "description": "La recherche a été exécutée avec succès"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "UnexpectedException",
+                                                "parameters": null
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Champs manquants ou invalides"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "number",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 4
+                    },
+                    {
+                        "in": "query",
+                        "name": "street",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "boulevard des capucines"
+                    },
+                    {
+                        "in": "query",
+                        "name": "city",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Paris",
+                        "description": "ville de l'emplacement de référence. Obligatoire si le pays ne requiert pas de code postal."
+                    },
+                    {
+                        "in": "query",
+                        "name": "postalCode",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 75009,
+                        "description": "code postal de l'emplacement de référence. Obligatoire si le pays le requiert."
+                    },
+                    {
+                        "in": "query",
+                        "name": "countryIsoCode",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "FR",
+                        "required": true,
+                        "description": "Code ISO à 2 lettres du pays de l'emplacement de référence"
+                    },
+                    {
+                        "in": "query",
+                        "name": "searchNetworks",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/ParcelPointNetworksEnum"
+                            }
+                        },
+                        "example": [
+                            "MONR_NETWORK",
+                            "UPSE_NETWORK"
+                        ],
+                        "required": true,
+                        "description": "Tableau de réseaux de points de proximité"
+                    }
+                ],
+                "description": "Cette méthode vous donne la possibilité d'obtenir les points de proximité autour d'une adresse donnée à partir d'une liste de réseaux de points relais.\nLes réseaux passés en paramètre vont se cumuler, mais vous n'aurez pas les points en double.\nPar exemple, si vous choisissez MONR_NETWORK, CHRP_NETWORK et MONR_LOCKERS_ONLY_NETWORK, vous aurez tous les points Mondial Relay et Chronopost et vous ne recevrez pas les lockers Mondial Relay en double.\n",
+                "operationId": "getNearbyParcelPointsByNetwork"
+            }
+        },
+        "/shipping/v3.1/shipping-order/{id}/tracking": {
+            "get": {
+                "tags": [
+                    "Commande d'expédition"
+                ],
+                "summary": "Récupérer le suivi d'une commande d'expédition",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PackageTrackingListResponse"
+                                }
+                            }
+                        },
+                        "description": "Suivi du colis de commande d'expédition récupéré avec succès"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "NoPackageTrackingFoundException",
+                                                "parameters": null
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Le suivi n'est pas encore disponible ou la commande n'a pas pu être trouvée"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "id de la commande d'expédition"
+                    }
+                ],
+                "operationId": "findTrackingByShippingOrderId"
+            }
+        },
+        "/shipping/v3.2/parcel-point-by-shipping-offer": {
+            "get": {
+                "tags": [
+                    "Point de proximité"
+                ],
+                "summary": "Récupérer les points de proximité en filtrant par offre d'expédition et type d'opération",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ParcelPointSearchResponseV2"
+                                }
+                            }
+                        },
+                        "description": "La recherche a été exécutée avec succès"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "UnexpectedException",
+                                                "parameters": null
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Champs manquants ou invalides"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "number",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 4
+                    },
+                    {
+                        "in": "query",
+                        "name": "street",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "boulevard des capucines"
+                    },
+                    {
+                        "in": "query",
+                        "name": "city",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Paris",
+                        "description": "ville de l'emplacement de référence. Obligatoire si le pays ne requiert pas de code postal."
+                    },
+                    {
+                        "in": "query",
+                        "name": "postalCode",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 75009,
+                        "description": "code postal de l'emplacement de référence. Obligatoire si le pays le requiert."
+                    },
+                    {
+                        "in": "query",
+                        "name": "countryIsoCode",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "FR",
+                        "required": true,
+                        "description": "Code ISO à 2 lettres du pays de l'emplacement de référence"
+                    },
+                    {
+                        "in": "query",
+                        "name": "operationType",
+                        "schema": {
+                            "enum": [
+                                "DEPARTURE",
+                                "ARRIVAL"
+                            ],
+                            "type": "string",
+                            "default": "ARRIVAL"
+                        },
+                        "required": true,
+                        "description": "Si vous souhaitez les points de proximité pour le départ ou l'arrivée de l'envoi"
+                    },
+                    {
+                        "in": "query",
+                        "name": "shippingOfferCode",
+                        "schema": {
+                            "type": "string",
+                            "example": "MONR-CpourToi"
+                        },
+                        "required": true,
+                        "description": "Code de l'offre d'expédition"
+                    }
+                ],
+                "description": "Cette méthode vous donne la possibilité d'obtenir les points de proximité autour d'une adresse donnée à partir d'un type d'opération (départ ou arrivée) et d'une offre d'expédition.\n",
+                "operationId": "getNearbyParcelPointsByShippingOffer"
+            }
+        },
+        "/shipping/v3.1/shipping-order/{id}/shipping-document": {
+            "get": {
+                "tags": [
+                    "Commande d'expédition"
+                ],
+                "summary": "Récupérer les documents d'expédition",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ShippingDocumentListResponse"
+                                }
+                            }
+                        },
+                        "description": "Les documents d'expédition générés pour cette expédition"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BaseResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/Error"
+                                        }
+                                    ],
+                                    "example": {
+                                        "errors": [
+                                            {
+                                                "code": "NoShippingDocumentException",
+                                                "parameters": null
+                                            }
+                                        ],
+                                        "status": 422,
+                                        "timestamp": "2024-02-23T21:15:28+0100"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Les documents d'expédition ne sont pas encore disponibles ou la commande n'a pas pu être trouvée"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "id de la commande d'expédition"
+                    }
+                ],
+                "description": "Renvoie tous les documents d'expédition de la commande d'expédition spécifiée.\n",
+                "operationId": "findShippingDocumentByShippingOrderId"
+            }
+        }
+    },
+    "openapi": "3.0.1",
+    "servers": [
+        {
+            "url": "https://api.boxtal.build",
+            "description": "Serveur de test"
+        },
+        {
+            "url": "https://api.boxtal.com",
+            "description": "Serveur de production"
+        }
+    ],
+    "security": [
+        {
+            "BearerAuth": []
+        }
+    ],
+    "components": {
+        "schemas": {
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "parameters": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ErrorParameter"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Money": {
+                "type": "object",
+                "properties": {
+                    "value": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "currency": {
+                        "enum": [
+                            "EUR"
+                        ],
+                        "type": "string",
+                        "default": "EUR"
+                    }
+                }
+            },
+            "Address": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "contact",
+                    "location"
+                ],
+                "properties": {
+                    "type": {
+                        "enum": [
+                            "RESIDENTIAL",
+                            "BUSINESS"
+                        ],
+                        "type": "string",
+                        "description": "BUSINESS: l'adresse est une adresse professionnelle (accessible durant les heures de bureau)\n\nRESIDENTIAL: l'adresse est résidentielle ou considérée comme telle\n"
+                    },
+                    "contact": {
+                        "$ref": "#/components/schemas/Contact"
+                    },
+                    "location": {
+                        "$ref": "#/components/schemas/Location"
+                    },
+                    "additionalInformation": {
+                        "type": "string"
+                    }
+                },
+                "description": "Les objets _Address_ sont utilisés pour désigner les contacts, emplacements et entreprises.\nLe fait que l'adresse soit résidentielle (RESIDENTIAL) ou commerciale (BUSINESS) a un impact significatif sur les tarifs d'expédition pour de nombreux transporteurs. Les adresses commerciales avec des heures d'ouverture limitées doivent être considérées comme résidentielles.\nUn _Shipment_ nécessite une adresse d'expédition (fromAddress) et une adresse de destination (toAddress) pour être en mesure de correctement calculer les tarifs et générer les documents d'expédition.\n"
+            },
+            "Article": {
+                "type": "object",
+                "required": [
+                    "description",
+                    "originCountry",
+                    "quantity",
+                    "unitWeight",
+                    "unitValue"
+                ],
+                "properties": {
+                    "quantity": {
+                        "type": "number",
+                        "example": 2
+                    },
+                    "unitValue": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Money"
+                            }
+                        ],
+                        "example": {
+                            "value": 15,
+                            "currency": "EUR"
+                        },
+                        "description": "valeur unitaire"
+                    },
+                    "unitWeight": {
+                        "type": "number",
+                        "format": "double",
+                        "example": 0.7,
+                        "description": "poids unitaire en kilo"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Illustrated book for children",
+                        "description": "description de la marchandise (en anglais si possible)"
+                    },
+                    "tariffNumber": {
+                        "type": "string",
+                        "example": "49030000",
+                        "description": "Le code de l'article dans le système harmonisé. Voir https://help.boxtal.com/fr/fr/article/understanding-hs-codes"
+                    },
+                    "originCountry": {
+                        "type": "string",
+                        "example": "FR",
+                        "description": "Code ISO à 2 lettres du pays d'origine"
+                    },
+                    "packageExternalId": {
+                        "type": "string",
+                        "example": "XYZ12345",
+                        "description": "L'identifiant du colis contenant cet article. Non utilisé actuellement.\n"
+                    }
+                },
+                "description": "l'_Article_ décrit les marchandises destinées à l'expédition internationale et doit être créé dans un objet CustomsDeclaration.\n"
+            },
+            "Contact": {
+                "type": "object",
+                "required": [
+                    "firstName",
+                    "lastName",
+                    "email",
+                    "phone"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "format": "+CCCNNNNNNN...",
+                        "description": "numéro de téléphone portable."
+                    },
+                    "company": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    }
+                },
+                "description": "Les objets _Contact_ désignent des personnes et des organisations."
+            },
+            "Content": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "description"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "L'id de la catégorie de contenu (voir GET /content-category)"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Une description en texte libre du contenu."
+                    }
+                }
+            },
+            "Package": {
+                "type": "object",
+                "required": [
+                    "weight",
+                    "length",
+                    "width",
+                    "value"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": 12345,
+                        "readOnly": true
+                    },
+                    "type": {
+                        "enum": [
+                            "PARCEL",
+                            "LETTER",
+                            "PALLET"
+                        ],
+                        "type": "string",
+                        "default": "PARCEL",
+                        "description": "Le type de conteneur physique pour tous les éléments de cet envoi (colis, lettre ou palette)"
+                    },
+                    "value": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Money"
+                            }
+                        ],
+                        "example": {
+                            "value": 30,
+                            "currency": "EUR"
+                        },
+                        "description": "La valeur des marchandises contenues dans le colis."
+                    },
+                    "width": {
+                        "type": "integer",
+                        "example": 15,
+                        "description": "Le second côté le plus long du colis en centimètres."
+                    },
+                    "height": {
+                        "type": "integer",
+                        "default": 0,
+                        "example": 11,
+                        "description": "Le côté le plus court du colis en centimètres. Non requis pour les colis de type LETTER."
+                    },
+                    "length": {
+                        "type": "integer",
+                        "example": 16,
+                        "description": "Le côté le plus long du colis en centimètres."
+                    },
+                    "weight": {
+                        "type": "number",
+                        "format": "double",
+                        "example": 1.5,
+                        "description": "Le poids du colis en kilogrammes. La précision est au gramme près (0,001 kg)"
+                    },
+                    "content": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Content"
+                            }
+                        ],
+                        "example": {
+                            "id": "content:v1:10150",
+                            "description": "Livre illustré pour enfants"
+                        },
+                        "description": "La description du contenu du colis. L'id de la catégorie de contenu doit être le même pour tous les éléments."
+                    },
+                    "stackable": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Si le package est empilable ou non. Ce champ n'est pas encore utilisé."
+                    },
+                    "externalId": {
+                        "type": "string",
+                        "example": "XYZ12345",
+                        "description": "Un identifiant unique pour le Package, généralement provenant d'un autre système."
+                    }
+                },
+                "description": "Les objets _Package_ représentent le conteneur physique expédié (colis, lettre ou palette). Le type de conteneur doit être le même pour tous les éléments de cet envoi.\nLes colis ont les dimensions suivantes : - Poids, en kilogrammes (float). - Longueur, en centimètres (entier). - Largeur, en centimètres (entier). - Hauteur, en centimètres (entier). La hauteur n'est pas obligatoire pour le type LETTER.\nL'id de la catégorie de contenu doit être identique pour tous les éléments de cet envoi.\n"
+            },
+            "Location": {
+                "type": "object",
+                "required": [
+                    "street",
+                    "city",
+                    "country"
+                ],
+                "properties": {
+                    "city": {
+                        "type": "string",
+                        "example": "Paris"
+                    },
+                    "state": {
+                        "type": "string",
+                        "description": "Code ISO à 2 lettres pour l'état"
+                    },
+                    "number": {
+                        "type": "string",
+                        "example": 4
+                    },
+                    "street": {
+                        "type": "string",
+                        "example": "boulevard des capucines"
+                    },
+                    "position": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Position"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "postalCode": {
+                        "type": "string",
+                        "example": 75009
+                    },
+                    "countryIsoCode": {
+                        "type": "string",
+                        "example": "FR",
+                        "description": "Code ISO à 2 lettres pour le pays"
+                    }
+                },
+                "description": "Les objets _Location_ désignées des emplacements géocodables et des lieux."
+            },
+            "Position": {
+                "type": "object",
+                "required": [
+                    "latitude",
+                    "longitude"
+                ],
+                "properties": {
+                    "latitude": {
+                        "type": "string",
+                        "example": 48.859224
+                    },
+                    "longitude": {
+                        "type": "string",
+                        "example": 2.346714
+                    }
+                }
+            },
+            "Shipment": {
+                "type": "object",
+                "required": [
+                    "content",
+                    "fromAddress",
+                    "toAddress",
+                    "packages"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "packages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Package"
+                        },
+                        "description": "Tableau de colis à expédier."
+                    },
+                    "toAddress": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Address"
+                            }
+                        ],
+                        "example": {
+                            "type": "RESIDENTIAL",
+                            "contact": {
+                                "email": "dt@acme.com",
+                                "phone": 33612341234,
+                                "lastName": "Targaryen",
+                                "firstName": "Daenerys"
+                            },
+                            "location": {
+                                "city": "Paris",
+                                "number": 15,
+                                "street": "rue Marsollier",
+                                "postalCode": 75002,
+                                "countryIsoCode": "FR"
+                            }
+                        },
+                        "description": "L'adresse de destination."
+                    },
+                    "externalId": {
+                        "type": "string",
+                        "example": "ABC1234",
+                        "description": "Identifiant pour le Shipment, généralement issu d'un autre système."
+                    },
+                    "fromAddress": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Address"
+                            }
+                        ],
+                        "example": {
+                            "type": "BUSINESS",
+                            "contact": {
+                                "email": "js@acme.com",
+                                "phone": 33612341234,
+                                "company": "Acme",
+                                "lastName": "Snow",
+                                "firstName": "Jon"
+                            },
+                            "location": {
+                                "city": "Paris",
+                                "number": 4,
+                                "street": "boulevard des Capucines",
+                                "postalCode": 75009,
+                                "countryIsoCode": "FR"
+                            },
+                            "additionalInformation": "Sonner au 2ème étage."
+                        },
+                        "description": "L'adresse d'expédition."
+                    },
+                    "pickupPointCode": {
+                        "type": "string",
+                        "example": 99439,
+                        "description": "Le point de proximité où le destinataire récupérera le colis. Obligatoire dans le cas d'un service d'expédition de colis en point relais."
+                    },
+                    "dropoffPointCode": {
+                        "type": "string",
+                        "example": 99438,
+                        "description": "Le point de proximité où l'expéditeur déposera le colis. Facultatif."
+                    },
+                    "customsDeclaration": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CustomsDeclaration"
+                            }
+                        ]
+                    }
+                }
+            },
+            "BaseEvent": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "shippingOrderId": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "shipmentExternalId": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                }
+            },
+            "ParcelPoint": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": 32058,
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "MINUTE PHONE",
+                        "readOnly": true
+                    },
+                    "status": {
+                        "enum": [
+                            "AVAILABLE",
+                            "UNAVAILABLE"
+                        ],
+                        "type": "string",
+                        "example": "AVAILABLE"
+                    },
+                    "network": {
+                        "$ref": "#/components/schemas/ParcelPointNetworksEnum"
+                    },
+                    "location": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Location"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "openingDays": {
+                        "type": "object",
+                        "properties": {
+                            "FRIDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "MONDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "SUNDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "TUESDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "SATURDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "THURSDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "WEDNESDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "BaseResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "integer",
+                        "example": 200,
+                        "description": "Code HTTP de la réponse"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2024-02-23T21:15:28+0100"
+                    }
+                }
+            },
+            "Subscription": {
+                "type": "object",
+                "required": [
+                    "eventType",
+                    "callbackUrl",
+                    "webhookSecret"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": 123,
+                        "readOnly": true,
+                        "description": "id de la souscription"
+                    },
+                    "appId": {
+                        "type": "string",
+                        "example": "app-cda02e2bec10616f0d847291b8ac1ea3",
+                        "readOnly": true,
+                        "description": "id de l'application API v3"
+                    },
+                    "status": {
+                        "enum": [
+                            "ACTIVE",
+                            "INACTIVE",
+                            "SUSPENDED"
+                        ],
+                        "type": "string",
+                        "example": "ACTIVE",
+                        "readOnly": true
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "example": "2024-09-05T23:09:20+02:00",
+                        "readOnly": true
+                    },
+                    "eventType": {
+                        "enum": [
+                            "DOCUMENT_CREATED",
+                            "TRACKING_CHANGED"
+                        ],
+                        "type": "string",
+                        "example": "DOCUMENT_CREATED"
+                    },
+                    "callbackUrl": {
+                        "type": "string",
+                        "example": "https://any.url"
+                    },
+                    "webhookSecret": {
+                        "type": "string",
+                        "example": "AZERGAERG2AERGA2ER",
+                        "description": "La clé de validation du webhook sera utilisée pour encoder l'en-tête `x-bxt-signature` et vous permet d'authentifier les appels."
+                    }
+                },
+                "description": "L'objet Subscription est associé à l'application API v3 rattachée à votre compte et reçoit uniquement les événements de cette application de compte."
+            },
+            "OpeningPeriod": {
+                "type": "object",
+                "properties": {
+                    "closingTime": {
+                        "type": "string",
+                        "format": "time",
+                        "example": "18:00"
+                    },
+                    "openingTime": {
+                        "type": "string",
+                        "format": "time",
+                        "example": "08:00"
+                    }
+                }
+            },
+            "ParcelPointV2": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": 32058,
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "MINUTE PHONE",
+                        "readOnly": true
+                    },
+                    "location": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Location"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "openingDays": {
+                        "type": "object",
+                        "properties": {
+                            "FRIDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "MONDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "SUNDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "TUESDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "SATURDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "THURSDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            },
+                            "WEDNESDAY": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OpeningPeriod"
+                                }
+                            }
+                        }
+                    },
+                    "compatibleNetworks": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ParcelPointNetworksEnum"
+                        },
+                        "description": "la liste des réseaux dans lesquels le point de proximité se trouve."
+                    }
+                }
+            },
+            "ShippingOrder": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "2440000000MONR4IA8FR",
+                        "readOnly": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ShippingOrderStatusEnum"
+                    },
+                    "shipmentId": {
+                        "type": "string",
+                        "example": 12345
+                    },
+                    "deliveryPriceExclTax": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Money"
+                            }
+                        ],
+                        "example": {
+                            "value": 4.3,
+                            "currency": "EUR"
+                        },
+                        "readOnly": true
+                    },
+                    "estimatedDeliveryDate": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-02-29",
+                        "readOnly": true,
+                        "description": "La date à laquelle l'envoi est censé être livré. Elle peut être sujette à modification en fonction de la date réelle de remise au transporteur."
+                    },
+                    "insurancePriceExclTax": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Money"
+                            }
+                        ],
+                        "example": {
+                            "value": 0.8,
+                            "currency": "EUR"
+                        },
+                        "readOnly": true,
+                        "description": "Ce prix n'est présent que si l'assurance est commandée"
+                    },
+                    "expectedTakingOverDate": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-02-23",
+                        "description": "La date souhaitée à laquelle le transporteur devra traiter (recevra en dépôt ou collectera) les colis à expédier."
+                    }
+                }
+            },
+            "ErrorParameter": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "field": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "parameters": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ContentCategory": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PackageTracking": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/PackageTrackingStatusEnum"
+                    },
+                    "history": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PackageTrackingDetail"
+                        },
+                        "description": "Tableau des événements de suivi des colis. Il contient l'historique de tous les statuts de suivi, en commençant par le dernier événement de suivi en premier.\n"
+                    },
+                    "isFinal": {
+                        "type": "boolean",
+                        "example": true,
+                        "readOnly": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Livraison effectuée",
+                        "readOnly": true
+                    },
+                    "packageId": {
+                        "type": "string",
+                        "example": "CR2402230000000008121",
+                        "readOnly": true
+                    },
+                    "trackingNumber": {
+                        "type": "string",
+                        "example": "CR240223000000000812",
+                        "readOnly": true,
+                        "description": "le numéro de suivi du transporteur pour l'expédition"
+                    },
+                    "trackingDateTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-02-24 12:00:00",
+                        "readOnly": true
+                    },
+                    "packageExternalId": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Identifiant défini au moment de la création de la commande d'expédition"
+                    },
+                    "packageTrackingUrl": {
+                        "type": "string",
+                        "example": "http://www.chronopost.fr/expedier/inputLTNumbersNoJahia.do?lang=fr_FR&listeNumeros=CR2402230000000008121",
+                        "readOnly": true,
+                        "description": "l'url de suivi du transporteur"
+                    }
+                }
+            },
+            "ShippingDocument": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Cette URL peut être utilisée pour télécharger le fichier du document. Cette URL est une URL signée qui expire après 7 jours.\n"
+                    },
+                    "type": {
+                        "enum": [
+                            "LABEL",
+                            "PROFORMA",
+                            "CN23",
+                            "VOUCHER"
+                        ],
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "* LABEL : le bordereau d'expédition (peut être pour tous les colis ou un seul)\n* PROFORMA : la facture pro forma à destination des douanes, inutile dans le cas d'une déclaration sans papier\n* CN23 : le formulaire CN23 à destination des douanes (disponible uniquement avec La Poste et Delivengo)\n* VOUCHER : un document à scanner par le transporteur lors de la remise des envois (présent uniquement pour certains transporteurs tels que La Poste, TNT Express)\n"
+                    },
+                    "format": {
+                        "enum": [
+                            "PDF_A4",
+                            "PDF_10x15"
+                        ],
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Le format du document"
+                    }
+                },
+                "description": "Un objet _ShippingDocument_ est un document relatif à l'expédition. Certains documents sont associés à tous les colis du _Shipment_ et certains peuvent être liés à un seul _Package_. Le type de document principal est le bordereau d'expédition _LABEL_.\n"
+            },
+            "NearbyParcelPoint": {
+                "type": "object",
+                "properties": {
+                    "parcelpoint": {
+                        "$ref": "#/components/schemas/ParcelPoint"
+                    },
+                    "distanceFromSearchLocation": {
+                        "type": "integer",
+                        "example": 450,
+                        "description": "la distance entre le point de proximité et l'emplacement de référence en mètres"
+                    }
+                }
+            },
+            "CustomsDeclaration": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "$ref": "#/components/schemas/CustomsDeclarationReasonEnum"
+                    },
+                    "articles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Article"
+                        },
+                        "description": "Tableau des descriptions de marchandises destinées à l'expédition internationale.\n"
+                    }
+                },
+                "description": "Un objet CustomsDeclaration contient des objets Article et toutes les informations nécessaires à la génération des formulaires douaniers requis pour l'expédition internationale.\n"
+            },
+            "NearbyParcelPointV2": {
+                "type": "object",
+                "properties": {
+                    "parcelpoint": {
+                        "$ref": "#/components/schemas/ParcelPointV2"
+                    },
+                    "distanceFromSearchLocation": {
+                        "type": "integer",
+                        "example": 450,
+                        "description": "la distance entre le point de proximité et l'emplacement de référence en mètres"
+                    }
+                }
+            },
+            "WebhookEventPayload": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/WebhookEventDocumentCreated"
+                            },
+                            {
+                                "$ref": "#/components/schemas/WebhookEventTrackingChanged"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "PackageTrackingEvent": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseEvent"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "enum": [
+                                    "TRACKING_CHANGED"
+                                ]
+                            },
+                            "trackings": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PackageTracking"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "SubscriptionResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "$ref": "#/components/schemas/Subscription"
+                            }
+                        }
+                    }
+                ]
+            },
+            "PackageTrackingDetail": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/PackageTrackingStatusEnum"
+                    },
+                    "isFinal": {
+                        "type": "boolean",
+                        "example": true,
+                        "readOnly": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Livraison effectuée",
+                        "readOnly": true
+                    },
+                    "trackingDateTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-02-24 12:00:00",
+                        "readOnly": true
+                    }
+                }
+            },
+            "ShippingDocumentEvent": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseEvent"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "enum": [
+                                    "DOCUMENT_CREATED"
+                                ]
+                            },
+                            "documents": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/ShippingDocument"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "ShippingOrderResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "$ref": "#/components/schemas/ShippingOrder"
+                            }
+                        }
+                    }
+                ]
+            },
+            "ParcelPointNetworksEnum": {
+                "type": "string",
+                "example": "MONR_NETWORK"
+            },
+            "ShippingOrderStatusEnum": {
+                "enum": [
+                    "PENDING",
+                    "REQUESTED",
+                    "CONFIRMED",
+                    "CANCELLED"
+                ],
+                "type": "string",
+                "example": "PENDING",
+                "readOnly": true,
+                "description": "|Valeur|Description|\n|----|-----------|\n|PENDING|L'envoi est enregistré auprès de Boxtal mais pas encore auprès du transporteur choisi|\n|REQUESTED|L'envoi est enregistré auprès du transporteur choisi|\n|CONFIRMED|L'envoi est confirmé par le transporteur et possède un bordereau d'expédition|\n|CANCELLED|L'envoi est annulé|\n"
+            },
+            "SubscriptionListResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Subscription"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "PackageTrackingStatusEnum": {
+                "enum": [
+                    "ANNOUNCED",
+                    "SHIPPED",
+                    "IN_TRANSIT",
+                    "OUT_FOR_DELIVERY",
+                    "FAILED_ATTEMPT",
+                    "REACHED_DELIVERY_PICKUP_POINT",
+                    "DELIVERED",
+                    "RETURNED",
+                    "EXCEPTION"
+                ],
+                "type": "string",
+                "example": "DELIVERED",
+                "readOnly": true,
+                "description": "\n|Valeur|Description|\n|----|-----------|\n|ANNOUNCED| Le bordereau d'expédition est créé mais le colis n'est pas encore expédié |\n|SHIPPED| Le colis est soit récupéré par le transporteur, soit déposé dans un point de proximité |\n|IN_TRANSIT| Le colis a été scanné par le transporteur et est en transit |\n|OUT_FOR_DELIVERY| Le colis est en cours de livraison |\n|FAILED_ATTEMPT| Quelque chose a empêché la livraison du colis |\n|REACHED_DELIVERY_PICKUP_POINT| Le colis est disponible pour être récupéré dans un point de proximité |\n|DELIVERED| Le colis a été livré au destinataire ou le destinataire a récupéré le colis dans un point de proximité |\n|RETURNED| Le colis est renvoyé à l'expéditeur |\n|EXCEPTION| Un problème est survenu pendant le transit qui nécessite une action de l'expéditeur |\n"
+            },
+            "ParcelPointSearchResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/NearbyParcelPoint"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "CreateShippingOrderRequest": {
+                "type": "object",
+                "properties": {
+                    "insured": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "shipment": {
+                        "$ref": "#/components/schemas/Shipment"
+                    },
+                    "labelType": {
+                        "enum": [
+                            "PDF_A4",
+                            "PDF_10x15"
+                        ],
+                        "type": "string",
+                        "example": "PDF_A4",
+                        "description": "Le format des bordereaux d'expédition de cet envoi. Si aucune préférence n'est spécifiée, les préférences du compte sont utilisées pour définir la valeur par défaut de ce paramètre. Si aucune préférence n'est spécifiée, PDF_A4 est choisi.\n"
+                    },
+                    "shippingOfferId": {
+                        "type": "string",
+                        "description": "L'identifiant de l'offre d'expédition. Doit être spécifié lorsque vous souhaitez utiliser des offres d'expédition de contrats hébergés.\n"
+                    },
+                    "shippingOfferCode": {
+                        "type": "string",
+                        "example": "MONR-CpourToi",
+                        "description": "Le code de l'offre d'expédition. Ce champ est obligatoire sauf si vous spécifiez un shippingOfferId."
+                    },
+                    "expectedTakingOverDate": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2022-10-20",
+                        "description": "La date souhaitée à laquelle le transporteur devra traiter (recevra en dépôt ou collectera) les colis à expédier."
+                    }
+                }
+            },
+            "ContentCategoryListResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/ContentCategory"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "example": {
+                    "status": 200,
+                    "content": [
+                        {
+                            "id": "content:v1:10120",
+                            "label": "Journaux"
+                        }
+                    ],
+                    "timestamp": "2024-02-23T21:15:28+0100"
+                }
+            },
+            "CreateShippingOrderResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "$ref": "#/components/schemas/ShippingOrder"
+                            }
+                        }
+                    }
+                ]
+            },
+            "PackageTrackingListResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PackageTracking"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "ParcelPointSearchResponseV2": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/NearbyParcelPointV2"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "WebhookEventDocumentCreated": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "id de l'événement"
+                    },
+                    "type": {
+                        "enum": [
+                            "DOCUMENT_CREATED"
+                        ],
+                        "type": "string"
+                    },
+                    "payload": {
+                        "type": "object",
+                        "properties": {
+                            "documents": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/ShippingDocument"
+                                }
+                            }
+                        }
+                    },
+                    "shippingOrderId": {
+                        "type": "string",
+                        "description": "La commande d'expédition concernée par l'événement"
+                    },
+                    "shipmentExternalId": {
+                        "type": "string",
+                        "description": "L'expédition (id externe) concerné par l'événement"
+                    }
+                }
+            },
+            "WebhookEventTrackingChanged": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "id de l'événement."
+                    },
+                    "type": {
+                        "enum": [
+                            "TRACKING_CHANGED"
+                        ],
+                        "type": "string"
+                    },
+                    "payload": {
+                        "type": "object",
+                        "properties": {
+                            "trackings": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PackageTracking"
+                                }
+                            }
+                        }
+                    },
+                    "shippingOrderId": {
+                        "type": "string",
+                        "description": "La commande d'expédition concernée par l'événement"
+                    },
+                    "shipmentExternalId": {
+                        "type": "string",
+                        "description": "L'expédition (id externe) concerné par l'événement"
+                    }
+                }
+            },
+            "CustomsDeclarationReasonEnum": {
+                "enum": [
+                    "SALE",
+                    "REPAIR",
+                    "RETURN",
+                    "GIFT",
+                    "SAMPLE",
+                    "DOCUMENTS",
+                    "PERSONAL_USE",
+                    "OTHER"
+                ],
+                "type": "string",
+                "example": "SALE",
+                "description": "Utilisez:\n- SALE pour une vente.\n- REPAIR pour une réparation.\n- RETURN pour un retour.\n- GIFT pour un cadeau.\n- SAMPLE pour un échantillon.\n- DOCUMENTS pour des documents inter-entreprise.\n- PERSONAL_USE pour un usage personnel.\n- OTHER pour tout autre raison.\n"
+            },
+            "ShippingDocumentListResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BaseResponse"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/ShippingDocument"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "example": {
+                    "status": 200,
+                    "content": [
+                        {
+                            "url": "https://document.boxtal.com/shipping-label/2440000050CHRP4xxxxx_bordereau.pdf?Expires=1711226314&Signature=xxxxxx&Key-Pair-Id=xxxx",
+                            "type": "LABEL",
+                            "format": "PDF_A4"
+                        }
+                    ],
+                    "timestamp": "2024-02-23T21:38:34+0100"
+                }
+            }
+        },
+        "securitySchemes": {
+            "BasicAuth": {
+                "type": "http",
+                "scheme": "basic",
+                "description": "Les requêtes HTTP doivent être authentifiées à l'aide de l'en-tête Authorization. La valeur d'en-tête peut utiliser la norme d'authentification Basic avec le mot `Basic` suivi d'un espace et d'une chaîne codée en base64 accessKey:secretKey, accessKey et secretKey étant les informations d'identification que vous avez obtenues lors de la création de votre application de compte API v3 sur notre application développeur.\nPar exemple, pour autoriser ABCDEFGHIJ0123456789*:*123e4567-e89b-12d3-a456-426655440000 le client enverrait ``` Authorization: Basic QUJDREVGR0hJSjAxMjM0NTY3ODk6MTIzZTQ1NjctZTg5Yi0xMmQzLWE0NTYtNDI2NjU1NDQwMDAw ```\n"
+            },
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "description": "Les requêtes HTTP doivent être authentifiées à l'aide de l'en-tête Authorization. La valeur de l'en-tête peut utiliser la norme d'authentification Bearer avec le mot `Bearer` suivi d'un espace et du jeton d'accès que vous avez obtenu de notre endpoint d'authentification.\n"
+            }
+        }
+    }
+}

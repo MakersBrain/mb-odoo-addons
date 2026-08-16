@@ -1,0 +1,1132 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_webshop
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-16 20:37+0000\n"
+"PO-Revision-Date: 2026-08-16 20:37+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/sale_order.py:0
+msgid "%(product)s is no longer available in the requested quantity."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
+msgid "01 · Material"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
+msgid "02 · Process"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
+msgid "03 · Care"
+msgstr ""
+
+#. module: mb_webshop
+#: model:mail.template,body_html:mb_webshop.mail_template_return_status
+msgid ""
+"<div style=\"margin: 0; padding: 0;\">\n"
+"    <p style=\"margin: 0; padding: 0; font-size: 13px;\">\n"
+"        Hello <t t-out=\"object.partner_id.name or ''\">Customer</t>,<br/><br/>\n"
+"        <t t-if=\"object.state == 'requested'\">\n"
+"            We received return request <strong t-out=\"object.name\">RET/2026/00001</strong>\n"
+"            for order <strong t-out=\"object.order_id.name\">S00001</strong>.\n"
+"            The workshop will review it before any items are sent back.\n"
+"        </t>\n"
+"        <t t-elif=\"object.state == 'approved'\">\n"
+"            Your return <strong t-out=\"object.name\">RET/2026/00001</strong> was approved.\n"
+"            The workshop will contact you with the return instructions.\n"
+"        </t>\n"
+"        <t t-elif=\"object.state == 'rejected'\">\n"
+"            Your return <strong t-out=\"object.name\">RET/2026/00001</strong> could not be approved.\n"
+"            <t t-if=\"object.decision_note\"><br/><span t-out=\"object.decision_note\"/></t>\n"
+"        </t>\n"
+"        <t t-elif=\"object.state == 'received'\">\n"
+"            The workshop received the items for return <strong t-out=\"object.name\">RET/2026/00001</strong>.\n"
+"        </t>\n"
+"        <t t-elif=\"object.state == 'resolved'\">\n"
+"            Return <strong t-out=\"object.name\">RET/2026/00001</strong> is complete.\n"
+"        </t>\n"
+"        <br/><br/>Thank you,<br/><t t-out=\"object.company_id.name or ''\">Workshop</t>\n"
+"    </p>\n"
+"</div>\n"
+"        "
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.portal_order_return
+msgid "<i class=\"fa fa-arrow-left me-1\"/> Back to order"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid ""
+"<i class=\"fa fa-check-circle text-success me-1\" invisible=\"not mb_ready_catalog\"/>\n"
+"                                <i class=\"fa fa-circle-o text-muted me-1\" invisible=\"mb_ready_catalog\"/>\n"
+"                                Published catalogue"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid ""
+"<i class=\"fa fa-check-circle text-success me-1\" invisible=\"not mb_ready_domain\"/>\n"
+"                            <i class=\"fa fa-circle-o text-muted me-1\" invisible=\"mb_ready_domain\"/>\n"
+"                            Public store URL assigned"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid ""
+"<i class=\"fa fa-check-circle text-success me-1\" invisible=\"not mb_ready_fulfilment\"/>\n"
+"                                <i class=\"fa fa-circle-o text-muted me-1\" invisible=\"mb_ready_fulfilment\"/>\n"
+"                                Published shipping or collection"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid ""
+"<i class=\"fa fa-check-circle text-success me-1\" invisible=\"not mb_ready_online_payment\"/>\n"
+"                                <i class=\"fa fa-circle-o text-muted me-1\" invisible=\"mb_ready_online_payment\"/>\n"
+"                                Production online payment"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid ""
+"<i class=\"fa fa-check-circle text-success me-1\" invisible=\"not mb_ready_returns\"/>\n"
+"                            <i class=\"fa fa-circle-o text-muted me-1\" invisible=\"mb_ready_returns\"/>\n"
+"                            Customer return window configured"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "<span class=\"ms-2\">days after delivery</span>"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "<span class=\"ms-2\">minutes</span>"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid ""
+"<span>\n"
+"                                <i class=\"fa fa-check-circle text-success me-1\" invisible=\"not mb_ready_sender\"/>\n"
+"                                <i class=\"fa fa-circle-o text-muted me-1\" invisible=\"mb_ready_sender\"/>\n"
+"                                Company email and outgoing mail server\n"
+"                            </span>"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.constraint,message:mb_webshop.constraint_mb_webshop_stock_hold_order_product_unique
+msgid "A cart can have only one stock hold per product."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/stock_hold.py:0
+msgid ""
+"A cart stock hold expired. Availability will be checked again before "
+"payment."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "A return quantity is invalid."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "A return quantity must be positive."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_stock_hold__state__active
+msgid "Active"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_ids
+msgid "Activities"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_type_icon
+msgid "Activity Type Icon"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Add a decision note before rejecting the return."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_res_config_settings__mb_launch_ready
+#: model:ir.model.fields,help:mb_webshop.field_website__mb_launch_ready
+msgid ""
+"All application configuration checks pass. DNS, TLS, provider webhooks, "
+"email deliverability and a live checkout still require deployment "
+"qualification."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.constraint,message:mb_webshop.constraint_mb_webshop_return_line_return_order_line_unique
+msgid "An order line can appear only once in a return request."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "Application configuration checks for the selected website."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "Application configuration is ready for deployment qualification."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_launch_ready
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_launch_ready
+msgid "Application launch ready"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Approve and Create Return"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Approve the return before receiving it."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__state__approved
+msgid "Approved"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_mb_webshop_stock_hold
+msgid "Atomic webshop cart stock hold"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_cart_hold_minutes
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_cart_hold_minutes
+msgid "Cart stock hold (minutes)"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/website.py:0
+msgid "Cart stock holds must last between 5 and 60 minutes."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.portal_order_return
+msgid ""
+"Choose the delivered items and quantities. The workshop will review the "
+"request before a return transfer is created."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
+msgid "Chosen with intent"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_search
+msgid "Closed"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__company_id
+msgid "Company"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "Complete the items below before deployment qualification."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_mb_control_capability_policy
+msgid "Control-plane capability enforcement policy"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_res_config_settings__mb_webshop_enabled
+#: model:ir.model.fields,help:mb_webshop.field_website__mb_webshop_enabled
+msgid "Controlled by the MakersBrain webshop capability."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_stock_hold__state__converted
+msgid "Converted to order"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Create Credit Note"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Create Replacement"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Create the replacement order before resolving the return."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__create_uid
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__create_uid
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__create_date
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__create_date
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__partner_id
+msgid "Customer"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_return_window_days
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_return_window_days
+msgid "Customer return window (days)"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_res_config_settings__mb_return_window_days
+#: model:ir.model.fields,help:mb_webshop.field_website__mb_return_window_days
+msgid "Days after delivery during which a customer can request a return."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__decision_note
+msgid "Decision Note"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "Delivery methods"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
+msgid ""
+"Describe the clay, metal, timber, stones, or reclaimed material used in this"
+" collection."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
+msgid "Designed to last"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_ir_http__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_control_capability_policy__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_res_company__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_sale_order__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_website__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Document why no refund is due."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Every return line must belong to the return's sales order."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_stock_hold__state__expired
+msgid "Expired"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__expires_at
+msgid "Expires At"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_maker_hero
+msgid "Explore the collection"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid ""
+"Final qualification still verifies DNS, TLS, payment webhooks,\n"
+"                        email deliverability, carrier credentials, and a live checkout."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
+msgid ""
+"Give practical care and repair guidance so the object can stay in use for a "
+"long time."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_ir_http
+msgid "HTTP Routing"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_maker_hero
+msgid "Handmade work in the studio"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_res_config_settings__mb_cart_hold_minutes
+#: model:ir.model.fields,help:mb_webshop.field_website__mb_cart_hold_minutes
+msgid "How long checkout stock remains reserved after cart activity."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_ir_http__id
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_control_capability_policy__id
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__id
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__id
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__id
+#: model:ir.model.fields,field_description:mb_webshop.field_res_company__id
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__id
+#: model:ir.model.fields,field_description:mb_webshop.field_sale_order__id
+#: model:ir.model.fields,field_description:mb_webshop.field_website__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_has_error
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_search
+msgid "In Progress"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Inspection result or rejection reason…"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Items"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__write_uid
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__write_uid
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__write_date
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__write_date
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__line_ids
+msgid "Line"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
+msgid "Made in the workshop"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_maker_hero
+msgid "Made slowly, kept for years"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "Mail servers"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.snippets
+msgid "Maker Hero"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_webshop_enabled
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_webshop_enabled
+msgid "MakersBrain webshop enabled"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "MakersBrain webshop pack"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Mark Received"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.snippets
+msgid "Material Story"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_fulfilment_count
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_fulfilment_count
+msgid "Mb Ready Fulfilment Count"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_payment_count
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_payment_count
+msgid "Mb Ready Payment Count"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_product_count
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_product_count
+msgid "Mb Ready Product Count"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__move_id
+msgid "Move"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__name
+msgid "Name"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_search
+msgid "Needs Approval"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.sale_order_portal_returns
+msgid "No items from this order are currently eligible for return."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__resolution__no_refund
+msgid "No refund"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_maker_hero
+msgid "Objects with a maker's touch"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Only %(quantity)s of %(product)s can be returned."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Only a requested return can be approved."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Only a requested return can be rejected."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid ""
+"Open the website editor and choose Theme to switch between the\n"
+"                        Ceramics, Jewellery, and Woodwork presets or customize them."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Operations"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__order_id
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__order_id
+msgid "Order"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__order_line_id
+msgid "Order Line"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "Payment providers"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Please tell the workshop why you are returning the item."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Post the native credit note before resolving the refund."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__product_id
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__product_id
+msgid "Product"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_online_payment
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_online_payment
+msgid "Production online payment"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "Products"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_domain
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_domain
+msgid "Public store URL"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_catalog
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_catalog
+msgid "Published catalogue"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_fulfilment
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_fulfilment
+msgid "Published fulfilment method"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__quantity
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__quantity
+#: model_terms:ir.ui.view,arch_db:mb_webshop.portal_order_return
+msgid "Quantity"
+msgstr ""
+
+#. module: mb_webshop
+#: model:mail.template,description:mb_webshop.mail_template_return_status
+msgid "Queued when a customer return changes status"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__reason
+msgid "Reason"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Receive the return and choose a resolution first."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Receive the return and select replacement first."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__state__received
+msgid "Received"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__resolution__refund
+msgid "Refund"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__refund_move_ids
+msgid "Refund Move"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Reject"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__state__rejected
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Rejected"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_stock_hold__state__released
+msgid "Released"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__replacement_order_id
+msgid "Replacement Order"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Replacement for %(return_name)s"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__resolution__replacement
+msgid "Replacement order"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__request_date
+msgid "Request Date"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.portal_order_return
+#: model_terms:ir.ui.view,arch_db:mb_webshop.sale_order_portal_returns
+msgid "Request a return"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Request and decision"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__state__requested
+msgid "Requested"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__resolution
+msgid "Resolution"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Resolve"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__state__resolved
+msgid "Resolved"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_user_id
+msgid "Responsible User"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__return_id
+msgid "Return"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__return_picking_ids
+msgid "Return Picking"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.actions.act_window,name:mb_webshop.action_webshop_returns
+#: model:ir.ui.menu,name:mb_webshop.menu_webshop_returns
+#: model_terms:ir.ui.view,arch_db:mb_webshop.sale_order_portal_returns
+msgid "Returns"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_returns
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_returns
+msgid "Returns policy"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Select at least one item to return."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.portal_order_return
+msgid "Send return request"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_maker_hero
+msgid "Share the material, process, and hands behind every unique piece."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
+msgid ""
+"Show the stages, tools, firing, finishing, and small variations that make "
+"each piece distinct."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__state
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__state
+msgid "State"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_search
+msgid "Status"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/website.py:0
+msgid "The customer return window must be between 7 and 90 days."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "The delivered quantity is no longer available for this return."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "The pack state is managed by your MakersBrain subscription."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "The return reason is too long."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "This order has no posted invoice to refund."
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "This order is not eligible for a webshop return."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_sender
+#: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_sender
+msgid "Transactional email sender"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__product_uom_id
+msgid "Unit"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.portal_order_return
+msgid "Up to"
+msgstr ""
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/return_request.py:0
+msgid "Validate every return transfer before marking it received."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
+msgid "Webshop Return"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_mb_webshop_return
+msgid "Webshop customer return"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_mb_webshop_return_line
+msgid "Webshop customer return line"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "Webshop launch readiness"
+msgstr ""
+
+#. module: mb_webshop
+#: model:mail.template,name:mb_webshop.mail_template_return_status
+msgid "Webshop: Return status"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.actions.server,name:mb_webshop.ir_cron_expire_stock_holds_ir_actions_server
+msgid "Webshop: expire cart stock holds"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_website
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__website_id
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_search
+msgid "Website"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__website_id
+msgid "Website through which this order was placed for eCommerce orders."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.portal_order_return
+msgid "Why are you returning these items?"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.sale_order_portal_returns
+msgid "Your return request was sent to the workshop."
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.snippets
+msgid "artisan, craft, studio, collection, handmade"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.snippets
+msgid "material, provenance, process, care, craft"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "methods)"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "products)"
+msgstr ""
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
+msgid "providers)"
+msgstr ""
+
+#. module: mb_webshop
+#: model:mail.template,subject:mb_webshop.mail_template_return_status
+msgid ""
+"{{ object.company_id.name }} return {{ object.name }}: {{ object.state }}"
+msgstr ""

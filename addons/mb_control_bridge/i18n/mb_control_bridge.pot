@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0-20260810\n"
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-15 20:18+0000\n"
-"PO-Revision-Date: 2026-08-15 20:18+0000\n"
+"POT-Creation-Date: 2026-08-16 20:51+0000\n"
+"PO-Revision-Date: 2026-08-16 20:51+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -77,6 +77,11 @@ msgstr ""
 #. module: mb_control_bridge
 #: model:ir.model,name:mb_control_bridge.model_mb_control_capability_policy
 msgid "Control-plane capability enforcement policy"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__mb_control_public_hostname
+msgid "Control-plane public hostname"
 msgstr ""
 
 #. module: mb_control_bridge
@@ -158,6 +163,16 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_users.py:0
 msgid "Erased data subject"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__evidence
+msgid "Evidence"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,help:mb_control_bridge.field_res_company__mb_control_public_hostname
+msgid "Exact hostname assigned by the trusted MakersBrain tenant gateway."
 msgstr ""
 
 #. module: mb_control_bridge
@@ -443,6 +458,12 @@ msgstr ""
 
 #. module: mb_control_bridge
 #. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "public_hostname must be a lowercase fully qualified hostname"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
 #: code:addons/mb_control_bridge/models/res_users.py:0
 msgid "subject is invalid"
 msgstr ""
@@ -493,6 +514,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_users.py:0
 msgid "the membership epoch already contains different data"
+msgstr ""
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "this company is linked to another public hostname"
 msgstr ""
 
 #. module: mb_control_bridge

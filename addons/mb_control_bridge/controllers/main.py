@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from werkzeug.exceptions import BadRequest, HTTPException
 
@@ -26,6 +27,130 @@ def _json_error(error):
 
 
 class ControlPlaneBridge(http.Controller):
+    @http.route(
+        "/mb_control/v1/carriers",
+        type="http",
+        auth="public",
+        methods=["GET"],
+        csrf=False,
+        save_session=False,
+    )
+    def carrier_targets(self):
+        try:
+            authenticate_control_request()
+            carriers = request.env["delivery.carrier"].sudo().search(
+                [("delivery_type", "=", "mb_boxtal"), ("company_id", "!=", False)]
+            )
+            return request.make_json_response([
+                {
+                    "company_id": carrier.company_id.id,
+                    "company_name": carrier.company_id.display_name,
+                    "carrier_id": carrier.id,
+                    "carrier_name": carrier.display_name,
+                    "provider": "boxtal",
+                    "environment": "production" if carrier.prod_environment else "test",
+                    "service_code": carrier.mb_provider_service_code or "",
+                    "configured": bool(carrier.mb_secret_ref),
+                }
+                for carrier in carriers
+            ])
+        except Exception as error:
+            if not isinstance(error, (HTTPException, ValidationError)):
+                _logger.exception("carrier target listing failed")
+            return _json_error(error)
+
+    @http.route(
+        "/mb_control/v1/carriers/bind-secret",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
+    def bind_carrier_secret(self):
+        try:
+            authenticate_control_request()
+            body = json_body()
+            workshop_id = str(body.get("workshop_id") or "")
+            company = request.env["res.company"].sudo().browse(int(body.get("company_id") or 0)).exists()
+            carrier = request.env["delivery.carrier"].sudo().browse(int(body.get("carrier_id") or 0)).exists()
+            environment = body.get("environment")
+            secret_ref = str(body.get("secret_ref") or "")
+            expected_prefix = f"docker/{workshop_id}/carrier/"
+            try:
+                secret_id = uuid.UUID(secret_ref.removeprefix(expected_prefix))
+            except (ValueError, AttributeError):
+                secret_id = None
+            if (
+                not company
+                or company.mb_control_workshop_id != workshop_id
+                or not carrier
+                or carrier.company_id != company
+                or carrier.delivery_type != "mb_boxtal"
+                or body.get("provider") != "boxtal"
+                or environment not in ("test", "production")
+                or carrier.prod_environment != (environment == "production")
+                or not secret_ref.startswith(expected_prefix)
+                or not secret_id
+                or secret_ref != f"{expected_prefix}{secret_id}"
+            ):
+                raise BadRequest("carrier secret scope is invalid")
+            values = {
+                "mb_secret_ref": secret_ref,
+                "mb_credential_state": environment,
+                "mb_last_error": False,
+            }
+            if carrier.mb_secret_ref and carrier.mb_secret_ref != secret_ref:
+                prepare_rotation = getattr(carrier, "_mb_prepare_secret_rotation", None)
+                credentials = body.get("credentials")
+                if not prepare_rotation or not isinstance(credentials, dict):
+                    raise BadRequest("carrier rotation material is invalid")
+                values["mb_subscription_id"] = prepare_rotation(credentials)
+            carrier.write(values)
+            return request.make_json_response({"bound": True, "carrier_id": carrier.id})
+        except Exception as error:
+            if not isinstance(error, (HTTPException, ValidationError)):
+                _logger.exception("carrier secret binding failed")
+            return _json_error(error)
+
+    @http.route(
+        "/mb_control/v1/carriers/unbind-secret",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
+    def unbind_carrier_secret(self):
+        try:
+            authenticate_control_request()
+            body = json_body()
+            workshop_id = str(body.get("workshop_id") or "")
+            company = request.env["res.company"].sudo().browse(int(body.get("company_id") or 0)).exists()
+            carrier = request.env["delivery.carrier"].sudo().browse(int(body.get("carrier_id") or 0)).exists()
+            if (
+                not company
+                or company.mb_control_workshop_id != workshop_id
+                or not carrier
+                or carrier.company_id != company
+                or carrier.delivery_type != "mb_boxtal"
+                or body.get("provider") != "boxtal"
+                or body.get("environment") not in ("test", "production")
+                or carrier.prod_environment != (body.get("environment") == "production")
+                or carrier.mb_secret_ref != body.get("secret_ref")
+            ):
+                raise BadRequest("carrier secret scope is invalid")
+            carrier.write({
+                "mb_secret_ref": False,
+                "mb_credential_state": "unconfigured",
+                "mb_last_error": False,
+            })
+            return request.make_json_response({"unbound": True, "carrier_id": carrier.id})
+        except Exception as error:
+            if not isinstance(error, (HTTPException, ValidationError)):
+                _logger.exception("carrier secret unbinding failed")
+            return _json_error(error)
+
     @http.route(
         "/mb_control/v1/tenant/bootstrap",
         type="http",

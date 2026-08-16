@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_local_handover" model="ir.actions.report">
+        <field name="name">Local Handover Worksheet</field>
+        <field name="model">mb.carrier.manifest</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mb_webshop_carrier_base.report_local_handover</field>
+        <field name="report_file">mb_webshop_carrier_base.report_local_handover</field>
+        <field name="print_report_name">'Local handover worksheet - %s' % object.date</field>
+    </record>
+    <template id="report_local_handover">
+        <t t-call="web.html_container"><t t-foreach="docs" t-as="manifest"><t t-call="web.external_layout">
+            <div class="page">
+                <h2>Local handover worksheet</h2>
+                <p><strong>Not a carrier-accepted manifest.</strong> This document is an internal checklist for parcels handed over on <span t-field="manifest.date"/>.</p>
+                <p><strong>Carrier:</strong> <span t-field="manifest.carrier_id"/> · <strong>Company:</strong> <span t-field="manifest.company_id"/></p>
+                <table class="table table-sm"><thead><tr><th>Transfer</th><th>Recipient</th><th>Tracking</th><th>Provider reference</th><th>Handed over</th></tr></thead>
+                    <tbody><tr t-foreach="manifest.shipment_ids" t-as="shipment"><td><span t-field="shipment.picking_id"/></td><td><span t-field="shipment.picking_id.partner_id"/></td><td><span t-field="shipment.tracking_number"/></td><td><span t-field="shipment.provider_ref"/></td><td>☐</td></tr></tbody>
+                </table>
+                <p>Parcel count: <strong t-esc="len(manifest.shipment_ids)"/></p>
+                <p>Handover signature: ____________________________________</p>
+            </div>
+        </t></t></t>
+    </template>
+</odoo>

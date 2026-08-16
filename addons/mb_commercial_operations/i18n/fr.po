@@ -1206,6 +1206,11 @@ msgid "Costs"
 msgstr "Coûts"
 
 #. module: mb_commercial_operations
+#: model:ir.model,website_form_label:mb_commercial_operations.model_project_task
+msgid "Create a Task"
+msgstr "Créer une tâche"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_contract__create_uid
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_cost_line__create_uid
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_obligation__create_uid

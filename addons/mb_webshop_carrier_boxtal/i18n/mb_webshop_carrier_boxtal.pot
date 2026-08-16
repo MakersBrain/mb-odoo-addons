@@ -1,0 +1,146 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_webshop_carrier_boxtal
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-16 20:37+0000\n"
+"PO-Revision-Date: 2026-08-16 20:37+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_webshop_carrier_boxtal
+#. odoo-python
+#: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
+msgid "A public HTTPS web base URL is required for Boxtal webhooks."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_boxtal.selection__delivery_carrier__delivery_type__mb_boxtal
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_boxtal.view_delivery_carrier_form_mb_boxtal
+msgid "Boxtal"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_commercial_readiness_confirmed
+msgid "Boxtal commercial readiness confirmed"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_content_category
+msgid "Boxtal content category"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#. odoo-python
+#: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
+msgid "Boxtal parcel dimensions must be greater than zero."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#. odoo-python
+#: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
+msgid "Boxtal supports only A4 and 10 × 15 cm PDF labels."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#. odoo-python
+#: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
+msgid "Boxtal webhook reactivation failed."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#. odoo-python
+#: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
+msgid "Boxtal webhook setup failed."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#. odoo-python
+#: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
+msgid "Configure a Boxtal shipping offer before testing the connection."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#. odoo-python
+#: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
+msgid ""
+"Confirm Boxtal deferred-payment and shipping-offer readiness before enabling"
+" production."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_height_cm
+msgid "Default parcel height (cm)"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_length_cm
+msgid "Default parcel length (cm)"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_width_cm
+msgid "Default parcel width (cm)"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_commercial_readiness_confirmed
+msgid ""
+"Manual release gate: the merchant confirms that Boxtal enabled deferred "
+"direct-debit payment and that the configured offer is usable. The connection"
+" test cannot verify these commercial settings."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_use_locations
+msgid "Offer uses parcel points"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_content_description
+msgid "Parcel content description"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__delivery_type
+msgid "Provider"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_use_locations
+msgid "Require the customer to choose a Boxtal parcel point at checkout."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model,name:mb_webshop_carrier_boxtal.model_delivery_carrier
+msgid "Shipping Methods"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#. odoo-python
+#: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
+msgid "The Boxtal webhook endpoint is not configured."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#. odoo-python
+#: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
+msgid "The carrier rotation material is invalid."
+msgstr ""

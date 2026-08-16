@@ -70,7 +70,8 @@ KNOWN_EXTERNAL = {
     "project_purchase", "project_stock_account", "purchase", "purchase_stock", "resource",
     "sale_management", "sale_project", "sale_timesheet", "stock_account",
     "sale", "sale_stock", "stock", "uom", "web", "website_sale_stock",
-    "website_sale_collect", "delivery",
+    "website_sale_collect", "delivery", "website_sale", "stock_delivery",
+    "delivery_mondialrelay", "website_sale_mondialrelay",
     # OCA, vendored and optional.
     "sale_order_global_stock_route", "stock_restrict_lot", "stock_picking_filter_lot",
     "stock_inventory", "stock_picking_report_valued", "sale_invoice_frequency",
