@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_webshop_stock_hold_system,mb.webshop.stock.hold system,model_mb_webshop_stock_hold,base.group_system,1,0,0,0
+access_webshop_stock_hold_stock_manager,mb.webshop.stock.hold stock manager,model_mb_webshop_stock_hold,stock.group_stock_manager,1,0,0,0
+access_webshop_return_sale_manager,mb.webshop.return sales manager,model_mb_webshop_return,sales_team.group_sale_manager,1,1,1,0
+access_webshop_return_stock_manager,mb.webshop.return stock manager,model_mb_webshop_return,stock.group_stock_manager,1,1,1,0
+access_webshop_return_line_sale_manager,mb.webshop.return.line sales manager,model_mb_webshop_return_line,sales_team.group_sale_manager,1,1,1,0
+access_webshop_return_line_stock_manager,mb.webshop.return.line stock manager,model_mb_webshop_return_line,stock.group_stock_manager,1,1,1,0

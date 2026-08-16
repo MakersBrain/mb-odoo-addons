@@ -7,7 +7,7 @@ plane. It links provisioned Odoo users to stable Rauthy subjects, applies one
 allowlisted workshop role and records signed entitlement state. It is not a
 general remote-administration API and stores no Rauthy administration secret.
 """,
-    "version": "19.0.1.8.0",
+    "version": "19.0.1.10.0",
     "license": "LGPL-3",
     "category": "Administration",
     "author": "Makersbrain",

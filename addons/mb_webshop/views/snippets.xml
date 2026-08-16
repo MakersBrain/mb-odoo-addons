@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="s_maker_hero" name="Maker hero">
+        <section class="s_maker_hero o_cc o_cc3 pt96 pb96" data-snippet="s_maker_hero" data-name="Maker Hero">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6">
+                        <p class="text-uppercase fw-semibold small mb-3">Made slowly, kept for years</p>
+                        <h1 class="display-2">Objects with a maker's touch</h1>
+                        <p class="lead mt-4">Share the material, process, and hands behind every unique piece.</p>
+                        <a class="btn btn-primary btn-lg mt-3" href="/shop">Explore the collection</a>
+                    </div>
+                    <div class="col-lg-6">
+                        <img src="/web/image/website.s_text_image_default_image"
+                             class="img img-fluid rounded shadow"
+                             alt="Handmade work in the studio" loading="lazy"/>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <template id="s_material_story" name="Material story">
+        <section class="s_material_story pt80 pb80" data-snippet="s_material_story" data-name="Material Story">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <p class="text-uppercase text-primary fw-semibold small">01 · Material</p>
+                        <h2 class="h3">Chosen with intent</h2>
+                        <p>Describe the clay, metal, timber, stones, or reclaimed material used in this collection.</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <p class="text-uppercase text-primary fw-semibold small">02 · Process</p>
+                        <h2 class="h3">Made in the workshop</h2>
+                        <p>Show the stages, tools, firing, finishing, and small variations that make each piece distinct.</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <p class="text-uppercase text-primary fw-semibold small">03 · Care</p>
+                        <h2 class="h3">Designed to last</h2>
+                        <p>Give practical care and repair guidance so the object can stay in use for a long time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <template id="snippets" inherit_id="website.snippets" name="MakersBrain craft snippets">
+        <xpath expr="//snippets[@id='snippet_structure']" position="inside">
+            <t t-snippet="mb_webshop.s_maker_hero" string="Maker Hero" group="intro"
+               t-thumbnail="/website/static/src/img/snippets_thumbs/s_cover.svg">
+                <keywords>artisan, craft, studio, collection, handmade</keywords>
+            </t>
+            <t t-snippet="mb_webshop.s_material_story" string="Material Story" group="content"
+               t-thumbnail="/website/static/src/img/snippets_thumbs/s_three_columns.svg">
+                <keywords>material, provenance, process, care, craft</keywords>
+            </t>
+        </xpath>
+    </template>
+</odoo>

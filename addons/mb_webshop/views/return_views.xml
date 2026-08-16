@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_webshop_return_list" model="ir.ui.view">
+        <field name="name">mb.webshop.return.list</field>
+        <field name="model">mb.webshop.return</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'requested'" decoration-success="state == 'resolved'" decoration-muted="state == 'rejected'">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="website_id" optional="show"/>
+                <field name="state" widget="badge"/>
+                <field name="resolution" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_webshop_return_form" model="ir.ui.view">
+        <field name="name">mb.webshop.return.form</field>
+        <field name="model">mb.webshop.return</field>
+        <field name="arch" type="xml">
+            <form string="Webshop Return">
+                <header>
+                    <button name="action_approve" type="object" string="Approve and Create Return" class="btn-primary" invisible="state != 'requested'"/>
+                    <button name="action_reject" type="object" string="Reject" invisible="state != 'requested'"/>
+                    <button name="action_mark_received" type="object" string="Mark Received" class="btn-primary" invisible="state != 'approved'"/>
+                    <button name="action_open_credit_note" type="object" string="Create Credit Note" invisible="state != 'received' or resolution != 'refund'"/>
+                    <button name="action_create_replacement" type="object" string="Create Replacement" invisible="state != 'received' or resolution != 'replacement' or replacement_order_id"/>
+                    <button name="action_resolve" type="object" string="Resolve" class="btn-primary" invisible="state != 'received'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="requested,approved,received,resolved"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Rejected" bg_color="text-bg-danger" invisible="state != 'rejected'"/>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="partner_id"/>
+                            <field name="request_date"/>
+                        </group>
+                        <group>
+                            <field name="website_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="resolution" readonly="state not in ('received',)"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Items" name="items">
+                            <field name="line_ids" readonly="1">
+                                <list create="0" delete="0">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="order_line_id" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Request and decision" name="decision">
+                            <group>
+                                <field name="reason"/>
+                                <field name="decision_note" placeholder="Inspection result or rejection reason…"/>
+                            </group>
+                        </page>
+                        <page string="Operations" name="operations">
+                            <group>
+                                <field name="return_picking_ids" widget="many2many_tags"/>
+                                <field name="refund_move_ids" widget="many2many_tags"/>
+                                <field name="replacement_order_id"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_webshop_returns" model="ir.actions.act_window">
+        <field name="name">Returns</field>
+        <field name="res_model">mb.webshop.return</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_requested': 1}</field>
+    </record>
+
+    <record id="view_webshop_return_search" model="ir.ui.view">
+        <field name="name">mb.webshop.return.search</field>
+        <field name="model">mb.webshop.return</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <filter name="requested" string="Needs Approval" domain="[('state', '=', 'requested')]"/>
+                <filter name="in_progress" string="In Progress" domain="[('state', 'in', ('approved', 'received'))]"/>
+                <filter name="closed" string="Closed" domain="[('state', 'in', ('rejected', 'resolved'))]"/>
+                <separator/>
+                <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                <filter string="Website" name="group_website" context="{'group_by': 'website_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <menuitem id="menu_webshop_returns" name="Returns" parent="website_sale.menu_orders" action="action_webshop_returns" sequence="5" groups="sales_team.group_sale_manager,stock.group_stock_manager"/>
+</odoo>

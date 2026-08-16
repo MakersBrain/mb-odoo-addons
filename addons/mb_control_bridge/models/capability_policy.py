@@ -15,6 +15,7 @@ class CapabilityPolicy(models.Model):
     reason = fields.Char(required=True, readonly=True)
     modules = fields.Json(required=True, readonly=True)
     rule_ids = fields.Many2many("ir.rule", readonly=True)
+    evidence = fields.Json(readonly=True, default=dict)
     enforced_at = fields.Datetime(required=True, readonly=True)
 
     _policy_unique = models.Constraint(
@@ -45,14 +46,17 @@ class CapabilityPolicy(models.Model):
                 raise ValidationError(_("the capability is already restricted differently"))
             return existing._evidence(applied=False)
 
+        custom_evidence = company._mb_apply_capability_restriction(module_key, reason)
+
         # Restrict writes only on models owned by the capability addons. Models
         # merely extended by an addon are intentionally excluded so unrelated
         # Odoo workflows remain available and historical records remain readable.
+        use_owned_model_rules = self._requires_owned_model_rules(module_key)
         model_data = company.env["ir.model.data"].sudo().search([
             ("module", "in", modules), ("model", "=", "ir.model")
-        ])
+        ]) if use_owned_model_rules else company.env["ir.model.data"]
         models_owned = model_data.mapped("res_id")
-        if not models_owned:
+        if not models_owned and use_owned_model_rules:
             raise ValidationError(_("the capability exposes no enforceable owned model"))
         rules = company.env["ir.rule"].sudo()
         created = rules.browse()
@@ -78,13 +82,18 @@ class CapabilityPolicy(models.Model):
             "reason": reason,
             "modules": modules,
             "rule_ids": [(6, 0, created.ids)],
+            "evidence": custom_evidence,
             "enforced_at": fields.Datetime.now(),
         })
         return policy._evidence(applied=True)
 
+    def _requires_owned_model_rules(self, module_key):
+        """Allow an addon to provide a stronger capability-specific adapter."""
+        return True
+
     def _evidence(self, applied):
         self.ensure_one()
-        return {
+        evidence = {
             "applied": applied,
             "adapter": "odoo_write_rules",
             "policy_id": self.id,
@@ -92,3 +101,5 @@ class CapabilityPolicy(models.Model):
             "write_blocked": True,
             "historical_read_retained": True,
         }
+        evidence.update(self.evidence or {})
+        return evidence

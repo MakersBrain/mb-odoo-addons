@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+    <record id="mail_template_return_status" model="mail.template">
+        <field name="name">Webshop: Return status</field>
+        <field name="model_id" ref="model_mb_webshop_return"/>
+        <field name="subject">{{ object.company_id.name }} return {{ object.name }}: {{ object.state }}</field>
+        <field name="email_from">{{ object.company_id.email_formatted or user.email_formatted }}</field>
+        <field name="partner_to">{{ object.partner_id.id }}</field>
+        <field name="use_default_to" eval="False"/>
+        <field name="description">Queued when a customer return changes status</field>
+        <field name="body_html" type="html">
+<div style="margin: 0; padding: 0;">
+    <p style="margin: 0; padding: 0; font-size: 13px;">
+        Hello <t t-out="object.partner_id.name or ''">Customer</t>,<br/><br/>
+        <t t-if="object.state == 'requested'">
+            We received return request <strong t-out="object.name">RET/2026/00001</strong>
+            for order <strong t-out="object.order_id.name">S00001</strong>.
+            The workshop will review it before any items are sent back.
+        </t>
+        <t t-elif="object.state == 'approved'">
+            Your return <strong t-out="object.name">RET/2026/00001</strong> was approved.
+            The workshop will contact you with the return instructions.
+        </t>
+        <t t-elif="object.state == 'rejected'">
+            Your return <strong t-out="object.name">RET/2026/00001</strong> could not be approved.
+            <t t-if="object.decision_note"><br/><span t-out="object.decision_note"/></t>
+        </t>
+        <t t-elif="object.state == 'received'">
+            The workshop received the items for return <strong t-out="object.name">RET/2026/00001</strong>.
+        </t>
+        <t t-elif="object.state == 'resolved'">
+            Return <strong t-out="object.name">RET/2026/00001</strong> is complete.
+        </t>
+        <br/><br/>Thank you,<br/><t t-out="object.company_id.name or ''">Workshop</t>
+    </p>
+</div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+</data></odoo>

@@ -8,6 +8,10 @@ from odoo.exceptions import ValidationError
 UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 )
+HOSTNAME_RE = re.compile(
+    r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+"
+    r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"
+)
 ENTITLEMENT_STATUSES = {"provisioning", "trial", "active", "past_due", "restricted", "suspended"}
 MODULE_BUNDLES = {
     "catalogue": ("mb_catalogue_sync",),
@@ -18,6 +22,7 @@ MODULE_BUNDLES = {
     "sumup": ("mb_payment_sumup", "mb_account_payment_sumup", "mb_pos_sumup"),
     "invoice-capture": ("mb_invoice_capture",),
     "inventory-capture": ("mb_inventory_capture",),
+    "webshop": ("mb_webshop",),
 }
 
 
@@ -26,6 +31,13 @@ class ResCompany(models.Model):
 
     mb_control_workshop_id = fields.Char(
         string="Control-plane workshop ID", copy=False, readonly=True, index=True
+    )
+    mb_control_public_hostname = fields.Char(
+        string="Control-plane public hostname",
+        copy=False,
+        readonly=True,
+        index=True,
+        help="Exact hostname assigned by the trusted MakersBrain tenant gateway.",
     )
     mb_control_bridge_token_hash = fields.Char(
         string="Control-plane tenant credential hash",
@@ -63,10 +75,18 @@ class ResCompany(models.Model):
         client_id = str(payload.get("oidc_client_id", "")).strip()
         issuer = str(payload.get("oidc_issuer", "")).rstrip("/")
         bridge_token = str(payload.get("bridge_token", ""))
+        public_hostname = str(payload.get("public_hostname", "")).strip()
         if not UUID_RE.fullmatch(workshop_id):
             raise ValidationError(_("workshop_id must be a lowercase UUID"))
         if self.mb_control_workshop_id and self.mb_control_workshop_id != workshop_id:
             raise ValidationError(_("this company is linked to another workshop"))
+        if not HOSTNAME_RE.fullmatch(public_hostname):
+            raise ValidationError(_("public_hostname must be a lowercase fully qualified hostname"))
+        if (
+            self.mb_control_public_hostname
+            and self.mb_control_public_hostname != public_hostname
+        ):
+            raise ValidationError(_("this company is linked to another public hostname"))
         if not client_id or not issuer.startswith(("https://", "http://rauthy.localhost:")):
             raise ValidationError(_("OIDC client and trusted issuer are required"))
         if not 48 <= len(bridge_token) <= 128 or not bridge_token.isalnum():
@@ -101,10 +121,21 @@ class ResCompany(models.Model):
             self._mb_bootstrap_french_accounting()
         self.write({
             "mb_control_workshop_id": workshop_id,
+            "mb_control_public_hostname": public_hostname,
             "mb_control_bridge_token_hash": hashlib.sha256(bridge_token.encode()).hexdigest(),
         })
+        if "website" in self.env:
+            self.env["website"].sudo().search([
+                ("company_id", "=", self.id),
+                ("domain", "=", False),
+            ]).write({"domain": public_hostname})
         self._mb_configure_login_policy(provider)
-        return {"applied": True, "workshop_id": workshop_id, "provider_id": provider.id}
+        return {
+            "applied": True,
+            "workshop_id": workshop_id,
+            "public_hostname": public_hostname,
+            "provider_id": provider.id,
+        }
 
     def _mb_bootstrap_french_accounting(self):
         """Give a newly provisioned workshop a usable French chart immediately."""
@@ -167,6 +198,7 @@ class ResCompany(models.Model):
         if policy:
             policy.rule_ids.unlink()
             policy.unlink()
+            self._mb_remove_capability_restriction(module_key)
         pending = records.filtered(lambda module: module.state == "uninstalled")
         if pending:
             # Only schedule the native module operation here. Immediate module
@@ -183,6 +215,14 @@ class ResCompany(models.Model):
             "modules": list(expected),
             "restriction_removed": restriction_removed,
         }
+
+    def _mb_apply_capability_restriction(self, module_key, reason):
+        """Extension point for capability-specific runtime enforcement."""
+        return {}
+
+    def _mb_remove_capability_restriction(self, module_key):
+        """Undo capability-specific enforcement after its policy is removed."""
+        return None
 
     def mb_restrict_module_bundle(self, payload):
         self.ensure_one()

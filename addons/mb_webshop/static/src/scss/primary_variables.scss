@@ -1,0 +1,77 @@
+// Curated starting points for Odoo 19's native Website Builder. These are
+// ordinary editor palettes: makers can switch, recolour and change typography
+// with the upstream editor, and no MakersBrain-only document format is created.
+
+$o-theme-font-configs: (
+    'IBM Plex Sans': (
+        'family': ('IBM Plex Sans', sans-serif),
+    ),
+    'Bitter': (
+        'family': ('Bitter', serif),
+    ),
+);
+
+$o-color-palettes: map-merge($o-color-palettes, (
+    'mb-ceramics': (
+        'o-color-1': #a44f35,
+        'o-color-2': #283d36,
+        'o-color-3': #eadfce,
+        'o-color-4': #fffaf2,
+        'o-color-5': #25211d,
+        'menu': 4,
+        'footer': 2,
+        'copyright': 5,
+    ),
+    'mb-jewellery': (
+        'o-color-1': #9b7444,
+        'o-color-2': #25232b,
+        'o-color-3': #e8e1dc,
+        'o-color-4': #fffdf9,
+        'o-color-5': #19181c,
+        'menu': 4,
+        'footer': 2,
+        'copyright': 5,
+    ),
+    'mb-woodwork': (
+        'o-color-1': #8a5a36,
+        'o-color-2': #30443a,
+        'o-color-3': #ded4c4,
+        'o-color-4': #fbf7ef,
+        'o-color-5': #25231f,
+        'menu': 4,
+        'footer': 2,
+        'copyright': 5,
+    ),
+));
+
+$o-selected-color-palettes-names: append($o-selected-color-palettes-names, 'mb-ceramics');
+$o-selected-color-palettes-names: append($o-selected-color-palettes-names, 'mb-jewellery');
+$o-selected-color-palettes-names: append($o-selected-color-palettes-names, 'mb-woodwork');
+
+$o-website-values-palettes: append($o-website-values-palettes, (
+    'color-palettes-name': 'mb-ceramics',
+    'font': 'IBM Plex Sans',
+    'headings-font': 'Bitter',
+    'btn-border-radius': .25rem,
+    'btn-border-radius-sm': .2rem,
+    'btn-border-radius-lg': .3rem,
+    'link-underline': 'never',
+));
+$o-website-values-palettes: append($o-website-values-palettes, (
+    'color-palettes-name': 'mb-jewellery',
+    'font': 'IBM Plex Sans',
+    'headings-font': 'Bitter',
+    'btn-border-radius': 0,
+    'btn-border-radius-sm': 0,
+    'btn-border-radius-lg': 0,
+    'link-underline': 'never',
+));
+$o-website-values-palettes: append($o-website-values-palettes, (
+    'color-palettes-name': 'mb-woodwork',
+    'font': 'IBM Plex Sans',
+    'headings-font': 'Bitter',
+    'btn-border-radius': .5rem,
+    'btn-border-radius-sm': .4rem,
+    'btn-border-radius-lg': .6rem,
+    'link-underline': 'never',
+));

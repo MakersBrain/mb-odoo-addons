@@ -39,7 +39,7 @@ of the web client keep Odoo's own layout. Fighting an upstream theme wholesale
 is a cost that never stops being paid, and the recolour above already makes the
 product read as MakersBrain.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "license": "LGPL-3",
     "category": "Technical",
     "author": "Makersbrain",

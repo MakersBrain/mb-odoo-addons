@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sale_order_portal_returns" inherit_id="sale.sale_order_portal_template" name="Webshop returns on order">
+        <xpath expr="//div[@id='sale_order_communication']" position="before">
+            <section class="my-4" id="mb_order_returns">
+                <div t-if="mb_return_submitted" class="alert alert-success" role="status">
+                    Your return request was sent to the workshop.
+                </div>
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                    <h3 class="mb-0">Returns</h3>
+                    <a t-if="mb_can_request_return" t-att-href="sale_order.get_portal_url(suffix='/return')" class="btn btn-primary">
+                        Request a return
+                    </a>
+                </div>
+                <div t-if="mb_returns" class="list-group">
+                    <div t-foreach="mb_returns" t-as="mb_return" class="list-group-item">
+                        <div class="d-flex justify-content-between gap-3">
+                            <strong t-field="mb_return.name"/>
+                            <span class="badge text-bg-secondary" t-field="mb_return.state"/>
+                        </div>
+                        <small class="text-muted" t-field="mb_return.request_date"/>
+                        <div class="mt-2" t-foreach="mb_return.line_ids" t-as="return_line">
+                            <span t-field="return_line.product_id"/> —
+                            <span t-field="return_line.quantity"/>
+                            <span t-field="return_line.product_uom_id"/>
+                        </div>
+                    </div>
+                </div>
+                <p t-elif="not mb_can_request_return" class="text-muted mb-0">
+                    No items from this order are currently eligible for return.
+                </p>
+            </section>
+            <hr/>
+        </xpath>
+    </template>
+
+    <template id="portal_order_return" name="Request a return">
+        <t t-call="portal.portal_layout">
+            <t t-set="additional_title">Request a return</t>
+            <div class="container py-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <a t-att-href="sale_order.get_portal_url()" class="btn btn-link px-0 mb-3">
+                            <i class="fa fa-arrow-left me-1"/> Back to order <span t-field="sale_order.name"/>
+                        </a>
+                        <h1 class="h2 mb-2">Request a return</h1>
+                        <p class="text-muted mb-4">
+                            Choose the delivered items and quantities. The workshop will review the request before a return transfer is created.
+                        </p>
+                        <div t-if="error" class="alert alert-danger" role="alert" t-out="error"/>
+                        <form method="post" t-att-action="sale_order.get_portal_url(suffix='/return')" class="card">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="card-body">
+                                <div t-foreach="returnable_lines" t-as="line" class="row align-items-center border-bottom py-3">
+                                    <div class="col">
+                                        <strong t-field="line.product_id"/>
+                                        <div class="small text-muted">
+                                            Up to <span t-out="returnable_quantities[line.id]"/> <span t-field="line.product_uom_id"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 col-md-3">
+                                        <label t-att-for="'line_%s' % line.id" class="form-label">Quantity</label>
+                                        <input type="number" min="0" t-att-max="returnable_quantities[line.id]" t-att-step="line.product_uom_id.rounding" value="0" t-att-id="'line_%s' % line.id" t-att-name="'line_%s' % line.id" class="form-control"/>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <label for="return_reason" class="form-label">Why are you returning these items?</label>
+                                    <textarea id="return_reason" name="reason" maxlength="2000" rows="4" required="required" class="form-control" t-out="request.params.get('reason', '')"/>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">Send return request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -8,6 +8,7 @@
             <xpath expr="//sheet" position="inside">
                 <group string="MakersBrain control plane" groups="base.group_system">
                     <field name="mb_control_workshop_id"/>
+                    <field name="mb_control_public_hostname"/>
                     <field name="mb_entitlement_version"/>
                     <field name="mb_entitlement_plan"/>
                     <field name="mb_entitlement_status"/>

@@ -1,0 +1,14 @@
+.s_maker_hero {
+    overflow: hidden;
+
+    img {
+        aspect-ratio: 4 / 5;
+        object-fit: cover;
+        width: 100%;
+    }
+}
+
+.s_material_story .col-lg-4 {
+    border-top: 1px solid rgba($body-color, .25);
+    padding-top: 1.5rem;
+}

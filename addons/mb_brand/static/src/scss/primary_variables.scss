@@ -55,6 +55,16 @@ $o-color-palettes: (
         'o-color-4': #ffffff,   // surface
         'o-color-5': #1e1915,   // ink
     ),
+    // Keep Odoo's complete second base palette. This file is prepended before
+    // html_editor defines its defaults; omitting base-2 makes Website's later
+    // map-merge receive null and breaks broad frontend asset compilation.
+    'base-2': (
+        'o-color-1': #337ab7,
+        'o-color-2': #e9ecef,
+        'o-color-3': #f8f9fa,
+        'o-color-4': #ffffff,
+        'o-color-5': #343a40,
+    ),
 );
 
 // Odoo builds `.btn-primary` from its own map rather than from Bootstrap's

@@ -121,6 +121,7 @@ class TestControlBridge(TransactionCase):
             "oidc_client_id": f"makersbrain-odoo-{workshop}",
             "oidc_issuer": "https://identity.example.test",
             "bridge_token": token,
+            "public_hostname": "atelier.makersbrain.fr",
         })
 
         self.assertEqual(
@@ -128,6 +129,23 @@ class TestControlBridge(TransactionCase):
             hashlib.sha256(token.encode()).hexdigest(),
         )
         self.assertNotEqual(self.company.mb_control_bridge_token_hash, token)
+        self.assertEqual(
+            self.company.mb_control_public_hostname,
+            "atelier.makersbrain.fr",
+        )
+
+    def test_tenant_public_hostname_is_strict_and_immutable(self):
+        from ..models.res_company import HOSTNAME_RE
+
+        self.assertTrue(HOSTNAME_RE.fullmatch("atelier.makersbrain.fr"))
+        for hostname in (
+            "ATELIER.makersbrain.fr",
+            "atelier",
+            "-atelier.makersbrain.fr",
+            "atelier..makersbrain.fr",
+            "atelier.makersbrain.fr;return 200",
+        ):
+            self.assertFalse(HOSTNAME_RE.fullmatch(hostname), hostname)
 
     def test_global_bridge_credential_is_valid_only_before_tenant_bootstrap(self):
         tenant_token = "T" * 64
