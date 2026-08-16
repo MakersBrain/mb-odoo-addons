@@ -112,7 +112,8 @@
   "mb_commercial_operations": {
     "identical": [
       "h",
-      "Source / date"
+      "Source / date",
+      "Verdict"
     ]
   },
   "mb_commercial_operations_urssaf": {

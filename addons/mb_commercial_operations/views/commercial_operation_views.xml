@@ -14,6 +14,11 @@
         <field name="planned_cost" sum="Planned cost"/>
         <field name="expected_revenue" sum="Expected revenue"/>
         <field name="planned_margin" sum="Planned margin"/>
+        <field name="planning_margin_per_hour" optional="show"/>
+        <field name="planning_recommendation" widget="badge" optional="show"
+               decoration-success="planning_recommendation == 'go'"
+               decoration-warning="planning_recommendation == 'marginal'"
+               decoration-danger="planning_recommendation == 'no_go'"/>
         <field name="state" widget="badge"/>
         <field name="company_id" groups="base.group_multi_company"/>
       </list>
@@ -87,6 +92,15 @@
                 <group>
                   <field name="planned_cost" readonly="1"/>
                   <field name="planned_margin" readonly="1"/>
+                  <field name="planning_effort_hours" readonly="1" invisible="not primary_scenario_id"/>
+                  <field name="planning_margin_per_hour" readonly="1" invisible="not primary_scenario_id"/>
+                  <field name="planning_recommendation" widget="badge" readonly="1"
+                         invisible="not primary_scenario_id"
+                         decoration-success="planning_recommendation == 'go'"
+                         decoration-warning="planning_recommendation == 'marginal'"
+                         decoration-danger="planning_recommendation == 'no_go'"/>
+                  <field name="planning_recommendation_note" readonly="1" invisible="not primary_scenario_id"/>
+                  <field name="primary_scenario_id" invisible="1"/>
                   <field name="currency_id" invisible="1"/>
                 </group>
               </group>
@@ -136,6 +150,12 @@
                   <field name="weighted_unit_contribution"/>
                   <field name="break_even_units"/>
                   <field name="break_even_revenue"/>
+                  <field name="margin_per_effort_hour"/>
+                  <field name="recommendation" widget="badge"
+                         decoration-success="recommendation == 'go'"
+                         decoration-warning="recommendation == 'marginal'"
+                         decoration-danger="recommendation == 'no_go'"/>
+                  <field name="recommendation_note" optional="show"/>
                   <field name="calculation_note"/>
                   <field name="currency_id" column_invisible="True"/>
                 </list>
@@ -193,6 +213,11 @@
         <filter name="upcoming" string="Upcoming" domain="[('planned_start', '&gt;=', context_today()), ('state', 'not in', ('cancelled', 'financially_closed'))]"/>
         <filter name="needs_close" string="Needs Financial Close" domain="[('state', '=', 'done')]"/>
         <separator/>
+        <filter name="verdict_go" string="Worth Attending" domain="[('planning_recommendation', '=', 'go')]"/>
+        <filter name="verdict_marginal" string="Marginal" domain="[('planning_recommendation', '=', 'marginal')]"/>
+        <filter name="verdict_no_go" string="Not Worth It" domain="[('planning_recommendation', '=', 'no_go')]"/>
+        <separator/>
+        <filter name="group_verdict" string="Verdict" context="{'group_by': 'planning_recommendation'}"/>
         <filter name="group_type" string="Type" context="{'group_by': 'operation_type'}"/>
         <filter name="group_state" string="State" context="{'group_by': 'state'}"/>
         <filter name="group_month" string="Month" context="{'group_by': 'planned_start:month'}"/>

@@ -150,6 +150,20 @@ class MbCommercialOperation(models.Model):
         related="primary_scenario_id.break_even_customer_receipts_incl_vat",
         string="Break-even Receipts Including VAT",
     )
+    planning_recommendation = fields.Selection(
+        related="primary_scenario_id.recommendation", string="Profitability Verdict",
+        store=True, index=True,
+    )
+    planning_recommendation_note = fields.Char(
+        related="primary_scenario_id.recommendation_note", string="Verdict Explanation",
+    )
+    planning_effort_hours = fields.Float(
+        related="primary_scenario_id.effort_hours", string="Planned Work + Travel Hours",
+    )
+    planning_margin_per_hour = fields.Monetary(
+        related="primary_scenario_id.margin_per_effort_hour",
+        string="Planned Margin per Hour", store=True,
+    )
     accepted_travel_cost = fields.Monetary(
         related="travel_estimate_id.total_operating_cost", string="Accepted Travel Cost",
     )

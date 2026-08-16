@@ -2,7 +2,11 @@ import math
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_compare
+from odoo.tools import float_compare, formatLang
+
+# Planned units must clear break-even by this share before a market is called worth it;
+# anything thinner is one rained-out afternoon away from a loss.
+BREAK_EVEN_HEADROOM_RATIO = 0.15
 
 
 class MbCommercialProfitabilityScenario(models.Model):
@@ -83,9 +87,39 @@ class MbCommercialProfitabilityScenario(models.Model):
     break_even_customer_receipts_incl_vat = fields.Monetary(compute="_compute_results", store=True)
     calculation_blocked = fields.Boolean(compute="_compute_results", store=True)
     calculation_note = fields.Char(compute="_compute_results", store=True)
+    target_margin_per_hour = fields.Monetary(
+        string="Target Margin per Hour",
+        help="Hourly margin floor this market is judged against. Defaults to the company "
+             "policy; zero judges the market on break-even headroom alone.",
+    )
+    effort_hours = fields.Float(
+        compute="_compute_results", store=True, string="Work + Travel Hours",
+        help="Hours the market actually costs: stand work plus travel.",
+    )
+    margin_per_effort_hour = fields.Monetary(
+        compute="_compute_results", store=True, string="Margin per Hour (Work + Travel)",
+    )
+    margin_per_work_hour = fields.Monetary(
+        compute="_compute_results", store=True, string="Margin per Work Hour",
+    )
+    break_even_headroom_ratio = fields.Float(
+        compute="_compute_results", store=True, string="Break-even Headroom",
+        help="How far the planned units sit above break-even, as a share of break-even.",
+    )
+    recommendation = fields.Selection(
+        [
+            ("unknown", "Not assessable"),
+            ("no_go", "Not worth it"),
+            ("marginal", "Marginal"),
+            ("go", "Worth it"),
+        ],
+        compute="_compute_results", store=True, string="Verdict",
+    )
+    recommendation_note = fields.Char(compute="_compute_results", store=True)
 
     _values_nonnegative = models.Constraint(
-        "CHECK(toll_cost >= 0 AND fuel_cost >= 0 AND planned_travel_hours >= 0 "
+        "CHECK(target_margin_per_hour >= 0 "
+        "AND toll_cost >= 0 AND fuel_cost >= 0 AND planned_travel_hours >= 0 "
         "AND travel_hourly_cost >= 0 AND ferry_cost >= 0 AND zone_cost >= 0 "
         "AND other_route_cost >= 0 AND manual_travel_total >= 0 "
         "AND planned_work_hours >= 0 AND work_hourly_cost >= 0 AND stall_rent >= 0 "
@@ -99,6 +133,10 @@ class MbCommercialProfitabilityScenario(models.Model):
             operation = self.env["mb.commercial.operation"].browse(values.get("operation_id"))
             if operation:
                 values.setdefault("travel_estimate_id", operation.travel_estimate_id.id)
+                values.setdefault(
+                    "target_margin_per_hour",
+                    operation.company_id.mb_market_target_margin_per_hour,
+                )
         return super().create(values_list)
 
     @api.depends(
@@ -106,7 +144,11 @@ class MbCommercialProfitabilityScenario(models.Model):
         "fuel_cost", "planned_travel_hours", "travel_hourly_cost", "ferry_cost",
         "zone_cost", "other_route_cost", "manual_travel_total", "planned_work_hours",
         "work_hourly_cost", "stall_rent", "parking_cost", "accommodation_cost",
-        "other_fixed_cost", "calculation_mode", "cost_line_ids.planned_amount",
+        "other_fixed_cost", "calculation_mode", "target_margin_per_hour",
+        "travel_estimate_id.duration_hours", "operation_id.planned_work_hours",
+        "operation_id.accepted_travel_duration_hours",
+        "cost_line_ids.category", "cost_line_ids.calculation", "cost_line_ids.quantity",
+        "cost_line_ids.planned_amount",
         "line_ids.expected_sold_qty", "line_ids.sale_price_excluded_tax",
         "line_ids.customer_price_incl_vat", "line_ids.channel_fee_unrounded",
         "line_ids.turnover_levy_unrounded", "line_ids.variable_cost_unrounded",
@@ -203,6 +245,108 @@ class MbCommercialProfitabilityScenario(models.Model):
             ) if not blocked else 0.0
             scenario.calculation_blocked = blocked
             scenario.calculation_note = note
+            work_hours = scenario._resolved_work_hours()
+            travel_hours = scenario._resolved_travel_hours()
+            effort_hours = work_hours + travel_hours
+            margin = scenario.projected_margin
+            scenario.effort_hours = effort_hours
+            scenario.margin_per_effort_hour = scenario.currency_id.round(
+                margin / effort_hours
+            ) if effort_hours > 0 else 0.0
+            scenario.margin_per_work_hour = scenario.currency_id.round(
+                margin / work_hours
+            ) if work_hours > 0 else 0.0
+            if blocked:
+                scenario.break_even_headroom_ratio = 0.0
+            elif scenario.break_even_units:
+                scenario.break_even_headroom_ratio = (
+                    units - scenario.break_even_units
+                ) / scenario.break_even_units
+            else:
+                # With no fixed costs, the first profitable sale is already above
+                # break-even. Use a bounded sentinel that clears the headroom gate
+                # instead of storing an undefined/infinite ratio.
+                scenario.break_even_headroom_ratio = 1.0
+            scenario.recommendation, scenario.recommendation_note = (
+                scenario._evaluate_recommendation(blocked, note, use_legacy_mix, units)
+            )
+
+    def _resolved_work_hours(self):
+        """Stand hours, from the scenario, its hourly labour lines, or the operation."""
+        self.ensure_one()
+        return (
+            self.planned_work_hours
+            or sum(
+                line.quantity for line in self.cost_line_ids
+                if line.category == "labour" and line.calculation == "hour"
+            )
+            or self.operation_id.planned_work_hours
+        )
+
+    def _resolved_travel_hours(self):
+        """Door-to-door travel hours behind the accepted route cost."""
+        self.ensure_one()
+        if self.route_cost_mode == "provider_total":
+            quoted = self.travel_estimate_id.duration_hours
+        else:
+            quoted = self.planned_travel_hours
+        return quoted or self.operation_id.accepted_travel_duration_hours
+
+    def _evaluate_recommendation(self, blocked, note, use_legacy_mix, units):
+        """Turn the break-even figures into a verdict a stallholder can act on."""
+        self.ensure_one()
+        if blocked:
+            return "unknown", note or _("Complete the scenario before judging this market.")
+        if use_legacy_mix or units <= 0:
+            return "unknown", _(
+                "Enter expected sold quantities: an average-basket mix without volumes "
+                "cannot be judged."
+            )
+        def money(amount):
+            return formatLang(self.env, amount, currency_obj=self.currency_id)
+
+        headroom_percent = self.break_even_headroom_ratio * 100.0
+        if self.projected_margin <= 0 or units < self.break_even_units:
+            return "no_go", _(
+                "Projected margin %(margin)s: %(units)s planned units against %(break_even)s "
+                "needed to break even.",
+                margin=money(self.projected_margin),
+                units=round(units, 2),
+                break_even=self.break_even_units,
+            )
+        if self.effort_hours <= 0:
+            return "marginal", _(
+                "%(margin)s above costs, but no work or travel hours are planned, so the "
+                "hourly return cannot be checked.",
+                margin=money(self.projected_margin),
+            )
+        if (
+            self.target_margin_per_hour
+            and self.margin_per_effort_hour < self.target_margin_per_hour
+        ):
+            return "marginal", _(
+                "%(rate)s per hour over %(hours).1f hours of work and travel, below the "
+                "%(target)s target.",
+                rate=money(self.margin_per_effort_hour),
+                hours=self.effort_hours,
+                target=money(self.target_margin_per_hour),
+            )
+        if self.break_even_headroom_ratio < BREAK_EVEN_HEADROOM_RATIO:
+            return "marginal", _(
+                "Only %(headroom).0f%% above break-even (%(units)s planned against "
+                "%(break_even)s): a slow day turns this into a loss.",
+                headroom=headroom_percent,
+                units=round(units, 2),
+                break_even=self.break_even_units,
+            )
+        return "go", _(
+            "%(margin)s over %(hours).1f hours of work and travel (%(rate)s per hour), "
+            "%(headroom).0f%% above break-even.",
+            margin=money(self.projected_margin),
+            hours=self.effort_hours,
+            rate=money(self.margin_per_effort_hour),
+            headroom=headroom_percent,
+        )
 
     def action_approve(self):
         for scenario in self:

@@ -1,3 +1,5 @@
+from . import res_company
+from . import res_config_settings
 from . import commercial_contract
 from . import commercial_operation
 from . import planning_report

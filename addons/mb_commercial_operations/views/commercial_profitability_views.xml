@@ -15,6 +15,12 @@
         <field name="weighted_unit_contribution"/>
         <field name="break_even_units"/>
         <field name="break_even_revenue"/>
+        <field name="margin_per_effort_hour" optional="show"/>
+        <field name="recommendation" widget="badge"
+               decoration-success="recommendation == 'go'"
+               decoration-warning="recommendation == 'marginal'"
+               decoration-danger="recommendation == 'no_go'"/>
+        <field name="recommendation_note" optional="show"/>
         <field name="calculation_note"/>
         <field name="state" widget="badge"/>
         <field name="currency_id" column_invisible="True"/>
@@ -44,6 +50,11 @@
             <group>
               <field name="accepted_travel_cost" readonly="1"/>
               <field name="fixed_event_cost" readonly="1"/>
+              <field name="recommendation" widget="badge" readonly="1"
+                     decoration-success="recommendation == 'go'"
+                     decoration-warning="recommendation == 'marginal'"
+                     decoration-danger="recommendation == 'no_go'"/>
+              <field name="recommendation_note" readonly="1"/>
               <field name="calculation_blocked" readonly="1"/>
               <field name="calculation_note" readonly="1"/>
               <field name="currency_id" invisible="1"/>
@@ -111,6 +122,13 @@
               </group>
             </page>
             <page string="Break-even">
+              <group string="Verdict">
+                <field name="target_margin_per_hour" readonly="state != 'draft'"/>
+                <field name="effort_hours" readonly="1"/>
+                <field name="margin_per_effort_hour" readonly="1"/>
+                <field name="margin_per_work_hour" readonly="1"/>
+                <field name="break_even_headroom_ratio" widget="percentage" readonly="1"/>
+              </group>
               <group>
                 <field name="weighted_unit_revenue" readonly="1"/>
                 <field name="weighted_unit_contribution" readonly="1"/>

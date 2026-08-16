@@ -75,6 +75,9 @@
                   <tr><th>Break-even sales excluding VAT</th><td class="text-end"><span t-field="scenario.break_even_sales_excl_vat"/></td></tr>
                   <tr><th>Break-even receipts including VAT</th><td class="text-end"><span t-field="scenario.break_even_customer_receipts_incl_vat"/></td></tr>
                   <tr><th>Projected margin</th><td class="text-end"><span t-field="scenario.projected_margin"/></td></tr>
+                  <tr><th>Work and travel hours</th><td class="text-end"><span t-field="scenario.effort_hours"/></td></tr>
+                  <tr><th>Margin per hour</th><td class="text-end"><span t-field="scenario.margin_per_effort_hour"/></td></tr>
+                  <tr><th>Verdict</th><td class="text-end"><span t-field="scenario.recommendation"/> — <span t-field="scenario.recommendation_note"/></td></tr>
                 </tbody>
               </table>
               <h3>Products / sales assumptions</h3>

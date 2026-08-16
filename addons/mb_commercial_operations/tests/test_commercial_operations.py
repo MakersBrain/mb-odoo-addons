@@ -288,6 +288,117 @@ class TestCommercialOperations(TransactionCase):
             product_scenario.projected_contribution,
         )
 
+    def _verdict_scenario(self, operation, **values):
+        """A market selling 20 mugs at 40 with 10 of product cost, over 8 + 2 hours."""
+        line = values.pop("line", {})
+        return self.env["mb.commercial.profitability.scenario"].create({
+            "operation_id": operation.id,
+            "manual_travel_total": 50.0,
+            "planned_travel_hours": 2.0,
+            "planned_work_hours": 8.0,
+            "stall_rent": 50.0,
+            "line_ids": [fields.Command.create({
+                "product_id": self.product.id,
+                "expected_sold_qty": 20,
+                "sale_price_excluded_tax": 40.0,
+                "product_unit_cost": 10.0,
+                "cost_source": "product",
+                "cost_date": fields.Date.today(),
+                **line,
+            })],
+            **values,
+        })
+
+    def test_hourly_margin_counts_work_and_travel_and_recommends_the_market(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(operation)
+        self.assertEqual(scenario.fixed_event_cost, 100.0)
+        self.assertEqual(scenario.projected_margin, 500.0)
+        self.assertEqual(scenario.break_even_units, 4)
+        self.assertEqual(scenario.effort_hours, 10.0)
+        self.assertEqual(scenario.margin_per_effort_hour, 50.0)
+        self.assertEqual(scenario.margin_per_work_hour, 62.5)
+        self.assertEqual(scenario.break_even_headroom_ratio, 4.0)
+        self.assertEqual(scenario.recommendation, "go")
+        self.assertIn("above break-even", scenario.recommendation_note)
+        operation.primary_scenario_id = scenario
+        self.assertEqual(operation.planning_recommendation, "go")
+        self.assertEqual(operation.planning_margin_per_hour, 50.0)
+        self.assertEqual(operation.planning_effort_hours, 10.0)
+
+    def test_hourly_target_from_company_policy_downgrades_the_verdict(self):
+        self.company.mb_market_target_margin_per_hour = 60.0
+        operation = self._operation()
+        scenario = self._verdict_scenario(operation)
+        self.assertEqual(scenario.target_margin_per_hour, 60.0)
+        self.assertEqual(scenario.margin_per_effort_hour, 50.0)
+        self.assertEqual(scenario.recommendation, "marginal")
+        self.assertIn("below the", scenario.recommendation_note)
+
+    def test_market_below_break_even_is_not_worth_attending(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(operation, stall_rent=900.0)
+        self.assertEqual(scenario.break_even_units, 32)
+        self.assertEqual(scenario.projected_margin, -350.0)
+        self.assertEqual(scenario.recommendation, "no_go")
+        self.assertIn("32", scenario.recommendation_note)
+
+    def test_thin_break_even_headroom_is_only_marginal(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(operation, stall_rent=480.0)
+        self.assertEqual(scenario.break_even_units, 18)
+        self.assertEqual(scenario.projected_margin, 70.0)
+        self.assertAlmostEqual(scenario.break_even_headroom_ratio, 2 / 18, places=6)
+        self.assertEqual(scenario.recommendation, "marginal")
+        self.assertIn("slow day", scenario.recommendation_note)
+
+    def test_profitable_market_without_fixed_costs_clears_break_even_headroom(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(
+            operation,
+            manual_travel_total=0.0,
+            stall_rent=0.0,
+        )
+        self.assertEqual(scenario.fixed_event_cost, 0.0)
+        self.assertEqual(scenario.break_even_units, 0)
+        self.assertGreater(scenario.projected_margin, 0.0)
+        self.assertEqual(scenario.break_even_headroom_ratio, 1.0)
+        self.assertEqual(scenario.recommendation, "go")
+
+    def test_mix_without_quantities_cannot_be_judged(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(
+            operation, line={"expected_sold_qty": 0, "mix_share": 100.0},
+        )
+        self.assertFalse(scenario.calculation_blocked)
+        self.assertEqual(scenario.recommendation, "unknown")
+        self.assertIn("expected sold quantities", scenario.recommendation_note)
+
+    def test_effort_hours_fall_back_to_hourly_labour_cost_lines(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(
+            operation,
+            planned_work_hours=0.0,
+            planned_travel_hours=0.0,
+            cost_line_ids=[
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Stand crew",
+                    "category": "labour", "calculation": "hour",
+                    "quantity": 6.0, "rate": 10.0,
+                }),
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Stall",
+                    "category": "venue", "calculation": "fixed",
+                    "quantity": 1.0, "rate": 100.0,
+                }),
+            ],
+        )
+        self.assertEqual(scenario.fixed_event_cost, 160.0)
+        self.assertEqual(scenario.effort_hours, 6.0)
+        self.assertEqual(scenario.projected_margin, 440.0)
+        self.assertAlmostEqual(scenario.margin_per_effort_hour, 73.33, places=2)
+        self.assertEqual(scenario.recommendation, "go")
+
     def test_new_operation_wizard_saves_one_authoritative_plan_only(self):
         before_operations = self.env["mb.commercial.operation"].search_count([])
         before_moves = self.env["account.move"].search_count([])

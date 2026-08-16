@@ -1,0 +1,178 @@
+# Market Profitability: Current Capability Findings
+
+Date: 2026-08-17
+Question answered: can we define a marketplace event, set what we intend to sell, enter
+entry fee / commission / stand setup and teardown / worked hours, reuse the toll quote API,
+and get an answer on whether the market is worth it?
+
+Short answer: almost all of it already exists in `addons/mb_commercial_operations`. The
+calendar is not the feature — it is one view (`calendar,list,form,pivot,graph`) on the
+`mb.commercial.operation` model. Four gaps remain, listed at the end.
+
+## 1. Defining the market event
+
+Model: `mb.commercial.operation` — `addons/mb_commercial_operations/models/commercial_operation.py:9`
+
+- `operation_type`: `market` (Market / Fair) | `attendance` (Venue Attendance) | `visit` (Site Visit) — line 21
+- Organizer, partner, contract, project, analytic account, assigned users
+- State machine: `draft -> quoted (Costed) -> approved -> scheduled -> in_progress -> done -> financially_closed`, plus `cancelled` — line 29
+- Deadlines that matter for fairs: `application_deadline`, `payment_deadline`,
+  `stock_preparation_deadline`
+- Calendar and obligation-calendar views and menus:
+  `views/commercial_operation_views.xml:169`, `views/commercial_contract_views.xml:146`,
+  `views/mb_commercial_operations_menus.xml:17`
+- Recurring markets are modelled as contracts with obligation occurrences
+  (`models/commercial_contract.py`)
+
+## 2. Hours: setup, service, teardown, worked
+
+`commercial_operation.py:78-86`
+
+- `expected_arrival`, `setup_duration_hours`, `service_start`, `service_end`,
+  `teardown_duration_hours`, `expected_return`
+- `planned_work_hours` — computed and stored from the above
+- Costed in the scenario as `planned_work_hours * work_hourly_cost`
+- `actual_work_hours` computed from timesheets, so planned vs real hours is comparable
+  after the event
+
+## 3. Entry fee, commission, stand cost
+
+Two levels, both native.
+
+Event level — `mb.commercial.cost.line` (`commercial_operation.py:801`):
+
+- `category`: `travel`, `labour`, `rent`, `venue` (Venue / Stall), `accommodation`,
+  `parking`, `fee` (Fee / Commission), `other` — line 818
+- `calculation`: `fixed`, `hour`, `kilometre`, `day`, `revenue_percent`, `unit` — line 827
+- So a percentage commission on turnover is a first-class line: `revenue_percent` resolves
+  against the scenario revenue, falling back to `operation.expected_revenue`
+  (`_compute_planned_amount`, line 864)
+- `source_kind` traces where a line came from: `manual`, `travel` (quote), `contract`,
+  `template`, `migration`. Multi-currency source amount, rate and conversion date are kept.
+- Cost lines are locked once the operation leaves `draft`/`quoted`, and once a scenario is
+  approved (create a revision instead) — lines 873-907
+
+Product level — `mb.commercial.profitability.scenario.line`
+(`models/profitability_scenario.py:255`):
+
+- `channel_fee_rate` / `channel_fee_amount` (per-sale channel fee)
+- `turnover_levy_rate` + `eligible_turnover_basis` (URSSAF / cotisation on turnover)
+- `vat_rate` -> `customer_price_incl_vat`
+
+## 4. What we plan to sell
+
+`mb.market.stock.plan.line` — `commercial_operation.py:910`
+
+- `target_type`: `product` (exact product) or `bucket` (assortment: product category +
+  `price_min` / `price_max`)
+- `priority`, `desired_opening_qty`, `safety_qty`, computed `required_qty`
+- `expected_sold_qty`, `expected_unit_price`, `expected_unit_cost`
+- These feed scenario lines via `source_stock_plan_line_id`; a warning fires if the
+  scenario later drifts from its source stock plan line
+
+## 5. Travel cost from the toll quote API
+
+`models/travel_estimate.py`
+
+- `mb.tollquote.connector` (line 13): environment, base URL, API token, timeout,
+  health check with `last_health_at` / `last_health_status`
+- `mb.travel.estimate` (line 121): origin/destination partner or coordinates, `round_trip`,
+  `departure_at`, `vehicle_class`, `payment_option`, `fuel_consumption_l_per_100km`,
+  `fuel_price_eur_per_l`, `driver_cost_eur_per_hour`
+- Returns: `distance_km`, `duration_hours`, `toll_cost`, `fuel_cost`, `driver_cost`,
+  `ferry_cost`, `zone_cost`, `other_route_cost`, `total_operating_cost`
+- Auditability: `request_id`, `provider_version`, `calculated_at`, `request_snapshot`,
+  `response_snapshot`, `revision` / `previous_revision_id`, currency conversion rate and date
+- `incomplete` + `warning_text` + `incomplete_acknowledged`: a partial quote must be
+  acknowledged explicitly, it cannot slip through silently
+- Accepted result lands on the operation as `accepted_travel_cost`,
+  `accepted_travel_distance_km`, `accepted_travel_duration_hours`
+- The scenario chooses between quote and manual via `route_cost_mode`
+  (`profitability_scenario.py:43`)
+
+## 6. Is the market worth it
+
+`mb.commercial.profitability.scenario` — `models/profitability_scenario.py:9`
+
+Computed and stored by `_compute_results` (line 115):
+
+- `weighted_unit_revenue`, `weighted_unit_contribution`, `contribution_margin_ratio`
+- `fixed_event_cost` (travel + labour + stall rent + parking + accommodation + other fixed)
+- `break_even_units`, `break_even_revenue`
+- `break_even_sales_excl_vat`, `break_even_customer_receipts_incl_vat`
+- `planned_units`, `sales_revenue_excl_vat`, `customer_receipts_incl_vat`
+- `total_variable_cost`, `projected_contribution`, `projected_margin`
+- `calculation_blocked` + `calculation_note` when inputs are unsound
+
+Governance around it:
+
+- Several scenarios per operation (pessimistic / realistic / optimistic), one approved as
+  `primary_scenario_id`; approved scenarios are immutable, revisions are explicit
+- `profitability_required` with a mandatory `profitability_opt_out_reason` when skipped
+- Blocking vs warning vs info planning checks in `_get_planning_warnings`
+  (`commercial_operation.py`): missing primary scenario, blocked scenario, legacy/scenario
+  cost mismatch, product cost excluded, product cost from a sale-price proxy, cost
+  assumption older than 90 days, scenario drifted from its stock plan
+- Approval freezes evidence: `mb.commercial.report.snapshot` with a canonical payload
+  digest and a rendered PDF attachment (`models/planning_report.py:322`)
+- After the event: `actual_revenue`, `actual_cost`, `actual_margin` from POS, invoices and
+  analytic lines, plus an outcome snapshot comparing plan against reality
+
+## 7. Verdict and hourly KPIs (implemented 2026-08-17)
+
+Gaps 1 and 2 below are now closed. On `mb.commercial.profitability.scenario`:
+
+- `effort_hours` — the hours the market really costs: stand work plus travel. Work hours are
+  taken from `planned_work_hours`, else from hourly labour cost lines
+  (`category = labour`, `calculation = hour`), else from the operation's own planned hours.
+  Travel hours come from the accepted TollQuote duration in `provider_total` mode, else from
+  `planned_travel_hours`, else from `operation.accepted_travel_duration_hours`.
+- `margin_per_effort_hour` — projected margin over work plus travel hours. This is the number
+  that separates a distant fair with a 45 EUR stall from a local one.
+- `margin_per_work_hour` — the same over stand hours only.
+- `break_even_headroom_ratio` — how far planned units sit above `break_even_units`.
+- `target_margin_per_hour` — the hourly floor this market is judged against, defaulted at
+  creation from the company policy `res.company.mb_market_target_margin_per_hour`
+  (Settings, under Accounting). Zero means judge on break-even headroom alone.
+- `recommendation` + `recommendation_note` — the verdict, in plain words:
+  - `unknown` — the scenario is incomplete, or it is an average-basket mix with no expected
+    quantities, so nothing can be judged.
+  - `no_go` — projected margin not positive, or planned units below break-even.
+  - `marginal` — below the hourly target, or less than
+    `BREAK_EVEN_HEADROOM_RATIO` (15%) above break-even, or no hours planned so the hourly
+    return cannot be checked.
+  - `go` — clears both tests.
+
+Mirrored on `mb.commercial.operation` as `planning_recommendation` (stored and indexed),
+`planning_recommendation_note`, `planning_effort_hours` and `planning_margin_per_hour`, shown
+on the operation list and Plan tab, filterable and groupable in the search view, and printed
+in the planning report next to the break-even block. The frozen snapshot payload was
+deliberately left untouched: the verdict is derived from figures already in it, and changing
+the payload would break the digest comparison in `action_freeze_replacement_copy` for
+snapshots taken before the upgrade.
+
+Covered by six tests in `tests/test_commercial_operations.py`; the module's 31 tests pass.
+
+## 8. Remaining gaps
+
+1. **No cross-market comparison screen.** The verdict and margin-per-hour are now filterable
+   and groupable on the operation list, which covers the crude case, but there is no ranked
+   "which of these six fairs do I apply to" view driven by those KPIs.
+2. **No margin per kilometre.** `accepted_travel_distance_km` is available on the operation;
+   the KPI is not computed.
+3. **No seeding of a recurring market's scenario from last year's actuals.** The contract and
+   obligation-occurrence model exists; the step that turns a previous outcome snapshot into
+   this year's assumptions does not.
+
+## Key files
+
+| Concern | File |
+| --- | --- |
+| Event, cost lines, stock plan | `addons/mb_commercial_operations/models/commercial_operation.py` |
+| Break-even and margin engine | `addons/mb_commercial_operations/models/profitability_scenario.py` |
+| Toll quote connector and estimates | `addons/mb_commercial_operations/models/travel_estimate.py` |
+| Planning wizard, snapshots, evidence | `addons/mb_commercial_operations/models/planning_report.py` |
+| Recurring markets and obligations | `addons/mb_commercial_operations/models/commercial_contract.py` |
+| Calendar and other views | `addons/mb_commercial_operations/views/commercial_operation_views.xml` |
+| POS actuals feedback | `addons/mb_commercial_operations_pos/` |
+| Stock planning for the stand | `addons/mb_commercial_operations_stock/` |

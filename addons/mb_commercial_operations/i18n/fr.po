@@ -16,6 +16,26 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #. odoo-python
+#: code:addons/mb_commercial_operations/models/profitability_scenario.py:0
+msgid ""
+"%(margin)s above costs, but no work or travel hours are planned, so the "
+"hourly return cannot be checked."
+msgstr ""
+"%(margin)s au-dessus des coûts, mais aucune heure de travail ni de "
+"déplacement n'est prévue : le rendement horaire ne peut pas être vérifié."
+
+#. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/profitability_scenario.py:0
+msgid ""
+"%(margin)s over %(hours).1f hours of work and travel (%(rate)s per hour), "
+"%(headroom).0f%% above break-even."
+msgstr ""
+"%(margin)s sur %(hours).1f heures de travail et de déplacement (%(rate)s par"
+" heure), %(headroom).0f%% au-dessus du seuil de rentabilité."
+
+#. module: mb_commercial_operations
+#. odoo-python
 #: code:addons/mb_commercial_operations/models/commercial_contract.py:0
 msgid "%(name)s — %(period)s #%(sequence)s"
 msgstr "%(name)s — %(period)s n°%(sequence)s"
@@ -35,6 +55,16 @@ msgstr ""
 #: code:addons/mb_commercial_operations/models/planning_report.py:0
 msgid "%(operation)s — %(kind)s r%(revision)s"
 msgstr "%(operation)s — %(kind)s rév.%(revision)s"
+
+#. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/profitability_scenario.py:0
+msgid ""
+"%(rate)s per hour over %(hours).1f hours of work and travel, below the "
+"%(target)s target."
+msgstr ""
+"%(rate)s par heure sur %(hours).1f heures de travail et de déplacement, en "
+"dessous de l'objectif de %(target)s."
 
 #. module: mb_commercial_operations
 #: model:ir.actions.report,print_report_name:mb_commercial_operations.action_report_commercial_operation_outcome
@@ -671,6 +701,11 @@ msgid "Break-even"
 msgstr "Seuil de rentabilité"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__break_even_headroom_ratio
+msgid "Break-even Headroom"
+msgstr "Marge au-dessus du seuil de rentabilité"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_break_even_receipts
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard__preview_break_even_receipts
 msgid "Break-even Receipts Including VAT"
@@ -993,6 +1028,11 @@ msgid "Commercial purpose"
 msgstr "Objet commercial"
 
 #. module: mb_commercial_operations
+#: model:ir.model,name:mb_commercial_operations.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_contract__company_id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_cost_line__company_id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_obligation__company_id
@@ -1057,6 +1097,12 @@ msgstr "Terminez l'opération avant d'imprimer son rapport de résultat."
 
 #. module: mb_commercial_operations
 #. odoo-python
+#: code:addons/mb_commercial_operations/models/profitability_scenario.py:0
+msgid "Complete the scenario before judging this market."
+msgstr "Complétez le scénario avant de juger ce marché."
+
+#. module: mb_commercial_operations
+#. odoo-python
 #: code:addons/mb_commercial_operations/models/commercial_operation.py:0
 msgid "Completed operations require correction/reversal, not cancellation."
 msgstr ""
@@ -1081,6 +1127,11 @@ msgstr "Exhaustivité"
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
 msgid "Component"
 msgstr "Composant"
+
+#. module: mb_commercial_operations
+#: model:ir.model,name:mb_commercial_operations.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
 
 #. module: mb_commercial_operations
 #: model:ir.ui.menu,name:mb_commercial_operations.menu_commercial_configuration
@@ -1450,6 +1501,8 @@ msgstr "Justificatifs comptables directs"
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_project_task__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_report_mb_commercial_operations_operation_outcome__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_report_mb_commercial_operations_report_commercial_operation__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_res_company__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
 
@@ -1544,6 +1597,16 @@ msgstr ""
 #: code:addons/mb_commercial_operations/models/planning_report.py:0
 msgid "Enter a void reason before voiding this frozen report."
 msgstr "Saisissez un motif d'annulation avant d'annuler ce rapport figé."
+
+#. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/profitability_scenario.py:0
+msgid ""
+"Enter expected sold quantities: an average-basket mix without volumes cannot"
+" be judged."
+msgstr ""
+"Saisissez les quantités attendues : un mix en panier moyen sans volumes ne "
+"peut pas être jugé."
 
 #. module: mb_commercial_operations
 #. odoo-python
@@ -1869,6 +1932,43 @@ msgid "Horizon Months"
 msgstr "Horizon (mois)"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,help:mb_commercial_operations.field_mb_commercial_profitability_scenario__target_margin_per_hour
+msgid ""
+"Hourly margin floor this market is judged against. Defaults to the company "
+"policy; zero judges the market on break-even headroom alone."
+msgstr ""
+"Marge horaire plancher sur laquelle ce marché est jugé. Reprend par défaut "
+"la politique de la société ; à zéro, le marché est jugé sur la seule marge "
+"au-dessus du seuil de rentabilité."
+
+#. module: mb_commercial_operations
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.res_config_settings_view_form_commercial_operations
+msgid ""
+"Hourly margin floor used to tell you whether a market or fair is worth "
+"attending. Counted over stand work plus travel. Leave at zero to judge "
+"markets on break-even headroom alone."
+msgstr ""
+"Marge horaire plancher utilisée pour dire si un marché ou une foire vaut le "
+"déplacement. Comptée sur le travail au stand plus le déplacement. Laissez à "
+"zéro pour juger les marchés sur la seule marge au-dessus du seuil de "
+"rentabilité."
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,help:mb_commercial_operations.field_mb_commercial_operation__planning_effort_hours
+#: model:ir.model.fields,help:mb_commercial_operations.field_mb_commercial_profitability_scenario__effort_hours
+msgid "Hours the market actually costs: stand work plus travel."
+msgstr ""
+"Heures que le marché coûte réellement : travail au stand plus déplacement."
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,help:mb_commercial_operations.field_mb_commercial_profitability_scenario__break_even_headroom_ratio
+msgid ""
+"How far the planned units sit above break-even, as a share of break-even."
+msgstr ""
+"Écart des unités prévues au-dessus du seuil de rentabilité, en part de ce "
+"seuil."
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_account_analytic_line__id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_account_move__id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_ir_attachment__id
@@ -1894,6 +1994,8 @@ msgstr "Horizon (mois)"
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_project_task__id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_report_mb_commercial_operations_operation_outcome__id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_report_mb_commercial_operations_report_commercial_operation__id
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_res_company__id
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_res_config_settings__id
 msgid "ID"
 msgstr "ID"
 
@@ -2105,10 +2207,31 @@ msgid "Margin Variance"
 msgstr "Écart de marge"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__margin_per_effort_hour
+msgid "Margin per Hour (Work + Travel)"
+msgstr "Marge par heure (travail + déplacement)"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__margin_per_work_hour
+msgid "Margin per Work Hour"
+msgstr "Marge par heure de travail"
+
+#. module: mb_commercial_operations
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
+msgid "Margin per hour"
+msgstr "Marge par heure"
+
+#. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_profitability_report_list
 msgid "Margin variance"
 msgstr "Écart de marge"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_profitability_scenario__recommendation__marginal
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_search
+msgid "Marginal"
+msgstr "Limite"
 
 #. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_form
@@ -2172,6 +2295,19 @@ msgstr "Erreur d'envoi du message"
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_travel_estimate__message_ids
 msgid "Messages"
 msgstr "Messages"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,help:mb_commercial_operations.field_res_company__mb_market_target_margin_per_hour
+#: model:ir.model.fields,help:mb_commercial_operations.field_res_config_settings__mb_market_target_margin_per_hour
+msgid ""
+"Minimum planned margin per hour of effort (work plus travel) below which a "
+"market is only worth attending for reasons other than money. Leave at zero "
+"to judge markets on break-even headroom alone."
+msgstr ""
+"Marge prévue minimale par heure d'effort (travail plus déplacement) en "
+"dessous de laquelle un marché ne vaut le déplacement que pour des raisons "
+"autres que financières. Laissez à zéro pour juger les marchés sur la seule "
+"marge au-dessus du seuil de rentabilité."
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario_line__mix_share
@@ -2313,6 +2449,21 @@ msgstr ""
 "saisie manuellement figure dans les coûts fixes."
 
 #. module: mb_commercial_operations
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_search
+msgid "Not Worth It"
+msgstr "Ne vaut pas le coup"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_profitability_scenario__recommendation__unknown
+msgid "Not assessable"
+msgstr "Non évaluable"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_profitability_scenario__recommendation__no_go
+msgid "Not worth it"
+msgstr "Ne vaut pas le coup"
+
+#. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
 msgid "Note"
 msgstr "Note"
@@ -2435,6 +2586,17 @@ msgstr "Une ou plusieurs activités de l'opération sont en retard."
 msgid "One or more sales assumptions explicitly exclude product cost."
 msgstr ""
 "Une ou plusieurs hypothèses de vente excluent explicitement le coût produit."
+
+#. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/profitability_scenario.py:0
+msgid ""
+"Only %(headroom).0f%% above break-even (%(units)s planned against "
+"%(break_even)s): a slow day turns this into a loss."
+msgstr ""
+"Seulement %(headroom).0f%% au-dessus du seuil de rentabilité (%(units)s "
+"prévues contre %(break_even)s) : une journée creuse transforme ce marché en "
+"perte."
 
 #. module: mb_commercial_operations
 #. odoo-python
@@ -2842,6 +3004,11 @@ msgid "Planned Margin"
 msgstr "Marge prévue"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_margin_per_hour
+msgid "Planned Margin per Hour"
+msgstr "Marge prévue par heure"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_report__planned_revenue
 msgid "Planned Revenue"
 msgstr "Chiffre d'affaires prévu"
@@ -2872,6 +3039,11 @@ msgstr "Unités prévues"
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard__preview_units
 msgid "Planned Units / Baskets"
 msgstr "Unités / paniers prévus"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_effort_hours
+msgid "Planned Work + Travel Hours"
+msgstr "Heures prévues de travail + déplacement"
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planned_work_hours
@@ -3138,6 +3310,11 @@ msgid "Profitability Scenarios"
 msgstr "Scénarios de rentabilité"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_recommendation
+msgid "Profitability Verdict"
+msgstr "Verdict de rentabilité"
+
+#. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_profitability_report_graph
 msgid "Profitability by Month"
 msgstr "Rentabilité par mois"
@@ -3176,6 +3353,16 @@ msgstr "Marge projetée"
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_snapshot
 msgid "Projected margin"
 msgstr "Marge projetée"
+
+#. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/profitability_scenario.py:0
+msgid ""
+"Projected margin %(margin)s: %(units)s planned units against %(break_even)s "
+"needed to break even."
+msgstr ""
+"Marge projetée de %(margin)s : %(units)s unités prévues contre "
+"%(break_even)s nécessaires pour atteindre le seuil de rentabilité."
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_obligation_occurrence__state__proposed
@@ -3323,6 +3510,11 @@ msgstr "Évaluations"
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_form_planning_report
 msgid "Readiness"
 msgstr "État de préparation"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__recommendation_note
+msgid "Recommendation Note"
+msgstr "Note du verdict"
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_market_stock_plan_line__remaining_bucket_qty
@@ -3863,9 +4055,25 @@ msgid "Target"
 msgstr "Cible"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__target_margin_per_hour
+msgid "Target Margin per Hour"
+msgstr "Objectif de marge par heure"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_res_company__mb_market_target_margin_per_hour
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_res_config_settings__mb_market_target_margin_per_hour
+msgid "Target Market Margin per Hour"
+msgstr "Objectif de marge horaire sur les marchés"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_market_stock_plan_line__target_type
 msgid "Target Type"
 msgstr "Type de cible"
+
+#. module: mb_commercial_operations
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.res_config_settings_view_form_commercial_operations
+msgid "Target market margin per hour"
+msgstr "Objectif de marge horaire sur les marchés"
 
 #. module: mb_commercial_operations
 #: model:ir.model,name:mb_commercial_operations.model_project_task
@@ -3981,6 +4189,11 @@ msgstr "Le scénario principal doit appartenir à cette opération."
 #: code:addons/mb_commercial_operations/models/commercial_operation.py:0
 msgid "The scenario travel quote is not accepted."
 msgstr "Le devis de déplacement du scénario n'est pas accepté."
+
+#. module: mb_commercial_operations
+#: model:ir.model.constraint,message:mb_commercial_operations.constraint_res_company_mb_market_target_margin_nonnegative
+msgid "The target market margin per hour cannot be negative."
+msgstr "L'objectif de marge horaire sur les marchés ne peut pas être négatif."
 
 #. module: mb_commercial_operations
 #: model:ir.model.constraint,message:mb_commercial_operations.constraint_mb_commercial_obligation_occurrence_occurrence_unique
@@ -4343,6 +4556,19 @@ msgid "Venue attendance"
 msgstr "Présence en point de vente"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__recommendation
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_search
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_profitability_scenario_form
+msgid "Verdict"
+msgstr "Verdict"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_recommendation_note
+msgid "Verdict Explanation"
+msgstr "Explication du verdict"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_report_snapshot__state__void
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_report_snapshot_form
 msgid "Void"
@@ -4448,9 +4674,29 @@ msgid "Work & Fixed Costs"
 msgstr "Main-d'oeuvre et coûts fixes"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__effort_hours
+msgid "Work + Travel Hours"
+msgstr "Heures de travail + déplacement"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__work_hourly_cost
 msgid "Work Hourly Cost"
 msgstr "Coût horaire de travail"
+
+#. module: mb_commercial_operations
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
+msgid "Work and travel hours"
+msgstr "Heures de travail et de déplacement"
+
+#. module: mb_commercial_operations
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_search
+msgid "Worth Attending"
+msgstr "Vaut le déplacement"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_profitability_scenario__recommendation__go
+msgid "Worth it"
+msgstr "Vaut le coup"
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__zone_cost

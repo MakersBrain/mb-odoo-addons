@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="res_config_settings_view_form_commercial_operations" model="ir.ui.view">
+    <field name="name">res.config.settings.view.form.commercial.operations</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//setting[@id='default_taxes']" position="after">
+        <setting id="mb_market_target_margin_per_hour_setting"
+                 string="Target market margin per hour"
+                 help="Hourly margin floor used to tell you whether a market or fair is worth attending. Counted over stand work plus travel. Leave at zero to judge markets on break-even headroom alone.">
+          <div class="content-group">
+            <div class="row mt16">
+              <label for="mb_market_target_margin_per_hour" class="col-lg-4 o_light_label"/>
+              <field name="mb_market_target_margin_per_hour" class="oe_inline"/>
+            </div>
+          </div>
+        </setting>
+      </xpath>
+    </field>
+  </record>
+</odoo>
