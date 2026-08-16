@@ -34,6 +34,33 @@ class MbCommercialContract(models.Model):
     rent_bill_ids = fields.Many2many(
         "account.move", compute="_compute_rent_bill_ids", string="Rent Bills",
     )
+    depot_scenario_ids = fields.One2many(
+        "mb.depot.profitability.scenario", "contract_id", string="Profitability Scenarios",
+    )
+    primary_depot_scenario_id = fields.Many2one(
+        "mb.depot.profitability.scenario", check_company=True, copy=False,
+        domain="[('contract_id', '=', id)]", ondelete="set null",
+    )
+    depot_recommendation = fields.Selection(
+        related="primary_depot_scenario_id.recommendation", string="Profitability Verdict",
+        store=True, index=True,
+    )
+    depot_recommendation_note = fields.Char(
+        related="primary_depot_scenario_id.recommendation_note",
+        string="Verdict Explanation",
+    )
+    depot_term_margin = fields.Monetary(
+        related="primary_depot_scenario_id.term_margin", string="Margin Over Term",
+        store=True,
+    )
+    depot_margin_per_hour = fields.Monetary(
+        related="primary_depot_scenario_id.margin_per_effort_hour",
+        string="Margin per Hour", store=True,
+    )
+    depot_break_even_monthly_sales = fields.Monetary(
+        related="primary_depot_scenario_id.break_even_monthly_sales",
+        string="Break-even Monthly Sales",
+    )
 
     @api.depends("rent_period_ids.bill_id")
     def _compute_rent_bill_ids(self):

@@ -153,7 +153,51 @@ snapshots taken before the upgrade.
 
 Covered by six tests in `tests/test_commercial_operations.py`; the module's 31 tests pass.
 
-## 8. Remaining gaps
+## 8. The same verdict for a depot contract (implemented 2026-08-17)
+
+A market is one day; a dépôt-vente is a standing arrangement, so the same question
+("is it worth it") is answered per month and then multiplied over the term.
+`mb.depot.profitability.scenario` in `mb_commercial_operations_depot`:
+
+- **Inputs.** Expected monthly sales at public price, VAT rate, commission rate
+  (defaulted from `stock.warehouse.depot_commission`) with an explicit
+  `commission_basis` (public price or excluding VAT, because contracts differ),
+  product cost ratio, other monthly variable cost, the monthly fixed fee (defaulted
+  from `contract.monthly_fixed_rent`), other monthly fixed cost, and an hourly cost
+  for permanence work.
+- **Term and permanences** come from the contract: `term_months` from
+  `date_start`/`date_end` (falling back to the six-month planning horizon when the
+  contract is open-ended), `permanences_per_month` and `hours_per_permanence` summed
+  from the contract's obligations. A weekly obligation counts as 52/12 a month, not
+  four. All three are computed but overridable.
+- **Travel** is one TollQuote round trip to the depot, multiplied by the number of
+  permanences over the term (`travel_cost_per_permanence` and
+  `travel_hours_per_permanence`, computed from the estimate, overridable so a
+  scenario can be drafted without calling the API).
+- **Results.** Monthly commission, receipts after commission, product cost,
+  contribution and contribution ratio; monthly fixed cost including permanence
+  labour and travel; monthly margin; the same figures over the term; the break-even
+  *monthly sales* the depot must make (expressed at public price, the number a
+  gallery actually quotes); headroom; and margin per hour of permanences and travel.
+- **Verdict.** Same four values and the same thresholds as a market, worded for a
+  contract: e.g. "3 300,00 € over 6 months (550,00 € a month) for 66.0 hours of
+  permanences and travel, 50,00 € per hour, 157% above break-even."
+
+The decision tree itself now lives once, in `mb.profitability.verdict.mixin`
+(`mb_commercial_operations/models/profitability_verdict.py`), which both scenario
+models inherit. It returns a verdict plus a reason; each model words its own note
+from that reason, so the thresholds cannot drift apart while the prose stays in the
+terms the user negotiates in — units on a market day, turnover over a depot term.
+
+Mirrored on the contract as `depot_recommendation` (stored, indexed),
+`depot_recommendation_note`, `depot_term_margin`, `depot_margin_per_hour` and
+`depot_break_even_monthly_sales`, on a Depot Profitability page, with a Depot
+Break-even list under the Depots menu. Approval supersedes the previous scenario and
+freezes it, as on the market side.
+
+Covered by seven tests in `mb_commercial_operations_depot/tests/test_commercial_depot.py`.
+
+## 9. Remaining gaps
 
 1. **No cross-market comparison screen.** The verdict and margin-per-hour are now filterable
    and groupable on the operation list, which covers the crude case, but there is no ranked

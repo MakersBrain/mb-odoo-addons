@@ -15,6 +15,50 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid ""
+"%(margin)s over %(months)s months (%(monthly)s a month) for %(hours).1f "
+"hours of permanences and travel, %(rate)s per hour, %(headroom).0f%% above "
+"break-even."
+msgstr ""
+"%(margin)s sur %(months)s mois (%(monthly)s par mois) pour %(hours).1f "
+"heures de permanences et de déplacement, %(rate)s par heure, "
+"%(headroom).0f%% au-dessus du seuil de rentabilité."
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid ""
+"%(margin)s over %(months)s months, but no permanence hours are planned, so "
+"the hourly return cannot be checked."
+msgstr ""
+"%(margin)s sur %(months)s mois, mais aucune heure de permanence n'est prévue"
+" : le rendement horaire ne peut pas être vérifié."
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid ""
+"%(margin)s over %(months)s months: %(sales)s of expected monthly sales "
+"against %(break_even)s needed to cover the commission, the fee and the "
+"permanences."
+msgstr ""
+"%(margin)s sur %(months)s mois : %(sales)s de ventes mensuelles attendues "
+"contre %(break_even)s nécessaires pour couvrir la commission, le forfait et "
+"les permanences."
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid ""
+"%(rate)s per hour over %(hours).1f hours of permanences and travel, below "
+"the %(target)s target."
+msgstr ""
+"%(rate)s par heure sur %(hours).1f heures de permanences et de déplacement, "
+"en dessous de l'objectif de %(target)s."
+
+#. module: mb_commercial_operations_depot
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.report_commercial_operation_depot
 msgid ""
 ". This comparison is not included in operation-attributed actual revenue and"
@@ -40,6 +84,11 @@ msgid "A rule already has a forecast snapshot for this date."
 msgstr "Une règle possède déjà un instantané de prévision pour cette date."
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__active
 msgid "Active"
 msgstr "Actif"
@@ -53,6 +102,24 @@ msgstr "Jours actifs"
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__amount
 msgid "Amount"
 msgstr "Montant"
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
+msgid "Approve Baseline"
+msgstr "Approuver la référence"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_profitability_scenario__state__approved
+msgid "Approved"
+msgstr "Approuvé"
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid "Approved or superseded scenarios are immutable; create a new scenario."
+msgstr ""
+"Les scénarios approuvés ou remplacés sont immuables ; créez un nouveau "
+"scénario."
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_assortment_rule__target_type__bucket
@@ -72,6 +139,11 @@ msgstr ""
 "ordonnées."
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__available_now
 msgid "Available Now"
 msgstr "Disponible actuellement"
@@ -82,14 +154,50 @@ msgid "Average Daily Sales"
 msgstr "Ventes moyennes par jour"
 
 #. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid "Base scenario"
+msgstr "Scénario de base"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__bill_id
 msgid "Bill"
 msgstr "Facture"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__break_even_headroom_ratio
+msgid "Break Even Headroom Ratio"
+msgstr "Marge au-dessus du seuil de rentabilité"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__break_even_monthly_sales
+msgid "Break Even Monthly Sales"
+msgstr "Ventes mensuelles au seuil de rentabilité"
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
+msgid "Break-even"
+msgstr "Seuil de rentabilité"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__depot_break_even_monthly_sales
+msgid "Break-even Monthly Sales"
+msgstr "Ventes mensuelles au seuil de rentabilité"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__calculated_at
 msgid "Calculated At"
 msgstr "Calculé le"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__calculation_blocked
+msgid "Calculation Blocked"
+msgstr "Calcul bloqué"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__calculation_note
+msgid "Calculation Note"
+msgstr "Note de calcul"
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_rent_period__state__cancelled
@@ -164,8 +272,29 @@ msgid "Commercial Operations: refresh depot forecasts"
 msgstr "Opérations commerciales : actualiser les prévisions de dépôt"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__commission_basis
+msgid "Commission Basis"
+msgstr "Base de la commission"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__commission_rate
+msgid "Commission Rate"
+msgstr "Taux de commission"
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid ""
+"Commission and product cost leave nothing from a sale; check the commission "
+"rate and the cost ratio."
+msgstr ""
+"La commission et le coût des produits ne laissent rien sur une vente ; "
+"vérifiez le taux de commission et le ratio de coût."
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__company_id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__company_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__company_id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__company_id
 msgid "Company"
 msgstr "Société"
@@ -174,6 +303,12 @@ msgstr "Société"
 #: model:ir.model,name:mb_commercial_operations_depot.model_mb_commercial_operation_plan_wizard
 msgid "Complete Commercial Operation Planning"
 msgstr "Compléter la planification de l'opération commerciale"
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid "Complete the scenario before judging this depot."
+msgstr "Complétez le scénario avant de juger ce dépôt."
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__confidence
@@ -189,7 +324,9 @@ msgstr "Configurez d'abord le dépôt et sa source de réassort par défaut."
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__contract_id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__contract_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__contract_id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__contract_id
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
 msgid "Contract"
 msgstr "Contrat"
 
@@ -199,6 +336,16 @@ msgid "Contract Sales in Comparison Window"
 msgstr "Ventes du contrat dans la fenêtre de comparaison"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__contribution_margin_ratio
+msgid "Contribution Margin Ratio"
+msgstr "Taux de marge sur coûts variables"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__product_cost_ratio
+msgid "Cost of the goods sold, as a percentage of sales excluding VAT."
+msgstr "Coût des produits vendus, en pourcentage des ventes HT."
+
+#. module: mb_commercial_operations_depot
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_operation_form_depot
 msgid "Create Refill Transfer"
 msgstr "Créer le transfert de réassort"
@@ -206,6 +353,7 @@ msgstr "Créer le transfert de réassort"
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__create_uid
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__create_uid
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__create_uid
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__create_uid
 msgid "Created by"
 msgstr "Créé par"
@@ -213,6 +361,7 @@ msgstr "Créé par"
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__create_date
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__create_date
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__create_date
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__create_date
 msgid "Created on"
 msgstr "Créé le"
@@ -220,6 +369,7 @@ msgstr "Créé le"
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__currency_id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__currency_id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__currency_id
 msgid "Currency"
 msgstr "Devise"
 
@@ -273,6 +423,17 @@ msgid "Depot Assortment and Refill Policy"
 msgstr "Assortiment du dépôt et politique de réassort"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.actions.act_window,name:mb_commercial_operations_depot.action_depot_scenarios
+#: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depot_scenarios
+msgid "Depot Break-even"
+msgstr "Seuil de rentabilité du dépôt"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model,name:mb_commercial_operations_depot.model_mb_depot_profitability_scenario
+msgid "Depot Contract Profitability Scenario"
+msgstr "Scénario de rentabilité de contrat de dépôt"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depot_contracts
 msgid "Depot Contracts"
 msgstr "Contrats de dépôt"
@@ -283,6 +444,11 @@ msgstr "Contrats de dépôt"
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_operation_search_depot
 msgid "Depot Permanence"
 msgstr "Permanence en dépôt"
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_contract_form_depot
+msgid "Depot Profitability"
+msgstr "Rentabilité du dépôt"
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_operation__operation_type__depot_refill
@@ -349,6 +515,14 @@ msgid "Depot sales until next approved refill"
 msgstr "Ventes du dépôt jusqu'au prochain réassort approuvé"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.constraint,message:mb_commercial_operations_depot.constraint_mb_depot_profitability_scenario_values_nonnegative
+msgid ""
+"Depot scenario rates must be percentages and amounts cannot be negative."
+msgstr ""
+"Les taux du scénario de dépôt doivent être des pourcentages et les montants "
+"ne peuvent pas être négatifs."
+
+#. module: mb_commercial_operations_depot
 #: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depots
 msgid "Depots"
 msgstr "Dépôts"
@@ -362,6 +536,7 @@ msgstr "Dépôts"
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation_plan_wizard__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_sale_report__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_sale_order__display_name
@@ -370,9 +545,19 @@ msgid "Display Name"
 msgstr "Nom d'affichage"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_profitability_scenario__state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_rent_period__state__draft_bill
 msgid "Draft Bill"
 msgstr "Facture brouillon"
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
+msgid "Each month"
+msgstr "Chaque mois"
 
 #. module: mb_commercial_operations_depot
 #. odoo-python
@@ -386,14 +571,45 @@ msgstr ""
 "une seule fois."
 
 #. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid "Enter the sales you expect the depot to make each month."
+msgstr "Saisissez les ventes que vous attendez du dépôt chaque mois."
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_assortment_rule__target_type__product
 msgid "Exact Product"
 msgstr "Produit exact"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__expected_monthly_sales
+msgid "Expected Monthly Sales (Public Price)"
+msgstr "Ventes mensuelles attendues (prix public)"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__exposed_days
 msgid "Exposed Days"
 msgstr "Jours d'exposition"
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
+msgid "Fee, Permanences and Travel"
+msgstr "Forfait, permanences et déplacement"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__monthly_fixed_rent
+msgid "Fixed fee the depot charges each month, defaulted from the contract."
+msgstr "Forfait mensuel facturé par le dépôt, repris par défaut du contrat."
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__forecast_ids
@@ -421,6 +637,32 @@ msgid "Forecasts"
 msgstr "Prévisions"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__target_margin_per_hour
+msgid ""
+"Hourly margin floor this depot is judged against. Defaults to the company "
+"policy; zero judges it on break-even headroom alone."
+msgstr ""
+"Marge horaire plancher sur laquelle ce dépôt est jugé. Reprend par défaut la"
+" politique de la société ; à zéro, il est jugé sur la seule marge au-dessus "
+"du seuil de rentabilité."
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__hours_per_permanence
+msgid "Hours Per Permanence"
+msgstr "Heures par permanence"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__hours_per_permanence
+msgid "Hours spent on site per permanence, from the obligation duration."
+msgstr ""
+"Heures passées sur place par permanence, d'après la durée de l'obligation."
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_account_move__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_obligation__id
@@ -429,12 +671,29 @@ msgstr "Prévisions"
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation_plan_wizard__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_sale_report__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_sale_order__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_sale_order_line__id
 msgid "ID"
 msgstr "ID"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_has_error
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model,name:mb_commercial_operations_depot.model_account_move
@@ -444,6 +703,7 @@ msgstr "Pièce comptable"
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__write_uid
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__write_uid
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__write_uid
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__write_uid
 msgid "Last Updated by"
 msgstr "Mis à jour par"
@@ -451,6 +711,7 @@ msgstr "Mis à jour par"
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__write_date
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__write_date
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__write_date
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__write_date
 msgid "Last Updated on"
 msgstr "Mis à jour le"
@@ -461,6 +722,31 @@ msgid "Low Confidence"
 msgstr "Confiance faible"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__depot_term_margin
+msgid "Margin Over Term"
+msgstr "Marge sur la durée"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__margin_per_work_hour
+msgid "Margin Per Work Hour"
+msgstr "Marge par heure de travail"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__depot_margin_per_hour
+msgid "Margin per Hour"
+msgstr "Marge par heure"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__margin_per_effort_hour
+msgid "Margin per Hour (Work + Travel)"
+msgstr "Marge par heure (travail + déplacement)"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_profitability_scenario__recommendation__marginal
+msgid "Marginal"
+msgstr "Limite"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_account_bank_statement_line__mb_commercial_contract_id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_account_move__mb_commercial_contract_id
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_sale_order__mb_commercial_contract_id
@@ -468,12 +754,72 @@ msgid "Mb Commercial Contract"
 msgstr "Contrat commercial"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__minimum_quantity
 msgid "Minimum Quantity"
 msgstr "Quantité minimale"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__monthly_commission
+msgid "Monthly Commission"
+msgstr "Commission mensuelle"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__monthly_contribution
+msgid "Monthly Contribution"
+msgstr "Marge sur coûts variables mensuelle"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__monthly_fixed_cost
+msgid "Monthly Fixed Cost"
+msgstr "Coût fixe mensuel"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__monthly_fixed_rent
+msgid "Monthly Fixed Rent"
+msgstr "Forfait mensuel"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__monthly_margin
+msgid "Monthly Margin"
+msgstr "Marge mensuelle"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__monthly_product_cost
+msgid "Monthly Product Cost"
+msgstr "Coût produit mensuel"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__monthly_receipts
+msgid "Monthly Receipts After Commission"
+msgstr "Encaissements mensuels après commission"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__monthly_sales_excl_vat
+msgid "Monthly Sales Excl Vat"
+msgstr "Ventes mensuelles HT"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__term_months
+msgid ""
+"Months this scenario judges. Taken from the contract dates, or the six-month"
+" planning horizon when the contract is open-ended."
+msgstr ""
+"Nombre de mois jugés par ce scénario. Repris des dates du contrat, ou de "
+"l'horizon de planification de six mois lorsque le contrat est sans terme."
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__name
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__name
 msgid "Name"
 msgstr "Nom"
 
@@ -484,9 +830,62 @@ msgid "No refill quantity is currently suggested."
 msgstr "Aucune quantité de réassort n'est actuellement suggérée."
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_profitability_scenario__recommendation__unknown
+msgid "Not assessable"
+msgstr "Non évaluable"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_profitability_scenario__recommendation__no_go
+msgid "Not worth it"
+msgstr "Ne vaut pas le coup"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_obligation__obligation_type
 msgid "Obligation Type"
 msgstr "Type d'obligation"
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid ""
+"Only %(headroom).0f%% above break-even (%(sales)s expected against "
+"%(break_even)s): a quiet month turns this into a loss."
+msgstr ""
+"Seulement %(headroom).0f%% au-dessus du seuil de rentabilité (%(sales)s "
+"attendues contre %(break_even)s) : un mois creux transforme ce dépôt en "
+"perte."
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid "Only draft depot scenarios can be deleted."
+msgstr "Seuls les scénarios de dépôt en brouillon peuvent être supprimés."
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid "Only draft scenarios can be approved."
+msgstr "Seuls les scénarios en brouillon peuvent être approuvés."
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__operation_type
@@ -500,9 +899,35 @@ msgid "Operation-linked evidence only"
 msgstr "Justificatifs liés à l'opération uniquement"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__other_monthly_fixed_cost
+msgid "Other Monthly Fixed Cost"
+msgstr "Autre coût fixe mensuel"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__other_monthly_variable_cost
+msgid "Other Monthly Variable Cost"
+msgstr "Autre coût variable mensuel"
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
+msgid "Over the term"
+msgstr "Sur la durée"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_commercial_rent_period__state__pending
 msgid "Pending"
 msgstr "En attente"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__vat_rate
+msgid "Percentage included in the public price."
+msgstr "Pourcentage inclus dans le prix public."
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__commission_rate
+msgid "Percentage the depot keeps, defaulted from the depot warehouse."
+msgstr ""
+"Pourcentage conservé par le dépôt, repris par défaut de l'entrepôt de dépôt."
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__period_end
@@ -518,6 +943,24 @@ msgstr "Début de période"
 #: model:ir.ui.menu,name:mb_commercial_operations_depot.menu_commercial_depot_permanence
 msgid "Permanence"
 msgstr "Permanences"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__permanence_count
+msgid "Permanence Count"
+msgstr "Nombre de permanences"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__permanences_per_month
+msgid ""
+"Permanence days owed each month, summed from the contract's obligations."
+msgstr ""
+"Jours de permanence dus chaque mois, cumulés depuis les obligations du "
+"contrat."
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__permanences_per_month
+msgid "Permanences Per Month"
+msgstr "Permanences par mois"
 
 #. module: mb_commercial_operations_depot
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_commercial_contract_form_depot
@@ -576,6 +1019,16 @@ msgid "Price Min"
 msgstr "Prix minimal"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_profitability_scenario__commission_basis__net_of_vat
+msgid "Price excluding VAT"
+msgstr "Prix HT"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__primary_depot_scenario_id
+msgid "Primary Depot Scenario"
+msgstr "Scénario de dépôt principal"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__priority
 msgid "Priority"
 msgstr "Priorité"
@@ -586,9 +1039,39 @@ msgid "Product"
 msgstr "Produit"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__product_cost_ratio
+msgid "Product Cost Ratio"
+msgstr "Ratio de coût produit"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__depot_scenario_ids
+msgid "Profitability Scenarios"
+msgstr "Scénarios de rentabilité"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__depot_recommendation
+msgid "Profitability Verdict"
+msgstr "Verdict de rentabilité"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_profitability_scenario__commission_basis__public
+msgid "Public price including VAT"
+msgstr "Prix public TTC"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__rating_ids
+msgid "Ratings"
+msgstr "Évaluations"
+
+#. module: mb_commercial_operations_depot
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_refill_forecast_form
 msgid "Recommendation"
 msgstr "Recommandation"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__recommendation_note
+msgid "Recommendation Note"
+msgstr "Note du verdict"
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_operation__recovery_date_from
@@ -694,9 +1177,23 @@ msgid "Returned Quantity"
 msgstr "Quantité retournée"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__travel_estimate_id
+msgid ""
+"Round trip to the depot. Its cost and duration are multiplied by the number "
+"of permanences over the term."
+msgstr ""
+"Aller-retour vers le dépôt. Son coût et sa durée sont multipliés par le "
+"nombre de permanences sur la durée."
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__rule_id
 msgid "Rule"
 msgstr "Règle"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Erreur d'envoi SMS"
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__safety_days
@@ -712,6 +1209,11 @@ msgstr "Commande client"
 #: model:ir.model,name:mb_commercial_operations_depot.model_sale_order_line
 msgid "Sales Order Line"
 msgstr "Ligne de commande"
+
+#. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
+msgid "Sales and Commission"
+msgstr "Ventes et commission"
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__season_end
@@ -730,10 +1232,21 @@ msgid "Selected contract period"
 msgstr "Période du contrat sélectionnée"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: mb_commercial_operations_depot
 #. odoo-python
 #: code:addons/mb_commercial_operations_depot/models/commercial_contract.py:0
 msgid "Set a monthly rent amount first."
 msgstr "Définissez d'abord un montant de loyer mensuel."
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid "Set how many months this depot contract is judged over."
+msgstr "Indiquez sur combien de mois ce contrat de dépôt est jugé."
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__snapshot_date
@@ -746,7 +1259,13 @@ msgid "Sold Quantity"
 msgstr "Quantité vendue"
 
 #. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
+msgid "Standing costs"
+msgstr "Coûts récurrents"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_rent_period__state
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__state
 msgid "State"
 msgstr "Statut"
 
@@ -766,9 +1285,19 @@ msgid "Suggested Quantity"
 msgstr "Quantité suggérée"
 
 #. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_profitability_scenario__state__superseded
+msgid "Superseded"
+msgstr "Remplacé"
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__target_days
 msgid "Target Days"
 msgstr "Jours cibles"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__target_margin_per_hour
+msgid "Target Margin Per Hour"
+msgstr "Objectif de marge par heure"
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__target_quantity
@@ -786,6 +1315,31 @@ msgid "Target quantity must be at least the non-negative minimum quantity."
 msgstr ""
 "La quantité cible doit être au moins égale à la quantité minimale, elle-même"
 " positive ou nulle."
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__term_commission
+msgid "Term Commission"
+msgstr "Commission sur la durée"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__term_fixed_cost
+msgid "Term Fixed Cost"
+msgstr "Coût fixe sur la durée"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__term_margin
+msgid "Term Margin"
+msgstr "Marge sur la durée"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__term_months
+msgid "Term Months"
+msgstr "Durée en mois"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__term_sales
+msgid "Term Sales"
+msgstr "Ventes sur la durée"
 
 #. module: mb_commercial_operations_depot
 #. odoo-python
@@ -824,6 +1378,71 @@ msgid "Total"
 msgstr "Total"
 
 #. module: mb_commercial_operations_depot
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
+msgid "Travel"
+msgstr "Déplacement"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__travel_cost_per_permanence
+msgid "Travel Cost Per Permanence"
+msgstr "Coût de déplacement par permanence"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__travel_estimate_id
+msgid "Travel Estimate"
+msgstr "Estimation de déplacement"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__travel_hours
+msgid "Travel Hours"
+msgstr "Heures de déplacement"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__travel_hours_per_permanence
+msgid "Travel Hours Per Permanence"
+msgstr "Heures de déplacement par permanence"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__vat_rate
+msgid "Vat Rate"
+msgstr "Taux de TVA"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__recommendation
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.view_depot_scenario_form
+msgid "Verdict"
+msgstr "Verdict"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_commercial_contract__depot_recommendation_note
+msgid "Verdict Explanation"
+msgstr "Explication du verdict"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__website_message_ids
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__website_message_ids
+msgid "Website communication history"
+msgstr "Historique de communication du site web"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__expected_monthly_sales
+msgid ""
+"What customers are expected to pay the depot each month, before the depot "
+"takes its commission."
+msgstr ""
+"Ce que les clients devraient payer au dépôt chaque mois, avant que le dépôt "
+"ne prenne sa commission."
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__commission_basis
+msgid "Which figure the contract applies the commission to."
+msgstr "Le montant auquel le contrat applique la commission."
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__window_end
 msgid "Window End"
 msgstr "Fin de la fenêtre"
@@ -832,6 +1451,26 @@ msgstr "Fin de la fenêtre"
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__window_start
 msgid "Window Start"
 msgstr "Début de la fenêtre"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__effort_hours
+msgid "Work + Travel Hours"
+msgstr "Heures de travail + déplacement"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__work_hourly_cost
+msgid "Work Hourly Cost"
+msgstr "Coût horaire du travail"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__work_hours
+msgid "Work Hours"
+msgstr "Heures de travail"
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields.selection,name:mb_commercial_operations_depot.selection__mb_depot_profitability_scenario__recommendation__go
+msgid "Worth it"
+msgstr "Vaut le coup"
 
 #. module: mb_commercial_operations_depot
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_depot.report_commercial_operation_depot

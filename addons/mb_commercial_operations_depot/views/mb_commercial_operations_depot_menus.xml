@@ -15,4 +15,6 @@
   <menuitem id="menu_commercial_depot_rules" name="Assortment Rules"
             parent="mb_commercial_operations.menu_commercial_configuration" action="action_depot_assortment_rules" sequence="30"
             groups="mb_commercial_operations.group_commercial_operations_manager"/>
+  <menuitem id="menu_commercial_depot_scenarios" name="Depot Break-even"
+            parent="menu_commercial_depots" action="action_depot_scenarios" sequence="50"/>
 </odoo>
