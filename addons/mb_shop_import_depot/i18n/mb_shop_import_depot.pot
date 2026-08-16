@@ -1,0 +1,47 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_shop_import_depot
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-16 20:28+0000\n"
+"PO-Revision-Date: 2026-08-16 20:28+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_shop_import_depot
+#. odoo-python
+#: code:addons/mb_shop_import_depot/models/shop_import.py:0
+msgid ""
+"A scraper stock snapshot cannot target a depot warehouse. Import into "
+"atelier stock, then use a placement transfer."
+msgstr ""
+
+#. module: mb_shop_import_depot
+#: model:ir.model.fields,field_description:mb_shop_import_depot.field_mb_shop_import_batch__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_shop_import_depot
+#: model:ir.model.fields,field_description:mb_shop_import_depot.field_mb_shop_import_batch__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_shop_import_depot
+#. odoo-python
+#: code:addons/mb_shop_import_depot/models/shop_import.py:0
+msgid ""
+"Imported physical products must remain storable, saleable, not purchasable, "
+"and invoiceable on delivery for depot sales."
+msgstr ""
+
+#. module: mb_shop_import_depot
+#: model:ir.model,name:mb_shop_import_depot.model_mb_shop_import_batch
+msgid "Shop catalogue import"
+msgstr ""

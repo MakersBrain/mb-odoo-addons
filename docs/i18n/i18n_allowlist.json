@@ -196,5 +196,11 @@
     "identical": [
       "Modules"
     ]
+  },
+  "mb_shop_import": {
+    "identical": [
+      "Catalogue v2 NDJSON",
+      "Services"
+    ]
   }
 }

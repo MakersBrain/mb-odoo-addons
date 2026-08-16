@@ -1,0 +1,1515 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_shop_import
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "A completed or cancelled import is immutable."
+msgstr "Une importation terminée ou annulée est immuable."
+
+#. module: mb_shop_import
+#: model:ir.model.constraint,message:mb_shop_import.constraint_mb_shop_source_identity_unique
+msgid "A scraper source can be registered only once per company and provider."
+msgstr ""
+"Une source scraper ne peut être enregistrée qu’une seule fois par entreprise"
+" et par fournisseur."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "A scraper source identity cannot be changed after creation."
+msgstr ""
+"L’identité d’une source de scraper ne peut pas être modifiée après sa "
+"création."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "A shop product binding cannot be redirected."
+msgstr "Une liaison de produit de boutique ne peut pas être redirigée."
+
+#. module: mb_shop_import
+#: model:ir.model.constraint,message:mb_shop_import.constraint_mb_shop_product_binding_external_unique
+msgid "A source variant can be bound only once."
+msgstr "Une variante source ne peut être liée qu’une seule fois."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Acknowledge selected warnings before importing."
+msgstr "Acceptez les avertissements sélectionnés avant l’importation."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Acknowledge warnings"
+msgstr "Accepter les avertissements"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__activity_ids
+msgid "Activities"
+msgstr "Activités"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Indicateur d’exception d’activité"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__activity_state
+msgid "Activity State"
+msgstr "Statut de l'activité"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Icône de type d'activité"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__adapter_key
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__adapter_key
+msgid "Adapter Key"
+msgstr "Clé adaptateur"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__adapter_version
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__adapter_version
+msgid "Adapter Version"
+msgstr "Version de l'adaptateur"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__affected_product_tmpl_ids
+msgid "Affected Product Tmpl"
+msgstr "Modèle de produit concerné"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__snapshot_stale_policy__warn
+msgid "Allow after warning"
+msgstr "Autoriser après avertissement"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__allowed_image_hosts
+msgid "Allowed Image Hosts"
+msgstr "Hôtes d'images autorisés"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__match_method__ambiguous_code
+msgid "Ambiguous reference"
+msgstr "Référence ambiguë"
+
+#. module: mb_shop_import
+#: model:ir.model.constraint,message:mb_shop_import.constraint_mb_shop_import_line_batch_external_unique
+msgid "An external variant may appear once in a batch."
+msgstr "Une variante externe peut apparaître une seule fois dans un lot."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "An imported or importing batch cannot be cancelled."
+msgstr "Un lot importé ou important ne peut pas être annulé."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "An unexpected image import error occurred."
+msgstr "Une erreur inattendue d’importation d’image s’est produite."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid ""
+"An unexpected import error occurred. Ask an administrator to inspect the "
+"server log for batch %(batch)s."
+msgstr ""
+"Une erreur d'importation inattendue s'est produite. Demandez à un "
+"administrateur d'inspecter le journal du serveur pour le lot%(batch)s."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__availability
+msgid "Availability"
+msgstr "Disponibilité"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__batch_id
+msgid "Batch"
+msgstr "Lot"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__snapshot_stale_policy__block
+msgid "Block tracked stock"
+msgstr "Bloquer le stock suivi"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__state__cancelled
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__adapter_key__catalogue_csv
+msgid "Catalogue scraper CSV"
+msgstr "Grattoir de catalogue CSV"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__adapter_key__catalogue_v2
+msgid "Catalogue v2 NDJSON"
+msgstr "Catalogue v2 NDJSON"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__category_path
+msgid "Category Path"
+msgstr "Chemin de la catégorie"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Choose the Odoo category for physical products."
+msgstr "Choisissez la catégorie Odoo pour les produits physiques."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Choose the stock location for physical products."
+msgstr "Choisissez l'emplacement de stockage des produits physiques."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__company_id
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__company_id
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__company_id
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_search
+msgid "Completed"
+msgstr "Complété"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid ""
+"Configure at least one allowed image hostname before enabling image import."
+msgstr ""
+"Configurez au moins un nom d'hôte d'image autorisé avant d'activer "
+"l'importation d'image."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Configure at least one allowed image hostname on the shop source."
+msgstr ""
+"Configurez au moins un nom d'hôte d'image autorisé sur la source de la "
+"boutique."
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__proposed_action__create
+msgid "Create"
+msgstr "Créer"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__create_count
+msgid "Create Count"
+msgstr "Créer un compte"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__create_uid
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__create_uid
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__create_uid
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__create_date
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__create_date
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__create_date
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__currency_id
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Currency %(currency)s is not available in Odoo."
+msgstr "La devise%(currency)sn’est pas disponible dans Odoo."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__current_list_price
+msgid "Current List Price"
+msgstr "Prix ​​catalogue actuel"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__current_name
+msgid "Current Name"
+msgstr "Nom actuel"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__default_code
+msgid "Default Code"
+msgstr "Code par défaut"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__description
+msgid "Description"
+msgstr "Description"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__adapter_key__auto
+msgid "Detect automatically"
+msgstr "Détecter automatiquement"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__display_name
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__display_name
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__display_name
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__state__done
+msgid "Done"
+msgstr "Terminé"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__duplicate_code
+msgid "Duplicate Code"
+msgstr "Code en double"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "Duplicates"
+msgstr "Doublons"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__validation_status__error
+msgid "Error"
+msgstr "Erreur"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__error_count
+msgid "Error Count"
+msgstr "Nombre d'erreurs"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "Errors"
+msgstr "Erreurs"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Every catalogue artifact must declare one currency."
+msgstr "Chaque artefact du catalogue doit déclarer une devise."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Every selected tax must be a sales tax of the batch company."
+msgstr ""
+"Chaque taxe sélectionnée doit être une taxe de vente de la société par lots."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__manual_product_id
+msgid "Explicit product match"
+msgstr "Correspondance de produit explicite"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__match_method__manual
+msgid "Explicit review match"
+msgstr "Correspondance d'avis explicite"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__external_id
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__external_id
+msgid "External"
+msgstr "Externe"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__state__failed
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__image_status__failed
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Failed"
+msgstr "Échec"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Failure"
+msgstr "Échec"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__failure_detail
+msgid "Failure Detail"
+msgstr "Détail de l'échec"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__fetched_at
+msgid "Fetched At"
+msgstr "Récupéré à"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__file_name
+msgid "File Name"
+msgstr "Nom de fichier"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__file_sha256
+msgid "File Sha256"
+msgstr "Fichier Sha256"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__file_size
+msgid "File Size"
+msgstr "Taille du fichier"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Filter review lines"
+msgstr "Filtrer les lignes à vérifier"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Generated internal reference collides inside this file."
+msgstr ""
+"La référence interne générée entre en collision à l'intérieur de ce fichier."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__has_reviewed_baseline
+msgid "Has Reviewed Baseline"
+msgstr "A révisé la ligne de base"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__homepage_url
+msgid "Homepage Url"
+msgstr "URL de la page d'accueil"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__id
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__id
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__id
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__activity_exception_icon
+msgid "Icon"
+msgstr "Icône"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Icône pour indiquer une activité d'exception."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__identity_is_fallback
+msgid "Identity Is Fallback"
+msgstr "L'identité est une solution de repli"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__message_has_error
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__image_failure
+msgid "Image Failure"
+msgstr "Échec de l'image"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__image_status
+msgid "Image Status"
+msgstr "Statut de l'image"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__image_url
+msgid "Image Url"
+msgstr "URL de l’image"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Images can be imported only after product ingestion."
+msgstr "Les images ne peuvent être importées qu’après l’ingestion du produit."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__import_images
+msgid "Import Images"
+msgstr "Importer des images"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Import evidence and lifecycle fields cannot be edited directly."
+msgstr ""
+"Les champs de preuves d’importation et de cycle de vie ne peuvent pas être "
+"modifiés directement."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Import policy"
+msgstr "Politique d'importation"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Import selected"
+msgstr "Importer la sélection"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Import/retry images"
+msgstr "Importer/réessayer des images"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__image_status__imported
+msgid "Imported"
+msgstr "Importé"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__imported_at
+msgid "Imported At"
+msgstr "Importé à"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__imported_by_id
+msgid "Imported By"
+msgstr "Importé par"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Imported products"
+msgstr "Produits importés"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__state__importing
+msgid "Importing"
+msgstr "Importation"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__validation_status__ingested
+msgid "Ingested"
+msgstr "Ingéré"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__ingested_product_id
+msgid "Ingested Product"
+msgstr "Produit ingéré"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__match_method__default_code
+msgid "Internal reference"
+msgstr "Référence interne"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__is_service
+msgid "Is Service"
+msgstr "Est-ce que le service"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__last_seen_at
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__last_seen_at
+msgid "Last Seen At"
+msgstr "Vu pour la dernière fois à"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__write_uid
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__write_uid
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__write_uid
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__write_date
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__write_date
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__write_date
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__line_ids
+msgid "Line"
+msgstr "Linéaire"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Lines can be edited only while their batch is under review."
+msgstr ""
+"Les lignes peuvent être modifiées uniquement lorsque leur lot est en cours "
+"de révision."
+
+#. module: mb_shop_import
+#: model:res.groups,name:mb_shop_import.group_shop_import_manager
+msgid "Manager"
+msgstr "Manager"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__match_method
+msgid "Match Method"
+msgstr "Méthode d'appariement"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "Matched"
+msgstr "Correspondant"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__matched_product_id
+msgid "Matched Product"
+msgstr "Produit correspondant"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "Missing images"
+msgstr "Images manquantes"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "More than one company product has this internal reference."
+msgstr "Plusieurs produits de l’entreprise possèdent cette référence interne."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "More than one untracked quant exists for %(product)s."
+msgstr "Il existe plusieurs quants non suivis pour%(product)s."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Échéance de mon activité"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__name
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__name
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_search
+msgid "Needs review"
+msgstr "À réviser"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__match_method__new
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "New"
+msgstr "Nouveau"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Date limite de l'activité à venir"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__activity_summary
+msgid "Next Activity Summary"
+msgstr "Résumé de l'activité suivante"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__activity_type_id
+msgid "Next Activity Type"
+msgstr "Type d'activités à venir"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__price_tax_basis__no_sales_tax
+msgid "No sales tax"
+msgstr "Pas de taxe de vente"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "No-sales-tax imports cannot select sales taxes."
+msgstr ""
+"Les importations sans taxe de vente ne peuvent pas sélectionner les taxes de"
+" vente."
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__validation_status__new
+msgid "Not validated"
+msgstr "Non validé"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_source_form
+msgid "One HTTPS hostname per line"
+msgstr "Un nom d'hôte HTTPS par ligne"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_source__allowed_image_hosts
+msgid "One HTTPS image hostname per line."
+msgstr "Un nom d'hôte d'image HTTPS par ligne."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_source__service_category_names
+msgid ""
+"One exact, case-insensitive source category per line. Matching rows become "
+"services."
+msgstr ""
+"Une catégorie source exacte, insensible à la casse, par ligne. Les lignes "
+"correspondantes deviennent des services."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_source_form
+msgid "One source category per line"
+msgstr "Une catégorie source par ligne"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Only a Shop Import Manager can import product images."
+msgstr "Seul un Shop Import Manager peut importer des images de produits."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Only a Shop Import Manager can ingest reviewed products."
+msgstr ""
+"Seul un responsable des imports boutique peut importer les produits "
+"vérifiés."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Only a Shop Import Manager can purge retained source evidence."
+msgstr ""
+"Seul un gestionnaire d'importation de boutique peut purger les preuves "
+"sources conservées."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Only a reviewed import can be selected."
+msgstr "Seule une importation révisée peut être sélectionnée."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Open products"
+msgstr "Produits ouverts"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__overwrite_images
+msgid "Overwrite Images"
+msgstr "Écraser les images"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Overwriting images requires image import."
+msgstr "L'écrasement des images nécessite l'importation d'images."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__parent_external_id
+msgid "Parent External"
+msgstr "Parent Externe"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Parse an uploaded catalogue before validating it."
+msgstr "Analysez un catalogue téléchargé avant de le valider."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Parse file"
+msgstr "Analyser le fichier"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__parsed_adapter_key
+msgid "Parsed Adapter Key"
+msgstr "Clé d'adaptateur analysée"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__parsed_at
+msgid "Parsed At"
+msgstr "analysé à"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__image_status__pending
+msgid "Pending"
+msgstr "En attente"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__price_changed
+msgid "Price Changed"
+msgstr "Prix ​​modifié"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__price_tax_basis
+msgid "Price Tax Basis"
+msgstr "Base de taxe sur les prix"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "Price changes"
+msgstr "Modifications de prix"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__product_id
+msgid "Product"
+msgstr "Produit"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__product_category_id
+msgid "Product Category"
+msgstr "Catégorie de produit"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__product_url
+msgid "Product Url"
+msgstr "URL du produit"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__proposed_action
+msgid "Proposed Action"
+msgstr "Action proposée"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__proposed_customer_price
+msgid "Proposed Customer Price"
+msgstr "Prix ​​client proposé"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__proposed_list_price
+msgid "Proposed List Price"
+msgstr "Prix ​​catalogue proposé"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__provider_key
+msgid "Provider Key"
+msgstr "Clé du fournisseur"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__published_vat_status
+msgid "Published Vat Status"
+msgstr "Statut de TVA publié"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__price_tax_basis__tax_excluded
+msgid "Published price excludes tax"
+msgstr "Le prix publié exclut les taxes"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__price_tax_basis__tax_included
+msgid "Published price includes tax"
+msgstr "Le prix publié inclut les taxes"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Purge retained source file and raw records"
+msgstr "Purger le fichier source conservé et les enregistrements bruts"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__rating_ids
+msgid "Ratings"
+msgstr "Évaluations"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__raw_record
+msgid "Raw Record"
+msgstr "Enregistrement brut"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__state__ready
+msgid "Ready"
+msgstr "Prêt"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__activity_user_id
+msgid "Responsible User"
+msgstr "Utilisateur responsable"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Result"
+msgstr "Résultat"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__result_summary
+msgid "Result Summary"
+msgstr "Résumé des résultats"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__state__review
+msgid "Review"
+msgstr "Révision"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Review lines"
+msgstr "Lignes de révision"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Review summary"
+msgstr "Résumé de l'examen"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__reviewed_quantity
+msgid "Reviewed Quantity"
+msgstr "Quantité examinée"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__reviewed_reserved_quantity
+msgid "Reviewed Reserved Quantity"
+msgstr "Quantité réservée révisée"
+
+#. module: mb_shop_import
+#: model:res.groups,name:mb_shop_import.group_shop_import_reviewer
+msgid "Reviewer"
+msgstr "Critique"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Erreur d'envoi SMS"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__sales_tax_ids
+msgid "Sales taxes"
+msgstr "Taxes de vente"
+
+#. module: mb_shop_import
+#: model:ir.model,name:mb_shop_import.model_mb_shop_source
+msgid "Scraped shop source"
+msgstr "Source du magasin grattée"
+
+#. module: mb_shop_import
+#: model:ir.actions.act_window,name:mb_shop_import.action_shop_sources
+#: model:ir.ui.menu,name:mb_shop_import.menu_shop_sources
+msgid "Scraped shop sources"
+msgstr "Sources de boutiques collectées"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Select at least one Odoo sales tax for a taxable import."
+msgstr ""
+"Sélectionnez au moins une taxe de vente Odoo pour une importation taxable."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Select at least one valid line to import."
+msgstr "Sélectionnez au moins une ligne valide à importer."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Select valid"
+msgstr "Sélectionner les lignes valides"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__selected
+msgid "Selected"
+msgstr "Choisi"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__selected_count
+msgid "Selected Count"
+msgstr "Nombre sélectionné"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Selected lines with errors cannot be imported."
+msgstr ""
+"Les lignes sélectionnées comportant des erreurs ne peuvent pas être "
+"importées."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__service_category_names
+msgid "Service Category Names"
+msgstr "Noms des catégories de services"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Service stock is ignored."
+msgstr "Le stock de service est ignoré."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "Services"
+msgstr "Services"
+
+#. module: mb_shop_import
+#: model:ir.module.category,name:mb_shop_import.module_category_shop_import
+#: model:res.groups.privilege,name:mb_shop_import.privilege_shop_import
+msgid "Shop Catalogue Import"
+msgstr "Importation du catalogue de boutique"
+
+#. module: mb_shop_import
+#: model:ir.model,name:mb_shop_import.model_mb_shop_import_batch
+msgid "Shop catalogue import"
+msgstr "Importation du catalogue de la boutique"
+
+#. module: mb_shop_import
+#: model:ir.model,name:mb_shop_import.model_mb_shop_import_line
+msgid "Shop catalogue import line"
+msgstr "Ligne d'importation du catalogue de la boutique"
+
+#. module: mb_shop_import
+#: model:ir.actions.act_window,name:mb_shop_import.action_shop_import_batches
+#: model:ir.ui.menu,name:mb_shop_import.menu_shop_import_batches
+msgid "Shop catalogue imports"
+msgstr "Imports du catalogue de la boutique"
+
+#. module: mb_shop_import
+#: model:ir.actions.act_window,name:mb_shop_import.action_shop_import_lines
+msgid "Shop import review lines"
+msgstr "Lignes de révision d'importation de boutique"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Shop product bindings are created only by a confirmed import."
+msgstr ""
+"Les liaisons de produits de la boutique sont créées uniquement par une "
+"importation confirmée."
+
+#. module: mb_shop_import
+#: model:ir.model,name:mb_shop_import.model_mb_shop_product_binding
+msgid "Shop source product binding"
+msgstr "Liaison du produit source de la boutique"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_source__sku_prefix
+msgid "Short prefix used for generated internal references."
+msgstr "Préfixe court utilisé pour les références internes générées."
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__proposed_action__skip
+msgid "Skip"
+msgstr "Sauter"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__skip_count
+msgid "Skip Count"
+msgstr "Compter les sauts"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__image_status__skipped
+msgid "Skipped"
+msgstr "Sauté"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__sku_prefix
+msgid "Sku Prefix"
+msgstr "Préfixe SKU"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__snapshot_max_age_hours
+msgid "Snapshot Max Age Hours"
+msgstr "Instantané Âge maximum Heures"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__snapshot_stale_policy
+msgid "Snapshot Stale Policy"
+msgstr "Politique relative aux instantanés obsolètes"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Snapshot maximum age cannot be negative."
+msgstr "L'âge maximum de l'instantané ne peut pas être négatif."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__source_id
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__source_id
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_search
+msgid "Source"
+msgstr "Source"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__source_category
+msgid "Source Category"
+msgstr "Catégorie source"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__source_file
+msgid "Source File"
+msgstr "Fichier source"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_source__source_key
+msgid "Source Key"
+msgstr "Clé source"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__source_price
+msgid "Source Price"
+msgstr "Prix ​​à la source"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__source_snapshot_at
+msgid "Source Snapshot At"
+msgstr "Instantané source à"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__source_snapshot_from
+msgid "Source Snapshot From"
+msgstr "Instantané source de"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_product_binding__source_url
+msgid "Source Url"
+msgstr "URL source"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Source artifact"
+msgstr "Artefact source"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__match_method__binding
+msgid "Source binding"
+msgstr "Liaison source"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Source evidence and computed review fields cannot be edited."
+msgstr ""
+"Les données source et les champs de vérification calculés ne peuvent pas "
+"être modifiés."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Source evidence can be purged only after the batch is closed."
+msgstr ""
+"Les preuves sources ne peuvent être purgées qu'après la clôture du lot."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Staging lines can be created only by parsing an uploaded artifact."
+msgstr ""
+"Les lignes intermédiaires ne peuvent être créées qu'en analysant un artefact"
+" téléchargé."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Staging lines cannot be deleted manually."
+msgstr ""
+"Les lignes de préparation ne peuvent pas être supprimées manuellement."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__state
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_search
+msgid "State"
+msgstr "Statut"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Statut basé sur les activités\n"
+"En retard : la date d'échéance est déjà dépassée\n"
+"Aujourd'hui : la date d'activité est aujourd'hui\n"
+"Planifiée : activités futures"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__stock_changed
+msgid "Stock Changed"
+msgstr "Stock modifié"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__stock_is_tracked
+msgid "Stock Is Tracked"
+msgstr "Le stock est suivi"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__stock_quantity
+msgid "Stock Quantity"
+msgstr "Quantité en stock"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid ""
+"Stock cannot be adjusted without lots or serials for this tracked product."
+msgstr ""
+"Le stock ne peut pas être ajusté sans lots ni séries pour ce produit suivi."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "Stock changes"
+msgstr "Variations de stocks"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Stock for %(product)s changed after review. Validate the batch again."
+msgstr ""
+"Le stock de %(product)s a changé depuis la vérification. Validez à nouveau "
+"le lot."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__target_location_id
+msgid "Target Location"
+msgstr "Emplacement cible"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid ""
+"The SKU prefix must contain 1–16 uppercase letters, digits, or hyphens."
+msgstr ""
+"Le préfixe SKU doit contenir de 1 à 16 lettres majuscules, chiffres ou "
+"traits d'union."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid ""
+"The artifact currency %(source)s differs from company currency %(company)s."
+msgstr ""
+"La devise de l'artefact%(source)sdiffère de la devise de la "
+"société%(company)s."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "The matched product belongs to another company."
+msgstr "Le produit correspondant appartient à une autre société."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid ""
+"The normalized audit summary remains, but the original file and raw records "
+"will be removed."
+msgstr ""
+"Le résumé d'audit normalisé est conservé, mais le fichier d'origine et les "
+"enregistrements bruts seront supprimés."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "The provider key is not valid."
+msgstr "La clé du fournisseur n'est pas valide."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid ""
+"The scraper CSV lacks an exact variant ID; review its fallback identity."
+msgstr ""
+"Le CSV du collecteur ne contient pas d’identifiant exact de variante ; "
+"vérifiez son identité de secours."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "The scraper source key is not valid."
+msgstr "La clé source du scraper n'est pas valide."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "The scraper stock snapshot is older than the configured maximum age."
+msgstr ""
+"L’instantané du stock du scraper est plus ancien que l’âge maximum "
+"configuré."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "The selected taxes cannot reproduce published price %(price)s."
+msgstr ""
+"Les taxes sélectionnées ne peuvent pas reproduire le prix publié%(price)s."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "The source binding now points at another product."
+msgstr "La liaison source pointe désormais vers un autre produit."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid ""
+"The source stock snapshot became stale after validation. Validate the batch "
+"again."
+msgstr ""
+"L’instantané du stock source est devenu obsolète après validation. Validez à"
+" nouveau le lot."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "The stock target must be an internal location of the batch company."
+msgstr ""
+"La cible de stock doit être un emplacement interne de la société par lots."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "The uploaded catalogue artifact exceeds 20 MB."
+msgstr "L'artefact de catalogue téléchargé dépasse 20 Mo."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "The uploaded file data is invalid."
+msgstr "Les données du fichier téléchargé ne sont pas valides."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "This import can no longer be parsed."
+msgstr "Cette importation ne peut plus être analysée."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__total_count
+msgid "Total Count"
+msgstr "Nombre total"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Type d'activité d'exception enregistrée."
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "Untracked stock"
+msgstr "Stock non suivi"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__proposed_action__update
+msgid "Update"
+msgstr "Mise à jour"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__update_count
+msgid "Update Count"
+msgstr "Nombre de mises à jour"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__update_existing_prices
+msgid "Update Existing Prices"
+msgstr "Mettre à jour les prix existants"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_batch__state__uploaded
+msgid "Uploaded"
+msgstr "Téléchargé"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__validation_status__valid
+msgid "Valid"
+msgstr "Valide"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_form
+msgid "Validate"
+msgstr "Valider"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Validate the import before acknowledging warnings."
+msgstr "Validez l'importation avant d'accuser réception des avertissements."
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "Validate the import immediately before ingestion."
+msgstr "Validez l’importation immédiatement avant l’ingestion."
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__validated_at
+msgid "Validated At"
+msgstr "Validé à"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__validated_snapshot_stale
+msgid "Validated Snapshot Stale"
+msgstr "Instantané validé obsolète"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__validation_messages
+msgid "Validation Messages"
+msgstr "Messages de validation"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__validation_status
+msgid "Validation Status"
+msgstr "Statut de validation"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_line__variant_title
+msgid "Variant Title"
+msgstr "Titre de la variante"
+
+#. module: mb_shop_import
+#: model:ir.model.fields.selection,name:mb_shop_import.selection__mb_shop_import_line__validation_status__warning
+msgid "Warning"
+msgstr "Avertissement"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__warning_count
+msgid "Warning Count"
+msgstr "Nombre d'avertissements"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_line_search
+msgid "Warnings"
+msgstr "Avertissements"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__warnings_acknowledged_at
+msgid "Warnings Acknowledged At"
+msgstr "Avertissements reconnus à"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__warnings_acknowledged_by_id
+msgid "Warnings Acknowledged By"
+msgstr "Avertissements reconnus par"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,field_description:mb_shop_import.field_mb_shop_import_batch__website_message_ids
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+#. module: mb_shop_import
+#: model:ir.model.fields,help:mb_shop_import.field_mb_shop_import_batch__website_message_ids
+msgid "Website communication history"
+msgstr "Historique de communication du site web"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_kanban
+msgid "errors"
+msgstr "erreurs"
+
+#. module: mb_shop_import
+#. odoo-python
+#: code:addons/mb_shop_import/models/shop_import.py:0
+msgid "id"
+msgstr "id"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_kanban
+msgid "lines ·"
+msgstr "lignes ·"
+
+#. module: mb_shop_import
+#: model_terms:ir.ui.view,arch_db:mb_shop_import.view_shop_import_batch_kanban
+msgid "warnings ·"
+msgstr "avertissements ·"

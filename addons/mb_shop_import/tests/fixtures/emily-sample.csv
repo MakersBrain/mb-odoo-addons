@@ -1,0 +1,4 @@
+product_name,variant_title,price,currency,availability,stock_quantity,category_path,product_url,image_url
+Bol Cœur,,28.0,EUR,https://schema.org/InStock,1,Ceramiques pour la maison,https://emily.example/article/bol-coeur,https://images.sumup.com/bol
+Fouet matcha,,10.0,EUR,https://schema.org/InStock,,Ceramiques pour la maison,https://emily.example/article/fouet,
+Petite coupelle,Bleu,10.0,EUR,https://schema.org/InStock,2,Ceramiques pour la maison,https://emily.example/article/coupelle,https://images.sumup.com/coupelle

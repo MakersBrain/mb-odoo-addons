@@ -279,6 +279,10 @@ class TestControlBridge(TransactionCase):
 
     def test_module_catalog_rejects_arbitrary_odoo_modules(self):
         self.company.mb_control_workshop_id = self.workshop_id
+        self.assertEqual(
+            self.company.mb_expected_module_bundle("shop-catalogue-import"),
+            ("mb_shop_import",),
+        )
 
         with self.assertRaises(ValidationError):
             self.company.mb_enable_module_bundle({

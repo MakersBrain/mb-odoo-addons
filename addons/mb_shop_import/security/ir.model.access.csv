@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_shop_source_reviewer,mb.shop.source reviewer,model_mb_shop_source,group_shop_import_reviewer,1,0,0,0
+access_shop_source_manager,mb.shop.source manager,model_mb_shop_source,group_shop_import_manager,1,1,1,0
+access_shop_binding_reviewer,mb.shop.product.binding reviewer,model_mb_shop_product_binding,group_shop_import_reviewer,1,0,0,0
+access_shop_binding_manager,mb.shop.product.binding manager,model_mb_shop_product_binding,group_shop_import_manager,1,1,1,0
+access_shop_import_batch_reviewer,mb.shop.import.batch reviewer,model_mb_shop_import_batch,group_shop_import_reviewer,1,1,1,0
+access_shop_import_batch_manager,mb.shop.import.batch manager,model_mb_shop_import_batch,group_shop_import_manager,1,1,1,0
+access_shop_import_line_reviewer,mb.shop.import.line reviewer,model_mb_shop_import_line,group_shop_import_reviewer,1,1,1,1
+access_shop_import_line_manager,mb.shop.import.line manager,model_mb_shop_import_line,group_shop_import_manager,1,1,1,1
