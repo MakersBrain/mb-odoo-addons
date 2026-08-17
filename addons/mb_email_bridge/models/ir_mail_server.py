@@ -51,15 +51,39 @@ class IrMailServer(models.Model):
         return approved
 
     def _connect__(self, *args, **kwargs):
+        args = list(args)
         # Odoo's signature permits mail_server_id as the tenth positional argument.
         server_id = kwargs.get("mail_server_id") or (args[9] if len(args) > 9 else None)
+        host = kwargs.get("host") if "host" in kwargs else (args[0] if args else None)
+        if not server_id and not host:
+            smtp_from = (
+                kwargs.get("smtp_from")
+                if "smtp_from" in kwargs
+                else (args[5] if len(args) > 5 else None)
+            )
+            selected, selected_smtp_from = self.sudo()._find_mail_server(smtp_from)
+            if selected and selected.mb_webshop_smtp:
+                # Bind the server selected by Odoo into the actual connection call.
+                # Otherwise core selects it a second time after this guard, leaving
+                # the normal no-mail_server_id path outside the DNS pin.
+                server_id = selected.id
+                if len(args) > 9:
+                    args[9] = server_id
+                else:
+                    kwargs["mail_server_id"] = server_id
+                if len(args) > 5:
+                    args[5] = selected_smtp_from
+                else:
+                    kwargs["smtp_from"] = selected_smtp_from
         approved_addresses = set()
         pin_token = None
         pinned_address = None
         if server_id:
             server = self.sudo().browse(server_id).exists()
             approved_addresses = server._mb_check_public_smtp_host()
-            hostname = (server.smtp_host or "").strip().rstrip(".")
+            # smtplib connects using the field value verbatim. Keep that exact value
+            # for the context pin while the resolver check uses its normalized form.
+            hostname = server.smtp_host
             pinned_address = sorted(approved_addresses)[0]
             pin_token = _SMTP_PIN.set((hostname, server.smtp_port, pinned_address))
         try:

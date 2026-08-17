@@ -177,6 +177,36 @@ class TestTransactionalMailBridge(TransactionCase):
             server._connect__(*positional)
         connection.close.assert_called_once()
 
+    def test_default_managed_smtp_selection_is_bound_to_dns_pin(self):
+        server = self.env["ir.mail_server"].sudo().create({
+            "name": "Default managed SMTP",
+            "smtp_host": "smtp.example.fr",
+            "smtp_port": 587,
+            "smtp_encryption": "starttls_strict",
+            "mb_webshop_smtp": True,
+        })
+        answer = [(2, 1, 6, "", ("8.8.8.8", 587))]
+        connection = Mock()
+        connection.sock.getpeername.return_value = ("8.8.8.8", 587)
+        with patch.object(
+            type(server),
+            "_find_mail_server",
+            return_value=(server, "notifications@example.fr"),
+        ), patch(
+            "odoo.addons.mb_email_bridge.models.ir_mail_server.socket.getaddrinfo",
+            return_value=answer,
+        ), patch(
+            "odoo.addons.base.models.ir_mail_server.IrMail_Server._connect__",
+            return_value=connection,
+        ) as connect:
+            result = server._connect__(smtp_from="orders@example.fr")
+
+        self.assertEqual(result, connection)
+        self.assertEqual(connect.call_args.kwargs["mail_server_id"], server.id)
+        self.assertEqual(
+            connect.call_args.kwargs["smtp_from"], "notifications@example.fr"
+        )
+
     def test_smtp_socket_is_pinned_without_changing_the_tls_hostname(self):
         from odoo.addons.mb_email_bridge.models import ir_mail_server as guard
 
