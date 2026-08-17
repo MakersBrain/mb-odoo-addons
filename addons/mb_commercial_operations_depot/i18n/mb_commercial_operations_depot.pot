@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0-20260803\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-16 23:27+0000\n"
-"PO-Revision-Date: 2026-08-16 23:27+0000\n"
+"POT-Creation-Date: 2026-08-17 08:19+0000\n"
+"PO-Revision-Date: 2026-08-17 08:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -69,6 +69,19 @@ msgstr ""
 #. module: mb_commercial_operations_depot
 #: model:ir.model.constraint,message:mb_commercial_operations_depot.constraint_mb_depot_refill_forecast_snapshot_unique
 msgid "A rule already has a forecast snapshot for this date."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid "Accept the travel quote, or enter the trip cost by hand."
+msgstr ""
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__travel_estimate_id
+msgid ""
+"Accepted round trip to the depot. Its cost and duration are multiplied by "
+"the number of permanences over the term."
 msgstr ""
 
 #. module: mb_commercial_operations_depot
@@ -781,8 +794,9 @@ msgstr ""
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__term_months
 msgid ""
-"Months this scenario judges. Taken from the contract dates, or the six-month"
-" planning horizon when the contract is open-ended."
+"Months this scenario judges. Taken from the contract dates when the scenario"
+" is created, or the six-month planning horizon when the contract is open-"
+"ended."
 msgstr ""
 
 #. module: mb_commercial_operations_depot
@@ -1134,13 +1148,6 @@ msgstr ""
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__returned_quantity
 msgid "Returned Quantity"
-msgstr ""
-
-#. module: mb_commercial_operations_depot
-#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__travel_estimate_id
-msgid ""
-"Round trip to the depot. Its cost and duration are multiplied by the number "
-"of permanences over the term."
 msgstr ""
 
 #. module: mb_commercial_operations_depot

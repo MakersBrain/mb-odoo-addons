@@ -1,7 +1,11 @@
 from calendar import monthrange
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+
+from .depot_scenario import DEFAULT_TERM_MONTHS
 
 
 class MbCommercialContract(models.Model):
@@ -61,6 +65,37 @@ class MbCommercialContract(models.Model):
         related="primary_depot_scenario_id.break_even_monthly_sales",
         string="Break-even Monthly Sales",
     )
+
+    def _depot_scenario_defaults(self):
+        """The contract terms a new profitability scenario starts from."""
+        self.ensure_one()
+        monthly = 0.0
+        weighted_hours = 0.0
+        for obligation in self.obligation_ids:
+            # A weekly obligation is not four a month: 52 weeks over 12 months.
+            per_month = obligation.required_occurrences * (
+                52.0 / 12.0 if obligation.period_unit == "week" else 1.0
+            )
+            monthly += per_month
+            weighted_hours += per_month * obligation.duration_hours
+        return {
+            "term_months": self._depot_scenario_term_months(),
+            "permanences_per_month": monthly,
+            "hours_per_permanence": weighted_hours / monthly if monthly else 0.0,
+            "monthly_fixed_rent": self.monthly_fixed_rent,
+            "commission_rate": self.depot_warehouse_id.depot_commission,
+            "target_margin_per_hour": self.company_id.mb_market_target_margin_per_hour,
+        }
+
+    def _depot_scenario_term_months(self):
+        self.ensure_one()
+        if not (self.date_start and self.date_end):
+            return DEFAULT_TERM_MONTHS
+        delta = relativedelta(self.date_end, self.date_start)
+        months = delta.years * 12 + delta.months
+        # A contract running to the last day of a month owes that month too, so
+        # leftover days count as a month rather than being dropped.
+        return max(1, months + (1 if delta.days else 0))
 
     @api.depends("rent_period_ids.bill_id")
     def _compute_rent_bill_ids(self):

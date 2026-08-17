@@ -296,6 +296,50 @@ class TestCommercialDepot(TransactionCase):
         self.assertAlmostEqual(scenario.permanences_per_month, 52.0 / 12.0, places=4)
         self.assertAlmostEqual(scenario.hours_per_permanence, 3.0, places=4)
 
+    def test_a_contract_ending_on_the_last_day_owes_that_month_too(self):
+        self.contract.date_start = fields.Date.to_date("2026-01-01")
+        self.contract.date_end = fields.Date.to_date("2026-12-31")
+        scenario = self._depot_scenario()
+
+        self.assertEqual(scenario.term_months, 12)
+
+    def test_unaccepted_travel_quote_cannot_price_the_drive_at_zero(self):
+        connector = self.env["mb.tollquote.connector"].create({
+            "name": "Depot quotes",
+            "company_id": self.env.company.id,
+            "api_token": "secret",
+        })
+        estimate = self.env["mb.travel.estimate"].create({
+            "name": "Depot round trip",
+            "connector_id": connector.id,
+            "company_id": self.env.company.id,
+            "origin_latitude": 48.85, "origin_longitude": 2.35,
+            "destination_latitude": 45.76, "destination_longitude": 4.83,
+        })
+        scenario = self._depot_scenario(
+            travel_estimate_id=estimate.id,
+            travel_cost_per_permanence=0.0,
+            travel_hours_per_permanence=0.0,
+        )
+
+        self.assertNotEqual(estimate.state, "accepted")
+        self.assertTrue(scenario.calculation_blocked)
+        self.assertEqual(scenario.recommendation, "unknown")
+        self.assertIn("travel quote", scenario.recommendation_note)
+
+    def test_approved_scenario_does_not_follow_later_contract_changes(self):
+        scenario = self._depot_scenario()
+        scenario.action_approve()
+
+        self.contract.monthly_fixed_rent = 900.0
+        self.depot.depot_commission = 60.0
+        scenario.invalidate_recordset()
+
+        self.assertEqual(scenario.monthly_fixed_rent, 310.0)
+        self.assertEqual(scenario.commission_rate, 35.0)
+        self.assertEqual(scenario.term_margin, 3300.0)
+        self.assertEqual(scenario.recommendation, "go")
+
     def test_approved_depot_scenario_is_frozen_and_carried_on_the_contract(self):
         scenario = self._depot_scenario()
         scenario.action_approve()

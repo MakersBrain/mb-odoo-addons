@@ -84,6 +84,22 @@ msgid "A rule already has a forecast snapshot for this date."
 msgstr "Une règle possède déjà un instantané de prévision pour cette date."
 
 #. module: mb_commercial_operations_depot
+#. odoo-python
+#: code:addons/mb_commercial_operations_depot/models/depot_scenario.py:0
+msgid "Accept the travel quote, or enter the trip cost by hand."
+msgstr ""
+"Acceptez le devis de déplacement, ou saisissez le coût du trajet à la main."
+
+#. module: mb_commercial_operations_depot
+#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__travel_estimate_id
+msgid ""
+"Accepted round trip to the depot. Its cost and duration are multiplied by "
+"the number of permanences over the term."
+msgstr ""
+"Aller-retour accepté vers le dépôt. Son coût et sa durée sont multipliés par"
+" le nombre de permanences sur la durée."
+
+#. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__message_needaction
 msgid "Action Needed"
 msgstr "Nécessite une action"
@@ -811,11 +827,13 @@ msgstr "Ventes mensuelles HT"
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__term_months
 msgid ""
-"Months this scenario judges. Taken from the contract dates, or the six-month"
-" planning horizon when the contract is open-ended."
+"Months this scenario judges. Taken from the contract dates when the scenario"
+" is created, or the six-month planning horizon when the contract is open-"
+"ended."
 msgstr ""
-"Nombre de mois jugés par ce scénario. Repris des dates du contrat, ou de "
-"l'horizon de planification de six mois lorsque le contrat est sans terme."
+"Nombre de mois jugés par ce scénario. Repris des dates du contrat à la "
+"création du scénario, ou de l'horizon de planification de six mois lorsque "
+"le contrat est sans terme."
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_assortment_rule__name
@@ -1175,15 +1193,6 @@ msgstr "Quantité réservée"
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__returned_quantity
 msgid "Returned Quantity"
 msgstr "Quantité retournée"
-
-#. module: mb_commercial_operations_depot
-#: model:ir.model.fields,help:mb_commercial_operations_depot.field_mb_depot_profitability_scenario__travel_estimate_id
-msgid ""
-"Round trip to the depot. Its cost and duration are multiplied by the number "
-"of permanences over the term."
-msgstr ""
-"Aller-retour vers le dépôt. Son coût et sa durée sont multipliés par le "
-"nombre de permanences sur la durée."
 
 #. module: mb_commercial_operations_depot
 #: model:ir.model.fields,field_description:mb_commercial_operations_depot.field_mb_depot_refill_forecast__rule_id

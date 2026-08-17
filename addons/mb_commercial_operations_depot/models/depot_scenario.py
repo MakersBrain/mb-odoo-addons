@@ -1,5 +1,3 @@
-from dateutil.relativedelta import relativedelta
-
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import formatLang
@@ -46,17 +44,19 @@ class MbDepotProfitabilityScenario(models.Model):
     )
 
     # --- Term and permanences -------------------------------------------------
+    # Contract terms are copied in when the scenario is created and then belong to
+    # the scenario. They are assumptions, not a live mirror: an approved baseline
+    # that quietly followed the contract would not be a baseline, and stored
+    # computed fields are written by _write(), which no immutability guard sees.
     term_months = fields.Integer(
-        compute="_compute_term_months", store=True, readonly=False,
-        help="Months this scenario judges. Taken from the contract dates, or the "
-             "six-month planning horizon when the contract is open-ended.",
+        help="Months this scenario judges. Taken from the contract dates when the "
+             "scenario is created, or the six-month planning horizon when the "
+             "contract is open-ended.",
     )
     permanences_per_month = fields.Float(
-        compute="_compute_permanences", store=True, readonly=False,
         help="Permanence days owed each month, summed from the contract's obligations.",
     )
     hours_per_permanence = fields.Float(
-        compute="_compute_permanences", store=True, readonly=False,
         help="Hours spent on site per permanence, from the obligation duration.",
     )
     work_hourly_cost = fields.Monetary()
@@ -64,15 +64,11 @@ class MbDepotProfitabilityScenario(models.Model):
     # --- Travel ---------------------------------------------------------------
     travel_estimate_id = fields.Many2one(
         "mb.travel.estimate", check_company=True, ondelete="restrict",
-        help="Round trip to the depot. Its cost and duration are multiplied by the "
-             "number of permanences over the term.",
+        help="Accepted round trip to the depot. Its cost and duration are multiplied "
+             "by the number of permanences over the term.",
     )
-    travel_cost_per_permanence = fields.Monetary(
-        compute="_compute_travel", store=True, readonly=False,
-    )
-    travel_hours_per_permanence = fields.Float(
-        compute="_compute_travel", store=True, readonly=False,
-    )
+    travel_cost_per_permanence = fields.Monetary()
+    travel_hours_per_permanence = fields.Float()
 
     # --- Sales and the depot's cut -------------------------------------------
     expected_monthly_sales = fields.Monetary(
@@ -82,7 +78,7 @@ class MbDepotProfitabilityScenario(models.Model):
     )
     vat_rate = fields.Float(digits=(16, 4), help="Percentage included in the public price.")
     commission_rate = fields.Float(
-        digits=(16, 4), compute="_compute_commission_rate", store=True, readonly=False,
+        digits=(16, 4),
         help="Percentage the depot keeps, defaulted from the depot warehouse.",
     )
     commission_basis = fields.Selection(
@@ -98,7 +94,6 @@ class MbDepotProfitabilityScenario(models.Model):
 
     # --- Standing costs -------------------------------------------------------
     monthly_fixed_rent = fields.Monetary(
-        compute="_compute_monthly_fixed_rent", store=True, readonly=False,
         help="Fixed fee the depot charges each month, defaulted from the contract.",
     )
     other_monthly_fixed_cost = fields.Monetary()
@@ -157,63 +152,27 @@ class MbDepotProfitabilityScenario(models.Model):
     def create(self, values_list):
         for values in values_list:
             contract = self.env["mb.commercial.contract"].browse(values.get("contract_id"))
-            if contract:
-                values.setdefault(
-                    "target_margin_per_hour",
-                    contract.company_id.mb_market_target_margin_per_hour,
-                )
+            if not contract:
+                continue
+            for field, value in contract._depot_scenario_defaults().items():
+                values.setdefault(field, value)
         return super().create(values_list)
 
-    @api.depends("contract_id.date_start", "contract_id.date_end")
-    def _compute_term_months(self):
-        for scenario in self:
-            contract = scenario.contract_id
-            if contract.date_start and contract.date_end:
-                delta = relativedelta(contract.date_end, contract.date_start)
-                scenario.term_months = max(1, delta.years * 12 + delta.months)
-            else:
-                scenario.term_months = DEFAULT_TERM_MONTHS
+    @api.onchange("contract_id")
+    def _onchange_contract_id(self):
+        """Refill the assumptions while a draft is being written, never after."""
+        if self.contract_id and self.state == "draft":
+            for field, value in self.contract_id._depot_scenario_defaults().items():
+                self[field] = value
 
-    @api.depends(
-        "contract_id.obligation_ids.required_occurrences",
-        "contract_id.obligation_ids.period_unit",
-        "contract_id.obligation_ids.duration_hours",
-        "contract_id.obligation_ids.active",
-    )
-    def _compute_permanences(self):
-        for scenario in self:
-            obligations = scenario.contract_id.obligation_ids
-            monthly = 0.0
-            weighted_hours = 0.0
-            for obligation in obligations:
-                # A weekly obligation is not four a month: 52 weeks over 12 months.
-                per_month = obligation.required_occurrences * (
-                    52.0 / 12.0 if obligation.period_unit == "week" else 1.0
-                )
-                monthly += per_month
-                weighted_hours += per_month * obligation.duration_hours
-            scenario.permanences_per_month = monthly
-            scenario.hours_per_permanence = weighted_hours / monthly if monthly else 0.0
-
-    @api.depends(
-        "travel_estimate_id.total_operating_cost", "travel_estimate_id.duration_hours",
-        "travel_estimate_id.state",
-    )
-    def _compute_travel(self):
-        for scenario in self:
-            estimate = scenario.travel_estimate_id
-            scenario.travel_cost_per_permanence = estimate.total_operating_cost
-            scenario.travel_hours_per_permanence = estimate.duration_hours
-
-    @api.depends("contract_id.monthly_fixed_rent")
-    def _compute_monthly_fixed_rent(self):
-        for scenario in self:
-            scenario.monthly_fixed_rent = scenario.contract_id.monthly_fixed_rent
-
-    @api.depends("contract_id.depot_warehouse_id.depot_commission")
-    def _compute_commission_rate(self):
-        for scenario in self:
-            scenario.commission_rate = scenario.contract_id.depot_warehouse_id.depot_commission
+    @api.onchange("travel_estimate_id")
+    def _onchange_travel_estimate_id(self):
+        if self.state != "draft":
+            return
+        estimate = self.travel_estimate_id
+        if estimate.state == "accepted":
+            self.travel_cost_per_permanence = estimate.total_operating_cost
+            self.travel_hours_per_permanence = estimate.duration_hours
 
     @api.depends(
         "term_months", "permanences_per_month", "hours_per_permanence",
@@ -221,6 +180,7 @@ class MbDepotProfitabilityScenario(models.Model):
         "expected_monthly_sales", "vat_rate", "commission_rate", "commission_basis",
         "product_cost_ratio", "other_monthly_variable_cost", "monthly_fixed_rent",
         "other_monthly_fixed_cost", "target_margin_per_hour",
+        "travel_estimate_id", "travel_estimate_id.state",
     )
     def _compute_results(self):
         for scenario in self:
@@ -295,6 +255,10 @@ class MbDepotProfitabilityScenario(models.Model):
         self.ensure_one()
         if months <= 0:
             return True, _("Set how many months this depot contract is judged over.")
+        if self.travel_estimate_id and self.travel_estimate_id.state != "accepted":
+            # An unaccepted quote contributes nothing, which would quietly price the
+            # drive to the depot at zero and turn a losing contract into a good one.
+            return True, _("Accept the travel quote, or enter the trip cost by hand.")
         if sales <= 0:
             return True, _("Enter the sales you expect the depot to make each month.")
         if ratio <= 0:
