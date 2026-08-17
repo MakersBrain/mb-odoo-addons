@@ -80,18 +80,19 @@ class IrMailServer(models.Model):
         pinned_address = None
         if server_id:
             server = self.sudo().browse(server_id).exists()
-            approved_addresses = server._mb_check_public_smtp_host()
-            # smtplib connects using the field value verbatim. Keep that exact value
-            # for the context pin while the resolver check uses its normalized form.
-            hostname = server.smtp_host
-            pinned_address = sorted(approved_addresses)[0]
-            pin_token = _SMTP_PIN.set((hostname, server.smtp_port, pinned_address))
+            if server and server.mb_webshop_smtp:
+                approved_addresses = server._mb_check_public_smtp_host()
+                # smtplib connects using the field value verbatim. Keep that exact value
+                # for the context pin while the resolver check uses its normalized form.
+                hostname = server.smtp_host
+                pinned_address = sorted(approved_addresses)[0]
+                pin_token = _SMTP_PIN.set((hostname, server.smtp_port, pinned_address))
         try:
             connection = super()._connect__(*args, **kwargs)
         finally:
             if pin_token is not None:
                 _SMTP_PIN.reset(pin_token)
-        if server_id and connection and getattr(connection, "sock", None):
+        if pinned_address and connection and getattr(connection, "sock", None):
             peer = connection.sock.getpeername()[0]
             if peer != pinned_address or not ipaddress.ip_address(peer).is_global:
                 connection.close()
