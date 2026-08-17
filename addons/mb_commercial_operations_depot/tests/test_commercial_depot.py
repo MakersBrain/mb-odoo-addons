@@ -1,8 +1,10 @@
 from calendar import monthrange
 from datetime import timedelta
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import fields
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
 
 
@@ -196,6 +198,159 @@ class TestCommercialDepot(TransactionCase):
             ("category", "=", "picking_entry"),
         ])
         self.assertEqual(sum(stock_costs.mapped("amount")), -20.0)
+
+    def _depot_scenario(self, **values):
+        """2000 a month at 35% commission, 310 rent, two 4-hour permanences."""
+        return self.env["mb.depot.profitability.scenario"].create({
+            "contract_id": self.contract.id,
+            "expected_monthly_sales": 2000.0,
+            "product_cost_ratio": 20.0,
+            "permanences_per_month": 2.0,
+            "hours_per_permanence": 4.0,
+            "travel_cost_per_permanence": 20.0,
+            "travel_hours_per_permanence": 1.5,
+            **values,
+        })
+
+    def test_depot_scenario_spreads_commission_fee_and_permanences_over_the_term(self):
+        scenario = self._depot_scenario()
+
+        self.assertEqual(scenario.commission_rate, 35.0)
+        self.assertEqual(scenario.monthly_fixed_rent, 310.0)
+        self.assertEqual(scenario.term_months, 6)
+        self.assertEqual(scenario.monthly_commission, 700.0)
+        self.assertEqual(scenario.monthly_receipts, 1300.0)
+        self.assertEqual(scenario.monthly_product_cost, 400.0)
+        self.assertEqual(scenario.monthly_contribution, 900.0)
+        self.assertEqual(scenario.monthly_fixed_cost, 350.0)
+        self.assertEqual(scenario.monthly_margin, 550.0)
+        self.assertEqual(scenario.term_margin, 3300.0)
+        self.assertEqual(scenario.permanence_count, 12.0)
+        self.assertEqual(scenario.work_hours, 48.0)
+        self.assertEqual(scenario.travel_hours, 18.0)
+        self.assertEqual(scenario.effort_hours, 66.0)
+        self.assertEqual(scenario.margin_per_effort_hour, 50.0)
+        self.assertAlmostEqual(scenario.break_even_monthly_sales, 777.78, places=2)
+        self.assertEqual(scenario.recommendation, "go")
+        self.assertIn("above break-even", scenario.recommendation_note)
+
+    def test_depot_below_break_even_is_not_worth_the_permanences(self):
+        scenario = self._depot_scenario(expected_monthly_sales=600.0)
+
+        self.assertEqual(scenario.monthly_margin, -80.0)
+        self.assertEqual(scenario.term_margin, -480.0)
+        self.assertEqual(scenario.recommendation, "no_go")
+        self.assertIn("needed to cover", scenario.recommendation_note)
+
+    def test_depot_hourly_target_downgrades_an_otherwise_profitable_contract(self):
+        self.env.company.mb_market_target_margin_per_hour = 60.0
+        scenario = self._depot_scenario()
+
+        self.assertEqual(scenario.target_margin_per_hour, 60.0)
+        self.assertEqual(scenario.margin_per_effort_hour, 50.0)
+        self.assertEqual(scenario.recommendation, "marginal")
+        self.assertIn("below the", scenario.recommendation_note)
+
+    def test_depot_without_expected_sales_cannot_be_judged(self):
+        scenario = self._depot_scenario(expected_monthly_sales=0.0)
+
+        self.assertTrue(scenario.calculation_blocked)
+        self.assertEqual(scenario.recommendation, "unknown")
+        self.assertIn("each month", scenario.recommendation_note)
+        with self.assertRaises(ValidationError):
+            scenario.action_approve()
+
+    def test_depot_term_and_permanences_come_from_the_contract(self):
+        self.contract.date_end = self.contract.date_start + relativedelta(months=6)
+        self.env["mb.commercial.obligation"].create({
+            "name": "Saturday permanence",
+            "contract_id": self.contract.id,
+            "date_start": self.contract.date_start,
+            "required_occurrences": 2,
+            "period_unit": "month",
+            "duration_hours": 4.0,
+        })
+        scenario = self.env["mb.depot.profitability.scenario"].create({
+            "contract_id": self.contract.id,
+            "expected_monthly_sales": 2000.0,
+        })
+
+        self.assertEqual(scenario.term_months, 6)
+        self.assertEqual(scenario.permanences_per_month, 2.0)
+        self.assertEqual(scenario.hours_per_permanence, 4.0)
+
+    def test_weekly_permanences_are_not_four_a_month(self):
+        self.env["mb.commercial.obligation"].create({
+            "name": "Weekly permanence",
+            "contract_id": self.contract.id,
+            "date_start": self.contract.date_start,
+            "required_occurrences": 1,
+            "period_unit": "week",
+            "duration_hours": 3.0,
+        })
+        scenario = self.env["mb.depot.profitability.scenario"].create({
+            "contract_id": self.contract.id,
+            "expected_monthly_sales": 2000.0,
+        })
+
+        self.assertAlmostEqual(scenario.permanences_per_month, 52.0 / 12.0, places=4)
+        self.assertAlmostEqual(scenario.hours_per_permanence, 3.0, places=4)
+
+    def test_a_contract_ending_on_the_last_day_owes_that_month_too(self):
+        self.contract.date_start = fields.Date.to_date("2026-01-01")
+        self.contract.date_end = fields.Date.to_date("2026-12-31")
+        scenario = self._depot_scenario()
+
+        self.assertEqual(scenario.term_months, 12)
+
+    def test_unaccepted_travel_quote_cannot_price_the_drive_at_zero(self):
+        connector = self.env["mb.tollquote.connector"].create({
+            "name": "Depot quotes",
+            "company_id": self.env.company.id,
+            "api_token": "secret",
+        })
+        estimate = self.env["mb.travel.estimate"].create({
+            "name": "Depot round trip",
+            "connector_id": connector.id,
+            "company_id": self.env.company.id,
+            "origin_latitude": 48.85, "origin_longitude": 2.35,
+            "destination_latitude": 45.76, "destination_longitude": 4.83,
+        })
+        scenario = self._depot_scenario(
+            travel_estimate_id=estimate.id,
+            travel_cost_per_permanence=0.0,
+            travel_hours_per_permanence=0.0,
+        )
+
+        self.assertNotEqual(estimate.state, "accepted")
+        self.assertTrue(scenario.calculation_blocked)
+        self.assertEqual(scenario.recommendation, "unknown")
+        self.assertIn("travel quote", scenario.recommendation_note)
+
+    def test_approved_scenario_does_not_follow_later_contract_changes(self):
+        scenario = self._depot_scenario()
+        scenario.action_approve()
+
+        self.contract.monthly_fixed_rent = 900.0
+        self.depot.depot_commission = 60.0
+        scenario.invalidate_recordset()
+
+        self.assertEqual(scenario.monthly_fixed_rent, 310.0)
+        self.assertEqual(scenario.commission_rate, 35.0)
+        self.assertEqual(scenario.term_margin, 3300.0)
+        self.assertEqual(scenario.recommendation, "go")
+
+    def test_approved_depot_scenario_is_frozen_and_carried_on_the_contract(self):
+        scenario = self._depot_scenario()
+        scenario.action_approve()
+
+        self.assertEqual(scenario.state, "approved")
+        self.assertEqual(self.contract.primary_depot_scenario_id, scenario)
+        self.assertEqual(self.contract.depot_recommendation, "go")
+        self.assertEqual(self.contract.depot_term_margin, 3300.0)
+        self.assertEqual(self.contract.depot_margin_per_hour, 50.0)
+        with self.assertRaises(UserError):
+            scenario.expected_monthly_sales = 2500.0
 
     def test_overlapping_depot_contract_is_rejected(self):
         with self.assertRaises(ValidationError):

@@ -1495,6 +1495,7 @@ msgstr "Justificatifs comptables directs"
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario_line__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_report_snapshot__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_market_stock_plan_line__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_profitability_verdict_mixin__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_tollquote_connector__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_travel_estimate__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_project_project__display_name
@@ -1988,6 +1989,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario_line__id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_report_snapshot__id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_market_stock_plan_line__id
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_profitability_verdict_mixin__id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_tollquote_connector__id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_travel_estimate__id
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_project_project__id
@@ -3313,6 +3315,11 @@ msgstr "Scénarios de rentabilité"
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_recommendation
 msgid "Profitability Verdict"
 msgstr "Verdict de rentabilité"
+
+#. module: mb_commercial_operations
+#: model:ir.model,name:mb_commercial_operations.model_mb_profitability_verdict_mixin
+msgid "Profitability Verdict Rules"
+msgstr "Règles de verdict de rentabilité"
 
 #. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_profitability_report_graph

@@ -4,15 +4,13 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, formatLang
 
-# Planned units must clear break-even by this share before a market is called worth it;
-# anything thinner is one rained-out afternoon away from a loss.
-BREAK_EVEN_HEADROOM_RATIO = 0.15
+from .profitability_verdict import VERDICT_SELECTION
 
 
 class MbCommercialProfitabilityScenario(models.Model):
     _name = "mb.commercial.profitability.scenario"
     _description = "Commercial Profitability Scenario"
-    _inherit = ["mail.thread"]
+    _inherit = ["mail.thread", "mb.profitability.verdict.mixin"]
     _order = "operation_id, sequence, id"
     _check_company_auto = True
 
@@ -107,13 +105,7 @@ class MbCommercialProfitabilityScenario(models.Model):
         help="How far the planned units sit above break-even, as a share of break-even.",
     )
     recommendation = fields.Selection(
-        [
-            ("unknown", "Not assessable"),
-            ("no_go", "Not worth it"),
-            ("marginal", "Marginal"),
-            ("go", "Worth it"),
-        ],
-        compute="_compute_results", store=True, string="Verdict",
+        VERDICT_SELECTION, compute="_compute_results", store=True, string="Verdict",
     )
     recommendation_note = fields.Char(compute="_compute_results", store=True)
 
@@ -295,51 +287,59 @@ class MbCommercialProfitabilityScenario(models.Model):
     def _evaluate_recommendation(self, blocked, note, use_legacy_mix, units):
         """Turn the break-even figures into a verdict a stallholder can act on."""
         self.ensure_one()
-        if blocked:
-            return "unknown", note or _("Complete the scenario before judging this market.")
-        if use_legacy_mix or units <= 0:
-            return "unknown", _(
-                "Enter expected sold quantities: an average-basket mix without volumes "
-                "cannot be judged."
-            )
+        verdict, reason = self._verdict(
+            blocked=blocked,
+            judgeable=not use_legacy_mix and units > 0,
+            margin=self.projected_margin,
+            below_break_even=units < self.break_even_units,
+            effort_hours=self.effort_hours,
+            margin_per_hour=self.margin_per_effort_hour,
+            target_per_hour=self.target_margin_per_hour,
+            headroom_ratio=self.break_even_headroom_ratio,
+        )
+
         def money(amount):
             return formatLang(self.env, amount, currency_obj=self.currency_id)
 
         headroom_percent = self.break_even_headroom_ratio * 100.0
-        if self.projected_margin <= 0 or units < self.break_even_units:
-            return "no_go", _(
+        if reason == "blocked":
+            return verdict, note or _("Complete the scenario before judging this market.")
+        if reason == "not_judgeable":
+            return verdict, _(
+                "Enter expected sold quantities: an average-basket mix without volumes "
+                "cannot be judged."
+            )
+        if reason == "below_break_even":
+            return verdict, _(
                 "Projected margin %(margin)s: %(units)s planned units against %(break_even)s "
                 "needed to break even.",
                 margin=money(self.projected_margin),
                 units=round(units, 2),
                 break_even=self.break_even_units,
             )
-        if self.effort_hours <= 0:
-            return "marginal", _(
+        if reason == "no_hours":
+            return verdict, _(
                 "%(margin)s above costs, but no work or travel hours are planned, so the "
                 "hourly return cannot be checked.",
                 margin=money(self.projected_margin),
             )
-        if (
-            self.target_margin_per_hour
-            and self.margin_per_effort_hour < self.target_margin_per_hour
-        ):
-            return "marginal", _(
+        if reason == "below_target":
+            return verdict, _(
                 "%(rate)s per hour over %(hours).1f hours of work and travel, below the "
                 "%(target)s target.",
                 rate=money(self.margin_per_effort_hour),
                 hours=self.effort_hours,
                 target=money(self.target_margin_per_hour),
             )
-        if self.break_even_headroom_ratio < BREAK_EVEN_HEADROOM_RATIO:
-            return "marginal", _(
+        if reason == "thin_headroom":
+            return verdict, _(
                 "Only %(headroom).0f%% above break-even (%(units)s planned against "
                 "%(break_even)s): a slow day turns this into a loss.",
                 headroom=headroom_percent,
                 units=round(units, 2),
                 break_even=self.break_even_units,
             )
-        return "go", _(
+        return verdict, _(
             "%(margin)s over %(hours).1f hours of work and travel (%(rate)s per hour), "
             "%(headroom).0f%% above break-even.",
             margin=money(self.projected_margin),

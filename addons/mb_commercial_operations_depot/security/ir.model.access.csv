@@ -5,3 +5,4 @@ access_depot_forecast_user,mb.depot.refill.forecast.user,model_mb_depot_refill_f
 access_depot_forecast_manager,mb.depot.refill.forecast.manager,model_mb_depot_refill_forecast,mb_commercial_operations.group_commercial_operations_manager,1,1,1,0
 access_commercial_rent_period_user,mb.commercial.rent.period.user,model_mb_commercial_rent_period,mb_commercial_operations.group_commercial_operations_user,1,0,0,0
 access_commercial_rent_period_account,mb.commercial.rent.period.account,model_mb_commercial_rent_period,account.group_account_invoice,1,1,1,0
+access_depot_scenario_user,mb.depot.profitability.scenario.user,model_mb_depot_profitability_scenario,mb_commercial_operations.group_commercial_operations_user,1,1,1,1

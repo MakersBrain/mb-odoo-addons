@@ -1,3 +1,4 @@
+from . import depot_scenario
 from . import commercial_contract
 from . import commercial_operation
 from . import depot_forecast

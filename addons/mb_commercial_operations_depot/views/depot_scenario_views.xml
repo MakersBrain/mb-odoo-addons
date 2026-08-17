@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_depot_scenario_list" model="ir.ui.view">
+    <field name="name">mb.depot.profitability.scenario.list</field>
+    <field name="model">mb.depot.profitability.scenario</field>
+    <field name="arch" type="xml">
+      <list decoration-success="state == 'approved'" decoration-muted="state == 'superseded'">
+        <field name="name"/>
+        <field name="contract_id"/>
+        <field name="term_months"/>
+        <field name="permanences_per_month"/>
+        <field name="expected_monthly_sales"/>
+        <field name="commission_rate"/>
+        <field name="monthly_fixed_rent"/>
+        <field name="break_even_monthly_sales"/>
+        <field name="monthly_margin"/>
+        <field name="term_margin"/>
+        <field name="margin_per_effort_hour"/>
+        <field name="recommendation" widget="badge"
+               decoration-success="recommendation == 'go'"
+               decoration-warning="recommendation == 'marginal'"
+               decoration-danger="recommendation == 'no_go'"/>
+        <field name="recommendation_note" optional="show"/>
+        <field name="state" widget="badge"/>
+        <field name="currency_id" column_invisible="True"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_depot_scenario_form" model="ir.ui.view">
+    <field name="name">mb.depot.profitability.scenario.form</field>
+    <field name="model">mb.depot.profitability.scenario</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_approve" type="object" string="Approve Baseline"
+                  class="btn-primary" invisible="state != 'draft'"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
+        </header>
+        <sheet>
+          <div class="oe_title"><h1><field name="name" readonly="state != 'draft'"/></h1></div>
+          <group>
+            <group string="Contract">
+              <field name="contract_id" readonly="state != 'draft'"/>
+              <field name="term_months" readonly="state != 'draft'"/>
+              <field name="permanences_per_month" readonly="state != 'draft'"/>
+              <field name="hours_per_permanence" readonly="state != 'draft'"/>
+              <field name="work_hourly_cost" readonly="state != 'draft'"/>
+              <field name="currency_id" invisible="1"/>
+            </group>
+            <group string="Verdict">
+              <field name="recommendation" widget="badge" readonly="1"
+                     decoration-success="recommendation == 'go'"
+                     decoration-warning="recommendation == 'marginal'"
+                     decoration-danger="recommendation == 'no_go'"/>
+              <field name="recommendation_note" readonly="1"/>
+              <field name="calculation_blocked" readonly="1"/>
+              <field name="calculation_note" readonly="1"/>
+              <field name="target_margin_per_hour" readonly="state != 'draft'"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Sales and Commission">
+              <group>
+                <group>
+                  <field name="expected_monthly_sales" readonly="state != 'draft'"/>
+                  <field name="vat_rate" readonly="state != 'draft'"/>
+                  <field name="commission_rate" readonly="state != 'draft'"/>
+                  <field name="commission_basis" readonly="state != 'draft'"/>
+                </group>
+                <group>
+                  <field name="product_cost_ratio" readonly="state != 'draft'"/>
+                  <field name="other_monthly_variable_cost" readonly="state != 'draft'"/>
+                  <field name="monthly_sales_excl_vat" readonly="1"/>
+                  <field name="monthly_commission" readonly="1"/>
+                  <field name="monthly_receipts" readonly="1"/>
+                  <field name="monthly_product_cost" readonly="1"/>
+                </group>
+              </group>
+            </page>
+            <page string="Fee, Permanences and Travel">
+              <group>
+                <group string="Standing costs">
+                  <field name="monthly_fixed_rent" readonly="state != 'draft'"/>
+                  <field name="other_monthly_fixed_cost" readonly="state != 'draft'"/>
+                </group>
+                <group string="Travel">
+                  <field name="travel_estimate_id" readonly="state != 'draft'"/>
+                  <field name="travel_cost_per_permanence" readonly="state != 'draft'"/>
+                  <field name="travel_hours_per_permanence" readonly="state != 'draft'"/>
+                </group>
+              </group>
+              <group>
+                <group string="Over the term">
+                  <field name="permanence_count" readonly="1"/>
+                  <field name="work_hours" readonly="1"/>
+                  <field name="travel_hours" readonly="1"/>
+                  <field name="effort_hours" readonly="1"/>
+                </group>
+              </group>
+            </page>
+            <page string="Break-even">
+              <group>
+                <group string="Each month">
+                  <field name="monthly_contribution" readonly="1"/>
+                  <field name="contribution_margin_ratio" widget="percentage" readonly="1"/>
+                  <field name="monthly_fixed_cost" readonly="1"/>
+                  <field name="monthly_margin" readonly="1"/>
+                  <field name="break_even_monthly_sales" readonly="1"/>
+                  <field name="break_even_headroom_ratio" widget="percentage" readonly="1"/>
+                </group>
+                <group string="Over the term">
+                  <field name="term_sales" readonly="1"/>
+                  <field name="term_commission" readonly="1"/>
+                  <field name="term_fixed_cost" readonly="1"/>
+                  <field name="term_margin" readonly="1"/>
+                  <field name="margin_per_effort_hour" readonly="1"/>
+                  <field name="margin_per_work_hour" readonly="1"/>
+                </group>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_depot_scenarios" model="ir.actions.act_window">
+    <field name="name">Depot Break-even</field>
+    <field name="res_model">mb.depot.profitability.scenario</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>
