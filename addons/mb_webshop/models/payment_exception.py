@@ -76,7 +76,7 @@ class WebshopPaymentException(models.Model):
                 raise UserError(_("Only a captured payment can be refunded."))
             with self.env.cr.savepoint():
                 refund = transaction._refund(amount_to_refund=transaction.amount)
-                if refund.state == "error":
+                if refund.state in ("cancel", "error"):
                     raise UserError(_(
                         "The refund provider rejected the request. Correct the provider "
                         "problem, then try the refund again."
@@ -123,7 +123,7 @@ class PaymentTransaction(models.Model):
             state_message=state_message, extra_allowed_states=extra_allowed_states
         )
         exceptions = self.env["mb.webshop.payment.exception"].sudo().search([
-            ("refund_transaction_id", "in", self.ids),
+            ("refund_transaction_id", "in", result.ids),
             ("state", "=", "refund_pending"),
         ])
         if exceptions:
@@ -133,6 +133,20 @@ class PaymentTransaction(models.Model):
     def _set_error(self, state_message, extra_allowed_states=()):
         result = super()._set_error(
             state_message, extra_allowed_states=extra_allowed_states
+        )
+        exceptions = self.env["mb.webshop.payment.exception"].sudo().search([
+            ("refund_transaction_id", "in", result.ids),
+            ("state", "=", "refund_pending"),
+        ])
+        if exceptions:
+            exceptions.write({
+                "state": "open", "refund_transaction_id": False, "resolved_at": False,
+            })
+        return result
+
+    def _set_canceled(self, state_message=None, extra_allowed_states=()):
+        result = super()._set_canceled(
+            state_message=state_message, extra_allowed_states=extra_allowed_states
         )
         exceptions = self.env["mb.webshop.payment.exception"].sudo().search([
             ("refund_transaction_id", "in", result.ids),

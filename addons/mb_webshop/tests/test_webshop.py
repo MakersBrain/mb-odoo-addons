@@ -95,7 +95,13 @@ class TestWebshopPack(TransactionCase):
         price_filter = self.env.ref("mb_webshop.price_filter_accessible_name").arch_db
         footer = self.env.ref("mb_webshop.default_footer_accessible_headings").arch_db
         self.assertIn('<h2 class="mt8 text-center">', products)
-        self.assertIn('<attribute name="aria-label">Price range</attribute>', price_filter)
+        self.assertEqual(
+            price_filter.count(
+                '<attribute name="aria-label">Price range</attribute>'
+            ),
+            2,
+            "both conditional price-range inputs need an accessible name",
+        )
         self.assertIn('<attribute name="aria-level">2</attribute>', footer)
 
     def test_launch_readiness_uses_strict_native_configuration_evidence(self):
@@ -624,6 +630,65 @@ class TestLateWebshopPayment(AccountPaymentCommon):
 
         self.assertEqual(exception.state, "open")
         self.assertFalse(exception.refund_transaction_id)
+
+    def test_async_refund_cancellation_keeps_exception_retryable(self):
+        order, _product = self._cart_with_last_piece()
+        transaction = self._create_transaction("redirect")
+        transaction.sale_order_ids = [fields.Command.link(order.id)]
+        transaction._set_done()
+        exception = self.env["mb.webshop.payment.exception"].sudo().create({
+            "transaction_id": transaction.id,
+            "order_id": order.id,
+            "reason": "stock_unavailable",
+        })
+        exception.action_refund()
+        refund = exception.refund_transaction_id
+
+        refund._set_canceled("provider canceled the refund")
+
+        self.assertEqual(exception.state, "open")
+        self.assertFalse(exception.refund_transaction_id)
+
+    def test_async_refund_error_keeps_exception_retryable(self):
+        order, _product = self._cart_with_last_piece()
+        transaction = self._create_transaction("redirect")
+        transaction.sale_order_ids = [fields.Command.link(order.id)]
+        transaction._set_done()
+        exception = self.env["mb.webshop.payment.exception"].sudo().create({
+            "transaction_id": transaction.id,
+            "order_id": order.id,
+            "reason": "stock_unavailable",
+        })
+        exception.action_refund()
+        refund = exception.refund_transaction_id
+
+        refund._set_error("provider rejected the refund")
+
+        self.assertEqual(exception.state, "open")
+        self.assertFalse(exception.refund_transaction_id)
+
+    def test_ignored_refund_done_transition_does_not_resolve_exception(self):
+        order, _product = self._cart_with_last_piece()
+        transaction = self._create_transaction("redirect")
+        transaction.sale_order_ids = [fields.Command.link(order.id)]
+        transaction._set_done()
+        exception = self.env["mb.webshop.payment.exception"].sudo().create({
+            "transaction_id": transaction.id,
+            "order_id": order.id,
+            "reason": "stock_unavailable",
+        })
+        exception.action_refund()
+        refund = exception.refund_transaction_id
+        refund._set_canceled("provider canceled the refund")
+        exception.write({
+            "refund_transaction_id": refund.id,
+            "state": "refund_pending",
+        })
+
+        self.assertFalse(refund._set_done())
+
+        self.assertEqual(exception.state, "refund_pending")
+        self.assertEqual(exception.refund_transaction_id, refund)
 
     def test_authorized_payment_exception_cannot_be_refunded(self):
         order, _product = self._cart_with_last_piece()
