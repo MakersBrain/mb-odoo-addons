@@ -5,3 +5,5 @@ access_webshop_return_sale_manager,mb.webshop.return sales manager,model_mb_webs
 access_webshop_return_stock_manager,mb.webshop.return stock manager,model_mb_webshop_return,stock.group_stock_manager,1,1,1,0
 access_webshop_return_line_sale_manager,mb.webshop.return.line sales manager,model_mb_webshop_return_line,sales_team.group_sale_manager,1,1,1,0
 access_webshop_return_line_stock_manager,mb.webshop.return.line stock manager,model_mb_webshop_return_line,stock.group_stock_manager,1,1,1,0
+access_webshop_payment_exception_sale_manager,mb.webshop.payment.exception sales manager,model_mb_webshop_payment_exception,sales_team.group_sale_manager,1,1,0,0
+access_payment_transaction_webshop_sale_manager,payment.transaction webshop sales manager,payment.model_payment_transaction,sales_team.group_sale_manager,1,0,0,0

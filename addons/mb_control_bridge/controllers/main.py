@@ -28,6 +28,53 @@ def _json_error(error):
 
 class ControlPlaneBridge(http.Controller):
     @http.route(
+        "/mb_control/v1/webshop/status",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
+    def webshop_status(self):
+        try:
+            authenticate_control_request()
+            return request.make_json_response(
+                request.env.company.sudo().mb_webshop_status(json_body())
+            )
+        except Exception as error:
+            if not isinstance(error, (HTTPException, ValidationError)):
+                _logger.exception("webshop status observation failed")
+            return _json_error(error)
+
+    @http.route(
+        "/mb_control/v1/webshop/domain",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
+    def project_webshop_domain(self):
+        try:
+            authenticate_control_request()
+            body = json_body()
+            operation_key = body.pop("operation_key", None)
+            if not operation_key:
+                raise BadRequest("operation_key is required")
+            digest = payload_digest(body)
+            receipts = request.env["mb.control.operation.receipt"].sudo()
+            existing = receipts.for_replay(operation_key, "webshop.domain", digest)
+            if existing:
+                return request.make_json_response(existing.response)
+            result = request.env.company.sudo().mb_project_webshop_domain(body)
+            receipts.record(operation_key, "webshop.domain", digest, result)
+            return request.make_json_response(result)
+        except Exception as error:
+            if not isinstance(error, (HTTPException, ValidationError)):
+                _logger.exception("webshop domain projection failed")
+            return _json_error(error)
+
+    @http.route(
         "/mb_control/v1/carriers",
         type="http",
         auth="public",

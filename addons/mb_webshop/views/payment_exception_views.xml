@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_webshop_payment_exception_list" model="ir.ui.view">
+        <field name="name">mb.webshop.payment.exception.list</field>
+        <field name="model">mb.webshop.payment.exception</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state == 'open'" decoration-warning="state == 'refund_pending'" decoration-success="state in ('fulfilled', 'refunded')">
+                <field name="created_at"/><field name="order_id"/><field name="transaction_id"/>
+                <field name="reason"/><field name="state" widget="badge"/><field name="website_id" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_webshop_payment_exception_form" model="ir.ui.view">
+        <field name="name">mb.webshop.payment.exception.form</field>
+        <field name="model">mb.webshop.payment.exception</field>
+        <field name="arch" type="xml">
+            <form string="Payment Exception">
+                <header>
+                    <button name="action_retry_fulfilment" type="object" string="Retry fulfilment" class="btn-primary" invisible="state != 'open'"/>
+                    <button name="action_refund" type="object" string="Refund payment" invisible="state != 'open'" confirm="Refund the complete captured payment?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,refund_pending,fulfilled,refunded"/>
+                </header>
+                <sheet><div class="oe_title"><h1><field name="order_id"/></h1></div>
+                    <group><group><field name="transaction_id"/><field name="reason"/><field name="created_at"/></group>
+                    <group><field name="website_id"/><field name="company_id" groups="base.group_multi_company"/><field name="refund_transaction_id"/><field name="resolved_at"/></group></group>
+                </sheet><chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_webshop_payment_exception_search" model="ir.ui.view">
+        <field name="name">mb.webshop.payment.exception.search</field><field name="model">mb.webshop.payment.exception</field>
+        <field name="arch" type="xml"><search><field name="order_id"/><field name="transaction_id"/><filter name="needs_action" string="Needs action" domain="[('state','=','open')]"/><filter name="refund_pending" string="Refund pending" domain="[('state','=','refund_pending')]"/><separator/><filter name="group_state" string="Status" context="{'group_by':'state'}"/></search></field>
+    </record>
+    <record id="action_webshop_payment_exceptions" model="ir.actions.act_window">
+        <field name="name">Payment Exceptions</field><field name="res_model">mb.webshop.payment.exception</field><field name="view_mode">list,form</field><field name="context">{'search_default_needs_action': 1}</field>
+    </record>
+    <menuitem id="menu_webshop_payment_exceptions" name="Payment Exceptions" parent="website_sale.menu_orders" action="action_webshop_payment_exceptions" sequence="4" groups="sales_team.group_sale_manager"/>
+</odoo>

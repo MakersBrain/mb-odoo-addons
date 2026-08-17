@@ -1,5 +1,6 @@
 from . import capability_policy
 from . import ir_http
+from . import payment_exception
 from . import res_company
 from . import res_config_settings
 from . import return_request

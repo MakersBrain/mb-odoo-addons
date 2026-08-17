@@ -114,12 +114,37 @@ class Website(models.Model):
             ("website_id", "in", website_scope),
             ("company_id", "in", company_scope),
         ])
+        platform_relay = self.env["ir.module.module"].sudo().search_count([
+            ("name", "=", "mb_email_bridge"),
+            ("state", "=", "installed"),
+        ])
+        company = self.company_id.sudo()
+        managed_transport = "mb_webshop_mail_transport" in company._fields
+        transport = getattr(company, "mb_webshop_mail_transport", "platform")
+        smtp_server = getattr(company, "mb_webshop_smtp_server_id", False)
+        if smtp_server:
+            smtp_server = smtp_server.sudo()
         sender_ready = bool(
-            self.company_id.email
-            and self.env["ir.mail_server"].sudo().search_count([
-                ("active", "=", True),
-                ("smtp_host", "!=", False),
-            ])
+            company.email
+            and (
+                (transport == "platform" and platform_relay)
+                or (
+                    not managed_transport
+                    and self.env["ir.mail_server"].sudo().search_count([
+                        ("active", "=", True),
+                        ("smtp_host", "!=", False),
+                    ])
+                )
+                or (
+                    transport == "smtp"
+                    and smtp_server
+                    and smtp_server.active
+                    and smtp_server.smtp_host
+                    and smtp_server.smtp_user
+                    and smtp_server.smtp_pass
+                    and smtp_server.smtp_encryption in ("starttls_strict", "ssl_strict")
+                )
+            )
         )
         result = {
             "catalog": bool(products),

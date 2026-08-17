@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="products_accessible_empty_state" inherit_id="website_sale.products">
+        <xpath expr="//div[@id='products_grid']/div[@t-else='']/t[@t-if='not search']/h3" position="replace">
+            <h2 class="mt8 text-center">No product defined</h2>
+        </xpath>
+        <xpath expr="//div[@id='products_grid']/div[@t-else='']/t[@t-else='']/h3" position="replace">
+            <h2 class="mt8 text-center">No results</h2>
+        </xpath>
+    </template>
+
+    <template id="price_filter_accessible_name" inherit_id="website_sale.filter_products_price">
+        <xpath expr="//t[@t-if='is_sidebar_collapsible']//input[@type='range']" position="attributes">
+            <attribute name="aria-label">Price range</attribute>
+        </xpath>
+        <xpath expr="//t[@t-else='']/input[@type='range']" position="attributes">
+            <attribute name="aria-label">Price range</attribute>
+        </xpath>
+    </template>
+
+    <template id="default_footer_accessible_headings" inherit_id="website.footer_custom">
+        <xpath expr="//div[@id='footer']//h5" position="attributes">
+            <attribute name="role">heading</attribute>
+            <attribute name="aria-level">2</attribute>
+        </xpath>
+        <xpath expr="//div[@id='footer']//div[hasclass('col-lg-5')]/h5" position="attributes">
+            <attribute name="role">heading</attribute>
+            <attribute name="aria-level">2</attribute>
+        </xpath>
+        <xpath expr="//div[@id='footer']//div[hasclass('col-lg-4')]/h5" position="attributes">
+            <attribute name="role">heading</attribute>
+            <attribute name="aria-level">2</attribute>
+        </xpath>
+    </template>
+</odoo>

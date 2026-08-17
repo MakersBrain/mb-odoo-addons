@@ -22,7 +22,7 @@ MODULE_BUNDLES = {
     "sumup": ("mb_payment_sumup", "mb_account_payment_sumup", "mb_pos_sumup"),
     "invoice-capture": ("mb_invoice_capture",),
     "inventory-capture": ("mb_inventory_capture",),
-    "webshop": ("mb_webshop",),
+    "webshop": ("mb_webshop", "mb_email_bridge"),
     "shop-catalogue-import": ("mb_shop_import",),
     "shipping-boxtal": ("mb_webshop_carrier_base", "mb_webshop_carrier_boxtal"),
 }
@@ -69,6 +69,83 @@ class ResCompany(models.Model):
         "UNIQUE(mb_control_workshop_id)",
         "A control-plane workshop can be linked to only one company.",
     )
+
+    def mb_webshop_status(self, payload):
+        self.ensure_one()
+        workshop_id = str(payload.get("workshop_id", "")).lower()
+        if workshop_id != self.mb_control_workshop_id:
+            raise ValidationError(_("webshop status workshop scope is invalid"))
+        if "website" not in self.env or "mb_webshop_enabled" not in self.env["website"]._fields:
+            raise ValidationError(_("the webshop capability is not installed"))
+        website = self.env["website"].sudo().search([
+            ("company_id", "in", [self.id, False]),
+            ("mb_webshop_enabled", "=", True),
+        ], order="company_id desc, id", limit=1)
+        if not website:
+            raise ValidationError(_("no enabled webshop exists for this workshop"))
+
+        issues = []
+
+        def add_issue(model_name, domain, kind, action_xmlid):
+            if model_name not in self.env:
+                return
+            count = self.env[model_name].sudo().search_count(domain)
+            if not count:
+                return
+            action = self.env.ref(action_xmlid, raise_if_not_found=False)
+            issues.append({
+                "kind": kind,
+                "state": "action_required",
+                "count": count,
+                "action_path": f"/odoo/action-{action.id}" if action else None,
+            })
+
+        add_issue(
+            "mb.webshop.payment.exception",
+            [("company_id", "=", self.id), ("state", "in", ["open", "refund_pending"])],
+            "payment",
+            "mb_webshop.action_webshop_payment_exceptions",
+        )
+        add_issue(
+            "mb.carrier.shipment",
+            [("company_id", "=", self.id), ("state", "in", ["failed", "unknown"])],
+            "shipment",
+            "mb_webshop_carrier_base.action_mb_carrier_shipments",
+        )
+        add_issue(
+            "mb.webshop.return",
+            [("company_id", "=", self.id), ("state", "in", ["requested", "received"])],
+            "return",
+            "mb_webshop.action_webshop_returns",
+        )
+        return {
+            "workshop_id": workshop_id,
+            "website_id": website.id,
+            "readiness": website._mb_webshop_readiness(),
+            "issues": issues,
+        }
+
+    def mb_project_webshop_domain(self, payload):
+        self.ensure_one()
+        workshop_id = str(payload.get("workshop_id", "")).lower()
+        hostname = str(payload.get("hostname", "")).strip().lower()
+        if workshop_id != self.mb_control_workshop_id:
+            raise ValidationError(_("webshop domain workshop scope is invalid"))
+        if not HOSTNAME_RE.fullmatch(hostname):
+            raise ValidationError(_("webshop domain must be a lowercase fully qualified hostname"))
+        if "website" not in self.env or "mb_webshop_enabled" not in self.env["website"]._fields:
+            raise ValidationError(_("the webshop capability is not installed"))
+        website = self.env["website"].sudo().search([
+            ("company_id", "in", [self.id, False]),
+            ("mb_webshop_enabled", "=", True),
+        ], order="company_id desc, id", limit=1)
+        if not website:
+            raise ValidationError(_("no enabled webshop exists for this workshop"))
+        website_domain = f"https://{hostname}"
+        changed = website.domain != website_domain
+        if changed:
+            website.write({"domain": website_domain})
+        return {"projected": changed, "website_id": website.id, "hostname": hostname}
 
     def mb_bootstrap_tenant(self, payload):
         self.ensure_one()

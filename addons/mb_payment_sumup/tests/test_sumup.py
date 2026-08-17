@@ -142,10 +142,15 @@ class TestSumUp(SumUpCommon, PaymentHttpCommon):
 
         with patch(_SEND_REQUEST, return_value=self._paid_checkout_data()) as send_request:
             self._make_http_post_request(url, data=dict(self.callback_data, status="FAILED"))
+            self._make_http_post_request(url, data=dict(self.callback_data, status="FAILED"))
 
-        send_request.assert_called_once()
+        self.assertEqual(send_request.call_count, 2)
         self.assertEqual(send_request.call_args[0][0], "GET")
         self.assertEqual(tx.state, "done")
+        self.assertEqual(self.env["payment.transaction"].search_count([
+            ("reference", "=", tx.reference),
+            ("provider_id", "=", self.provider.id),
+        ]), 1)
 
     @mute_logger(
         "odoo.addons.mb_payment_sumup.controllers.main",

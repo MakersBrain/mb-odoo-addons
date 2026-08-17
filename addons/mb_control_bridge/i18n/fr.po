@@ -531,6 +531,36 @@ msgstr ""
 
 #. module: mb_control_bridge
 #. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "the webshop capability is not installed"
+msgstr "la capacité de boutique en ligne n'est pas installée"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "no enabled webshop exists for this workshop"
+msgstr "aucune boutique en ligne activée n'existe pour cet atelier"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "webshop status workshop scope is invalid"
+msgstr "le périmètre d'atelier du statut de la boutique est invalide"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "webshop domain must be a lowercase fully qualified hostname"
+msgstr "le domaine de la boutique doit être un nom d'hôte complet en minuscules"
+
+#. module: mb_control_bridge
+#. odoo-python
+#: code:addons/mb_control_bridge/models/res_company.py:0
+msgid "webshop domain workshop scope is invalid"
+msgstr "le périmètre d'atelier du domaine de la boutique est invalide"
+
+#. module: mb_control_bridge
+#. odoo-python
 #: code:addons/mb_control_bridge/models/res_users.py:0
 msgid "the membership epoch already contains different data"
 msgstr "l'époque d'adhésion contient déjà des données différentes"

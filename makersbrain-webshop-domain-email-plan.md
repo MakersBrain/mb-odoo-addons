@@ -1,8 +1,8 @@
 # MakersBrain Webshop, Domain and Email Module Plan
 
 **Project:** MakersBrain on Odoo 19 Community
-**Status:** Odoo 19 verified; foundation implementation in progress
-**Date:** 16 August 2026
+**Status:** Paid-release implementation complete locally; live provider, staged isolation and production-load qualification remain
+**Date:** 17 August 2026
 
 ## 1. Goal
 
@@ -59,7 +59,7 @@ The repository and its running `odoo:19` image were verified against Odoo
 | Need | Odoo 19 / existing addon decision | MakersBrain work still justified |
 |---|---|---|
 | Theme editor | Use Odoo Website Builder as the editor SDK: QWeb, snippets, SCSS value palettes, fonts, headers, footers and shapes | Curated craft presets, craft-specific blocks, safe defaults and onboarding |
-| Themes | Three palettes now ship in `mb_webshop`: Ceramics, Jewellery and Woodwork; all broad Odoo web/portal/editor asset bundles compile after preserving both native base palettes | Production visual, mobile and accessibility QA plus more section presets |
+| Themes | Three palettes now ship in `mb_webshop`: Ceramics, Jewellery and Woodwork; all broad Odoo web/portal/editor asset bundles compile after preserving both native base palettes | Local desktop/mobile browser and automated accessibility QA pass; staged content/theme qualification and more section presets remain |
 | Catalog and checkout | Reuse `website_sale` | Guided setup and artisan-specific product storytelling |
 | Stock visibility | Reuse `website_sale_stock` and its `free_qty` validation | Atomic expiring holds for one-of-one POS/webshop concurrency; upstream validation alone is not a reservation |
 | Workshop pickup | Reuse `website_sale_collect` | MakersBrain onboarding and readiness checks only |
@@ -75,7 +75,7 @@ MakersBrain addons are LGPL-3. Their semantics also do not replace atomic
 one-of-one reservations.
 
 The first implementation slice is present: registry v2 maps the `webshop`
-capability to `mb_webshop`; activation installs its native Odoo dependencies;
+capability to `mb_webshop` and `mb_email_bridge`; activation installs their native Odoo dependencies;
 restriction closes the `/shop` storefront and checkout while preserving the
 backend and historical commerce records; reactivation reopens it. This is the
 pack-level switch required by the product lifecycle.
@@ -90,34 +90,35 @@ shippable product capability.
 | Product area | Status | Current evidence / next gap |
 |---|---|---|
 | Pack activation and restriction | **Verified** | Registry v2, release contract, bridge lifecycle test, storefront and checkout route gate |
-| Native theme editor | **Verified foundation** | Three compiled palettes and two editor snippets; visual, mobile and accessibility QA remains |
+| Native theme editor | **Verified foundation** | Three compiled palettes and two editor snippets; Chromium desktop/mobile rendering passes and Lighthouse accessibility is 100/100. Staged representative-content QA remains |
 | Catalog, cart and checkout | **Reused** | Odoo `website_sale`; guided setup and end-to-end payment qualification remain |
 | Atomic cart inventory | **Verified** | `mb.webshop.stock.hold` uses real Odoo stock moves and quant reservations; second-cart, competing stock/POS move, expiry, conversion and late-confirmation tests pass |
 | Pickup | **Reused** | Odoo `website_sale_collect`; the launch-readiness card now detects published collection/delivery methods, while live pickup-address and checkout qualification remain |
-| Shipping rates | **Reused foundation** | Odoo `delivery`; production carrier labels, tracking and exception operations remain |
-| Online payments | **Partial** | Odoo providers and `mb_payment_sumup` exist; the readiness card requires a published production-enabled online provider and explicitly rejects offline Pay on Site, while webhook/late-payment and live-provider qualification remain |
-| Returns and exchanges | **Verified foundation** | `mb_webshop` now provides an access-token customer portal GET/POST journey, queued customer status emails, a configurable post-delivery window, delivered/claimed quantity and ownership validation, company-scoped merchant queue, approval/rejection/receipt/resolution states, native Odoo return pickings, native posted credit-note validation and return-plus-replacement orders. Odoo 19 now runs 21 webshop test methods with zero failures, including the real HTTP portal journey, duplicate prevention, stock restocking, posted-credit-note resolution, launch readiness and hostname projection. Partial-credit-note merchant UX and provider email-delivery qualification remain |
+| Shipping rates | **Verified foundation** | Provider-neutral shipment state machine and Boxtal v3 adapter are implemented. The Boxtal sandbox created/cancelled synthetic orders, returned valid PDF labels, delivered real document/tracking callbacks with valid HMAC signatures, and removed both test subscriptions. Exact-release staging and commercial-account qualification remain |
+| Online payments | **Verified foundation** | SumUp sandbox hosted settlement/refund and a provider-delivered callback through ephemeral public HTTPS into a real scratch Odoo transaction pass. Post-processing produced one confirmed order, converted hold, stock move, posted invoice and payment; two public webhook replays stayed idempotent. The exact immutable staging-release journey remains a promotion gate |
+| Returns and exchanges | **Verified foundation** | `mb_webshop` provides an access-token customer portal journey, queued status emails, a configurable post-delivery window, delivered/claimed quantity and ownership validation, a company-scoped merchant queue, native return pickings, posted credit-note validation and replacement orders. The fresh repository matrix includes 26 webshop tests with zero failures. Partial-credit-note merchant UX and provider email-delivery qualification remain |
 | Platform hostname | **Verified foundation** | Workshop creation allocates a unique platform hostname separately from the opaque database ID; the deployment driver renders and validates an exact-host gateway route, the Odoo server-wide filter accepts only the trusted opaque mapping, reconciliation verifies the observed route, and tenant bootstrap now stores the immutable hostname and projects it into an empty Odoo website domain without replacing a custom domain. Deployment DNS/TLS and live two-tenant topology qualification remain release gates |
-| Existing custom domain | **Planned** | Ownership, certificate, canonical redirect and self-service diagnostics not implemented |
-| Platform transactional mail | **Partial** | Odoo mail queue and control mail gateway exist; tenant webshop sender/template projection remains |
-| Branded email domain | **Planned** | DNS verification and provider reconciliation not implemented |
-| Merchant onboarding | **Partial** | A thin Odoo-native launch-readiness card checks the selected website's published catalogue, production online payment, shipping/collection, company sender plus SMTP, public store URL and returns window, with links to the native configuration screens. It is intentionally not a second onboarding engine; control-plane provisioning state, durable progress/recovery and support diagnostics remain |
-| Production qualification | **Planned** | Browser journeys, accessibility, load, provider sandbox and staged rollout evidence remain |
+| Existing custom domain | **Verified foundation** | Global hostname claims, public-suffix/IDNA validation, live TXT ownership checks, Cloudflare custom-hostname/TLS reconciliation, exact-host routing, canonical redirects, Odoo projection, disconnect, observed-state UI and safe operation retry are implemented. Live provider and two-tenant HTTP/TLS qualification remain |
+| Platform transactional mail | **Verified foundation** | `mb_email_bridge` relays approved rendered webshop messages through a tenant-authenticated durable outbox to the fixed Scaleway TEM boundary, preserving the artisan reply-to and using `Atelier via MakersBrain`; authenticated delivery events update delivered/deferred/bounce/complaint state and tenant suppressions. Live TEM deliverability and failure-drill evidence remain |
+| Branded email domain | **Verified foundation** | Scaleway TEM registration/revocation, SPF/DKIM/DMARC observation, self-service DNS status, mandatory delivered test, branded sender selection, platform fallback and periodic reconciliation are implemented. Live DNS/provider and deliverability qualification remain |
+| Merchant onboarding | **Verified foundation** | The Odoo-native readiness observation is tenant scoped; the control plane persists resumable progress and completion evidence, admits idempotent refresh/complete commands, and exposes merchant and operator dashboards with bounded direct recovery actions. The Svelte self-service journey passes type checking and production build |
+| Pack lifecycle | **Verified** | Merchant deactivation uses the durable restriction operation and is immediately reversible; tests prove storefront gating while return-window/domain configuration and ERP history survive. Domains and mail remain independent. No overlay uninstall is supported in v1 because harmless removal cannot yet be proven |
+| Production qualification | **In progress** | Local desktop/mobile browser QA and Lighthouse accessibility pass. SumUp sandbox payment/refund plus public callback-to-Odoo post-processing pass; Boxtal sandbox order, label, signed tracking/document events and cancellation pass. Exact-release staging evidence, live Cloudflare and Scaleway TEM/DNS, deployed two-tenant TLS/isolation and production-like multiworker load evidence remain |
 
 The practical stop line for “near Shopify” is the first paid-release acceptance
 criteria in section 14, not the existence of a theme screen. Work continues
 until every row required by those criteria is verified or explicitly removed
 from product scope by a product decision.
 
-Latest regression evidence (2026-08-16): a fresh Odoo `19.0-20260803`
-database installed the repository module graph, compiled the broad web,
-portal and editor asset bundles, and ran the combined `mb_webshop` plus
-`mb_control_bridge` selection: 35 post-test cases, zero failures or errors.
-Odoo's per-module statistics report 21 webshop and 20 control-bridge test
-methods; two documented optional OAuth methods skipped because `auth_oauth`
-is not installed. The control-plane Rust library suite also passes all 112
-tests, including exact-host configuration injection resistance and the
-versioned tenant-bootstrap request contract.
+Latest regression evidence (2026-08-17): a fresh Odoo `19.0-20260803`
+database installed all 40 repository addons, compiled the broad web, portal
+and editor bundles, and ran 581 post-tests with zero failures or errors. The
+same database then completed an in-place upgrade of all 40 addons. The
+control-plane Rust suite passes 135 unit tests; all 17 PostgreSQL integration
+tests pass against a disposable database. Strict Clippy and formatting,
+OpenAPI compatibility, release/configuration contracts, all-addon structure,
+40-addon French translation coverage, focused Ruff, Svelte checking (zero
+errors/warnings), the production web build and `git diff --check` all pass.
 
 ### 1.4 Engineering checkpoint — 16 August 2026
 
@@ -162,6 +163,228 @@ self-service recovery diagnostics. Production carrier labels, payment webhook
 qualification, transactional-email deliverability and staged browser/accessibility
 qualification remain later paid-release blockers; they must not be reported as
 complete.
+
+### 1.5 Engineering checkpoint — 17 August 2026
+
+The existing-custom-domain foundation is now implemented across the control
+plane, edge and tenant boundary:
+
+- migration `0035_webshop_custom_domains` owns globally unique claims and
+  separate desired, DNS, certificate, routing and canonical state;
+- hostname admission uses IDNA plus the public-suffix list, rejects reserved or
+  MakersBrain-owned targets and verifies a random per-claim TXT challenge;
+- a Cloudflare-for-SaaS adapter creates, discovers, observes and deletes custom
+  hostnames without persisting provider error text or exposing credentials;
+- durable five-minute reconciliation recovers lost callbacks and ambiguous
+  creates, retains actionable certificate-validation records and never routes a
+  hostname before ownership and provider TLS evidence are present;
+- the exact-host gateway proxies only the canonical hostname and sends permanent
+  redirects from every secondary platform or custom hostname;
+- canonical changes are projected through the authenticated, idempotent Odoo
+  bridge, while disconnect restores the platform hostname before retiring the
+  provider resource;
+- the workshop UI provides copyable DNS instructions, desired/observed health,
+  canonical selection, safe disconnect and retry for dead-letter operations;
+- Cloudflare runtime secrets and zone configuration are declared in Compose,
+  bootstrap/migration scripts and the versioned deployment contract.
+
+Verification checkpoint:
+
+- 128 control-plane Rust library tests pass;
+- the custom-domain registry migration passes against disposable PostgreSQL,
+  including global claim, active-evidence and one-canonical constraints;
+- the generated OpenAPI baseline/client, Svelte type checking and release
+  configuration contract pass;
+- the focused Odoo `19.0-20260803` domain-projection test passes after fresh
+  module installation, including workshop scoping and idempotency;
+- translation/source validation passes; the repository-wide `make check` still
+  reports pre-existing `mb_brand` SCSS tokens that are absent from
+  `@makersbrain/brand@0.1.0`.
+
+This is not yet production-qualified: a real Cloudflare staging zone, public
+DNS/TLS, two-tenant browser isolation and provider failure drills remain Phase
+3 release evidence. The next implementation slice is transactional sender
+projection and branded email-domain reconciliation.
+
+### 1.6 Engineering checkpoint — 17 August 2026, transactional mail
+
+The platform-sender transactional-mail foundation is now implemented:
+
+- the optional `mb_email_bridge` intercepts only approved webshop order,
+  invoice, shipment and return messages, preserves rendered Odoo content and
+  attachments, and authenticates with the exact workshop credential;
+- a stable source key makes submission idempotent before Odoo marks the mail
+  sent, while a bounded control-plane outbox retains provider submission and
+  delivery state;
+- the isolated mail gateway accepts the visible artisan sender name and
+  verified reply-to while retaining the fixed MakersBrain sending address and
+  Scaleway TEM credential boundary;
+- signed, project/domain-scoped provider events are journaled once and
+  projected through a separate authenticated control route;
+- delivered, deferred, bounced, complained and suppressed states are durable,
+  and hard delivery failures create a tenant-scoped do-not-send record before
+  another message can be queued to that recipient;
+- runtime releases receive the exact tenant bridge token mount required for
+  outbound Odoo submissions.
+
+Verification checkpoint:
+
+- 130 control-plane Rust library tests and strict Clippy pass;
+- migrations through `0037_transactional_mail_events` pass against disposable
+  PostgreSQL, including tenant/source idempotency and scope constraints;
+- fresh Odoo `19.0-20260803` installation runs the two focused
+  `mb_email_bridge` post-tests with zero failures;
+- Ruff, addon graph, translation/source validation, Svelte checking and
+  `git diff --check` pass;
+- the repository-wide `make check` remains blocked only by the previously
+  documented unrelated `mb_brand` SCSS token mismatch.
+
+Production TEM delivery and bounce/complaint drills remain release gates. The
+next implementation slice completed the branded sender-domain foundation
+described below.
+
+### 1.7 Engineering checkpoint — 17 August 2026, branded sender domains
+
+The branded sender-domain foundation is now implemented:
+
+- migration `0038_webshop_email_domains` owns globally unique sender-domain
+  claims and separates desired state from provider, DNS, test-delivery and
+  activation evidence;
+- the Scaleway TEM adapter registers, checks, observes and revokes domains at
+  the pinned Paris endpoint, and idempotently provisions/deletes the exact
+  per-domain SNS webhook, without retaining provider error text;
+- five-minute durable reconciliation publishes provider SPF, DKIM and DMARC
+  records and refuses activation until all three are valid and an exact-domain
+  test message has a delivered event;
+- transactional sends select the active verified artisan address and provider
+  domain ID, while every non-active or disconnected state automatically falls
+  back to the fixed MakersBrain sender;
+- delivery events are bound to the outbox message and provider domain before
+  they can satisfy the test gate, and existing event journals remain readable;
+- the workshop Domains screen now provides sender registration, copyable DNS
+  records, per-record status, manual recheck, test evidence and safe disconnect.
+
+Verification checkpoint:
+
+- 133 control-plane Rust library tests and strict Clippy pass;
+- migration `0038` and its active-evidence/global-claim constraints pass
+  against disposable PostgreSQL;
+- the generated browser client and Svelte check pass with zero errors or
+  warnings;
+- shell/JSON configuration validation and `git diff --check` pass.
+
+This is production-shaped but not provider-qualified: staging Scaleway
+credentials, public DNS propagation, inbox placement, bounce/complaint drills
+and revocation failure tests remain
+release evidence. At this checkpoint, the broader paid-release blockers were
+the live payment journey, carrier account qualification, onboarding recovery
+diagnostics and two-tenant browser/accessibility/load qualification; section
+1.8 records the subsequent local onboarding and accessibility completion.
+
+### 1.8 Engineering checkpoint — 17 August 2026, paid-release local completion
+
+The remaining locally implementable paid-release slices are now present:
+
+- SumUp settlement is read back from the provider before state transition;
+  successful Odoo post-processing creates the order reservation and invoice
+  once, while a payment arriving after hold expiry creates one durable
+  merchant-visible fulfil-or-refund exception;
+- migration `0039_webshop_onboarding` persists resumable onboarding state,
+  observed readiness, Odoo issues, operation linkage and completion evidence;
+- idempotent refresh and completion commands run through the standard durable
+  command ledger and reconciliation worker, using a tenant-scoped Odoo status
+  boundary rather than trusting browser assertions;
+- merchant and operator webshop dashboards combine onboarding, payment,
+  shipping, return, domain, sender-domain, transactional-mail and dead-letter
+  issues into bounded recovery actions without exposing provider payloads;
+- the module screen offers explicit merchant deactivation and reactivation.
+  Restriction closes the storefront but retains Odoo configuration and history;
+  external domains and mail remain separate control-plane resources;
+- v1 deliberately supports no operator overlay-uninstall path. The webshop
+  overlay owns historical return, stock-hold and payment-exception records, so
+  the evidence-gated policy retains it restricted until harmless uninstall and
+  reinstallation can be proven;
+- local Chromium QA covers desktop and mobile layouts. Storefront accessibility
+  fixes for heading order and the price-range control raise the automated
+  Lighthouse accessibility score to 100/100.
+
+Final local verification is the regression evidence recorded in section 1.3:
+581 fresh-install Odoo tests and the all-addon upgrade pass; 135 Rust unit and
+17 PostgreSQL integration tests pass; Svelte, OpenAPI, contract, lint,
+translation and repository consistency gates pass.
+
+This checkpoint completes implementation, not paid-release qualification. The
+remaining evidence requires external state that is absent from this workspace:
+real or staging Cloudflare, Scaleway TEM/DNS, SumUp and Boxtal accounts; a
+deployed two-tenant exact-host TLS/isolation environment; and a
+production-like multiworker load environment. Those checks remain mandatory
+before the first paid release. The signed staging qualification contract now
+requires five independent webshop evidence files rather than allowing a broad
+provider attestation to cover them; the exact pass conditions are recorded in
+`control-plane/docs/runbooks/webshop-paid-release-qualification.md`.
+
+### 1.9 Engineering checkpoint — 17 August 2026, merchant SMTP
+
+Merchant-owned SMTP is now a supported alternative to the MakersBrain relay:
+
+- the Domains screen accepts an SMTP hostname, port, username, one-time
+  password, From address and either STARTTLS or implicit SSL/TLS;
+- both modes use Odoo's certificate-validating `*_strict` transports. Plaintext
+  SMTP, certificate-skipping modes, IP literals, reserved names and SMTP hosts
+  that resolve to non-public addresses are rejected;
+- a candidate connection is tested through authentication, MAIL FROM, RCPT TO
+  and DATA readiness before it becomes active. A failed rotation leaves the
+  previous transport and credential untouched;
+- the password crosses the authenticated tenant boundary only on configuration,
+  is stored in Odoo's system-only SMTP password field, is excluded from command
+  receipts and API responses, and all configuration responses are `no-store`;
+- transport selection is explicit. Approved webshop mail uses either the durable
+  MakersBrain relay or native Odoo SMTP, and readiness requires the selected
+  route to be fully configured with certificate validation;
+- resetting SMTP deletes the managed Odoo mail-server record and immediately
+  restores the platform relay.
+
+Verification adds six focused `mb_email_bridge` tests and passes the focused
+`mb_webshop` suite on fresh Odoo installation. All 136 Rust tests, the generated
+OpenAPI/client contract, Svelte check/build, addon and translation checks,
+focused Ruff, all-addon Odoo upgrade and `git diff --check` pass.
+
+A subsequent credential audit found usable SumUp and Boxtal sandbox accounts.
+Read-only authentication returned HTTP 200 for both. The SumUp sandbox first
+completed a hosted-checkout create/read/deactivate cycle, then a headless
+browser used the provider's successful test card to reach authoritative
+`PAID`/`SUCCESSFUL`. A €20 sandbox payment met the provider's minimum refund
+threshold; the refund endpoint returned HTTP 201 and the transaction read-back
+contained a refund event. These are simulated sandbox transactions, not real
+funds. A subsequent scratch-topology journey placed a real Odoo webshop stock
+hold and payment transaction behind an ephemeral public HTTPS tunnel. SumUp's
+provider callback arrived without a manual poll and changed the Odoo
+transaction to `done`; standard post-processing produced one confirmed order,
+converted hold, stock move, posted invoice and payment with no exception. Two
+public webhook replays retained those exact counts. The tunnel and live
+credential projection were then removed, the provider disabled and its scratch
+credential fields cleared. This is strong integration evidence, but not the
+signed qualification artifact for an immutable deployed staging release.
+The Boxtal sandbox subsequently used an official Colissimo offer code and the
+adapter's exact v3.1 payload to create two synthetic, no-charge orders. It
+returned valid PDF labels; a temporary public receiver obtained both
+`DOCUMENT_CREATED` and `TRACKING_CHANGED` events whose HMAC-SHA256 signatures
+verified against the scoped webhook secret. Both test subscriptions were
+deleted and the provider accepted order cancellation. This proves provider
+order/label/tracking mechanics, but not their projection through an immutable
+deployed Odoo release or production commercial readiness.
+
+Provider-access update on 17 August 2026: protected, expiring runtime
+credentials now exist for staging Scaleway sender-domain/webhook enrolment and
+for staging and production Cloudflare Custom Hostnames. All three files are
+mode `0600`. Read-only calls to the exact scoped product APIs succeed: staging
+Scaleway domain and webhook lists return HTTP 200, and each Cloudflare token can
+list Custom Hostnames only through its intended zone endpoint. No provider
+resource was created or changed during this check, and no secret value was
+printed or copied into the repository. This removes the provider-credential
+acquisition blocker; it does not constitute paid-release evidence because no
+digest-pinned staging release, two synthetic tenants, public staging DNS/TLS or
+qualification artifact currently exists.
 
 ## 2. Product boundary
 
@@ -238,7 +461,7 @@ adapter.
 
 | Capability key | Product meaning | Initial realization |
 |---|---|---|
-| `webshop` | Storefront, checkout and platform hostname | **Implemented in registry v2:** `mb_webshop`; its manifest brings the required native Odoo modules |
+| `webshop` | Storefront, checkout, platform hostname and platform transactional mail | **Implemented in registry v2:** `mb_webshop` plus `mb_email_bridge`; their manifests bring the required native Odoo modules |
 | `webshop-ceramics` | Ceramic-specific product storytelling | Future `mb_webshop_ceramics`; add only with the ceramics capability dependency |
 | `webshop-carrier-*` | A production carrier label/API integration | Future carrier-specific addon; depends on `webshop` |
 | `webshop-branded-email` | Verified-domain transactional sending | Future `mb_email_bridge` plus the email-domain service; depends on `webshop` |
@@ -456,6 +679,14 @@ Implement mailbox hosting as an optional paid add-on through a provider adapter.
 | Business Mailbox | One real mailbox plus configurable aliases |
 
 Do not promise a mailbox when the product only provides outbound email or forwarding.
+
+### D. Merchant SMTP credential
+
+An artisan may instead connect an existing outbound SMTP account. This remains
+transactional sending, not mailbox provisioning. Require certificate-validated
+STARTTLS or implicit SSL/TLS, test the credential before activation, never
+return the password after submission, and retain the MakersBrain relay as the
+explicit fallback transport.
 
 ## 8. Storefront functional scope
 
@@ -695,13 +926,14 @@ delivery qualification remain.
 
 ### Phase 6 — Themes and onboarding hardening, 4–7 weeks
 
-**Current evidence (2026-08-16):** `mb_webshop` 19.0.1.3.0 adds a computed,
-non-authoritative launch-readiness card over native Odoo configuration. Fresh
-tests prove placeholder/private domains and offline Pay on Site cannot satisfy
-production readiness. The card deliberately calls application configuration
-“ready for deployment qualification”; it does not claim DNS/TLS, webhooks,
-SMTP delivery or carrier credentials have been exercised. Resumable
-control-plane onboarding and external observed-state diagnostics remain.
+**Current evidence (2026-08-17):** `mb_webshop` 19.0.1.5.0 exposes a scoped,
+non-authoritative observation over native Odoo configuration. Migration `0039`
+and the standard operation worker persist resumable progress, require current
+evidence before completion, and feed merchant/operator dashboards with direct
+recovery actions. Chromium desktop/mobile rendering and Lighthouse
+accessibility (100/100) pass locally. The readiness language deliberately does
+not claim DNS/TLS, provider webhooks, mail delivery or carrier credentials have
+been exercised; those remain deployment qualification.
 
 - at least three tested themes;
 - controlled homepage, collection and editorial sections;
@@ -714,6 +946,14 @@ control-plane onboarding and external observed-state diagnostics remain.
 **Exit:** a new artisan can launch a credible branded shop through self-service onboarding.
 
 ### Phase 7 — Deactivation and portability hardening, 2–4 weeks
+
+**Current evidence (2026-08-17):** merchant deactivation and reactivation use
+the existing durable capability restriction/enable operations. Automated Odoo
+tests prove the storefront closes and reopens while ERP history, return-window
+configuration and domain configuration remain. External domain and mail state
+is not mutated. No overlay removal/reinstallation path is supported in v1:
+the harmless-removal proof is not met, so the policy correctly retains the
+overlay in a restricted state.
 
 - grace-period deactivation;
 - configuration export;
@@ -748,24 +988,35 @@ The committed good SaaS v1 represents approximately 9–14 months for the recomm
 
 ## 14. Acceptance criteria for the first paid release
 
-- A tenant activates the webshop without staff running commands.
-- The default `atelier-xxx.makersbrain.com` hostname becomes reachable automatically.
-- Products and stock come directly from the tenant's Odoo database.
-- Selling the last unique piece through POS prevents webshop checkout, and the reverse also holds.
-- Abandoned checkout holds expire safely, while late payment webhooks enter a recoverable exception flow and never create negative stock or duplicate fulfilment.
-- A successful checkout creates the correct Odoo order, payment state, stock movement and invoice workflow.
-- Failed/repeated payment webhooks do not duplicate orders or payments.
-- An artisan can connect and verify an existing custom domain.
-- TLS issuance and routing status are visible and recoverable.
-- Transactional email has monitored delivery, bounce and complaint handling.
-- The artisan can purchase a shipping label, send tracking and handle a delivery exception.
-- The customer can request a return and the artisan can approve, receive, restock and refund it.
-- At least three upgrade-safe themes are available with responsive and accessibility validation.
-- The artisan onboarding flow can be paused, resumed and completed without ordinary support intervention.
-- Failed operational workflows are visible in a merchant/support dashboard with a recoverable next action.
-- Deactivation is immediate and reversible.
-- Any supported operator-only overlay removal preserves all ERP/fiscal history and does not silently cancel domains or mailboxes.
-- Reactivation, and reinstallation where supported, restores the shop from retained configuration or an explicit export.
+Status below distinguishes implementation evidence from the live qualification
+required to sell the product. **Local verified** is not a production sign-off.
+
+| Criterion | Status on 17 August 2026 |
+|---|---|
+| A tenant activates the webshop without staff running commands | **Local verified** — self-service command/UI uses the durable capability workflow |
+| The default `atelier-xxx.makersbrain.com` hostname becomes reachable automatically | **Qualification required** — allocation, exact-host rendering and reconciliation are tested; staged public DNS/TLS reachability is not |
+| Products and stock come directly from the tenant's Odoo database | **Local verified** |
+| POS and webshop mutually exclude sale of the last unique piece | **Local verified** with real stock moves and quant reservations |
+| Abandoned holds expire; late payment is recoverable without negative stock or duplicate fulfilment | **Local verified** |
+| Successful checkout creates the correct order, payment, stock movement and invoice workflow | **Integration verified on scratch** through SumUp hosted payment, provider callback and real Odoo post-processing; exact-release staging evidence remains |
+| Failed/repeated payment webhooks do not duplicate orders or payments | **Integration verified on scratch** — two public callback replays retained one fulfilment, invoice and payment; exact-release staging evidence remains |
+| An artisan can connect and verify an existing custom domain | **Qualification required** — workflow and live DNS observation code are tested, but no staging zone has been exercised |
+| TLS issuance and routing status are visible and recoverable | **Qualification required** — UI/reconciliation implemented; live Cloudflare TLS evidence absent |
+| Transactional email has monitored delivery, bounce and complaint handling | **Qualification required** — durable event/suppression paths implemented; live Scaleway TEM drills absent |
+| The artisan can purchase a shipping label, send tracking and handle a delivery exception | **Provider integration verified** — Boxtal sandbox order, valid PDF label, signed document/tracking events and cancellation pass; exact-release Odoo projection and a delivery-exception drill remain |
+| Customer return through approval, receipt, restock and refund | **Local verified** |
+| Three upgrade-safe themes with responsive and accessibility validation | **Local verified** — all-addon upgrade, desktop/mobile Chromium and Lighthouse 100/100 pass |
+| Onboarding can be paused, resumed and completed without ordinary support | **Local verified** — persisted state, evidence gate, commands and merchant UI pass |
+| Merchant/support dashboard exposes failed workflows and a recovery action | **Local verified** |
+| Deactivation is immediate and reversible | **Local verified** |
+| Any supported operator-only overlay removal preserves history and external assets | **Not applicable in v1** — no removal path is supported until harmless uninstall is proven; restriction retains the overlay and external resources |
+| Reactivation, and reinstallation where supported, restores retained configuration | **Local verified for reactivation**; reinstallation is not supported in v1 |
+
+Paid-release qualification therefore remains open until the five live evidence
+groups are complete: Cloudflare DNS/TLS, Scaleway TEM/DNS and delivery events,
+the exact-release staged SumUp journey, exact-release Boxtal/Odoo projection
+and a delivery-exception drill, and a deployed two-tenant isolation plus
+production-like multiworker load exercise.
 
 ## 15. Immediate engineering decisions
 
