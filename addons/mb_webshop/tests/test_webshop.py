@@ -1,11 +1,13 @@
 import uuid
 import re
 from datetime import timedelta
+from unittest.mock import patch
 
 from odoo import fields
+from odoo.addons.account_payment.tests.common import AccountPaymentCommon
 from odoo.addons.website_sale.tests.common import MockRequest
-from odoo.exceptions import ValidationError
-from odoo.tests import HttpCase, TransactionCase, tagged
+from odoo.exceptions import UserError, ValidationError
+from odoo.tests import HttpCase, TransactionCase, new_test_user, tagged
 
 from .. import post_init_hook
 from ..models.ir_http import webshop_path_is_gated
@@ -33,10 +35,14 @@ class TestWebshopPack(TransactionCase):
         self.assertFalse(webshop_path_is_gated("/my/orders"))
 
     def test_capability_restriction_and_enable_toggle_the_whole_storefront(self):
+        self.website.write({
+            "domain": "https://retained.atelier.example",
+            "mb_return_window_days": 45,
+        })
         payload = {
             "workshop_id": self.workshop_id,
             "module_key": "webshop",
-            "modules": ["mb_webshop"],
+            "modules": ["mb_webshop", "mb_email_bridge"],
             "reason": "entitlement_inactive",
         }
 
@@ -50,6 +56,8 @@ class TestWebshopPack(TransactionCase):
         self.assertTrue(restricted["storefront_blocked"])
         self.assertTrue(restricted["checkout_blocked"])
         self.assertFalse(self.website.mb_webshop_enabled)
+        self.assertEqual(self.website.domain, "https://retained.atelier.example")
+        self.assertEqual(self.website.mb_return_window_days, 45)
         policy = self.env["mb.control.capability.policy"].sudo().search([
             ("workshop_id", "=", self.workshop_id),
             ("module_key", "=", "webshop"),
@@ -59,12 +67,14 @@ class TestWebshopPack(TransactionCase):
         enabled = self.company.mb_enable_module_bundle({
             "workshop_id": self.workshop_id,
             "module_key": "webshop",
-            "modules": ["mb_webshop"],
+            "modules": ["mb_webshop", "mb_email_bridge"],
         })
         self.website.invalidate_recordset(["mb_webshop_enabled"])
 
         self.assertTrue(enabled["restriction_removed"])
         self.assertTrue(self.website.mb_webshop_enabled)
+        self.assertEqual(self.website.domain, "https://retained.atelier.example")
+        self.assertEqual(self.website.mb_return_window_days, 45)
 
     def test_native_editor_contains_all_three_craft_palettes_and_snippets(self):
         variables = self.env["ir.asset"]._get_asset_paths(
@@ -81,6 +91,12 @@ class TestWebshopPack(TransactionCase):
         snippets = self.env.ref("mb_webshop.snippets").arch_db
         self.assertIn("mb_webshop.s_maker_hero", snippets)
         self.assertIn("mb_webshop.s_material_story", snippets)
+        products = self.env.ref("mb_webshop.products_accessible_empty_state").arch_db
+        price_filter = self.env.ref("mb_webshop.price_filter_accessible_name").arch_db
+        footer = self.env.ref("mb_webshop.default_footer_accessible_headings").arch_db
+        self.assertIn('<h2 class="mt8 text-center">', products)
+        self.assertIn('<attribute name="aria-label">Price range</attribute>', price_filter)
+        self.assertIn('<attribute name="aria-level">2</attribute>', footer)
 
     def test_launch_readiness_uses_strict_native_configuration_evidence(self):
         self.env["product.template"].sudo().search([]).write({"is_published": False})
@@ -142,6 +158,15 @@ class TestWebshopPack(TransactionCase):
         self.assertTrue(configured["returns"])
         self.assertFalse(configured["online_payment"])
         self.assertFalse(configured["launch_ready"])
+
+        if self.env["ir.module.module"].sudo().search_count([
+            ("name", "=", "mb_email_bridge"), ("state", "=", "installed"),
+        ]):
+            self.env["ir.mail_server"].sudo().search([]).write({"active": False})
+            self.assertTrue(
+                self.website._mb_webshop_readiness()["sender"],
+                "the installed platform relay is the transactional sender route",
+            )
 
         # The native click-and-collect fallback confirms orders for payment at
         # pickup. It must never satisfy the production online-payment check.
@@ -455,6 +480,230 @@ class TestWebshopPack(TransactionCase):
             days=self.website.mb_return_window_days + 1
         )
         self.assertFalse(old_order._mb_returnable_lines())
+
+
+@tagged("post_install", "-at_install")
+class TestLateWebshopPayment(AccountPaymentCommon):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.website = cls.env["website"].create({
+            "name": "Payment lifecycle test shop",
+            "company_id": cls.company.id,
+        })
+        cls.warehouse = cls.env["stock.warehouse"].search([
+            ("company_id", "=", cls.env.company.id),
+        ], limit=1)
+        cls.website.warehouse_id = cls.warehouse
+
+    def _cart_with_last_piece(self):
+        product = self.env["product.product"].sudo().create({
+            "name": "Late-paid unique piece", "is_storable": True,
+            "allow_out_of_stock_order": False, "list_price": self.amount,
+        })
+        self.env["stock.quant"].sudo()._update_available_quantity(
+            product, self.warehouse.lot_stock_id, 1
+        )
+        order = self.env["sale.order"].sudo().create({
+            "partner_id": self.partner.id, "website_id": self.website.id,
+            "warehouse_id": self.warehouse.id, "company_id": self.company.id,
+        })
+        with MockRequest(self.env, website=self.website, sale_order_id=order.id):
+            order._cart_add(product.id, 1)
+        return order, product
+
+    def test_late_paid_order_creates_one_recoverable_exception(self):
+        order, product = self._cart_with_last_piece()
+        hold = self.env["mb.webshop.stock.hold"].sudo().search([
+            ("order_id", "=", order.id), ("product_id", "=", product.id),
+        ])
+        hold.expires_at = fields.Datetime.now() - timedelta(seconds=1)
+        hold._expire_due()
+        winner = self.env["sale.order"].sudo().create({
+            "partner_id": self.partner.id, "website_id": self.website.id,
+            "warehouse_id": self.warehouse.id, "company_id": self.company.id,
+        })
+        with MockRequest(self.env, website=self.website, sale_order_id=winner.id):
+            winner._cart_add(product.id, 1)
+        transaction = self._create_transaction("redirect")
+        transaction.sale_order_ids = [fields.Command.link(order.id)]
+        self.env["ir.config_parameter"].sudo().set_param(
+            "sale.automatic_invoice", "True"
+        )
+
+        transaction._set_done()
+        transaction.with_context(skip_sale_auto_invoice_send=True)._post_process()
+        mail_count = self.env["mail.mail"].sudo().search_count([])
+        transaction.with_context(skip_sale_auto_invoice_send=True)._post_process()
+        self.assertEqual(
+            self.env["mail.mail"].sudo().search_count([]), mail_count,
+            "idempotent post-processing must not resend payment-success mail",
+        )
+
+        exception = self.env["mb.webshop.payment.exception"].sudo().search([
+            ("transaction_id", "=", transaction.id),
+        ])
+        self.assertEqual(len(exception), 1)
+        self.assertEqual(exception.state, "open")
+        self.assertEqual(transaction.state, "done")
+        self.assertTrue(transaction.payment_id)
+        self.assertFalse(transaction.invoice_ids)
+        self.assertEqual(order.state, "draft")
+        self.assertEqual(winner.state, "draft")
+
+        with MockRequest(self.env, website=self.website, sale_order_id=winner.id):
+            winner._cart_update_line_quantity(winner.order_line.id, 0)
+        with patch.object(
+            type(order), "_send_payment_succeeded_for_order_mail", autospec=True,
+        ) as send_payment_mail:
+            exception.action_retry_fulfilment()
+        self.assertFalse(
+            any(call.args[0] for call in send_payment_mail.call_args_list),
+            "retrying fulfilment must not resend success mail for an order",
+        )
+        self.assertEqual(exception.state, "fulfilled")
+        self.assertEqual(order.state, "sale")
+        self.assertEqual(len(transaction.invoice_ids), 1)
+        self.assertEqual(transaction.invoice_ids.state, "posted")
+
+    def test_late_paid_order_can_be_refunded_exactly_once(self):
+        order, product = self._cart_with_last_piece()
+        hold = self.env["mb.webshop.stock.hold"].sudo().search([
+            ("order_id", "=", order.id), ("product_id", "=", product.id),
+        ])
+        hold.expires_at = fields.Datetime.now() - timedelta(seconds=1)
+        hold._expire_due()
+        winner = self.env["sale.order"].sudo().create({
+            "partner_id": self.partner.id,
+            "website_id": self.website.id,
+            "warehouse_id": self.warehouse.id,
+            "company_id": self.company.id,
+        })
+        with MockRequest(self.env, website=self.website, sale_order_id=winner.id):
+            winner._cart_add(product.id, 1)
+        transaction = self._create_transaction("redirect")
+        transaction.sale_order_ids = [fields.Command.link(order.id)]
+        transaction._set_done()
+        transaction.with_context(skip_sale_auto_invoice_send=True)._post_process()
+        exception = self.env["mb.webshop.payment.exception"].sudo().search([
+            ("transaction_id", "=", transaction.id),
+        ])
+
+        exception.action_refund()
+
+        refund = exception.refund_transaction_id
+        self.assertEqual(exception.state, "refund_pending")
+        self.assertEqual(refund.operation, "refund")
+        self.assertEqual(refund.amount, -transaction.amount)
+        with self.assertRaises(UserError):
+            exception.action_refund()
+
+        refund._set_done()
+        refund._post_process()
+        exception.invalidate_recordset(["state", "resolved_at"])
+        self.assertEqual(exception.state, "refunded")
+        self.assertTrue(exception.resolved_at)
+        self.assertEqual(order.state, "draft")
+
+    def test_refund_provider_error_keeps_exception_retryable(self):
+        order, _product = self._cart_with_last_piece()
+        transaction = self._create_transaction("redirect")
+        transaction.sale_order_ids = [fields.Command.link(order.id)]
+        transaction._set_done()
+        exception = self.env["mb.webshop.payment.exception"].sudo().create({
+            "transaction_id": transaction.id,
+            "order_id": order.id,
+            "reason": "stock_unavailable",
+        })
+
+        with patch.object(
+            type(transaction), "_send_refund_request",
+            side_effect=ValidationError("provider unavailable"),
+        ), self.assertRaises(UserError):
+            exception.action_refund()
+
+        self.assertEqual(exception.state, "open")
+        self.assertFalse(exception.refund_transaction_id)
+
+    def test_authorized_payment_exception_cannot_be_refunded(self):
+        order, _product = self._cart_with_last_piece()
+        transaction = self._create_transaction("redirect")
+        transaction.sale_order_ids = [fields.Command.link(order.id)]
+        transaction.provider_id.support_manual_capture = "full_only"
+        transaction._set_authorized()
+        exception = self.env["mb.webshop.payment.exception"].sudo().create({
+            "transaction_id": transaction.id,
+            "order_id": order.id,
+            "reason": "stock_unavailable",
+        })
+
+        with self.assertRaises(UserError):
+            exception.action_refund()
+        self.assertEqual(exception.state, "open")
+
+    def test_sales_manager_can_read_payment_and_resolve_exception(self):
+        order, _product = self._cart_with_last_piece()
+        transaction = self._create_transaction("redirect")
+        transaction.sale_order_ids = [fields.Command.link(order.id)]
+        transaction._set_done()
+        exception = self.env["mb.webshop.payment.exception"].sudo().create({
+            "transaction_id": transaction.id,
+            "order_id": order.id,
+            "reason": "stock_unavailable",
+        })
+        manager = new_test_user(
+            self.env,
+            login="webshop-payment-manager",
+            groups="sales_team.group_sale_manager",
+            company_id=self.company.id,
+        )
+
+        self.assertIsNone(transaction.with_user(manager).check_access("read"))
+        exception.with_user(manager).action_refund()
+        self.assertEqual(exception.state, "refund_pending")
+
+    def test_successful_payment_post_processes_order_stock_and_invoice_once(self):
+        order, product = self._cart_with_last_piece()
+        hold = self.env["mb.webshop.stock.hold"].sudo().search([
+            ("order_id", "=", order.id), ("product_id", "=", product.id),
+        ])
+        transaction = self._create_transaction(
+            "redirect",
+            amount=order.amount_total,
+            currency_id=order.currency_id.id,
+        )
+        transaction.sale_order_ids = [fields.Command.link(order.id)]
+        self.env["ir.config_parameter"].sudo().set_param(
+            "sale.automatic_invoice", "True"
+        )
+
+        transaction._set_done()
+        transaction.with_context(skip_sale_auto_invoice_send=True)._post_process()
+
+        self.assertEqual(transaction.state, "done")
+        self.assertTrue(transaction.is_post_processed)
+        self.assertEqual(order.state, "sale")
+        self.assertEqual(hold.state, "converted")
+        sale_moves = order.order_line.move_ids.filtered(
+            lambda move: move.product_id == product and move.state != "cancel"
+        )
+        self.assertEqual(len(sale_moves), 1)
+        self.assertEqual(sale_moves.quantity, 1)
+        self.assertEqual(len(transaction.invoice_ids), 1)
+        self.assertEqual(transaction.invoice_ids.state, "posted")
+        self.assertTrue(transaction.payment_id)
+        self.assertNotEqual(transaction.payment_id.state, "draft")
+        self.assertFalse(self.env["mb.webshop.payment.exception"].sudo().search([
+            ("transaction_id", "=", transaction.id),
+        ]))
+
+        picking_ids = order.picking_ids.ids
+        invoice_ids = transaction.invoice_ids.ids
+        payment_id = transaction.payment_id.id
+        transaction.with_context(skip_sale_auto_invoice_send=True)._post_process()
+        self.assertEqual(order.picking_ids.ids, picking_ids)
+        self.assertEqual(transaction.invoice_ids.ids, invoice_ids)
+        self.assertEqual(transaction.payment_id.id, payment_id)
 
 
 @tagged("post_install", "-at_install")

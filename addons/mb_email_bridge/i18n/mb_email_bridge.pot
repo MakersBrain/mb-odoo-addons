@@ -1,0 +1,147 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_email_bridge
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-17 05:36+0000\n"
+"PO-Revision-Date: 2026-08-17 05:36+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mb_email_bridge
+#: model:ir.model,name:mb_email_bridge.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model.fields,field_description:mb_email_bridge.field_ir_mail_server__display_name
+#: model:ir.model.fields,field_description:mb_email_bridge.field_mail_mail__display_name
+#: model:ir.model.fields,field_description:mb_email_bridge.field_res_company__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model.fields,field_description:mb_email_bridge.field_ir_mail_server__id
+#: model:ir.model.fields,field_description:mb_email_bridge.field_mail_mail__id
+#: model:ir.model.fields,field_description:mb_email_bridge.field_res_company__id
+msgid "ID"
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model,name:mb_email_bridge.model_ir_mail_server
+msgid "Mail Server"
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model.fields.selection,name:mb_email_bridge.selection__res_company__mb_webshop_mail_transport__platform
+msgid "MakersBrain relay"
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/mail_mail.py:0
+msgid "MakersBrain transactional email submission failed."
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model.fields,field_description:mb_email_bridge.field_ir_mail_server__mb_webshop_smtp
+msgid "MakersBrain webshop SMTP"
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model.fields.selection,name:mb_email_bridge.selection__res_company__mb_webshop_mail_transport__smtp
+msgid "Merchant SMTP"
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model,name:mb_email_bridge.model_mail_mail
+msgid "Outgoing Mails"
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/res_company.py:0
+msgid "SMTP workshop scope is invalid."
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model,website_form_label:mb_email_bridge.model_mail_mail
+msgid "Send an E-mail"
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/mail_mail.py:0
+msgid "The MakersBrain transactional email service is unavailable."
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/res_company.py:0
+msgid "The SMTP credential payload is invalid."
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/ir_mail_server.py:0
+msgid "The SMTP hostname could not be resolved."
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/ir_mail_server.py:0
+msgid "The SMTP hostname must resolve only to public addresses."
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/ir_mail_server.py:0
+msgid "The SMTP connection did not use an approved public address."
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/res_company.py:0
+msgid "The SMTP port is invalid."
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/mail_mail.py:0
+msgid "The transactional email could not be queued. Try again."
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/mail_mail.py:0
+msgid "The transactional email has no valid recipient."
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/mail_mail.py:0
+msgid "Transactional email attachments exceed 8 MiB."
+msgstr ""
+
+#. module: mb_email_bridge
+#. odoo-python
+#: code:addons/mb_email_bridge/models/mail_mail.py:0
+msgid "Transactional email authentication is unavailable."
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model.fields,field_description:mb_email_bridge.field_res_company__mb_webshop_smtp_server_id
+msgid "Webshop SMTP server"
+msgstr ""
+
+#. module: mb_email_bridge
+#: model:ir.model.fields,field_description:mb_email_bridge.field_res_company__mb_webshop_mail_transport
+msgid "Webshop mail transport"
+msgstr ""

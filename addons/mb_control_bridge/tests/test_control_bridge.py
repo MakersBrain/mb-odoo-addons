@@ -36,6 +36,57 @@ class TestControlBridge(TransactionCase):
         payload.update(changes)
         return payload
 
+    def test_webshop_domain_projection_is_workshop_scoped_and_idempotent(self):
+        self.company.write({"mb_control_workshop_id": self.workshop_id})
+        with self.assertRaises(ValidationError):
+            self.company.mb_project_webshop_domain({
+                "workshop_id": str(uuid.uuid4()),
+                "hostname": "www.atelier-luna.fr",
+            })
+        with self.assertRaises(ValidationError):
+            self.company.mb_project_webshop_domain({
+                "workshop_id": self.workshop_id,
+                "hostname": "www.atelier-luna.fr;return 200",
+            })
+        if "website" not in self.env or "mb_webshop_enabled" not in self.env["website"]._fields:
+            self.skipTest("optional webshop module is not installed")
+        website = self.env["website"].sudo().search([
+            ("company_id", "in", [self.company.id, False]),
+        ], limit=1)
+        website.write({"company_id": self.company.id, "mb_webshop_enabled": True})
+        first = self.company.mb_project_webshop_domain({
+            "workshop_id": self.workshop_id,
+            "hostname": "www.atelier-luna.fr",
+        })
+        replay = self.company.mb_project_webshop_domain({
+            "workshop_id": self.workshop_id,
+            "hostname": "www.atelier-luna.fr",
+        })
+        self.assertTrue(first["projected"])
+        self.assertFalse(replay["projected"])
+        self.assertEqual(website.domain, "https://www.atelier-luna.fr")
+
+    def test_webshop_status_is_scoped_and_reports_application_evidence(self):
+        self.company.write({"mb_control_workshop_id": self.workshop_id})
+        with self.assertRaises(ValidationError):
+            self.company.mb_webshop_status({"workshop_id": str(uuid.uuid4())})
+        if "website" not in self.env or "mb_webshop_enabled" not in self.env["website"]._fields:
+            self.skipTest("optional webshop module is not installed")
+        website = self.env["website"].sudo().search([
+            ("company_id", "in", [self.company.id, False]),
+        ], limit=1)
+        website.write({"company_id": self.company.id, "mb_webshop_enabled": True})
+
+        status = self.company.mb_webshop_status({"workshop_id": self.workshop_id})
+
+        self.assertEqual(status["workshop_id"], self.workshop_id)
+        self.assertEqual(status["website_id"], website.id)
+        self.assertEqual(set(status["readiness"]), {
+            "catalog", "online_payment", "fulfilment", "sender", "domain", "returns",
+            "product_count", "payment_count", "fulfilment_count", "launch_ready",
+        })
+        self.assertIsInstance(status["issues"], list)
+
     def test_membership_reconciliation_is_monotonic_and_idempotent(self):
         first = self.Users.mb_reconcile_membership(self.membership(epoch=2))
         replay = self.Users.mb_reconcile_membership(self.membership(epoch=2))

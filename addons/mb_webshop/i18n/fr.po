@@ -193,6 +193,12 @@ msgstr ""
 "vérifiée avant le paiement."
 
 #. module: mb_webshop
+#: model:ir.model.constraint,message:mb_webshop.constraint_mb_webshop_payment_exception_transaction_unique
+msgid "A payment can have only one webshop payment exception."
+msgstr ""
+"Un paiement ne peut avoir qu’une seule anomalie de paiement de la boutique."
+
+#. module: mb_webshop
 #. odoo-python
 #: code:addons/mb_webshop/models/return_request.py:0
 msgid "A return quantity is invalid."
@@ -205,6 +211,7 @@ msgid "A return quantity must be positive."
 msgstr "Une quantité de retour doit être positive."
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_needaction
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_needaction
 msgid "Action Needed"
 msgstr "Nécessite une action"
@@ -215,21 +222,25 @@ msgid "Active"
 msgstr "Actif"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__activity_ids
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_ids
 msgid "Activities"
 msgstr "Activités"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__activity_exception_decoration
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Indicateur d’exception d’activité"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__activity_state
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_state
 msgid "Activity State"
 msgstr "Statut de l'activité"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__activity_type_icon
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_type_icon
 msgid "Activity Type Icon"
 msgstr "Icône de type d'activité"
@@ -301,6 +312,7 @@ msgid "Atomic webshop cart stock hold"
 msgstr "Stockage du panier de la boutique en ligne Atomic"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_attachment_count
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_attachment_count
 msgid "Attachment Count"
 msgstr "Nombre de pièces jointes"
@@ -342,6 +354,7 @@ msgid "Companies"
 msgstr "Sociétés"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__company_id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__company_id
 msgid "Company"
 msgstr "Société"
@@ -390,6 +403,12 @@ msgid "Create the replacement order before resolving the return."
 msgstr "Créez la commande de remplacement avant de résoudre le retour."
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__created_at
+msgid "Created At"
+msgstr "Créé le"
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__create_uid
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__create_uid
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__create_uid
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__create_uid
@@ -397,6 +416,7 @@ msgid "Created by"
 msgstr "Créé par"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__create_date
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__create_date
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__create_date
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__create_date
@@ -448,9 +468,11 @@ msgstr "Conçu pour durer"
 #. module: mb_webshop
 #: model:ir.model.fields,field_description:mb_webshop.field_ir_http__display_name
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_control_capability_policy__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__display_name
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__display_name
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__display_name
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__display_name
+#: model:ir.model.fields,field_description:mb_webshop.field_payment_transaction__display_name
 #: model:ir.model.fields,field_description:mb_webshop.field_res_company__display_name
 #: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:mb_webshop.field_sale_order__display_name
@@ -496,19 +518,27 @@ msgstr ""
 "                        délivrabilité des e-mails, informations d'identification de l'opérateur et paiement en direct."
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_follower_ids
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_follower_ids
 msgid "Followers"
 msgstr "Abonnés"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_partner_ids
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Abonnés (Partenaires)"
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__activity_type_icon
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
 msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_payment_exception__state__fulfilled
+msgid "Fulfilment recovered"
+msgstr "Préparation rétablie"
 
 #. module: mb_webshop
 #: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
@@ -530,6 +560,7 @@ msgid "Handmade work in the studio"
 msgstr "Travail fait main en atelier"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__has_message
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__has_message
 msgid "Has Message"
 msgstr "A un message"
@@ -545,9 +576,11 @@ msgstr ""
 #. module: mb_webshop
 #: model:ir.model.fields,field_description:mb_webshop.field_ir_http__id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_control_capability_policy__id
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__id
+#: model:ir.model.fields,field_description:mb_webshop.field_payment_transaction__id
 #: model:ir.model.fields,field_description:mb_webshop.field_res_company__id
 #: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__id
 #: model:ir.model.fields,field_description:mb_webshop.field_sale_order__id
@@ -556,21 +589,26 @@ msgid "ID"
 msgstr "ID"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__activity_exception_icon
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_exception_icon
 msgid "Icon"
 msgstr "Icône"
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__activity_exception_icon
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__activity_exception_icon
 msgid "Icon to indicate an exception activity."
 msgstr "Icône pour indiquer une activité d'exception."
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__message_needaction
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "Si coché, de nouveaux messages demandent votre attention."
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__message_has_error
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__message_has_sms_error
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_has_error
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
@@ -587,6 +625,7 @@ msgid "Inspection result or rejection reason…"
 msgstr "Résultat de l’inspection ou motif de rejet…"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_is_follower
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_is_follower
 msgid "Is Follower"
 msgstr "Est un abonné"
@@ -597,6 +636,7 @@ msgid "Items"
 msgstr "Articles"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__write_uid
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__write_uid
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__write_uid
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__write_uid
@@ -604,6 +644,7 @@ msgid "Last Updated by"
 msgstr "Mis à jour par"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__write_date
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__write_date
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__write_date
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__write_date
@@ -675,11 +716,13 @@ msgid "Mb Ready Product Count"
 msgstr "Nombre de produits Mb Ready"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_has_error
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_has_error
 msgid "Message Delivery error"
 msgstr "Erreur d'envoi du message"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_ids
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_ids
 msgid "Messages"
 msgstr "Messages"
@@ -690,6 +733,7 @@ msgid "Move"
 msgstr "Mouvement"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__my_activity_date_deadline
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__my_activity_date_deadline
 msgid "My Activity Deadline"
 msgstr "Échéance de mon activité"
@@ -705,16 +749,25 @@ msgid "Needs Approval"
 msgstr "Nécessite une approbation"
 
 #. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_payment_exception__state__open
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_payment_exception_search
+msgid "Needs action"
+msgstr "Action requise"
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__activity_date_deadline
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_date_deadline
 msgid "Next Activity Deadline"
 msgstr "Date limite de l'activité à venir"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__activity_summary
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_summary
 msgid "Next Activity Summary"
 msgstr "Résumé de l'activité suivante"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__activity_type_id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_type_id
 msgid "Next Activity Type"
 msgstr "Type d'activités à venir"
@@ -726,26 +779,40 @@ msgstr ""
 "Aucun article de cette commande n'est actuellement éligible au retour."
 
 #. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.products_accessible_empty_state
+msgid "No product defined"
+msgstr "Aucun produit défini"
+
+#. module: mb_webshop
 #: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__resolution__no_refund
 msgid "No refund"
 msgstr "Aucun remboursement"
 
 #. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.products_accessible_empty_state
+msgid "No results"
+msgstr "Aucun résultat"
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_needaction_counter
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_needaction_counter
 msgid "Number of Actions"
 msgstr "Nombre d'actions"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_has_error_counter
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_has_error_counter
 msgid "Number of errors"
 msgstr "Nombre d'erreurs"
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__message_needaction_counter
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "Nombre de messages nécessitant une action"
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__message_has_error_counter
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Nombre de messages avec des erreurs d'envoi"
@@ -774,6 +841,24 @@ msgid "Only a requested return can be rejected."
 msgstr "Seul un retour demandé peut être refusé."
 
 #. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/payment_exception.py:0
+msgid "Only a captured payment can be refunded."
+msgstr "Seul un paiement encaissé peut être remboursé."
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/payment_exception.py:0
+msgid "Only an open payment exception can be refunded."
+msgstr "Seule une anomalie de paiement ouverte peut être remboursée."
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/payment_exception.py:0
+msgid "Only an open payment exception can be retried."
+msgstr "Seule une anomalie de paiement ouverte peut être relancée."
+
+#. module: mb_webshop
 #: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
 msgid ""
 "Open the website editor and choose Theme to switch between the\n"
@@ -788,6 +873,7 @@ msgid "Operations"
 msgstr "Opérations"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__order_id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__order_id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__order_id
 msgid "Order"
@@ -797,6 +883,22 @@ msgstr "Commande"
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__order_line_id
 msgid "Order Line"
 msgstr "Ligne de commande"
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_payment_exception_form
+msgid "Payment Exception"
+msgstr "Anomalie de paiement"
+
+#. module: mb_webshop
+#: model:ir.actions.act_window,name:mb_webshop.action_webshop_payment_exceptions
+#: model:ir.ui.menu,name:mb_webshop.menu_webshop_payment_exceptions
+msgid "Payment Exceptions"
+msgstr "Anomalies de paiement"
+
+#. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_payment_transaction
+msgid "Payment Transaction"
+msgstr "Transaction de paiement"
 
 #. module: mb_webshop
 #: model_terms:ir.ui.view,arch_db:mb_webshop.res_config_settings_view_form
@@ -814,6 +916,11 @@ msgstr "Veuillez indiquer à l'atelier pourquoi vous retournez l'article."
 #: code:addons/mb_webshop/models/return_request.py:0
 msgid "Post the native credit note before resolving the refund."
 msgstr "Publiez l’avoir natif avant de résoudre le remboursement."
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.price_filter_accessible_name
+msgid "Price range"
+msgstr "Fourchette de prix"
 
 #. module: mb_webshop
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__product_id
@@ -863,11 +970,13 @@ msgid "Queued when a customer return changes status"
 msgstr "Mis en file d'attente lorsqu'un retour client change de statut"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__rating_ids
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__rating_ids
 msgid "Ratings"
 msgstr "Évaluations"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__reason
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__reason
 msgid "Reason"
 msgstr "Motif"
@@ -890,6 +999,11 @@ msgid "Received"
 msgstr "Reçu"
 
 #. module: mb_webshop
+#: model:ir.model,name:mb_webshop.model_mb_webshop_payment_exception
+msgid "Recoverable webshop payment exception"
+msgstr "Anomalie récupérable de paiement de la boutique"
+
+#. module: mb_webshop
 #: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_return__resolution__refund
 msgid "Refund"
 msgstr "Remboursement"
@@ -898,6 +1012,32 @@ msgstr "Remboursement"
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__refund_move_ids
 msgid "Refund Move"
 msgstr "Déplacement de remboursement"
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__refund_transaction_id
+msgid "Refund Transaction"
+msgstr "Transaction de remboursement"
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_payment_exception_form
+msgid "Refund payment"
+msgstr "Rembourser le paiement"
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_payment_exception__state__refund_pending
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_payment_exception_search
+msgid "Refund pending"
+msgstr "Remboursement en attente"
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_payment_exception_form
+msgid "Refund the complete captured payment?"
+msgstr "Rembourser la totalité du paiement encaissé ?"
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_payment_exception__state__refunded
+msgid "Refunded"
+msgstr "Remboursé"
 
 #. module: mb_webshop
 #: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_form
@@ -968,9 +1108,20 @@ msgid "Resolved"
 msgstr "Résolu"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__resolved_at
+msgid "Resolved At"
+msgstr "Résolu le"
+
+#. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__activity_user_id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__activity_user_id
 msgid "Responsible User"
 msgstr "Utilisateur responsable"
+
+#. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_payment_exception_form
+msgid "Retry fulfilment"
+msgstr "Relancer la préparation"
 
 #. module: mb_webshop
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return_line__return_id
@@ -996,6 +1147,7 @@ msgid "Returns policy"
 msgstr "Politique de retour"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__message_has_sms_error
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Erreur d'envoi SMS"
@@ -1020,8 +1172,9 @@ msgstr "Envoyer une demande de retour"
 #: model_terms:ir.ui.view,arch_db:mb_webshop.s_maker_hero
 msgid "Share the material, process, and hands behind every unique piece."
 msgstr ""
-"Partagez le matériau, le processus et les mains derrière chaque pièce "
-"unique."
+"Le stock est toujours indisponible. Réapprovisionnez ou remplacez l’article,"
+" puis relancez ; sinon, remboursez le paiement.Partagez le matériau, le "
+"processus et les mains derrière chaque pièce unique."
 
 #. module: mb_webshop
 #: model_terms:ir.ui.view,arch_db:mb_webshop.s_material_story
@@ -1033,17 +1186,20 @@ msgstr ""
 "variations qui rendent chaque pièce distincte."
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__state
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__state
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_stock_hold__state
 msgid "State"
 msgstr "Statut"
 
 #. module: mb_webshop
+#: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_payment_exception_search
 #: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_search
 msgid "Status"
 msgstr "Statut"
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__activity_state
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__activity_state
 msgid ""
 "Status based on activities\n"
@@ -1055,6 +1211,21 @@ msgstr ""
 "En retard : la date d'échéance est déjà dépassée\n"
 "Aujourd'hui : la date d'activité est aujourd'hui\n"
 "Planifiée : activités futures"
+
+#. module: mb_webshop
+#. odoo-python
+#: code:addons/mb_webshop/models/payment_exception.py:0
+msgid ""
+"Stock is still unavailable. Replenish or substitute the item, then retry; "
+"otherwise refund the payment."
+msgstr ""
+"Le stock est toujours indisponible. Réapprovisionnez ou remplacez l'article,"
+" puis réessayez ; sinon, remboursez le paiement."
+
+#. module: mb_webshop
+#: model:ir.model.fields.selection,name:mb_webshop.selection__mb_webshop_payment_exception__reason__stock_unavailable
+msgid "Stock unavailable after payment"
+msgstr "Stock indisponible après paiement"
 
 #. module: mb_webshop
 #. odoo-python
@@ -1081,6 +1252,12 @@ msgstr "Le motif de retour est trop long."
 
 #. module: mb_webshop
 #. odoo-python
+#: code:addons/mb_webshop/models/payment_exception.py:0
+msgid "The refund provider rejected the request. Correct the provider problem, then try the refund again."
+msgstr "Le prestataire de paiement a refusé la demande. Corrigez le problème auprès du prestataire, puis réessayez le remboursement."
+
+#. module: mb_webshop
+#. odoo-python
 #: code:addons/mb_webshop/models/return_request.py:0
 msgid "This order has no posted invoice to refund."
 msgstr "Cette commande n'a pas de facture affichée à rembourser."
@@ -1093,12 +1270,18 @@ msgstr ""
 "Cette commande n'est pas éligible pour un retour dans la boutique en ligne."
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__transaction_id
+msgid "Transaction"
+msgstr "Opération de paiement"
+
+#. module: mb_webshop
 #: model:ir.model.fields,field_description:mb_webshop.field_res_config_settings__mb_ready_sender
 #: model:ir.model.fields,field_description:mb_webshop.field_website__mb_ready_sender
 msgid "Transactional email sender"
 msgstr "Expéditeur d'e-mails transactionnels"
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__activity_exception_decoration
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr "Type d'activité d'exception enregistrée."
@@ -1151,22 +1334,26 @@ msgstr "Boutique en ligne : le stock du panier expire"
 
 #. module: mb_webshop
 #: model:ir.model,name:mb_webshop.model_website
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__website_id
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__website_id
 #: model_terms:ir.ui.view,arch_db:mb_webshop.view_webshop_return_search
 msgid "Website"
 msgstr "Site web"
 
 #. module: mb_webshop
+#: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_payment_exception__website_message_ids
 #: model:ir.model.fields,field_description:mb_webshop.field_mb_webshop_return__website_message_ids
 msgid "Website Messages"
 msgstr "Messages du site web"
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__website_message_ids
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__website_message_ids
 msgid "Website communication history"
 msgstr "Historique de communication du site web"
 
 #. module: mb_webshop
+#: model:ir.model.fields,help:mb_webshop.field_mb_webshop_payment_exception__website_id
 #: model:ir.model.fields,help:mb_webshop.field_mb_webshop_return__website_id
 msgid "Website through which this order was placed for eCommerce orders."
 msgstr ""

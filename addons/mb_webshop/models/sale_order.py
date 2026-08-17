@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from odoo import _, fields, models
-from odoo.exceptions import ValidationError
+from ..exceptions import WebshopStockUnavailable
 
 
 class SaleOrder(models.Model):
@@ -132,7 +132,7 @@ class SaleOrder(models.Model):
             if move.state != "draft":
                 move._do_unreserve()
             move._action_cancel()
-            raise ValidationError(_(
+            raise WebshopStockUnavailable(_(
                 "%(product)s is no longer available in the requested quantity.",
                 product=product.display_name,
             ))

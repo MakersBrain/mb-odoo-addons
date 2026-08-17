@@ -10,7 +10,7 @@ catalogue, checkout, stock validation, delivery and click-and-collect flows.
 The control plane can restrict and re-enable the complete storefront without
 uninstalling modules or deleting historical orders.
 """,
-    "version": "19.0.1.3.0",
+    "version": "19.0.1.5.0",
     "license": "LGPL-3",
     "category": "Website/eCommerce",
     "author": "Makersbrain",
@@ -28,8 +28,10 @@ uninstalling modules or deleting historical orders.
         "data/return_mail_templates.xml",
         "data/stock_hold_data.xml",
         "views/res_config_settings_views.xml",
+        "views/payment_exception_views.xml",
         "views/return_views.xml",
         "views/return_portal_templates.xml",
+        "views/accessibility_templates.xml",
         "views/snippets.xml",
     ],
     "assets": {
