@@ -157,6 +157,8 @@ class DeliveryCarrier(models.Model):
     def _mb_prepare_secret_rotation(self, credentials):
         """Invalidate webhook readiness and rotate the opaque callback route."""
         self.ensure_one()
+        if self.delivery_type != "mb_sendcloud":
+            return super()._mb_prepare_secret_rotation(credentials)
         allowed = {"public_key", "private_key", "webhook_signature_key"}
         if (
             not isinstance(credentials, dict)

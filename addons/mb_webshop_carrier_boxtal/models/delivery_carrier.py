@@ -152,6 +152,8 @@ class DeliveryCarrier(models.Model):
     def _mb_prepare_secret_rotation(self, credentials):
         """Create a fresh callback before atomically switching the local secret."""
         self.ensure_one()
+        if self.delivery_type != "mb_boxtal":
+            return super()._mb_prepare_secret_rotation(credentials)
         webhook_secret = credentials.get("webhook_secret")
         if (
             set(credentials) != {"access_key", "secret_key", "webhook_secret"}

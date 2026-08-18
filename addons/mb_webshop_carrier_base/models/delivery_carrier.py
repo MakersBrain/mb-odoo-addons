@@ -56,6 +56,11 @@ class DeliveryCarrier(models.Model):
             "mb_label_format", "mb_secret_ref", "mb_provider_enabled",
         }
 
+    def _mb_prepare_secret_rotation(self, credentials):
+        """Dispatch provider-specific secret rotation through model inheritance."""
+        self.ensure_one()
+        raise UserError(_("Carrier credentials could not be resolved."))
+
     def write(self, values):
         protected = self._mb_restricted_configuration_fields().intersection(values)
         if (
