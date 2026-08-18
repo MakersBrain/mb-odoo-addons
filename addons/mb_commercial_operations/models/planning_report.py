@@ -426,6 +426,9 @@ class MbCommercialPlanningWizard(models.TransientModel):
     application_deadline = fields.Datetime()
     payment_deadline = fields.Datetime()
     template_id = fields.Many2one("mb.commercial.plan.template", check_company=True)
+    source_operation_id = fields.Many2one(
+        "mb.commercial.operation", check_company=True, string="Seeded From",
+    )
     scenario_name = fields.Char(required=True, default=lambda self: _("Planning scenario"))
     calculation_mode = fields.Selection(
         [("product_mix", "Product Mix"), ("average_basket", "Average Basket")],
@@ -490,6 +493,16 @@ class MbCommercialPlanningWizard(models.TransientModel):
     )
     preview_blocked = fields.Boolean(compute="_compute_preview")
     preview_note = fields.Char(compute="_compute_preview")
+    source_actual_revenue = fields.Monetary(
+        compute="_compute_source_actuals", string="Prior Actual Revenue",
+    )
+    source_actual_cost = fields.Monetary(
+        compute="_compute_source_actuals", string="Prior Actual Cost",
+    )
+    source_actual_margin = fields.Monetary(
+        compute="_compute_source_actuals", string="Prior Actual Margin",
+    )
+    source_actuals_known = fields.Boolean(compute="_compute_source_actuals")
 
     @api.model
     def default_get(self, field_list):
@@ -568,7 +581,82 @@ class MbCommercialPlanningWizard(models.TransientModel):
                 }) for target in operation.stock_plan_line_ids.filtered(
                     lambda target: target.target_type == "product"
                 )]
+            else:
+                source = operation._find_comparable_operation()
+                if source:
+                    values["source_operation_id"] = source.id
+                    values.update(self._seed_from_operation(source))
         return values
+
+    @api.model
+    def _seed_from_operation(self, operation):
+        """Carry a past plan's assumptions forward without its evidence.
+
+        Provenance stays behind on purpose: a travel quote, a stock target or a
+        posted cost belongs to the operation that produced it, and claiming it
+        here would present last year's evidence as this year's.
+        """
+        scenario = operation.primary_scenario_id
+        return {
+            "calculation_mode": scenario.calculation_mode,
+            "line_ids": [fields.Command.create({
+                "product_id": line.product_id.id,
+                "expected_sold_qty": line.expected_sold_qty,
+                "sale_price_excluded_tax": line.sale_price_excluded_tax,
+                "vat_rate": line.vat_rate, "channel_fee_rate": line.channel_fee_rate,
+                "turnover_levy_rate": line.turnover_levy_rate,
+                "product_unit_cost": line.product_unit_cost,
+                "product_cost_mode": line.product_cost_mode,
+                "product_cost_rate": line.product_cost_rate,
+                "other_variable_unit_cost": line.other_variable_unit_cost,
+                "exclude_product_cost": line.exclude_product_cost,
+                # The original dating travels with the assumption so that an
+                # ageing cost still raises product_cost_outdated on the new plan.
+                "cost_source": line.cost_source, "cost_date": line.cost_date,
+                # Only carry stock quantities that the source actually stated;
+                # writing a blank target's zero would silently override the
+                # field's own default of one unit.
+                **({
+                    "desired_opening_qty": line.source_stock_plan_line_id.desired_opening_qty,
+                    "safety_qty": line.source_stock_plan_line_id.safety_qty,
+                } if line.source_stock_plan_line_id else {}),
+            }) for line in scenario.line_ids],
+            "cost_ids": [fields.Command.create({
+                "name": line.name, "category": line.category,
+                "calculation": line.calculation, "quantity": line.quantity,
+                "rate": line.rate, "percentage": line.percentage,
+                "source_kind": "manual",
+            }) for line in self._seeded_cost_lines(scenario)],
+        }
+
+    @api.model
+    def _seeded_cost_lines(self, scenario):
+        """The source's fixed costs, whichever shape they were planned in.
+
+        A scenario costed before cost lines existed holds its fixed costs in the
+        scalar fields instead, and _compute_results falls back to them. Seeding
+        only the lines would carry last year's sales forward with none of last
+        year's costs, and hand back a verdict that says every market is worth it.
+        """
+        if scenario.cost_line_ids:
+            return scenario.cost_line_ids
+        legacy = [
+            (_("Travel"), "travel", "fixed", 1.0, scenario.accepted_travel_cost),
+            (_("Stand work"), "labour", "hour",
+             scenario.planned_work_hours, scenario.work_hourly_cost),
+            (_("Stall"), "venue", "fixed", 1.0, scenario.stall_rent),
+            (_("Parking"), "parking", "fixed", 1.0, scenario.parking_cost),
+            (_("Accommodation"), "accommodation", "fixed", 1.0, scenario.accommodation_cost),
+            (_("Other fixed cost"), "other", "fixed", 1.0, scenario.other_fixed_cost),
+        ]
+        return [
+            self.env["mb.commercial.cost.line"].new({
+                "name": name, "category": category, "calculation": calculation,
+                "quantity": quantity, "rate": rate,
+            })
+            for name, category, calculation, quantity, rate in legacy
+            if quantity and rate
+        ]
 
     def _new_preview_scenario(self):
         """Build an in-memory scenario so preview and saved records use one engine."""
@@ -629,6 +717,29 @@ class MbCommercialPlanningWizard(models.TransientModel):
             if wizard.operation_id.planning_warning_summary:
                 messages.append(wizard.operation_id.planning_warning_summary)
             wizard.warning_summary = "\n".join(messages)
+
+    @api.depends("source_operation_id")
+    def _compute_source_actuals(self):
+        for wizard in self:
+            source = wizard.source_operation_id
+            wizard.source_actual_revenue = source.actual_revenue
+            wizard.source_actual_cost = source.actual_cost
+            wizard.source_actual_margin = source.actual_margin
+            # A market that has not happened yet reports zero on all three, which
+            # reads as a market that broke even. Say nothing rather than that.
+            wizard.source_actuals_known = source.state in (
+                "done", "financially_closed",
+            )
+
+    @api.onchange("source_operation_id")
+    def _onchange_source_operation_id(self):
+        """Replace the whole mix, exactly as picking a template does."""
+        if not self.source_operation_id.primary_scenario_id:
+            return
+        seed = self._seed_from_operation(self.source_operation_id)
+        self.calculation_mode = seed["calculation_mode"]
+        self.line_ids = [fields.Command.clear()] + seed["line_ids"]
+        self.cost_ids = [fields.Command.clear()] + seed["cost_ids"]
 
     @api.onchange("template_id")
     def _onchange_template_id(self):
@@ -892,6 +1003,11 @@ class MbCommercialPlanningWizardLine(models.TransientModel):
     product_cost_rate = fields.Float()
     other_variable_unit_cost = fields.Monetary()
     exclude_product_cost = fields.Boolean()
+    cost_source = fields.Selection(
+        selection=lambda self: self.env["mb.commercial.profitability.scenario.line"]._fields["cost_source"].selection,
+        required=True, default="product",
+    )
+    cost_date = fields.Date(required=True, default=fields.Date.context_today)
     desired_opening_qty = fields.Float(default=1.0)
     safety_qty = fields.Float()
 
@@ -916,7 +1032,8 @@ class MbCommercialPlanningWizardLine(models.TransientModel):
             "other_variable_unit_cost": self.other_variable_unit_cost,
             "exclude_product_cost": self.exclude_product_cost,
             "eligible_turnover_basis": self.sale_price_excluded_tax,
-            "cost_source": "product", "cost_date": fields.Date.context_today(self),
+            "cost_source": self.cost_source,
+            "cost_date": self.cost_date or fields.Date.context_today(self),
         }
 
 

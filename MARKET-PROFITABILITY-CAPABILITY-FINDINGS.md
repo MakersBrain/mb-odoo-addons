@@ -197,16 +197,50 @@ freezes it, as on the market side.
 
 Covered by seven tests in `mb_commercial_operations_depot/tests/test_commercial_depot.py`.
 
-## 9. Remaining gaps
+## 9. Comparison, per-kilometre return, and seeding (implemented 2026-08-18)
 
-1. **No cross-market comparison screen.** The verdict and margin-per-hour are now filterable
-   and groupable on the operation list, which covers the crude case, but there is no ranked
-   "which of these six fairs do I apply to" view driven by those KPIs.
-2. **No margin per kilometre.** `accepted_travel_distance_km` is available on the operation;
-   the KPI is not computed.
-3. **No seeding of a recurring market's scenario from last year's actuals.** The contract and
-   obligation-occurrence model exists; the step that turns a previous outcome snapshot into
-   this year's assumptions does not.
+The three gaps left after the depot work are closed.
+
+**Compare Markets.** A ranked candidate list (`action_commercial_market_candidates`, menu under
+Commercial Operations) showing markets still open to apply for, ordered by planned margin per hour,
+with the verdict badge, break-even headroom and the application deadline. An `Open Applications`
+filter hides markets whose deadline has passed. `planning_break_even_headroom` was added to the
+operation as a related field so the headroom is readable beside the rest.
+
+**Margin per kilometre.** `planned_travel_km` on the scenario, resolved through
+`_resolved_travel_km()` — the accepted quote's distance in `provider_total` mode, else the typed
+distance, else the longest per-kilometre cost line (distance is not additive across parallel cost
+lines: two vehicles drive the same road once). It yields `travel_distance_km`,
+`travel_distance_known` and `margin_per_travel_km`, mirrored on the operation as
+`planning_margin_per_km`. An unknown distance is never shown as zero per kilometre: forms and the
+report hide the figure, and the comparison list carries the flag in a column beside it.
+
+**Seeding from the last comparable market.** The planning wizard finds the most recent comparable
+operation (same contract first, then the same venue) and seeds a **draft** plan from its primary
+scenario: the sales mix, its cost dating so an ageing assumption still raises
+`product_cost_outdated`, and the fixed costs — including those held in the legacy scalar fields,
+since seeding only the cost lines would carry last year's sales forward with none of last year's
+costs. Provenance stays behind: no travel quote, no stock-target link, no cost-line source, and
+never an approved baseline. The source's actual revenue, cost and margin are shown as context, but
+only once that market has actually happened.
+
+### What the review pass caught
+
+Three agents reviewed the diff through separate lenses. Two findings mattered and are fixed here:
+
+- **A frozen scenario followed the operation.** The new per-kilometre computes — and, it turned out,
+  the hours computes shipped earlier — fell back to `operation_id` fields that stay mutable after a
+  scenario is approved. Stored computes are written by `_write()` and never meet the guard in
+  `write()`, so moving a market's dates or accepting a new quote silently rewrote an approved
+  baseline's margin per hour. The resolvers now read only scenario-owned data. Regression test:
+  `test_approved_scenario_keeps_its_hourly_and_per_km_figures`.
+- **Seeding lost legacy fixed costs**, described above, which would have handed back a verdict
+  saying every market is worth attending. Regression test:
+  `test_seeding_carries_costs_planned_in_the_legacy_scalar_fields`.
+
+Also fixed: prior actuals no longer read as a break-even for a market that has not happened; the
+`Open Applications` filter compares real time rather than a local calendar date rendered as UTC;
+seeded lines keep the default opening quantity instead of a blank target's zero.
 
 ## Key files
 

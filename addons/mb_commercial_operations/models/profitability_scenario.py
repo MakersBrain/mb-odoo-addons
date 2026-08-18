@@ -57,6 +57,11 @@ class MbCommercialProfitabilityScenario(models.Model):
     toll_cost = fields.Monetary()
     fuel_cost = fields.Monetary()
     planned_travel_hours = fields.Float()
+    planned_travel_km = fields.Float(
+        string="Planned Travel Distance (km)",
+        help="Distance this market actually costs, counted the same way as the travel "
+             "cost: a return trip is entered as the full return distance.",
+    )
     travel_hourly_cost = fields.Monetary()
     ferry_cost = fields.Monetary()
     zone_cost = fields.Monetary()
@@ -100,6 +105,13 @@ class MbCommercialProfitabilityScenario(models.Model):
     margin_per_work_hour = fields.Monetary(
         compute="_compute_results", store=True, string="Margin per Work Hour",
     )
+    travel_distance_km = fields.Float(
+        compute="_compute_results", store=True, string="Travel Distance (km)",
+    )
+    travel_distance_known = fields.Boolean(compute="_compute_results", store=True)
+    margin_per_travel_km = fields.Monetary(
+        compute="_compute_results", store=True, string="Margin per Kilometre",
+    )
     break_even_headroom_ratio = fields.Float(
         compute="_compute_results", store=True, string="Break-even Headroom",
         help="How far the planned units sit above break-even, as a share of break-even.",
@@ -112,6 +124,7 @@ class MbCommercialProfitabilityScenario(models.Model):
     _values_nonnegative = models.Constraint(
         "CHECK(target_margin_per_hour >= 0 "
         "AND toll_cost >= 0 AND fuel_cost >= 0 AND planned_travel_hours >= 0 "
+        "AND planned_travel_km >= 0 "
         "AND travel_hourly_cost >= 0 AND ferry_cost >= 0 AND zone_cost >= 0 "
         "AND other_route_cost >= 0 AND manual_travel_total >= 0 "
         "AND planned_work_hours >= 0 AND work_hourly_cost >= 0 AND stall_rent >= 0 "
@@ -137,8 +150,9 @@ class MbCommercialProfitabilityScenario(models.Model):
         "zone_cost", "other_route_cost", "manual_travel_total", "planned_work_hours",
         "work_hourly_cost", "stall_rent", "parking_cost", "accommodation_cost",
         "other_fixed_cost", "calculation_mode", "target_margin_per_hour",
-        "travel_estimate_id.duration_hours", "operation_id.planned_work_hours",
-        "operation_id.accepted_travel_duration_hours",
+        "travel_estimate_id.duration_hours",
+        "planned_travel_km",
+        "travel_estimate_id.distance_km",
         "cost_line_ids.category", "cost_line_ids.calculation", "cost_line_ids.quantity",
         "cost_line_ids.planned_amount",
         "line_ids.expected_sold_qty", "line_ids.sale_price_excluded_tax",
@@ -248,6 +262,17 @@ class MbCommercialProfitabilityScenario(models.Model):
             scenario.margin_per_work_hour = scenario.currency_id.round(
                 margin / work_hours
             ) if work_hours > 0 else 0.0
+            travel_km = scenario._resolved_travel_km()
+            scenario.travel_distance_km = travel_km
+            # A market with no quote and no typed distance has no denominator, and a
+            # stored 0 per kilometre would read as a market that earns nothing per
+            # kilometre. Forms and the report hide the figure unless this flag is
+            # set; the comparison list, which cannot hide one cell, shows the flag
+            # in a column beside it.
+            scenario.travel_distance_known = travel_km > 0
+            scenario.margin_per_travel_km = scenario.currency_id.round(
+                margin / travel_km
+            ) if travel_km > 0 else 0.0
             if blocked:
                 scenario.break_even_headroom_ratio = 0.0
             elif scenario.break_even_units:
@@ -264,25 +289,43 @@ class MbCommercialProfitabilityScenario(models.Model):
             )
 
     def _resolved_work_hours(self):
-        """Stand hours, from the scenario, its hourly labour lines, or the operation."""
+        """Stand hours, from the scenario itself or its own hourly labour lines.
+
+        Never from the operation: these feed stored computes, which are written by
+        _write() and so never meet the immutability guard in write(). A scenario
+        that read the operation's hours would have its approved margin per hour
+        rewritten the next time somebody moved the market's dates.
+        """
         self.ensure_one()
-        return (
-            self.planned_work_hours
-            or sum(
-                line.quantity for line in self.cost_line_ids
-                if line.category == "labour" and line.calculation == "hour"
-            )
-            or self.operation_id.planned_work_hours
+        return self.planned_work_hours or sum(
+            line.quantity for line in self.cost_line_ids
+            if line.category == "labour" and line.calculation == "hour"
         )
 
     def _resolved_travel_hours(self):
-        """Door-to-door travel hours behind the accepted route cost."""
+        """Door-to-door travel hours behind this scenario's own route cost."""
         self.ensure_one()
         if self.route_cost_mode == "provider_total":
-            quoted = self.travel_estimate_id.duration_hours
+            return self.travel_estimate_id.duration_hours
+        return self.planned_travel_hours
+
+    def _resolved_travel_km(self):
+        """Kilometres behind the accepted route cost, mirroring _resolved_travel_hours."""
+        self.ensure_one()
+        if self.route_cost_mode == "provider_total":
+            quoted = self.travel_estimate_id.distance_km
         else:
-            quoted = self.planned_travel_hours
-        return quoted or self.operation_id.accepted_travel_duration_hours
+            # Per-kilometre cost lines are not additive as distance: two vehicles
+            # costed separately drive the same road once, so take the longest leg
+            # rather than their sum.
+            quoted = self.planned_travel_km or max(
+                (
+                    line.quantity for line in self.cost_line_ids
+                    if line.category == "travel" and line.calculation == "kilometre"
+                ),
+                default=0.0,
+            )
+        return quoted
 
     def _evaluate_recommendation(self, blocked, note, use_legacy_mix, units):
         """Turn the break-even figures into a verdict a stallholder can act on."""

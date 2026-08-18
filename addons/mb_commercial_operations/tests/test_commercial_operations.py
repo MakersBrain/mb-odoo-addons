@@ -1,11 +1,14 @@
+from ast import literal_eval
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import requests
+from lxml import etree
 
 from odoo import fields
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
+from odoo.tools.safe_eval import datetime as safe_datetime, safe_eval
 
 
 @tagged("post_install", "-at_install")
@@ -399,6 +402,120 @@ class TestCommercialOperations(TransactionCase):
         self.assertAlmostEqual(scenario.margin_per_effort_hour, 73.33, places=2)
         self.assertEqual(scenario.recommendation, "go")
 
+    def test_margin_per_kilometre_uses_the_scenario_distance_in_manual_mode(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(operation, planned_travel_km=120.0)
+        self.assertEqual(scenario.travel_distance_km, 120.0)
+        self.assertTrue(scenario.travel_distance_known)
+        self.assertEqual(scenario.margin_per_travel_km, 4.17)
+        self.assertEqual(scenario.margin_per_effort_hour, 50.0)
+        self.assertEqual(scenario.recommendation, "go")
+
+    def test_margin_per_kilometre_is_unknown_without_a_quote_or_typed_distance(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(operation)
+        self.assertFalse(scenario.travel_distance_known)
+        self.assertEqual(scenario.travel_distance_km, 0.0)
+        self.assertEqual(scenario.margin_per_travel_km, 0.0)
+        self.assertEqual(scenario.recommendation, "go")
+        self.assertIn("above break-even", scenario.recommendation_note)
+
+    def test_margin_per_kilometre_reads_the_accepted_quote_in_provider_total_mode(self):
+        connector = self.env["mb.tollquote.connector"].create({
+            "name": "Stage kilometres",
+            "company_id": self.company.id,
+            "api_token": "secret",
+        })
+        operation = self._operation()
+        estimate = self.env["mb.travel.estimate"].create({
+            "connector_id": connector.id,
+            "operation_id": operation.id,
+            "origin_latitude": 48.8566,
+            "origin_longitude": 2.3522,
+            "destination_latitude": 49.2583,
+            "destination_longitude": 4.0317,
+        })
+        route = {"response": {"trip": {
+            "summary": {"length": 100.0, "time": 3600},
+            "legs": [{"shape": "encoded-polyline6"}],
+        }}}
+        quote = {
+            "request_id": "00000000-0000-0000-0000-000000000002",
+            "reporting_currency": "EUR",
+            "totals": {"gross": {"value": "12.50", "currency": "EUR"}},
+        }
+        with patch.object(type(connector), "_request", autospec=True, side_effect=[route, quote, route, quote]):
+            estimate.action_calculate()
+        estimate.incomplete_acknowledged = True
+        estimate.action_accept()
+        self.assertEqual(estimate.distance_km, 200.0)
+        scenario = self._verdict_scenario(
+            operation,
+            route_cost_mode="provider_total",
+            travel_estimate_id=estimate.id,
+        )
+        self.assertFalse(scenario.calculation_blocked)
+        self.assertEqual(scenario.travel_distance_km, 200.0)
+        self.assertEqual(
+            scenario.margin_per_travel_km,
+            scenario.currency_id.round(scenario.projected_margin / 200.0),
+        )
+
+    def test_travel_kilometres_fall_back_to_per_kilometre_cost_lines(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(
+            operation,
+            planned_travel_km=0.0,
+            cost_line_ids=[
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Mileage allowance",
+                    "category": "travel", "calculation": "kilometre",
+                    "quantity": 150.0, "rate": 0.35,
+                }),
+            ],
+        )
+        self.assertEqual(scenario.travel_distance_km, 150.0)
+        self.assertTrue(scenario.travel_distance_known)
+        self.assertEqual(scenario.fixed_event_cost, 52.5)
+        self.assertEqual(scenario.projected_margin, 547.5)
+        self.assertEqual(scenario.margin_per_travel_km, 3.65)
+
+    def test_operation_mirrors_margin_per_kilometre_from_the_primary_scenario(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(operation, planned_travel_km=120.0)
+        operation.primary_scenario_id = scenario
+        self.assertEqual(operation.planning_margin_per_km, 4.17)
+        self.assertEqual(operation.planning_travel_distance_km, 120.0)
+        self.assertTrue(operation.planning_travel_distance_known)
+        self.assertEqual(operation.accepted_travel_distance_km, 0.0)
+
+    def test_approved_scenario_keeps_its_kilometre_kpi(self):
+        operation = self._operation(profitability_required=True)
+        scenario = self._verdict_scenario(operation, planned_travel_km=120.0)
+        scenario.action_approve()
+        self.assertEqual(scenario.state, "approved")
+        with self.assertRaises(UserError):
+            scenario.planned_travel_km = 999.0
+        self.assertEqual(scenario.travel_distance_km, 120.0)
+        self.assertEqual(scenario.margin_per_travel_km, 4.17)
+
+    def test_planning_snapshot_digest_is_unchanged_by_the_kilometre_kpi(self):
+        operation = self._operation(profitability_required=True)
+        scenario = self._verdict_scenario(operation, planned_travel_km=120.0)
+        scenario.action_approve()
+        snapshot = operation.report_snapshot_ids.filtered(
+            lambda item: item.report_kind == "planning" and item.state == "current"
+        )
+        self.assertEqual(len(snapshot), 1)
+        digest = snapshot.input_digest
+        operation.with_user(self.manager).action_freeze_replacement_copy()
+        replacement = operation.report_snapshot_ids.filtered(
+            lambda item: item.report_kind == "planning" and item.state == "current"
+        )
+        self.assertEqual(len(replacement), 1)
+        self.assertNotEqual(replacement, snapshot)
+        self.assertEqual(replacement.input_digest, digest)
+
     def test_new_operation_wizard_saves_one_authoritative_plan_only(self):
         before_operations = self.env["mb.commercial.operation"].search_count([])
         before_moves = self.env["account.move"].search_count([])
@@ -777,3 +894,380 @@ class TestCommercialOperations(TransactionCase):
             ])],
         })
         self.assertFalse(self.env["mb.commercial.operation"].with_user(user).search([("id", "=", operation.id)]))
+
+    def _candidate_domain(self):
+        action = self.env.ref("mb_commercial_operations.action_commercial_market_candidates")
+        return literal_eval(action.domain)
+
+    def test_market_candidates_rank_by_planned_margin_per_hour(self):
+        strong = self._operation(name="Strong fair")
+        strong.primary_scenario_id = self._verdict_scenario(strong)
+        weak = self._operation(name="Weak fair")
+        weak.primary_scenario_id = self._verdict_scenario(weak, stall_rent=480.0)
+        loss = self._operation(name="Loss-making fair")
+        loss.primary_scenario_id = self._verdict_scenario(loss, stall_rent=900.0)
+        uncosted = self._operation(name="Uncosted fair")
+        self.assertEqual(weak.planning_recommendation, "marginal")
+        self.assertEqual(loss.planning_recommendation, "no_go")
+
+        candidates = self.env["mb.commercial.operation"].search(
+            [*self._candidate_domain(), ("id", "in", (strong + weak + loss + uncosted).ids)],
+            order="planning_margin_per_hour desc",
+        )
+        self.assertEqual(candidates.ids, [strong.id, weak.id, uncosted.id, loss.id])
+
+    def test_uncosted_market_ranks_at_zero_not_null(self):
+        uncosted = self._operation()
+        self.assertFalse(uncosted.primary_scenario_id)
+        self.assertEqual(uncosted.planning_margin_per_hour, 0.0)
+        self.assertFalse(uncosted.planning_recommendation)
+        self.assertIn(uncosted, self.env["mb.commercial.operation"].search(self._candidate_domain()))
+
+    def test_market_candidate_domain_excludes_replanned_and_non_market_operations(self):
+        draft = self._operation()
+        quoted = self._operation()
+        quoted.state = "quoted"
+        approved = self._operation()
+        approved.state = "approved"
+        visit = self._operation(operation_type="visit")
+
+        candidates = self.env["mb.commercial.operation"].search([
+            *self._candidate_domain(),
+            ("id", "in", (draft + quoted + approved + visit).ids),
+        ])
+        self.assertEqual(set(candidates.ids), {draft.id, quoted.id})
+
+    def test_open_application_filter_hides_markets_whose_deadline_passed(self):
+        view = self.env.ref("mb_commercial_operations.view_commercial_operation_search")
+        arch = etree.fromstring(view.arch.encode())
+        domain = arch.xpath("//filter[@name='open_application']")[0].get("domain")
+
+        undated = self._operation()
+        open_call = self._operation(application_deadline=fields.Datetime.now() + timedelta(days=7))
+        closed_call = self._operation(application_deadline=fields.Datetime.now() - timedelta(days=7))
+        evaluated = safe_eval(domain, {
+            "context_today": lambda: fields.Date.context_today(undated),
+            # A search domain sees datetime as a namespace, not as the class, so
+            # bind the same wrapper Odoo evaluates domains with; binding the class
+            # would make this test pass on an expression the client cannot run.
+            "datetime": safe_datetime,
+        })
+
+        matches = self.env["mb.commercial.operation"].search([
+            *evaluated, ("id", "in", (undated + open_call + closed_call).ids),
+        ])
+        self.assertEqual(set(matches.ids), {undated.id, open_call.id})
+
+    def test_break_even_headroom_is_readable_on_the_operation(self):
+        operation = self._operation()
+        scenario = self._verdict_scenario(operation)
+        self.assertEqual(operation.planning_break_even_headroom, 0.0)
+        operation.primary_scenario_id = scenario
+        self.assertEqual(operation.planning_break_even_headroom, scenario.break_even_headroom_ratio)
+        self.assertEqual(operation.planning_break_even_headroom, 4.0)
+
+    def _past_market(self, state="done", **values):
+        """A market held last year at the same venue, with a costed plan."""
+        start = values.pop("planned_start", fields.Datetime.now() - timedelta(days=330))
+        operation = self._operation(**{
+            "name": "Last Autumn Market", "planned_start": start,
+            "planned_end": start + timedelta(hours=8), **values,
+        })
+        operation.primary_scenario_id = self.env["mb.commercial.profitability.scenario"].create({
+            "name": "Last year's plan",
+            "operation_id": operation.id,
+            "line_ids": [fields.Command.create({
+                "product_id": self.product.id, "expected_sold_qty": 20,
+                "sale_price_excluded_tax": 40.0, "vat_rate": 20.0,
+                "channel_fee_rate": 2.5, "turnover_levy_rate": 12.3,
+                "product_unit_cost": 10.0, "cost_source": "product",
+                "cost_date": fields.Date.today() - timedelta(days=330),
+            })],
+            "cost_line_ids": [fields.Command.create({
+                "operation_id": operation.id, "name": "Stall",
+                "category": "venue", "calculation": "fixed",
+                "quantity": 1, "rate": 100,
+            })],
+        })
+        operation.state = state
+        return operation
+
+    def _plan_wizard(self, operation):
+        return self.env["mb.commercial.operation.plan.wizard"].with_context(
+            default_operation_id=operation.id,
+        ).create({})
+
+    def test_new_market_seeds_its_draft_scenario_from_the_last_comparable_operation(self):
+        source = self._past_market()
+        wizard = self._plan_wizard(self._operation(name="This Autumn Market"))
+
+        self.assertEqual(wizard.source_operation_id, source)
+        self.assertEqual(len(wizard.line_ids), 1)
+        self.assertEqual(wizard.line_ids.product_id, self.product)
+        self.assertEqual(wizard.line_ids.sale_price_excluded_tax, 40.0)
+        self.assertEqual(wizard.line_ids.vat_rate, 20.0)
+        self.assertEqual(wizard.line_ids.channel_fee_rate, 2.5)
+        self.assertEqual(wizard.line_ids.turnover_levy_rate, 12.3)
+        self.assertEqual(wizard.line_ids.product_unit_cost, 10.0)
+        self.assertEqual(wizard.cost_ids.rate, 100)
+        self.assertEqual(wizard.source_actual_revenue, source.actual_revenue)
+
+    def test_seeded_scenario_is_draft_and_not_the_approved_baseline(self):
+        self._past_market()
+        operation = self._operation(name="This Autumn Market")
+        self._plan_wizard(operation).action_save_draft()
+
+        scenario = operation.primary_scenario_id
+        self.assertEqual(scenario.state, "draft")
+        self.assertFalse(scenario.approved_by_id)
+        self.assertFalse(scenario.approved_at)
+        self.assertEqual(operation.state, "draft")
+        self.assertFalse(operation.report_snapshot_ids)
+
+    def test_seeding_drops_travel_quote_and_stock_target_links(self):
+        source = self._past_market(state="draft")
+        connector = self.env["mb.tollquote.connector"].create({
+            "name": "Last year connector", "company_id": self.company.id,
+            "api_token": "secret",
+        })
+        estimate = self.env["mb.travel.estimate"].create({
+            "company_id": self.company.id, "connector_id": connector.id,
+            "operation_id": source.id, "origin_latitude": 43.30,
+            "origin_longitude": 3.50, "destination_latitude": 43.55,
+            "destination_longitude": 3.85, "state": "quoted",
+            "total_operating_cost": 60.0,
+        })
+        estimate.action_accept()
+        target = self.env["mb.market.stock.plan.line"].create({
+            "operation_id": source.id, "target_type": "product",
+            "product_id": self.product.id, "expected_sold_qty": 20,
+        })
+        source.primary_scenario_id.line_ids.source_stock_plan_line_id = target
+        source.state = "done"
+
+        operation = self._operation(name="This Autumn Market")
+        wizard = self._plan_wizard(operation)
+        self.assertEqual(wizard.source_operation_id, source)
+        self.assertFalse(wizard.line_ids.source_stock_plan_line_id)
+        self.assertFalse(wizard.travel_estimate_id)
+
+        wizard.action_save_draft()
+        seeded_targets = operation.primary_scenario_id.line_ids.source_stock_plan_line_id
+        self.assertTrue(seeded_targets)
+        self.assertEqual(seeded_targets.operation_id, operation)
+        self.assertFalse(operation.travel_estimate_id)
+        self.assertEqual(source.primary_scenario_id.line_ids.source_stock_plan_line_id, target)
+
+    def test_seeding_carries_costs_planned_in_the_legacy_scalar_fields(self):
+        # A plan costed before cost lines existed keeps its fixed costs in the
+        # scalar fields; seeding only the lines would carry last year's sales
+        # forward with none of last year's costs.
+        source = self._past_market()
+        scenario = source.primary_scenario_id
+        source.state = "draft"
+        scenario.cost_line_ids.unlink()
+        scenario.write({
+            "stall_rent": 120.0, "parking_cost": 15.0,
+            "planned_work_hours": 8.0, "work_hourly_cost": 20.0,
+            "manual_travel_total": 45.0,
+        })
+        source.state = "done"
+
+        wizard = self._plan_wizard(self._operation(name="This Autumn Market"))
+
+        self.assertEqual(wizard.source_operation_id, source)
+        seeded = {(line.category, line.quantity * line.rate) for line in wizard.cost_ids}
+        self.assertIn(("venue", 120.0), seeded)
+        self.assertIn(("parking", 15.0), seeded)
+        self.assertIn(("labour", 160.0), seeded)
+        self.assertIn(("travel", 45.0), seeded)
+        self.assertEqual(sum(line.quantity * line.rate for line in wizard.cost_ids), 340.0)
+
+    def test_seeded_lines_keep_the_default_opening_quantity(self):
+        # The source line has no stock target, so nothing should overwrite the
+        # field's own default with a zero.
+        source = self._past_market()
+        self.assertFalse(source.primary_scenario_id.line_ids.source_stock_plan_line_id)
+
+        wizard = self._plan_wizard(self._operation(name="This Autumn Market"))
+
+        self.assertEqual(wizard.line_ids.desired_opening_qty, 1.0)
+
+    def test_prior_actuals_stay_hidden_until_the_source_market_has_happened(self):
+        source = self._past_market(state="approved")
+
+        wizard = self._plan_wizard(self._operation(name="This Autumn Market"))
+
+        self.assertEqual(wizard.source_operation_id, source)
+        self.assertFalse(wizard.source_actuals_known)
+        source.state = "done"
+        wizard.invalidate_recordset()
+        self.assertTrue(wizard.source_actuals_known)
+
+    def test_approved_scenario_keeps_its_hourly_and_per_km_figures(self):
+        # These are stored computes, which are written by _write() and so never
+        # meet the immutability guard; the operation's dates and quote stay
+        # editable long after a scenario is approved.
+        operation = self._operation()
+        scenario = self._verdict_scenario(operation, planned_travel_km=100.0)
+        scenario.action_approve()
+        margin_per_hour = scenario.margin_per_effort_hour
+        margin_per_km = scenario.margin_per_travel_km
+
+        operation.with_user(self.manager).action_reopen()
+        operation.planned_end = operation.planned_start + timedelta(hours=40)
+        scenario.invalidate_recordset()
+
+        self.assertEqual(scenario.margin_per_effort_hour, margin_per_hour)
+        self.assertEqual(scenario.margin_per_travel_km, margin_per_km)
+
+    def test_seeded_fixed_costs_lose_their_travel_provenance(self):
+        source = self._past_market(state="draft")
+        connector = self.env["mb.tollquote.connector"].create({
+            "name": "Provenance connector", "company_id": self.company.id,
+            "api_token": "secret",
+        })
+        estimate = self.env["mb.travel.estimate"].create({
+            "company_id": self.company.id, "connector_id": connector.id,
+            "operation_id": source.id, "origin_latitude": 43.30,
+            "origin_longitude": 3.50, "destination_latitude": 43.55,
+            "destination_longitude": 3.85, "state": "quoted",
+            "total_operating_cost": 60.0,
+        })
+        self.env["mb.commercial.cost.line"].create({
+            "operation_id": source.id, "scenario_id": source.primary_scenario_id.id,
+            "name": "Accepted TollQuote travel total", "category": "travel",
+            "calculation": "fixed", "quantity": 1, "rate": 60.0,
+            "source_kind": "travel", "travel_estimate_id": estimate.id,
+            "source_reference": "quote-42",
+        })
+        source.state = "done"
+
+        operation = self._operation(name="This Autumn Market")
+        self._plan_wizard(operation).action_save_draft()
+
+        seeded = operation.primary_scenario_id.cost_line_ids.filtered(
+            lambda line: line.category == "travel"
+        )
+        self.assertEqual(len(seeded), 1)
+        self.assertEqual(seeded.name, "Accepted TollQuote travel total")
+        self.assertEqual(seeded.rate, 60.0)
+        self.assertEqual(seeded.source_kind, "manual")
+        self.assertFalse(seeded.travel_estimate_id)
+        self.assertFalse(seeded.source_reference)
+        self.assertEqual(seeded.assumption_date, fields.Date.context_today(seeded))
+
+    def test_seeding_ignores_financial_and_evidence_data(self):
+        source = self._past_market()
+        self.env["account.analytic.line"].create({
+            "name": "Last year's takings",
+            "account_id": source.analytic_account_id.id,
+            "mb_commercial_operation_id": source.id,
+            "amount": 900,
+        })
+        source.close_note = "Rain kept half the visitors away."
+
+        operation = self._operation(name="This Autumn Market")
+        wizard = self._plan_wizard(operation)
+        self.assertEqual(wizard.source_actual_revenue, 900)
+        self.assertEqual(wizard.source_actual_margin, source.actual_margin)
+
+        wizard.action_save_draft()
+        self.assertFalse(operation.analytic_evidence_ids)
+        self.assertFalse(operation.account_move_ids)
+        self.assertFalse(operation.financial_close_date)
+        self.assertFalse(operation.close_note)
+
+    def test_comparable_operation_prefers_same_contract_then_most_recent(self):
+        contract = self.env["mb.commercial.contract"].create({
+            "partner_id": self.partner.id, "company_id": self.company.id,
+            "date_start": fields.Date.today() - timedelta(days=700),
+            "rent_billing_method": "information",
+        })
+        contracted = self._past_market(
+            name="Contracted market", contract_id=contract.id,
+            planned_start=fields.Datetime.now() - timedelta(days=600),
+        )
+        recent = self._past_market(name="Recent market")
+        other_partner = self.env["res.partner"].create({
+            "name": "Other Hall", "company_id": self.company.id,
+        })
+        self._past_market(name="Other venue market", partner_id=other_partner.id)
+
+        operation = self._operation(name="This Autumn Market", contract_id=contract.id)
+        self.assertEqual(operation._find_comparable_operation(), contracted)
+
+        operation.contract_id = False
+        self.assertEqual(operation._find_comparable_operation(), recent)
+
+    def test_comparable_operation_ignores_draft_cancelled_and_scenarioless_operations(self):
+        operation = self._operation(name="This Autumn Market")
+        self.assertFalse(operation._find_comparable_operation())
+
+        self._past_market(state="draft")
+        self._past_market(state="cancelled")
+        start = fields.Datetime.now() - timedelta(days=200)
+        self._operation(
+            name="Scenarioless market", planned_start=start,
+            planned_end=start + timedelta(hours=8), state="done",
+        )
+        self.assertFalse(operation._find_comparable_operation())
+
+        wizard = self._plan_wizard(operation)
+        self.assertFalse(wizard.source_operation_id)
+        self.assertFalse(wizard.line_ids)
+
+    def test_seeded_stale_cost_dates_raise_the_outdated_warning(self):
+        self._past_market()
+        operation = self._operation(name="This Autumn Market")
+        self._plan_wizard(operation).action_save_draft()
+
+        self.assertEqual(
+            operation.primary_scenario_id.line_ids.cost_date,
+            fields.Date.today() - timedelta(days=330),
+        )
+        outdated = [
+            warning for warning in operation._get_planning_warnings()
+            if warning[0] == "product_cost_outdated"
+        ]
+        self.assertEqual(len(outdated), 1)
+        self.assertEqual(outdated[0][1], "warning")
+
+    def test_seeding_never_reads_or_creates_snapshots(self):
+        source = self._past_market(state="draft", profitability_required=True)
+        source.action_approve()
+        source.state = "done"
+        self.assertEqual(len(source.report_snapshot_ids), 1)
+
+        operation = self._operation(name="This Autumn Market")
+        self._plan_wizard(operation).action_save_draft()
+
+        self.assertEqual(len(source.report_snapshot_ids), 1)
+        self.assertFalse(source.report_snapshot_ids.filtered(
+            lambda snapshot: snapshot.report_kind == "outcome"
+        ))
+        self.assertFalse(operation.report_snapshot_ids)
+        source.with_user(self.manager).action_freeze_replacement_copy()
+
+    def test_seeding_respects_company_isolation(self):
+        other = self.env["res.company"].create({"name": "Other Workshop"})
+        other_partner = self.partner.copy({"company_id": other.id})
+        foreign = self.env["mb.commercial.operation"].with_company(other).create({
+            "name": "Other company market", "company_id": other.id,
+            "partner_id": other_partner.id,
+            "planned_start": fields.Datetime.now() - timedelta(days=300),
+            "planned_end": fields.Datetime.now() - timedelta(days=300) + timedelta(hours=8),
+        })
+        foreign.primary_scenario_id = self.env["mb.commercial.profitability.scenario"].with_company(other).create({
+            "name": "Foreign plan", "operation_id": foreign.id,
+            "line_ids": [fields.Command.create({
+                "expected_sold_qty": 10, "sale_price_excluded_tax": 40.0,
+                "product_cost_mode": "sales_percent", "product_cost_rate": 25,
+                "cost_source": "planning", "cost_date": fields.Date.today(),
+            })],
+        })
+        foreign.state = "done"
+
+        operation = self._operation(name="This Autumn Market")
+        self.assertFalse(operation._find_comparable_operation())
+        self.assertFalse(self._plan_wizard(operation).source_operation_id)

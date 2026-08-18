@@ -18,6 +18,8 @@
             parent="menu_commercial_operations" action="action_commercial_calendar" sequence="10"/>
   <menuitem id="menu_commercial_markets" name="Markets &amp; Fairs"
             parent="menu_commercial_operations" action="action_commercial_markets" sequence="20"/>
+  <menuitem id="menu_commercial_market_candidates" name="Compare Markets"
+            parent="menu_commercial_operations" action="action_commercial_market_candidates" sequence="25"/>
   <menuitem id="menu_commercial_all_operations" name="All Operations"
             parent="menu_commercial_operations" action="action_commercial_operations" sequence="30"/>
   <menuitem id="menu_commercial_obligation_calendar" name="Obligation Calendar"

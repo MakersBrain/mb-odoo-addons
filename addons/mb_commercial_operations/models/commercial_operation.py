@@ -150,6 +150,10 @@ class MbCommercialOperation(models.Model):
         related="primary_scenario_id.break_even_customer_receipts_incl_vat",
         string="Break-even Receipts Including VAT",
     )
+    planning_break_even_headroom = fields.Float(
+        related="primary_scenario_id.break_even_headroom_ratio",
+        string="Break-even Headroom",
+    )
     planning_recommendation = fields.Selection(
         related="primary_scenario_id.recommendation", string="Profitability Verdict",
         store=True, index=True,
@@ -163,6 +167,17 @@ class MbCommercialOperation(models.Model):
     planning_margin_per_hour = fields.Monetary(
         related="primary_scenario_id.margin_per_effort_hour",
         string="Planned Margin per Hour", store=True,
+    )
+    planning_travel_distance_km = fields.Float(
+        related="primary_scenario_id.travel_distance_km",
+        string="Planned Travel Distance (km)",
+    )
+    planning_travel_distance_known = fields.Boolean(
+        related="primary_scenario_id.travel_distance_known",
+    )
+    planning_margin_per_km = fields.Monetary(
+        related="primary_scenario_id.margin_per_travel_km",
+        string="Planned Margin per Kilometre", store=True,
     )
     accepted_travel_cost = fields.Monetary(
         related="travel_estimate_id.total_operating_cost", string="Accepted Travel Cost",
@@ -629,6 +644,33 @@ class MbCommercialOperation(models.Model):
             ))[:1]
             conflicts[operation.id] = conflict
         return conflicts
+
+    def _find_comparable_operation(self):
+        """Return the last comparable operation whose plan can seed this one."""
+        self.ensure_one()
+        if not self.partner_id or not self.planned_start:
+            return self.browse()
+        base = [
+            ("id", "not in", self.ids),
+            ("company_id", "=", self.company_id.id),
+            ("operation_type", "=", self.operation_type),
+            ("planned_start", "<", self.planned_start),
+            ("primary_scenario_id.line_ids", "!=", False),
+        ]
+        committed = [("state", "in", ("done", "financially_closed"))]
+        still_open = [("state", "in", ("approved", "scheduled", "in_progress"))]
+        subjects = []
+        if self.contract_id:
+            subjects.append([("contract_id", "=", self.contract_id.id)])
+        subjects.append([("partner_id", "=", self.partner_id.id)])
+        for subject in subjects:
+            for state_domain in (committed, still_open):
+                # Deliberately not sudoed: seeding may only carry data the planner
+                # is allowed to read. _order already sorts the most recent first.
+                match = self.search(base + subject + state_domain, limit=1)
+                if match:
+                    return match
+        return self.browse()
 
     def _check_user_conflicts(self):
         conflicts_by_operation = self._get_user_conflicts()

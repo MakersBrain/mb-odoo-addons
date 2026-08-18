@@ -77,6 +77,7 @@
                   <tr><th>Projected margin</th><td class="text-end"><span t-field="scenario.projected_margin"/></td></tr>
                   <tr><th>Work and travel hours</th><td class="text-end"><span t-field="scenario.effort_hours"/></td></tr>
                   <tr><th>Margin per hour</th><td class="text-end"><span t-field="scenario.margin_per_effort_hour"/></td></tr>
+                  <tr t-if="scenario.travel_distance_known"><th>Margin per kilometre</th><td class="text-end"><span t-field="scenario.margin_per_travel_km"/></td></tr>
                   <tr><th>Verdict</th><td class="text-end"><span t-field="scenario.recommendation"/> — <span t-field="scenario.recommendation_note"/></td></tr>
                 </tbody>
               </table>

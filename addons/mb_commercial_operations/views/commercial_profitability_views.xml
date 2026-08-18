@@ -98,6 +98,7 @@
                   <field name="toll_cost" readonly="state != 'draft'"/>
                   <field name="fuel_cost" readonly="state != 'draft'"/>
                   <field name="planned_travel_hours" readonly="state != 'draft'"/>
+                  <field name="planned_travel_km" readonly="state != 'draft'"/>
                   <field name="travel_hourly_cost" readonly="state != 'draft'"/>
                 </group>
                 <group>
@@ -127,6 +128,9 @@
                 <field name="effort_hours" readonly="1"/>
                 <field name="margin_per_effort_hour" readonly="1"/>
                 <field name="margin_per_work_hour" readonly="1"/>
+                <field name="travel_distance_known" invisible="1"/>
+                <field name="travel_distance_km" readonly="1" invisible="not travel_distance_known"/>
+                <field name="margin_per_travel_km" readonly="1" invisible="not travel_distance_known"/>
                 <field name="break_even_headroom_ratio" widget="percentage" readonly="1"/>
               </group>
               <group>

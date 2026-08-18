@@ -226,6 +226,8 @@ msgstr ""
 "nouvelle révision."
 
 #. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/planning_report.py:0
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_cost_line__category__accommodation
 msgid "Accommodation"
 msgstr "Hébergement"
@@ -701,6 +703,7 @@ msgid "Break-even"
 msgstr "Seuil de rentabilité"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_break_even_headroom
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__break_even_headroom_ratio
 msgid "Break-even Headroom"
 msgstr "Marge au-dessus du seuil de rentabilité"
@@ -1053,6 +1056,12 @@ msgid "Company"
 msgstr "Société"
 
 #. module: mb_commercial_operations
+#: model:ir.actions.act_window,name:mb_commercial_operations.action_commercial_market_candidates
+#: model:ir.ui.menu,name:mb_commercial_operations.menu_commercial_market_candidates
+msgid "Compare Markets"
+msgstr "Comparer les marchés"
+
+#. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_occurrence_form
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_form
 msgid "Complete"
@@ -1209,6 +1218,7 @@ msgid "Cost"
 msgstr "Coût"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard_line__cost_date
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario_line__cost_date
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_market_stock_plan_line__cost_date
 msgid "Cost Date"
@@ -1220,6 +1230,7 @@ msgid "Cost Line"
 msgstr "Ligne de coût"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard_line__cost_source
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario_line__cost_source
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_market_stock_plan_line__cost_source
 msgid "Cost Source"
@@ -1516,6 +1527,16 @@ msgstr "Distance du trajet"
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_travel_estimate__distance_km
 msgid "Distance Km"
 msgstr "Distance (km)"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,help:mb_commercial_operations.field_mb_commercial_profitability_scenario__planned_travel_km
+msgid ""
+"Distance this market actually costs, counted the same way as the travel "
+"cost: a return trip is entered as the full return distance."
+msgstr ""
+"Distance que ce marché coûte réellement, comptée de la même façon que le "
+"coût de déplacement : un aller-retour se saisit en distance aller-retour "
+"complète."
 
 #. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_contract_form
@@ -1962,6 +1983,7 @@ msgstr ""
 "Heures que le marché coûte réellement : travail au stand plus déplacement."
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,help:mb_commercial_operations.field_mb_commercial_operation__planning_break_even_headroom
 #: model:ir.model.fields,help:mb_commercial_operations.field_mb_commercial_profitability_scenario__break_even_headroom_ratio
 msgid ""
 "How far the planned units sit above break-even, as a share of break-even."
@@ -2107,6 +2129,11 @@ msgid "Labour"
 msgstr "Main-d'oeuvre"
 
 #. module: mb_commercial_operations
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_planning_wizard_form
+msgid "Last Comparable Operation"
+msgstr "Dernière opération comparable"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_tollquote_connector__last_health_at
 msgid "Last Health At"
 msgstr "Dernière vérification le"
@@ -2214,6 +2241,11 @@ msgid "Margin per Hour (Work + Travel)"
 msgstr "Marge par heure (travail + déplacement)"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__margin_per_travel_km
+msgid "Margin per Kilometre"
+msgstr "Marge par kilomètre"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__margin_per_work_hour
 msgid "Margin per Work Hour"
 msgstr "Marge par heure de travail"
@@ -2222,6 +2254,11 @@ msgstr "Marge par heure de travail"
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
 msgid "Margin per hour"
 msgstr "Marge par heure"
+
+#. module: mb_commercial_operations
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
+msgid "Margin per kilometre"
+msgstr "Marge par kilomètre"
 
 #. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
@@ -2716,6 +2753,11 @@ msgid "Only proposed occurrences can be deleted."
 msgstr "Seules les occurrences proposées peuvent être supprimées."
 
 #. module: mb_commercial_operations
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_search
+msgid "Open Applications"
+msgstr "Candidatures ouvertes"
+
+#. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
 msgid "Operating cost"
 msgstr "Coût d'exploitation"
@@ -2820,6 +2862,12 @@ msgstr "Autre coût unitaire variable"
 #. module: mb_commercial_operations
 #. odoo-python
 #: code:addons/mb_commercial_operations/models/planning_report.py:0
+msgid "Other fixed cost"
+msgstr "Autre coût fixe"
+
+#. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/planning_report.py:0
 msgid "Outcome"
 msgstr "Résultat"
 
@@ -2850,6 +2898,8 @@ msgid "Overview"
 msgstr "Vue d'ensemble"
 
 #. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/planning_report.py:0
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_cost_line__category__parking
 msgid "Parking"
 msgstr "Stationnement"
@@ -3011,6 +3061,11 @@ msgid "Planned Margin per Hour"
 msgstr "Marge prévue par heure"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_margin_per_km
+msgid "Planned Margin per Kilometre"
+msgstr "Marge prévue par kilomètre"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_report__planned_revenue
 msgid "Planned Revenue"
 msgstr "Chiffre d'affaires prévu"
@@ -3025,6 +3080,12 @@ msgstr "Ventes HT prévues"
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planned_start
 msgid "Planned Start"
 msgstr "Début prévu"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_travel_distance_km
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__planned_travel_km
+msgid "Planned Travel Distance (km)"
+msgstr "Distance de déplacement prévue (km)"
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__planned_travel_hours
@@ -3068,6 +3129,7 @@ msgstr "Main-d'oeuvre prévue"
 
 #. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_market_candidate_list
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_list
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_profitability_report_list
 msgid "Planned margin"
@@ -3210,6 +3272,21 @@ msgstr "Prix TTC"
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__primary_scenario_id
 msgid "Primary Scenario"
 msgstr "Scénario principal"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard__source_actual_cost
+msgid "Prior Actual Cost"
+msgstr "Coût réel précédent"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard__source_actual_margin
+msgid "Prior Actual Margin"
+msgstr "Marge réelle précédente"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard__source_actual_revenue
+msgid "Prior Actual Revenue"
+msgstr "Chiffre d'affaires réel précédent"
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_market_stock_plan_line__priority
@@ -3863,6 +3940,11 @@ msgid "Scheduled"
 msgstr "Planifié"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard__source_operation_id
+msgid "Seeded From"
+msgstr "Repris de"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_profitability_scenario__route_cost_mode__components
 msgid "Selected route components"
 msgstr "Composantes d'itinéraire sélectionnées"
@@ -3940,6 +4022,11 @@ msgid "Source / date"
 msgstr "Source / date"
 
 #. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard__source_actuals_known
+msgid "Source Actuals Known"
+msgstr "Réels de la source connus"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_cost_line__source_amount
 msgid "Source Amount"
 msgstr "Montant d'origine"
@@ -3972,9 +4059,21 @@ msgid "Staging"
 msgstr "Préproduction"
 
 #. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/planning_report.py:0
+msgid "Stall"
+msgstr "Stand"
+
+#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__stall_rent
 msgid "Stall Rent"
 msgstr "Loyer du stand"
+
+#. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/planning_report.py:0
+msgid "Stand work"
+msgstr "Travail au stand"
 
 #. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_form
@@ -4327,6 +4426,8 @@ msgid "Total Variable Cost"
 msgstr "Coût variable total"
 
 #. module: mb_commercial_operations
+#. odoo-python
+#: code:addons/mb_commercial_operations/models/planning_report.py:0
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_cost_line__category__travel
 #: model:ir.ui.menu,name:mb_commercial_operations.menu_commercial_travel
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
@@ -4340,8 +4441,15 @@ msgstr "Estimation du coût de déplacement"
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__accepted_travel_distance_km
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__travel_distance_km
 msgid "Travel Distance (km)"
 msgstr "Distance du déplacement (km)"
+
+#. module: mb_commercial_operations
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_travel_distance_known
+#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__travel_distance_known
+msgid "Travel Distance Known"
+msgstr "Distance de déplacement connue"
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__accepted_travel_duration_hours
