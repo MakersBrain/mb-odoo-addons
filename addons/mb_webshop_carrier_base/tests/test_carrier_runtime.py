@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 from odoo import fields
@@ -13,6 +14,7 @@ from ..provider import (
     ShipmentDocument,
     ShipmentSubmission,
     ShippingService,
+    TrackingSnapshot,
     register_provider,
 )
 from ..models.delivery_carrier import DeliveryCarrier
@@ -25,6 +27,8 @@ class FixtureProvider:
     supports_own_contract = False
     supports_manifest = False
     supports_return_label = True
+    supports_tracking_lookup = False
+    supports_contextual_options = False
     supports_idempotency = True
     supports_reconciliation = True
 
@@ -243,6 +247,24 @@ class TestCarrierRuntime(TransactionCase):
         self.assertEqual(shipment.state, "unknown")
         self.assertEqual(self.provider.create_calls, 1)
 
+    def test_return_creation_never_inherits_outbound_retry_safety(self):
+        shipment = self._shipment(direction="return", suffix="unsafe-return-timeout")
+        self.provider.create_result = ProviderTransientError("timeout")
+
+        shipment._process_create()
+
+        self.assertEqual(shipment.state, "unknown")
+        self.assertEqual(self.provider.create_calls, 1)
+
+    def test_return_request_reverses_customer_and_workshop_addresses(self):
+        shipment = self._shipment(direction="return", suffix="direction")
+
+        request = shipment._shipment_request()
+
+        self.assertEqual(request.sender["name"], "Recipient")
+        self.assertNotEqual(request.recipient["name"], "Recipient")
+        self.assertFalse(request.pickup_code)
+
     def test_idempotent_retry_can_complete_without_duplicate_journal(self):
         shipment = self._shipment(suffix="safe-retry-success")
         with patch.object(
@@ -340,6 +362,29 @@ class TestCarrierRuntime(TransactionCase):
         self.assertEqual(shipment.state, "cancelled")
         self.assertFalse(self.picking.carrier_tracking_ref)
 
+    def test_older_tracking_update_cannot_regress_terminal_state(self):
+        shipment = self._shipment(suffix="tracking-order")
+        delivered_at = datetime(2026, 8, 18, 12, 0, 0)
+        shipment._apply_tracking_snapshot(TrackingSnapshot(
+            status_code="DELIVERED",
+            category="delivered",
+            message="Delivered",
+            tracking_number="TRACK-TERMINAL",
+            event_at=delivered_at,
+        ))
+
+        changed = shipment._apply_tracking_snapshot(TrackingSnapshot(
+            status_code="IN_TRANSIT",
+            category="in_transit",
+            message="Older event",
+            tracking_number="TRACK-TERMINAL",
+            event_at=delivered_at - timedelta(hours=2),
+        ))
+
+        self.assertFalse(changed)
+        self.assertEqual(shipment.provider_tracking_code, "DELIVERED")
+        self.assertEqual(shipment.provider_tracking_status, "delivered")
+
     def test_return_document_alone_gets_portal_token(self):
         self.carrier.get_return_label_from_portal = True
         shipment = self._shipment(direction="return", suffix="return")
@@ -393,6 +438,8 @@ class TestCarrierRuntime(TransactionCase):
                     "service_code": "relay",
                 },
             },
+            "mb_delivery_recipient_partner_id": self.recipient.id,
+            "mb_delivery_recipient_snapshot": {"name": "Recipient", "country_code": "FR"},
         })
         with patch.object(
             type(self.carrier), "_mb_uses_pickup_locations", autospec=True, return_value=True
@@ -480,23 +527,40 @@ class TestCarrierRuntime(TransactionCase):
 
         self.assertFalse(order.pickup_location_data)
         self.assertEqual(order.partner_shipping_id, self.recipient)
+        self.assertFalse(order.mb_delivery_recipient_partner_id)
+        self.assertFalse(order.mb_delivery_recipient_snapshot)
 
     def test_capability_deactivation_keeps_history_and_blocks_mutation(self):
         shipment = self._shipment(suffix="capability")
         evidence = self.company._mb_apply_capability_restriction(
             "shipping-fixture", "entitlement_inactive"
         )
-        self.carrier.invalidate_recordset(["mb_provider_enabled"])
+        self.carrier.invalidate_recordset([
+            "mb_provider_enabled", "mb_provider_restricted",
+        ])
 
         self.assertEqual(evidence["adapter"], "odoo_carrier_mutation_gate")
-        self.assertFalse(self.carrier.mb_provider_enabled)
+        self.assertTrue(self.carrier.mb_provider_enabled)
+        self.assertTrue(self.carrier.mb_provider_restricted)
         self.assertTrue(shipment.exists())
         with self.assertRaises(UserError):
             DeliveryCarrier._mb_provider(self.carrier)
+        with self.assertRaises(UserError):
+            self.carrier.write({"mb_provider_service_code": "other"})
+        with patch.object(
+            DeliveryCarrier, "_mb_resolve_credentials", autospec=True, return_value={}
+        ):
+            provider = DeliveryCarrier._mb_provider(
+                self.carrier, purpose="cancellation"
+            )
+        self.assertIsInstance(provider, FixtureProvider)
 
         self.company._mb_remove_capability_restriction("shipping-fixture")
-        self.carrier.invalidate_recordset(["mb_provider_enabled"])
+        self.carrier.invalidate_recordset([
+            "mb_provider_enabled", "mb_provider_restricted",
+        ])
         self.assertTrue(self.carrier.mb_provider_enabled)
+        self.assertFalse(self.carrier.mb_provider_restricted)
 
     def test_retention_boundary_uses_sanitized_metadata_only(self):
         shipment = self._shipment(suffix="retention")

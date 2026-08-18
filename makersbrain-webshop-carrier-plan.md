@@ -1,7 +1,7 @@
 # MakersBrain Webshop Carrier Module Plan
 
 **Project:** MakersBrain on Odoo 19 Community
-**Status:** Phases 1–3 and the local-worksheet/exception subset of phase 4 are implemented; Boxtal return labels and multi-parcel shipping are not implemented, and external production qualification remains gated on merchant test/production accounts
+**Status:** Phases 1–3, the local-worksheet/exception subset of phase 4, and the Sendcloud provider are implemented; Boxtal return labels and multi-parcel shipping are not implemented, and paid external production qualification remains gated on merchant approval
 **Date:** 18 August 2026
 **Companion:** `makersbrain-webshop-domain-email-plan.md` sections 1.2, 6 and 12
 
@@ -112,7 +112,7 @@ because Odoo already ships the checkout half.
 mb_webshop
     └── mb_webshop_carrier_base          provider-agnostic runtime + registry
             ├── mb_webshop_carrier_boxtal            (primary, v1)
-            ├── mb_webshop_carrier_sendcloud         (later, own-contract tenants)
+            ├── mb_webshop_carrier_sendcloud         (implemented, own-contract tenants)
             ├── mb_webshop_carrier_mondialrelay      (later, direct)
             ├── mb_webshop_carrier_colissimo         (later, direct, gated on §9.2)
             └── mb_webshop_carrier_chronopost        (later, direct)

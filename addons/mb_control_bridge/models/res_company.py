@@ -25,6 +25,7 @@ MODULE_BUNDLES = {
     "webshop": ("mb_webshop", "mb_email_bridge"),
     "shop-catalogue-import": ("mb_shop_import",),
     "shipping-boxtal": ("mb_webshop_carrier_base", "mb_webshop_carrier_boxtal"),
+    "shipping-sendcloud": ("mb_webshop_carrier_sendcloud",),
 }
 
 

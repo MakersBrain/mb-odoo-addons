@@ -1,0 +1,188 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mb_webshop_carrier_sendcloud
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "A public HTTPS web base URL is required for Sendcloud webhooks."
+msgstr "Une URL Web HTTPS publique est requise pour les webhooks Sendcloud."
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "Configure a Sendcloud outbound option before testing."
+msgstr "Configurez une option d’expédition Sendcloud avant le test."
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_height_cm
+msgid "Default parcel height (cm)"
+msgstr "Hauteur du colis par défaut (cm)"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_length_cm
+msgid "Default parcel length (cm)"
+msgstr "Longueur du colis par défaut (cm)"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_width_cm
+msgid "Default parcel width (cm)"
+msgstr "Largeur du colis par défaut (cm)"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__display_name
+msgid "Display Name"
+msgstr "Nom d’affichage"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_last_webhook_at
+msgid "Last Sendcloud webhook"
+msgstr "Dernier webhook Sendcloud"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_use_locations
+msgid "Offer uses service points"
+msgstr "L’offre utilise des points relais"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_content_description
+msgid "Parcel content description"
+msgstr "Description du contenu du colis"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__delivery_type
+msgid "Provider"
+msgstr "Prestataire"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,help:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_use_locations
+msgid "Require a compatible Sendcloud service point at webshop checkout."
+msgstr ""
+"Exiger un point relais Sendcloud compatible lors du paiement en ligne."
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "Select a Sendcloud sender address before testing."
+msgstr "Sélectionnez une adresse d’expéditeur Sendcloud avant le test."
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_sendcloud.selection__delivery_carrier__delivery_type__mb_sendcloud
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_sendcloud.view_delivery_carrier_form_sendcloud
+msgid "Sendcloud"
+msgstr "Service Sendcloud"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_brand_id
+msgid "Sendcloud brand ID"
+msgstr "Identifiant de marque Sendcloud"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_carrier_code
+msgid "Sendcloud carrier filter"
+msgstr "Filtre de transporteur Sendcloud"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_contract_id
+msgid "Sendcloud contract ID"
+msgstr "Identifiant de contrat Sendcloud"
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "Sendcloud parcel dimensions must be greater than zero."
+msgstr "Les dimensions du colis Sendcloud doivent être supérieures à zéro."
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_sender_address_id
+msgid "Sendcloud sender address ID"
+msgstr "Identifiant d’adresse d’expéditeur Sendcloud"
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "Sendcloud webhook URL"
+msgstr "URL du webhook Sendcloud"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model,name:mb_webshop_carrier_sendcloud.model_delivery_carrier
+msgid "Shipping Methods"
+msgstr "Modes d’expédition"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_sendcloud.view_delivery_carrier_form_sendcloud
+msgid "Show webhook URL"
+msgstr "Afficher l’URL du webhook"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_webhook_ready
+msgid "Signed webhook verified"
+msgstr "Webhook signé vérifié"
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "Test policy permits only the Sendcloud unstamped-letter option."
+msgstr ""
+"La politique de test autorise uniquement l’option de lettre non affranchie "
+"Sendcloud."
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "The Sendcloud label format is unsupported."
+msgstr "Le format d’étiquette Sendcloud n’est pas pris en charge."
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "The Sendcloud sender address ID is invalid."
+msgstr "L’identifiant d’adresse d’expéditeur Sendcloud est invalide."
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "The Sendcloud webhook route is unavailable."
+msgstr "La route du webhook Sendcloud n’est pas disponible."
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid "The carrier rotation material is invalid."
+msgstr "Les données de rotation du transporteur sont invalides."
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid ""
+"Verify a signed Sendcloud test webhook before buying production labels."
+msgstr ""
+"Vérifiez un webhook de test Sendcloud signé avant d’acheter des étiquettes "
+"de production."
+
+#. module: mb_webshop_carrier_sendcloud
+#. odoo-python
+#: code:addons/mb_webshop_carrier_sendcloud/models/delivery_carrier.py:0
+msgid ""
+"Verify a signed Sendcloud test webhook before buying production return "
+"labels."
+msgstr ""
+"Vérifiez un webhook de test Sendcloud signé avant d’acheter des étiquettes "
+"de retour de production."

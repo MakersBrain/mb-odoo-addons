@@ -1,7 +1,7 @@
 # MakersBrain Sendcloud Carrier Integration Plan
 
 **Project:** MakersBrain on Odoo 19 Community
-**Status:** Planned; no Sendcloud mutation has been run
+**Status:** Implemented on `feat/sendcloud-integration`; offline qualification and the live read-only account check pass, while charged label/return qualification remains merchant-approval gated
 **Date:** 18 August 2026
 **Companion:** `makersbrain-webshop-carrier-plan.md`
 
@@ -357,16 +357,24 @@ Live stages run separately with `sendcloud.env`:
 The harness stops rather than substituting another option. Production is not
 advertised until the paid qualification evidence exists.
 
+Implementation evidence on 18 August 2026: the fixed-host read-only harness
+authenticated successfully, retrieved integration metadata and found one sender
+address (ID `886289`). It performed zero mutations. Service-point discovery was
+skipped because the ignored credential file intentionally contained no
+qualification destination. No credential value, address or response body was
+printed or copied into the repository. The paid stages remain deliberately
+unrun because no `--approve-live-charge` authorization was supplied.
+
 ## 13. Delivery increments
 
 | Increment | Scope | Exit criterion |
 |---|---|---|
-| 0 | Official/OCA reuse audit, read-only v3 qualification, license/security record | Reuse inventory and account assumptions documented; no proprietary code or secrets copied |
-| 1 | Generic operation safety, secret schema and restricted-operation policy | Boxtal and cross-provider tests pass |
-| 2 | Odoo 19 focused addon, sender/options, outbound label, document and cancellation | One allowlisted smoke label; ambiguous recovery proven offline |
-| 3 | Service points, recipient snapshot, signed webhooks and tracking endpoint | Home/point journeys pass and polling repairs a missed event |
-| 4 | Correct-direction returns with one-attempt safety and cancellation | Approved customer-to-workshop return passes |
-| 5 | Control-plane UI, translations, lifecycle, runbook and restore test | Workshop can self-connect, rotate, restrict and delete safely |
+| 0 | Official/OCA reuse audit, read-only v3 qualification, license/security record | Implemented; read-only live check passed and reuse record is in the runbook |
+| 1 | Generic operation safety, secret schema and restricted-operation policy | Implemented; Boxtal and cross-provider tests pass |
+| 2 | Odoo 19 focused addon, sender/options, outbound label, document and cancellation | Implemented and proven offline; charged smoke label remains approval-gated |
+| 3 | Service points, recipient snapshot, signed webhooks and tracking endpoint | Implemented; home/point, webhook and polling fixtures pass |
+| 4 | Correct-direction returns with one-attempt safety and cancellation | Implemented and proven offline; paid return remains approval-gated |
+| 5 | Control-plane UI, translations, lifecycle, runbook and restore test | Implemented; credential and lifecycle contracts pass |
 
 ## 14. Completion criteria
 

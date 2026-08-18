@@ -302,43 +302,29 @@ class TestBoxtalProvider(TransactionCase):
             for payload in created
         ))
 
-    def test_capability_reactivation_recreates_webhook_subscriptions(self):
+    def test_capability_restriction_keeps_webhook_cleanup_path_available(self):
         runtime = Mock()
         self.carrier.write({
             "mb_secret_ref": "carrier-secret-boxtal",
             "mb_provider_enabled": True,
         })
-        parameters = self.env["ir.config_parameter"].sudo()
-        previous_url = parameters.get_param("web.base.url")
-        parameters.set_param("web.base.url", "https://shop.test")
-        self.addCleanup(parameters.set_param, "web.base.url", previous_url)
-        with (
-            patch.object(
-                type(self.carrier), "_mb_provider", autospec=True, return_value=runtime
-            ) as provider_resolver,
-            patch.object(
-                type(self.carrier), "_mb_webhook_secret", autospec=True,
-                return_value="webhook-secret-that-is-long-enough",
-            ) as secret_resolver,
-        ):
+        with patch.object(
+            type(self.carrier), "_mb_provider", autospec=True, return_value=runtime
+        ) as provider_resolver:
             self.env.company._mb_apply_capability_restriction(
                 "shipping-boxtal", "entitlement_inactive"
             )
+            self.carrier.invalidate_recordset(["mb_provider_restricted"])
+            self.assertTrue(self.carrier.mb_provider_restricted)
+            self.carrier._mb_provider(purpose="webhook_processing")
             self.env.company._mb_remove_capability_restriction("shipping-boxtal")
 
         self.assertTrue(self.carrier.mb_provider_enabled)
-        runtime.suspend_subscriptions.assert_called_once()
-        self.assertEqual(
-            provider_resolver.call_args_list[-1].kwargs,
-            {"purpose": "webhook_reactivation"},
+        self.assertFalse(self.carrier.mb_provider_restricted)
+        provider_resolver.assert_called_once_with(
+            self.carrier, purpose="webhook_processing"
         )
-        secret_resolver.assert_called_once_with(
-            self.carrier, purpose="webhook_reactivation"
-        )
-        runtime.reconcile_subscriptions.assert_called_once_with(
-            f"https://shop.test/mb_carrier/webhook/boxtal/{self.carrier.mb_subscription_id}",
-            "webhook-secret-that-is-long-enough",
-        )
+        runtime.suspend_subscriptions.assert_not_called()
 
     def test_secret_rotation_prepares_a_fresh_signed_callback(self):
         runtime = Mock()

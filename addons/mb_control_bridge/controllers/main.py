@@ -11,6 +11,10 @@ from .auth import authenticate_control_request, json_body, payload_digest
 
 
 _logger = logging.getLogger(__name__)
+PROVIDER_BY_DELIVERY_TYPE = {
+    "mb_boxtal": "boxtal",
+    "mb_sendcloud": "sendcloud",
+}
 
 
 def _json_error(error):
@@ -85,16 +89,17 @@ class ControlPlaneBridge(http.Controller):
     def carrier_targets(self):
         try:
             authenticate_control_request()
-            carriers = request.env["delivery.carrier"].sudo().search(
-                [("delivery_type", "=", "mb_boxtal"), ("company_id", "!=", False)]
-            )
+            carriers = request.env["delivery.carrier"].sudo().search([
+                ("delivery_type", "in", tuple(PROVIDER_BY_DELIVERY_TYPE)),
+                ("company_id", "!=", False),
+            ])
             return request.make_json_response([
                 {
                     "company_id": carrier.company_id.id,
                     "company_name": carrier.company_id.display_name,
                     "carrier_id": carrier.id,
                     "carrier_name": carrier.display_name,
-                    "provider": "boxtal",
+                    "provider": PROVIDER_BY_DELIVERY_TYPE[carrier.delivery_type],
                     "environment": "production" if carrier.prod_environment else "test",
                     "service_code": carrier.mb_provider_service_code or "",
                     "configured": bool(carrier.mb_secret_ref),
@@ -133,8 +138,7 @@ class ControlPlaneBridge(http.Controller):
                 or company.mb_control_workshop_id != workshop_id
                 or not carrier
                 or carrier.company_id != company
-                or carrier.delivery_type != "mb_boxtal"
-                or body.get("provider") != "boxtal"
+                or PROVIDER_BY_DELIVERY_TYPE.get(carrier.delivery_type) != body.get("provider")
                 or environment not in ("test", "production")
                 or carrier.prod_environment != (environment == "production")
                 or not secret_ref.startswith(expected_prefix)
@@ -150,10 +154,13 @@ class ControlPlaneBridge(http.Controller):
             if carrier.mb_secret_ref and carrier.mb_secret_ref != secret_ref:
                 prepare_rotation = getattr(carrier, "_mb_prepare_secret_rotation", None)
                 credentials = body.get("credentials")
-                if not prepare_rotation or not isinstance(credentials, dict):
+                if credentials is not None and not isinstance(credentials, dict):
                     raise BadRequest("carrier rotation material is invalid")
-                values["mb_subscription_id"] = prepare_rotation(credentials)
-            carrier.write(values)
+                if prepare_rotation:
+                    if not isinstance(credentials, dict):
+                        raise BadRequest("carrier rotation material is invalid")
+                    values["mb_subscription_id"] = prepare_rotation(credentials)
+            carrier.with_context(mb_carrier_lifecycle_write=True).write(values)
             return request.make_json_response({"bound": True, "carrier_id": carrier.id})
         except Exception as error:
             if not isinstance(error, (HTTPException, ValidationError)):
@@ -180,14 +187,13 @@ class ControlPlaneBridge(http.Controller):
                 or company.mb_control_workshop_id != workshop_id
                 or not carrier
                 or carrier.company_id != company
-                or carrier.delivery_type != "mb_boxtal"
-                or body.get("provider") != "boxtal"
+                or PROVIDER_BY_DELIVERY_TYPE.get(carrier.delivery_type) != body.get("provider")
                 or body.get("environment") not in ("test", "production")
                 or carrier.prod_environment != (body.get("environment") == "production")
                 or carrier.mb_secret_ref != body.get("secret_ref")
             ):
                 raise BadRequest("carrier secret scope is invalid")
-            carrier.write({
+            carrier.with_context(mb_carrier_lifecycle_write=True).write({
                 "mb_secret_ref": False,
                 "mb_credential_state": "unconfigured",
                 "mb_last_error": False,

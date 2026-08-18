@@ -27,6 +27,9 @@ class DeliveryCarrier(models.Model):
     mb_provider_service_code = fields.Char(
         string="Provider service code", copy=False, groups="base.group_system"
     )
+    mb_provider_return_service_code = fields.Char(
+        string="Provider return service code", copy=False, groups="base.group_system"
+    )
     mb_credential_state = fields.Selection(
         [("unconfigured", "Unconfigured"), ("test", "Test"),
          ("production", "Production")],
@@ -44,6 +47,26 @@ class DeliveryCarrier(models.Model):
         copy=False, readonly=True, index=True, groups="base.group_system"
     )
     mb_provider_enabled = fields.Boolean(default=True, copy=False)
+    mb_provider_restricted = fields.Boolean(default=False, copy=False)
+
+    def _mb_restricted_configuration_fields(self):
+        return {
+            "delivery_type", "prod_environment", "mb_provider_code",
+            "mb_provider_service_code", "mb_provider_return_service_code",
+            "mb_label_format", "mb_secret_ref", "mb_provider_enabled",
+        }
+
+    def write(self, values):
+        protected = self._mb_restricted_configuration_fields().intersection(values)
+        if (
+            protected
+            and not self.env.context.get("mb_carrier_lifecycle_write")
+            and any(self.mapped("mb_provider_restricted"))
+        ):
+            raise UserError(_(
+                "Carrier configuration cannot be changed while its capability is restricted."
+            ))
+        return super().write(values)
 
     def _match(self, partner, source):
         self.ensure_one()
@@ -94,6 +117,7 @@ class DeliveryCarrier(models.Model):
                     "secret_ref": carrier.mb_secret_ref,
                     "environment": "production" if carrier.prod_environment else "test",
                     "purpose": purpose,
+                    "provider": carrier.mb_provider_code,
                 },
                 timeout=timeout,
             )
@@ -115,10 +139,23 @@ class DeliveryCarrier(models.Model):
             raise UserError(_("The webhook validation secret is unavailable."))
         return secret
 
+    @staticmethod
+    def _mb_existing_object_purposes():
+        return {
+            "cancellation",
+            "document_recovery",
+            "reconciliation",
+            "tracking_lookup",
+            "webhook_verification",
+            "webhook_processing",
+        }
+
     def _mb_provider(self, purpose="provider_operation"):
         self.ensure_one()
         if not self.mb_provider_enabled:
             raise UserError(_("This shipping provider is disabled."))
+        if self.mb_provider_restricted and purpose not in self._mb_existing_object_purposes():
+            raise UserError(_("This shipping provider is restricted for new purchases."))
         provider_type = provider_class(self.mb_provider_code or "")
         return provider_type(
             credentials=self._mb_resolve_credentials(purpose=purpose),
@@ -193,6 +230,8 @@ class DeliveryCarrier(models.Model):
         self.ensure_one()
         if not self.mb_provider_enabled:
             raise UserError(_("This shipping provider is disabled."))
+        if self.mb_provider_restricted:
+            raise UserError(_("This shipping provider is restricted for new purchases."))
         if not self.mb_provider_code or not self.mb_provider_service_code:
             raise ValidationError(_("The provider and service code must be configured."))
         results = []
@@ -277,6 +316,8 @@ class DeliveryCarrier(models.Model):
             raise UserError(_("This shipping provider does not support return labels."))
         if not self.mb_provider_enabled:
             raise UserError(_("This shipping provider is disabled."))
+        if self.mb_provider_restricted:
+            raise UserError(_("This shipping provider is restricted for new returns."))
         for picking in pickings:
             key = str(uuid.uuid5(
                 uuid.NAMESPACE_URL,

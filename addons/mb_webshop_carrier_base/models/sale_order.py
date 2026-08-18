@@ -1,6 +1,6 @@
 import json
 
-from odoo import _, models
+from odoo import _, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 from ..provider import ProviderError, provider_class
@@ -8,6 +8,11 @@ from ..provider import ProviderError, provider_class
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
+
+    mb_delivery_recipient_partner_id = fields.Many2one(
+        "res.partner", copy=False, readonly=True, check_company=True
+    )
+    mb_delivery_recipient_snapshot = fields.Json(copy=False, readonly=True)
 
     def write(self, values):
         """Discard a relay selection when its delivery method changes.
@@ -23,7 +28,11 @@ class SaleOrder(models.Model):
             changed = self.filtered(lambda order: order.carrier_id.id != new_carrier_id)
         result = super().write(values)
         for order in changed:
-            cleanup = {"pickup_location_data": False}
+            cleanup = {
+                "pickup_location_data": False,
+                "mb_delivery_recipient_partner_id": False,
+                "mb_delivery_recipient_snapshot": False,
+            }
             if order.partner_shipping_id.mb_pickup_ref:
                 cleanup["partner_shipping_id"] = order.partner_id.id
             super(SaleOrder, order.with_context(
@@ -185,7 +194,21 @@ class SaleOrder(models.Model):
                 and carrier._mb_uses_pickup_locations()
             ):
                 resolved_points[order.id] = order._mb_resolve_selected_pickup()
+                recipient = order.partner_shipping_id
+                order.sudo().write({
+                    "mb_delivery_recipient_partner_id": recipient.id,
+                    "mb_delivery_recipient_snapshot": self.env[
+                        "mb.carrier.shipment"
+                    ]._partner_payload(recipient),
+                })
         result = super()._action_confirm()
+        for order in self.filtered(lambda candidate: candidate.id in resolved_points):
+            order.picking_ids.filtered(
+                lambda picking: picking.picking_type_code == "outgoing"
+            ).sudo().write({
+                "mb_delivery_recipient_partner_id": order.mb_delivery_recipient_partner_id.id,
+                "mb_delivery_recipient_snapshot": order.mb_delivery_recipient_snapshot,
+            })
         for order in self.filtered(lambda candidate: candidate.id in resolved_points):
             point = resolved_points[order.id]
             carrier = order.carrier_id

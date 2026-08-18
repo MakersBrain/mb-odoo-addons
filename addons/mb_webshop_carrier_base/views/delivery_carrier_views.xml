@@ -10,8 +10,12 @@
                        invisible="not mb_provider_code" readonly="1"/>
                 <field name="mb_provider_service_code" groups="base.group_system"
                        invisible="not mb_provider_code"/>
+                <field name="mb_provider_return_service_code" groups="base.group_system"
+                       invisible="not mb_provider_code"/>
                 <field name="mb_provider_enabled" groups="base.group_system"
                        invisible="not mb_provider_code"/>
+                <field name="mb_provider_restricted" groups="base.group_system"
+                       invisible="not mb_provider_code" readonly="1"/>
                 <field name="mb_credential_state" groups="base.group_system"
                        invisible="not mb_provider_code" readonly="1"/>
                 <field name="mb_label_format" groups="base.group_system"

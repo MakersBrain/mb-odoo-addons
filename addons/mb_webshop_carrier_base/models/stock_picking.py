@@ -7,6 +7,10 @@ class StockPicking(models.Model):
     mb_carrier_shipment_ids = fields.One2many(
         "mb.carrier.shipment", "picking_id", string="Provider shipments"
     )
+    mb_delivery_recipient_partner_id = fields.Many2one(
+        "res.partner", copy=False, readonly=True, check_company=True
+    )
+    mb_delivery_recipient_snapshot = fields.Json(copy=False, readonly=True)
 
     def send_to_shipper(self):
         self.ensure_one()
