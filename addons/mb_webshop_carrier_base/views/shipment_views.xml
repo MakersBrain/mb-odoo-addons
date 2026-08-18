@@ -41,6 +41,9 @@
                             invisible="state != 'unknown' or operation != 'cancel'"
                             confirm="Verify in the provider portal first. This enables a cancellation retry."
                             class="btn-secondary"/>
+                    <button name="action_refresh_tracking" type="object" string="Refresh tracking"
+                            invisible="not provider_ref or state == 'cancelled'"
+                            class="btn-secondary"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -58,6 +61,12 @@
                             <field name="provider_ref"/>
                             <field name="tracking_number"/>
                             <field name="tracking_url" widget="url"/>
+                    <field name="provider_tracking_status"/>
+                    <field name="provider_tracking_code"/>
+                            <field name="provider_tracking_message"/>
+                            <field name="tracking_event_at"/>
+                            <field name="tracking_last_checked_at"/>
+                            <field name="tracking_last_error"/>
                             <field name="last_error"/>
                         </group>
                     </group>

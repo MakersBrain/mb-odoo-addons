@@ -27,13 +27,17 @@ class ResCompany(models.Model):
         carriers = self.env["delivery.carrier"].sudo().search([
             ("company_id", "=", self.id), ("mb_provider_code", "=", provider_code)
         ])
-        carriers._mb_suspend_webhooks()
-        carriers.write({"mb_provider_enabled": False})
+        # Restriction blocks new purchases but intentionally retains the
+        # credential path for cleanup and read-only repair of existing objects.
+        # Deleting credentials remains a separate, explicit lifecycle action.
+        carriers.with_context(mb_carrier_lifecycle_write=True).write({
+            "mb_provider_restricted": True,
+        })
         return {
             **evidence,
             "adapter": "odoo_carrier_mutation_gate",
             "provider": provider_code,
-            "carriers_disabled": carriers.ids,
+            "carriers_restricted": carriers.ids,
             "historical_read_retained": True,
         }
 
@@ -44,8 +48,7 @@ class ResCompany(models.Model):
             carriers = self.env["delivery.carrier"].sudo().search([
                 ("company_id", "=", self.id), ("mb_provider_code", "=", provider_code)
             ])
-            carriers.write({"mb_provider_enabled": True})
-            resume = getattr(carriers, "_mb_resume_webhooks", None)
-            if resume:
-                resume()
+            carriers.with_context(mb_carrier_lifecycle_write=True).write({
+                "mb_provider_restricted": False, "mb_provider_enabled": True,
+            })
         return result

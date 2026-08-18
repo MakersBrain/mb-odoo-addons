@@ -1,7 +1,7 @@
 {
-    "name": "MakersBrain Webshop Carrier: Boxtal",
-    "summary": "Boxtal v3 shipping, parcel points and signed webhooks.",
-    "version": "19.0.1.1.0",
+    "name": "MakersBrain Webshop Carrier: Sendcloud",
+    "summary": "Sendcloud API v3 labels, returns, service points and tracking.",
+    "version": "19.0.1.0.0",
     "license": "LGPL-3",
     "category": "Website/eCommerce",
     "author": "Makersbrain",

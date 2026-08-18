@@ -1,8 +1,8 @@
 # MakersBrain Webshop Carrier Module Plan
 
 **Project:** MakersBrain on Odoo 19 Community
-**Status:** Implemented for phases 1–4; external Boxtal production qualification remains gated on a merchant test/production account
-**Date:** 16 August 2026
+**Status:** Phases 1–3, the local-worksheet/exception subset of phase 4, and the Sendcloud provider are implemented; Boxtal return labels and multi-parcel shipping are not implemented, and paid external production qualification remains gated on merchant approval
+**Date:** 18 August 2026
 **Companion:** `makersbrain-webshop-domain-email-plan.md` sections 1.2, 6 and 12
 
 ## 1. Goal
@@ -37,6 +37,14 @@ Verified against the `odoo:19` image in this repository.
 | Mondial Relay Point Relais widget, backend and checkout | `delivery_mondialrelay`, `website_sale_mondialrelay` | Widget only |
 | Mondial Relay label / expedition WebService | — | **Absent by design** |
 | Colissimo, Chronopost, any aggregator | — | **Absent** |
+
+“Absent” here means absent from this Community image and its configured addon
+paths. Odoo 19 separately documents an official `delivery_sendcloud` connector,
+and Sendcloud lists both Odoo's connector and Onestein's connector in its App
+Store. The official module is not in the public Community addon tree used here.
+The LGPL OCA successor is currently available for Odoo 18 and primarily targets
+Sendcloud API v2. Any Sendcloud work must follow the reuse/license/version audit
+in `makersbrain-webshop-carrier-sendcloud-plan.md` before reusing connector code.
 
 The dispatch protocol is the seam everything hangs off. `rate_shipment`,
 `send_shipping`, `cancel_shipment`, `get_tracking_link`, `get_return_label` and
@@ -104,7 +112,7 @@ because Odoo already ships the checkout half.
 mb_webshop
     └── mb_webshop_carrier_base          provider-agnostic runtime + registry
             ├── mb_webshop_carrier_boxtal            (primary, v1)
-            ├── mb_webshop_carrier_sendcloud         (later, own-contract tenants)
+            ├── mb_webshop_carrier_sendcloud         (implemented, own-contract tenants)
             ├── mb_webshop_carrier_mondialrelay      (later, direct)
             ├── mb_webshop_carrier_colissimo         (later, direct, gated on §9.2)
             └── mb_webshop_carrier_chronopost        (later, direct)
@@ -136,19 +144,25 @@ class ShippingProvider(Protocol):
     supports_own_contract: bool    # merchant may bring their own carrier contract
     supports_manifest: bool
     supports_return_label: bool
+    supports_tracking_lookup: bool
+    supports_contextual_options: bool
 
     def check_credentials(self) -> CredentialStatus: ...
     def list_services(self) -> list[ShippingService]: ...
+    def shipping_options(self, query: ShippingOptionQuery) -> list[ShippingOption]: ...
+    def operation_safety(self, operation: str) -> OperationSafety: ...
     def search_pickup_points(self, query: PickupQuery) -> list[PickupPoint]: ...
     def get_pickup_point(self, code: str) -> PickupPoint: ...
     def create_shipment(self, req: ShipmentRequest) -> ShipmentSubmission: ...
     def cancel_shipment(self, provider_ref: str) -> None: ...
     def create_return_label(self, req: ShipmentRequest) -> ShipmentSubmission: ...
     def build_manifest(self, provider_refs: list[str]) -> ManifestResult: ...
+    def retrieve_tracking(self, tracking_number: str) -> TrackingSnapshot: ...
 ```
 
-Supporting dataclasses — `PickupQuery`, `PickupPoint`, `ShipmentRequest`,
-`Parcel`, `ShipmentSubmission`, `ShipmentDocument`, `ManifestResult` — and a
+Supporting dataclasses — `PickupQuery`, `PickupPoint`, `ShippingOptionQuery`,
+`ShippingOption`, `OperationSafety`, `ShipmentRequest`, `Parcel`,
+`ShipmentSubmission`, `ShipmentDocument`, `ManifestResult`, `TrackingSnapshot` — and a
 typed error hierarchy. `ShipmentSubmission` always carries the provider's order
 reference and declares whether documents and tracking are available immediately
 or will arrive asynchronously. A synchronous provider may include documents and
@@ -156,13 +170,19 @@ tracking in the submission; an asynchronous one returns `state='pending'` and
 completes the shipment through authenticated webhook events. The error hierarchy:
 `ProviderAuthError`, `ProviderValidationError` (never retried),
 `ProviderTransientError` (eligible for bounded retry subject to the operation's
-idempotency policy), `ProviderUnavailableError`. The error type determines
+`OperationSafety` policy), `ProviderUnavailableError`. The error type determines
 retry behaviour and the merchant-facing message; a provider that
 raises the wrong one is a bug the fixture tests must catch.
 
 Optional capabilities are declared by flag, not discovered by exception. A
 provider without pickup points simply reports `supports_pickup_points = False`
 and the checkout picker never appears.
+
+`OperationSafety` is evaluated per mutation, not once per provider. It declares
+native idempotency, an authoritative reconciliation lookup and whether automatic
+retry is permitted. A provider may safely retry outbound creation but not return
+creation; provider-wide `supports_idempotency` or `supports_reconciliation`
+flags must never extend one API operation's guarantee to another.
 
 **Registry.** `delivery.carrier` gains `mb_provider_code`; each addon registers
 its class at import. The base resolves the provider, obtains short-lived
@@ -215,9 +235,10 @@ fields or request-log values.
 **Shared runtime around the provider**
 
 - `CarrierClient` — requests-based transport, per-provider timeout, bounded
-  retry on read-only calls and on mutation calls only when the provider documents
-  an idempotency key. Credential redaction is mandatory before anything reaches
-  the log. An ambiguous mutation timeout is never blindly replayed.
+  retry on read-only calls and on mutation calls only when that exact operation's
+  `OperationSafety` proves native idempotency or authoritative reconciliation.
+  Credential redaction is mandatory before anything reaches the log. An
+  ambiguous mutation timeout is never blindly replayed.
 - Idempotency — label purchase runs as a queued operation after the
   `mb.carrier.shipment` row has committed. The worker locks the row, records
   `submitting`, and sends its stable key as the provider idempotency/client
@@ -286,9 +307,19 @@ creates or selects the immutable delivery partner server-side. Readiness is
 checked again before payment and before label purchase, so a forged, stale or
 closed point cannot be shipped.
 
+Changing `partner_shipping_id` to an immutable pickup partner must not erase the
+shopper recipient. The sale order keeps a company-scoped recipient/contact
+snapshot that is copied to the picking. Providers that accept a service-point ID
+build the recipient from that shopper snapshot and send the revalidated point ID
+separately; the pickup-point business is never used as the recipient name, email
+or phone.
+
 ### 4.2 What stays out of the base
 
-No rate abstraction beyond `list_services`. No carrier-selection engine. No
+No provider-independent rate engine or automatic carrier-selection engine.
+`shipping_options(query)` is the optional contextual availability/quote seam for
+providers such as Sendcloud; native Odoo price rules remain the checkout price
+unless a later product decision explicitly enables live rates. No
 duplicate fulfilment state machine beyond `stock.picking`: the shipment journal
 tracks only the external purchase/document lifecycle. No customs documents
 (CN23) in v1. If only one provider ever needs a thing, it lives in that
@@ -371,9 +402,9 @@ provider's shape.
 | Auth | application access key + secret via HTTP Basic, or bearer token | API key pair | Brand/marque/private key, MD5 signature (v1) or API V2 credentials | Contract number + password | Account number + Chronotrace password |
 | Pickup points | Boxtal map + API | Service Points API | Hosted widget, mandated | `findRDVPointRetraitAcheminement` | `recherchePointChronopost` |
 | Label transport | document-ready webhook, followed by document retrieval | REST JSON | REST/legacy, PDF by URL | MTOM multipart — PDF as a MIME part | SOAP-first |
-| Tracking | Webhook | Webhook | Poll or tracking URL | Poll | Poll |
+| Tracking | Webhook | Webhook plus authenticated Parcel Tracking lookup | Poll or tracking URL | Poll | Poll |
 | Own contract | No | Yes | n/a | n/a | n/a |
-| Manifest | **Unverified API capability; phase 0 gate** | Yes | Yes | Yes | Yes |
+| Manifest | **No official operation; local worksheet only** | No official operation qualified | Yes | Yes | Yes |
 
 Two consequences for the interface. A completed `ShipmentSubmission` or later
 document event yields `ShipmentDocument` objects containing bytes plus a
@@ -567,18 +598,26 @@ Nothing here may make a live provider call in CI.
   types still use `super()`. Cancellation preserves tracking until confirmed.
 - **Checkout journey test** (HTTP, in the style of the 20 existing `mb_webshop`
   tests): choose a relay, confirm the cart, verify the shipping partner is the
-  immutable pickup partner and that switching carrier clears it. Add forged
-  carrier/service/partner input, another session's cart, stale/closed point and
-  route rate-limit cases.
-- **Idempotence and concurrency tests** — a submission that times out after the
-  provider created it, an Odoo transaction rollback, two simultaneous workers,
-  and repeated merchant clicks all result in at most one provider purchase.
-  Providers without safe reconciliation enter `unknown` and never auto-retry.
+  immutable pickup partner while the original shopper/contact snapshot remains
+  the provider recipient, and verify that switching carrier clears both. Add
+  forged carrier/service/partner input, another session's cart, stale/closed
+  point and route rate-limit cases.
+- **Operation-safety and concurrency tests** — each mutation's native
+  idempotency, reconciliation and automatic-retry policy is asserted separately.
+  A safe outbound timeout, Odoo rollback, simultaneous workers and repeated
+  clicks result in at most one purchase. A return API without a documented
+  duplicate guard enters `unknown` after one attempt and never inherits outbound
+  retry safety.
 - **Webhook tests** — HMAC over the exact raw body, constant-time signature
   validation, invalid/unsigned rejection, replay rejection by event id and
   digest, unknown subscription rejection, inbox durability, sub-two-second
   acknowledgement and retry after worker failure. Reconciliation detects a
   disabled or missing subscription.
+- **Tracking lookup tests** — a provider with an authenticated endpoint uses it
+  as a read-only repair path for missed webhooks. Endpoint and webhook statuses
+  share normalization, honor event ordering and cannot regress terminal states.
+  Providers without an endpoint remain webhook-only; public tracking pages are
+  never scraped.
 - **Label classification tests** — outbound labels use
   `_get_delivery_label_prefix()` and never appear as portal return labels;
   return labels use `get_return_label_prefix()` and receive a portal token only
@@ -589,6 +628,10 @@ Nothing here may make a live provider call in CI.
 - **Neutralisation test** — restoring a database clears secret references and
   subscriptions, leaving carriers unable to resolve production credentials or
   buy labels.
+- **Restriction tests** — new shipment/return purchases fail closed, while
+  cancellation, document recovery, reconciliation, tracking lookup and signed
+  webhook processing for existing objects remain available through the
+  server-derived operation-purpose allowlist.
 
 ## 11. Control-plane registration
 
@@ -608,19 +651,30 @@ Proposed keys: `shipping-boxtal`, later `shipping-sendcloud`,
 `shipping-mondialrelay`, `shipping-colissimo`, `shipping-chronopost`. Keyed by
 provider rather than by carrier, because that is what a tenant actually turns on.
 
-Disabling a provider first suspends webhook subscriptions and secret resolution,
-then stops new mutations. It must leave `mb.carrier.shipment` rows, historical
-pickings, attachments, tracking numbers and a materialized tracking URL readable;
-history must not depend on calling methods from an uninstalled provider addon.
+Restriction is an operation policy, not a blanket provider disable. It blocks
+new label purchases, new returns and configuration changes, while retaining an
+allowlisted **existing-object** path for cancellation, document recovery,
+reconciliation, authenticated tracking lookup and webhook verification. Secret
+resolution receives a server-derived operation purpose and permits only those
+cleanup/read purposes while restricted; Odoo cannot supply an arbitrary purpose.
+Deleting/revoking credentials is a separate explicit action and warns that it
+ends provider-side cleanup. Restricted providers must leave
+`mb.carrier.shipment` rows, historical pickings, attachments, tracking numbers
+and a materialized tracking URL readable; history must not depend on calling
+methods from an uninstalled provider addon. Do not set a single enabled boolean
+that makes `_mb_provider()` reject every existing-object operation.
 The shared base addon cannot be uninstalled while any provider capability or
 historical shipment depends on it. Capability deactivation tests must cover two
 providers sharing the base and reactivation after one is disabled.
 
 ## 12. Phasing and estimate
 
-Implementation note (16 August 2026): phases 1–4 are present in
+Implementation note (18 August 2026): phases 1–3 and the local handover
+worksheet plus merchant-exception subset of phase 4 are present in
 `mb_webshop_carrier_base`, `mb_webshop_carrier_boxtal` and the MakersBrain
-control plane. V1 deliberately uses one parcel per shipment. The current Boxtal
+control plane. Boxtal currently declares `supports_return_label = False`, and
+multi-parcel shipping is not implemented. V1 deliberately uses one parcel per
+shipment. The current Boxtal
 OpenAPI exposes no official manifest operation, so v1 prints a document headed
 “Local handover worksheet” and “Not a carrier-accepted manifest.” Boxtal also
 does not expose a safe client-reference lookup or documented idempotency key;
@@ -690,6 +744,9 @@ Sources consulted for sections 3, 5, 8 and 9:
 [Boxtal PHP library](https://github.com/boxtal/php-library),
 [Sendcloud pricing](https://www.sendcloud.com/pricing/),
 [Sendcloud decentralized integration](https://www.sendcloud.dev/docs/marketplaces/decentralized-integration/),
+[Sendcloud App Store Odoo integration](https://app-store.sendcloud.com/odoo),
+[Odoo 19 Sendcloud documentation](https://www.odoo.com/documentation/19.0/applications/inventory_and_mrp/inventory/shipping_receiving/setup_configuration/sendcloud_shipping.html),
+[OCA Sendcloud connector 18.0](https://github.com/OCA/delivery-carrier/tree/18.0/delivery_sendcloud_oca),
 [Mondial Relay FAQ pro](https://www.mondialrelay.fr/faq-pro/votre-compte/ou-trouver-mes-parametres-code-enseigne-code-marque-cle-privee-pour-configurer-mon-module/),
 [Colissimo contrats](https://www.colissimo.entreprise.laposte.fr/fr/page-contrats),
 [Colissimo Web Service d'Affranchissement](https://www.colissimo.entreprise.laposte.fr/sites/default/files/2021-12/DT_Flexibilite_Expedition_Web-Service-Affranchissement_202112_FR.pdf),

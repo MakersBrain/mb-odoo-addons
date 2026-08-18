@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_carrier_structured_address" model="ir.ui.view">
+        <field name="name">res.partner.form.carrier.structured.address</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='street']" position="after">
+                <group string="Structured carrier address"
+                       invisible="is_company or mb_pickup_ref">
+                    <field name="mb_street_name" placeholder="Street name without house number"/>
+                    <field name="mb_house_number"/>
+                    <field name="mb_house_number_addition"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

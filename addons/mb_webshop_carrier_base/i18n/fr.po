@@ -141,6 +141,11 @@ msgid "Cancel"
 msgstr "Annuler"
 
 #. module: mb_webshop_carrier_base
+#: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__cancelling
+msgid "Cancellation pending at provider"
+msgstr "Annulation en attente chez le prestataire"
+
+#. module: mb_webshop_carrier_base
 #: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_shipment__state__cancel_pending
 msgid "Cancellation queued"
 msgstr "Annulation en file d'attente"
@@ -163,6 +168,15 @@ msgstr "Transporteur"
 #: code:addons/mb_webshop_carrier_base/models/stock_picking.py:0
 msgid "Carrier cancellation queued."
 msgstr "Annulation du transporteur en file d'attente."
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid ""
+"Carrier configuration cannot be changed while its capability is restricted."
+msgstr ""
+"La configuration du transporteur ne peut pas être modifiée lorsque sa "
+"capacité est restreinte."
 
 #. module: mb_webshop_carrier_base
 #. odoo-python
@@ -433,6 +447,18 @@ msgid "Handover signature: ____________________________________"
 msgstr "Signature de remise : ____________________________________"
 
 #. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_partner__mb_house_number
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_users__mb_house_number
+msgid "House number"
+msgstr "Numéro de voie"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_partner__mb_house_number_addition
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_users__mb_house_number_addition
+msgid "House number addition"
+msgstr "Complément de numéro de voie"
+
+#. module: mb_webshop_carrier_base
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_request_log__http_status
 msgid "Http Status"
 msgstr "Statut HTTP"
@@ -558,9 +584,26 @@ msgid "MakersBrain: purge transient carrier data"
 msgstr "MakersBrain : purger les données des transporteurs transitoires"
 
 #. module: mb_webshop_carrier_base
+#: model:ir.actions.server,name:mb_webshop_carrier_base.ir_cron_carrier_provider_state_ir_actions_server
+msgid "MakersBrain: reconcile carrier tracking and cancellations"
+msgstr "MakersBrain : rapprocher le suivi et les annulations du transporteur"
+
+#. module: mb_webshop_carrier_base
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_credential_state
 msgid "Mb Credential State"
 msgstr "État des informations d'identification Mo"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_sale_order__mb_delivery_recipient_partner_id
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_stock_picking__mb_delivery_recipient_partner_id
+msgid "Mb Delivery Recipient Partner"
+msgstr "Contact destinataire de la livraison"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_sale_order__mb_delivery_recipient_snapshot
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_stock_picking__mb_delivery_recipient_snapshot
+msgid "Mb Delivery Recipient Snapshot"
+msgstr "Instantané du destinataire de la livraison"
 
 #. module: mb_webshop_carrier_base
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_label_format
@@ -599,6 +642,11 @@ msgstr "Code du fournisseur Mo"
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_provider_enabled
 msgid "Mb Provider Enabled"
 msgstr "Fournisseur Mb activé"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_provider_restricted
+msgid "Mb Provider Restricted"
+msgstr "Prestataire restreint"
 
 #. module: mb_webshop_carrier_base
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_secret_ref
@@ -775,15 +823,41 @@ msgid "Provider Shipments"
 msgstr "Expéditions des fournisseurs"
 
 #. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__provider_tracking_code
+msgid "Provider Tracking Code"
+msgstr "Code de suivi du prestataire"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__provider_tracking_message
+msgid "Provider Tracking Message"
+msgstr "Message de suivi du prestataire"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__provider_tracking_status
+msgid "Provider Tracking Status"
+msgstr "Statut de suivi du prestataire"
+
+#. module: mb_webshop_carrier_base
 #. odoo-python
 #: code:addons/mb_webshop_carrier_base/models/shipment.py:0
 msgid "Provider cancellation confirmed."
 msgstr "Annulation du fournisseur confirmée."
 
 #. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Provider cancellation was requested and is pending confirmation."
+msgstr "L’annulation a été demandée au prestataire et attend sa confirmation."
+
+#. module: mb_webshop_carrier_base
 #: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.report_local_handover
 msgid "Provider reference"
 msgstr "Référence du fournisseur"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_provider_return_service_code
+msgid "Provider return service code"
+msgstr "Code du service de retour du prestataire"
 
 #. module: mb_webshop_carrier_base
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_delivery_carrier__mb_provider_service_code
@@ -829,6 +903,11 @@ msgstr "Destinataire"
 #: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
 msgid "Reconcile"
 msgstr "Réconcilier"
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_mb_carrier_shipment_form
+msgid "Refresh tracking"
+msgstr "Actualiser le suivi"
 
 #. module: mb_webshop_carrier_base
 #: model:ir.model.fields.selection,name:mb_webshop_carrier_base.selection__mb_carrier_webhook_event__state__retry
@@ -896,9 +975,50 @@ msgid "State"
 msgstr "Statut"
 
 #. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__status_category
+msgid "Status Category"
+msgstr "Catégorie de statut"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__status_code
+msgid "Status Code"
+msgstr "Code de statut"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__status_message
+msgid "Status Message"
+msgstr "Message de statut"
+
+#. module: mb_webshop_carrier_base
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_pickup_point__street
 msgid "Street"
 msgstr "Rue"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_partner__mb_street_name
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_res_users__mb_street_name
+msgid "Street name"
+msgstr "Nom de la voie"
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_partner_form_carrier_structured_address
+msgid "Street name without house number"
+msgstr "Nom de la voie sans numéro"
+
+#. module: mb_webshop_carrier_base
+#: model_terms:ir.ui.view,arch_db:mb_webshop_carrier_base.view_partner_form_carrier_structured_address
+msgid "Structured carrier address"
+msgstr "Adresse structurée pour le transporteur"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,help:mb_webshop_carrier_base.field_res_partner__mb_street_name
+#: model:ir.model.fields,help:mb_webshop_carrier_base.field_res_users__mb_street_name
+msgid ""
+"Structured street name used by carriers that require a separate house "
+"number."
+msgstr ""
+"Nom de voie structuré utilisé par les transporteurs qui exigent un numéro "
+"séparé."
 
 #. module: mb_webshop_carrier_base
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__submitted_at
@@ -1036,6 +1156,12 @@ msgstr "Ce fournisseur ne peut pas concilier automatiquement un achat ambigu."
 
 #. module: mb_webshop_carrier_base
 #. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "This provider has no authenticated tracking lookup."
+msgstr "Ce prestataire ne propose pas de consultation authentifiée du suivi."
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
 #: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
 msgid "This shipping provider does not support return labels."
 msgstr "Ce transporteur ne prend pas en charge les étiquettes de retour."
@@ -1045,6 +1171,18 @@ msgstr "Ce transporteur ne prend pas en charge les étiquettes de retour."
 #: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
 msgid "This shipping provider is disabled."
 msgstr "Ce fournisseur d'expédition est désactivé."
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "This shipping provider is restricted for new purchases."
+msgstr "Ce prestataire d’expédition est restreint pour les nouveaux achats."
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/delivery_carrier.py:0
+msgid "This shipping provider is restricted for new returns."
+msgstr "Ce prestataire d’expédition est restreint pour les nouveaux retours."
 
 #. module: mb_webshop_carrier_base
 #. odoo-python
@@ -1065,6 +1203,26 @@ msgid "Tracking"
 msgstr "Suivi"
 
 #. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__tracking_event_at
+msgid "Tracking Event At"
+msgstr "Date de l’événement de suivi"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__tracking_last_checked_at
+msgid "Tracking Last Checked At"
+msgstr "Dernière vérification du suivi"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__tracking_last_error
+msgid "Tracking Last Error"
+msgstr "Dernière erreur de suivi"
+
+#. module: mb_webshop_carrier_base
+#: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__tracking_next_check_at
+msgid "Tracking Next Check At"
+msgstr "Prochaine vérification du suivi"
+
+#. module: mb_webshop_carrier_base
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_shipment__tracking_number
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__tracking_number
 msgid "Tracking Number"
@@ -1075,6 +1233,12 @@ msgstr "Numéro de suivi"
 #: model:ir.model.fields,field_description:mb_webshop_carrier_base.field_mb_carrier_webhook_event__tracking_url
 msgid "Tracking Url"
 msgstr "URL de suivi"
+
+#. module: mb_webshop_carrier_base
+#. odoo-python
+#: code:addons/mb_webshop_carrier_base/models/shipment.py:0
+msgid "Tracking was refreshed recently. Wait one minute before trying again."
+msgstr "Le suivi a été actualisé récemment. Attendez une minute avant de réessayer."
 
 #. module: mb_webshop_carrier_base
 #. odoo-python

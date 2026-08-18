@@ -12,6 +12,7 @@ import requests
 
 from odoo.addons.mb_webshop_carrier_base.provider import (
     CredentialStatus,
+    OperationSafety,
     PickupPoint,
     ProviderAuthError,
     ProviderTransientError,
@@ -40,10 +41,16 @@ class BoxtalProvider:
     supports_own_contract = False
     supports_manifest = False
     supports_return_label = False
+    supports_tracking_lookup = False
+    supports_contextual_options = False
     # The current OpenAPI has neither an idempotency header nor lookup by
     # Shipment.externalId. An ambiguous POST must therefore remain unknown.
     supports_idempotency = False
     supports_reconciliation = False
+
+    @staticmethod
+    def operation_safety(operation):
+        return OperationSafety()
 
     def __init__(self, credentials, production=False, carrier=None, session=None):
         self.credentials = credentials

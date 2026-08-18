@@ -5,7 +5,7 @@ import time
 
 from odoo import _, api, fields, models
 
-from ..provider import ProviderError, ProviderWebhookEvent
+from ..provider import ProviderError, ProviderWebhookEvent, TrackingSnapshot
 
 
 class CarrierWebhookEvent(models.Model):
@@ -24,6 +24,9 @@ class CarrierWebhookEvent(models.Model):
     tracking_url = fields.Char()
     document_ref = fields.Char(groups="base.group_system")
     occurred_at = fields.Char()
+    status_code = fields.Char()
+    status_category = fields.Char()
+    status_message = fields.Char()
     state = fields.Selection([
         ("received", "Received"), ("processing", "Processing"),
         ("done", "Done"), ("retry", "Retry"), ("failed", "Failed"),
@@ -52,6 +55,9 @@ class CarrierWebhookEvent(models.Model):
             "tracking_url": event.tracking_url or False,
             "document_ref": event.document_ref or False,
             "occurred_at": event.occurred_at or False,
+            "status_code": event.status_code or False,
+            "status_category": event.status_category or False,
+            "status_message": (event.status_message or "")[:512] or False,
         }
         # Avoid raising/logging an expected uniqueness error for normal webhook
         # retries. The normalized inbox has no create hooks or computed fields.
@@ -60,12 +66,14 @@ class CarrierWebhookEvent(models.Model):
             INSERT INTO mb_carrier_webhook_event (
                 company_id, carrier_id, provider_code, subscription_id,
                 event_key, provider_ref, kind, tracking_number, tracking_url,
-                document_ref, occurred_at, state, attempts, next_attempt_at,
+                document_ref, occurred_at, status_code, status_category,
+                status_message, state, attempts, next_attempt_at,
                 create_uid, create_date, write_uid, write_date
             ) VALUES (
                 %(company_id)s, %(carrier_id)s, %(provider_code)s, %(subscription_id)s,
                 %(event_key)s, %(provider_ref)s, %(kind)s, %(tracking_number)s,
-                %(tracking_url)s, %(document_ref)s, %(occurred_at)s, 'received', 0,
+                %(tracking_url)s, %(document_ref)s, %(occurred_at)s,
+                %(status_code)s, %(status_category)s, %(status_message)s, 'received', 0,
                 %(now)s, %(uid)s, %(now)s, %(uid)s, %(now)s
             ) ON CONFLICT (carrier_id, subscription_id, event_key) DO NOTHING
             RETURNING id
@@ -90,13 +98,18 @@ class CarrierWebhookEvent(models.Model):
             tracking_url=self.tracking_url or "",
             document_ref=self.document_ref or "",
             occurred_at=self.occurred_at or "",
+            status_code=self.status_code or "",
+            status_category=self.status_category or "",
+            status_message=self.status_message or "",
         )
 
     def _process_one(self):
         self.ensure_one()
         shipment = self.env["mb.carrier.shipment"].sudo().search([
             ("carrier_id", "=", self.carrier_id.id),
+            "|",
             ("provider_ref", "=", self.provider_ref),
+            ("tracking_number", "=", self.tracking_number),
         ], limit=1)
         if not shipment:
             attempts = self.attempts + 1
@@ -112,7 +125,9 @@ class CarrierWebhookEvent(models.Model):
         started = time.monotonic()
         try:
             if self.kind == "document":
-                document = self.carrier_id._mb_provider().fetch_webhook_document(
+                document = self.carrier_id._mb_provider(
+                    purpose="document_recovery"
+                ).fetch_webhook_document(
                     self._provider_event()
                 )
                 shipment._store_document(document)
@@ -126,12 +141,24 @@ class CarrierWebhookEvent(models.Model):
                     body=_("The carrier label document is ready.")
                 )
             else:
-                shipment.write({
-                    "tracking_number": self.tracking_number or shipment.tracking_number,
-                    "tracking_url": self.tracking_url or shipment.tracking_url,
-                    "last_event_at": fields.Datetime.now(),
-                })
-                shipment._sync_tracking_to_picking()
+                try:
+                    occurred_at = (
+                        fields.Datetime.to_datetime(
+                            self.occurred_at.replace("Z", "+00:00")
+                        ).replace(tzinfo=None)
+                        if self.occurred_at else None
+                    )
+                except (TypeError, ValueError):
+                    occurred_at = None
+                shipment._apply_tracking_snapshot(TrackingSnapshot(
+                    status_code=self.status_code or "webhook_update",
+                    category=self.status_category or "unknown",
+                    message=self.status_message or "",
+                    tracking_number=self.tracking_number or shipment.tracking_number or "",
+                    tracking_url=self.tracking_url or shipment.tracking_url or "",
+                    event_at=occurred_at,
+                ))
+                shipment.last_event_at = fields.Datetime.now()
             self.write({
                 "state": "done", "processed_at": fields.Datetime.now(),
                 "document_ref": False, "last_error": False,

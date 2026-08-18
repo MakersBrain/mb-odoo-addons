@@ -1,7 +1,7 @@
 import hashlib
 import re
 
-from odoo import http
+from odoo import fields, http
 from odoo.http import request
 
 from ..provider import ProviderError, ProviderValidationError, provider_class
@@ -40,8 +40,15 @@ class CarrierWebhookController(http.Controller):
         if not carrier:
             return request.make_json_response({"error": "not found"}, status=404)
         try:
-            credentials = carrier._mb_resolve_credentials(timeout=(0.35, 0.9))
-            webhook_secret = credentials.get("webhook_secret", "")
+            credentials = carrier._mb_resolve_credentials(
+                timeout=(0.35, 0.9), purpose="webhook_verification"
+            )
+            webhook_secret = (
+                credentials.get("webhook_signature_key")
+                or credentials.get("webhook_secret")
+                or credentials.get("private_key")
+                or ""
+            )
             if not isinstance(webhook_secret, str) or len(webhook_secret) < 24:
                 raise ProviderValidationError("webhook secret unavailable")
             provider = provider_class(provider_code)(
@@ -69,4 +76,9 @@ class CarrierWebhookController(http.Controller):
         if len(event_key) > 128:
             event_key = hashlib.sha256(event_key.encode()).hexdigest()
         request.env["mb.carrier.webhook.event"].sudo().receive(carrier, event, event_key)
+        if provider_code == "sendcloud" and "mb_sendcloud_webhook_ready" in carrier._fields:
+            carrier.sudo().write({
+                "mb_sendcloud_webhook_ready": True,
+                "mb_sendcloud_last_webhook_at": fields.Datetime.now(),
+            })
         return request.make_json_response({"accepted": True}, status=202)
