@@ -106,10 +106,11 @@ test: ## Install MODULES on a fresh disposable database and run their tests
 check: lint i18n-check brand-check ## Everything CI runs that needs no container
 	python3 tools/check_addons.py
 
-# The design system is `@makersbrain/brand`, a dependency of control-plane/web.
-# It used to live here as brand/ and be copied into its consumers; there is
-# nothing left to copy, and the only hand-maintained mirror is the Odoo SCSS,
-# which cannot read CSS custom properties at compile time.
+# The design system is `@makersbrain/brand`, pinned by this repository's own
+# development-only package.json so the check needs no sibling checkout. It used
+# to live here as brand/ and be copied into its consumers; there is nothing left
+# to copy, and the only hand-maintained mirror is the Odoo SCSS, which cannot
+# read CSS custom properties at compile time. Run `npm install` once first.
 brand-check: ## Fail if the Odoo SCSS mirror has fallen behind the brand package
 	python3 tools/check_brand_scss.py
 

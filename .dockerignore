@@ -14,5 +14,3 @@
 **/.svelte-kit
 **/build
 
-control-plane/deploy/.env
-control-plane/deploy/secrets

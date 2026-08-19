@@ -1,0 +1,8 @@
+{
+  "name": "mb-odoo-addons-devtools",
+  "private": true,
+  "description": "Development-only manifest. Its single purpose is to pin the published @makersbrain/brand version that tools/check_brand_scss.py validates addons/mb_brand's SCSS mirror against. Nothing here ships in the Odoo image.",
+  "devDependencies": {
+    "@makersbrain/brand": "0.1.0"
+  }
+}
