@@ -58,6 +58,12 @@ $o-color-palettes: (
     // Keep Odoo's complete second base palette. This file is prepended before
     // html_editor defines its defaults; omitting base-2 makes Website's later
     // map-merge receive null and breaks broad frontend asset compilation.
+    //
+    // These are Odoo's stock values and must stay stock: base-2 is the palette a
+    // user picks to get *away* from ours, so rebranding it would defeat the
+    // choice, and Website reads these exact literals. tools/check_brand_scss.py
+    // would otherwise flag them as brand tokens that have gone stale.
+    // brand-check: upstream-start
     'base-2': (
         'o-color-1': #337ab7,
         'o-color-2': #e9ecef,
@@ -65,6 +71,7 @@ $o-color-palettes: (
         'o-color-4': #ffffff,
         'o-color-5': #343a40,
     ),
+    // brand-check: upstream-end
 );
 
 // Odoo builds `.btn-primary` from its own map rather than from Bootstrap's

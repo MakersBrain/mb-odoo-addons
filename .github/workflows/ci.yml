@@ -27,8 +27,14 @@ jobs:
   static:
     name: Static checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with: {node-version: "22", cache: "npm", cache-dependency-path: "package-lock.json"}
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
@@ -42,6 +48,22 @@ jobs:
 
       - name: Manifests, data paths, assets, XML, access rules, dependency graph
         run: python3 tools/check_addons.py
+
+      # The Odoo SCSS mirror is maintained by hand because SCSS cannot read the
+      # brand package's CSS custom properties at compile time, so nothing but
+      # this check notices when a token moves underneath it. It only ever ran
+      # from the Makefile before the split, which is why it was able to drift
+      # unnoticed. @makersbrain/brand is internal to the organisation, so the
+      # workflow's own token can read it.
+      - name: Authenticate to GitHub Packages
+        run: npm config set --location=user //npm.pkg.github.com/:_authToken "$GITHUB_TOKEN"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: npm ci
+
+      - name: Odoo SCSS mirror matches the brand package
+        run: python3 tools/check_brand_scss.py
 
       # Catalogue completeness and safety, plus the source scanner that catches
       # user-facing text extraction cannot see because it is not wrapped in

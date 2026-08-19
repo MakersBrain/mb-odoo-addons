@@ -55,12 +55,52 @@ def resolve(subpath: str) -> pathlib.Path:
     return pathlib.Path(out)
 
 
+# Not every colour in the mirror is ours to control. Odoo's `base-2` palette is
+# copied in verbatim so Website's map-merge has something to read, and it has to
+# keep Odoo's stock values -- it is the palette a user picks to get away from our
+# branding. Regions between these markers are skipped.
+UPSTREAM_START = re.compile(r"//\s*brand-check:\s*upstream-start\b")
+UPSTREAM_END = re.compile(r"//\s*brand-check:\s*upstream-end\b")
+
+
+def brand_lines(text: str):
+    """Yield (line_number, line) for lines that should mirror brand tokens."""
+    depth = 0
+    opened_at = 0
+    for number, line in enumerate(text.splitlines(), 1):
+        if UPSTREAM_START.search(line):
+            if depth == 0:
+                opened_at = number
+            depth += 1
+            continue
+        if UPSTREAM_END.search(line):
+            if depth == 0:
+                raise ValueError(
+                    f"line {number}: `brand-check: upstream-end` without a matching start"
+                )
+            depth -= 1
+            continue
+        if depth == 0:
+            yield number, line
+    if depth:
+        # An unclosed region would silently exempt the rest of the file.
+        raise ValueError(
+            f"line {opened_at}: `brand-check: upstream-start` is never closed"
+        )
+
+
 def main() -> int:
     tokens = resolve("tokens.css")
     palette = {m.lower() for m in HEX.findall(tokens.read_text())}
 
+    try:
+        candidates = list(brand_lines(SCSS.read_text()))
+    except ValueError as error:
+        print(f"{SCSS.relative_to(ROOT)}: {error}", file=sys.stderr)
+        return 1
+
     stale = []
-    for number, line in enumerate(SCSS.read_text().splitlines(), 1):
+    for number, line in candidates:
         code = line.split("//", 1)[0]
         for value in HEX.findall(code):
             if value.lower() not in palette:
@@ -76,13 +116,19 @@ def main() -> int:
         for number, value, text in stale:
             print(f"  line {number}: {value}\n    {text}", file=sys.stderr)
         print(
-            "\nA token changed upstream and was never carried into the Odoo "
-            "bundle. Update the SCSS by hand -- SCSS cannot read the tokens.",
+            "\nEither a token changed upstream and was never carried into the "
+            "Odoo bundle -- update the SCSS by hand, since SCSS cannot read the "
+            "tokens -- or this colour is deliberately Odoo's rather than ours, "
+            "in which case wrap it in `// brand-check: upstream-start` and "
+            "`// brand-check: upstream-end` and say why.",
             file=sys.stderr,
         )
         return 1
 
-    print(f"{len(palette)} palette values; every colour in the Odoo mirror is current")
+    print(
+        f"{len(palette)} palette values; every brand colour in the Odoo mirror "
+        f"is current ({len(candidates)} lines checked)"
+    )
     return 0
 
 
