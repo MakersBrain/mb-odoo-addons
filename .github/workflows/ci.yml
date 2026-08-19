@@ -123,32 +123,19 @@ jobs:
       - name: Translation catalogues and source marking
         run: python3 tools/check_i18n.py --all --summary
 
-      # gettext's own opinion, which is narrower than the checker above but
-      # independent of it: a malformed header or a format string gettext cannot
-      # parse fails here even if our parser accepted it.
-      - name: gettext validation
-        run: |
-          # msgfmt is NOT on the ubuntu-latest image -- checked, it is absent --
-          # so this install is a real dependency rather than the waste it looked
-          # like. It costs roughly 178s, nearly all of it `apt-get update`.
-          # That is tolerable because this repository is public and its runner
-          # minutes are free; if it ever moves back to private, replace this
-          # with a cached toolchain rather than dropping the check.
-          #
-          # `-o Acquire::Languages=none` skips the translation indexes, which
-          # are pure overhead for one package.
-          if ! command -v msgfmt >/dev/null 2>&1; then
-            sudo apt-get update -qq -o Acquire::Languages=none
-            sudo apt-get install -y -qq --no-install-recommends gettext
-          fi
-          status=0
-          for f in addons/*/i18n/fr.po; do
-            msgfmt --check-header --check-format -o /dev/null "$f" || status=1
-          done
-          for f in addons/*/i18n/*.pot; do
-            msgfmt --check-format -o /dev/null "$f" || status=1
-          done
-          exit $status
+      # A second opinion on the catalogues, from an implementation that does
+      # not share our parser's assumptions. This was `msgfmt --check-header
+      # --check-format`, which meant installing gettext every run: 178s of a
+      # 197s job while the repository was private, and once it went public the
+      # apt-get hung outright -- two runs cancelled at 18 and 29 minutes. polib
+      # is already here for the step above, so the independent check now costs
+      # nothing and cannot hang.
+      #
+      # msgfmt's --check-format is not missed: Odoo's exporter omits the
+      # `#, python-format` flags gettext needs, which is why check_i18n.py above
+      # is the strict placeholder check and always was.
+      - name: Catalogues parse and their headers are well formed
+        run: python3 tools/check_po_parse.py
 
   install:
     name: Clean install
