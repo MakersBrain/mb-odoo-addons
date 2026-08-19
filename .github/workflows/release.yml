@@ -1,0 +1,165 @@
+name: Odoo release
+
+# Publishes one signed, digest-addressed Odoo runtime image and the release
+# metadata that describes it. This repository does not compose a platform
+# release and does not touch any environment: MakersBrain/mb-infra consumes this
+# image by digest and owns staging qualification and production promotion.
+#
+# Migration plan section 4.1. The nine requirements map to the steps below:
+# the pinned base and the pinned OCA dependency live in deploy/Odoo.Dockerfile;
+# the addons are copied there too; the full CI suite is the `ci` job this one
+# depends on; SBOM, vulnerability report and the critical-severity gate are the
+# `record` steps; signing is keyless cosign with this workflow's OIDC identity;
+# and release metadata comes from tools/release_metadata.py.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build, scan and verify without publishing or signing
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: odoo-release
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ${{ vars.OCI_REGISTRY }}
+  REPOSITORY_PREFIX: ${{ vars.OCI_REPOSITORY_PREFIX }}
+  IMAGE_NAME: mb-odoo
+
+jobs:
+  # Publication is gated on the same suite that guards main. A release cannot
+  # be cut from a tree that has not passed static checks, a clean install, an
+  # in-place upgrade, the i18n gate and the server/browser tests.
+  ci:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+      packages: read
+
+  build:
+    needs: ci
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write   # keyless cosign signing
+      packages: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+      - uses: anchore/sbom-action/download-syft@e22c389904149dbc22b58101806040fa8d37a610 # v0
+      - uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6 # v1
+      - uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0
+
+      - name: Validate release inputs
+        run: |
+          set -eu
+          test -n "$REGISTRY"
+          test -n "$REPOSITORY_PREFIX"
+          # The metadata generator refuses a tag, but fail early and loudly here
+          # rather than after a ten-minute build.
+          grep -q '^FROM odoo:[0-9]\+@sha256:[0-9a-f]\{64\}' deploy/Odoo.Dockerfile
+          python3 tools/bridge_contract.py --check
+
+      - name: Authenticate to the controlled registry
+        run: printf '%s' "$GITHUB_TOKEN" | docker login "$REGISTRY" --username "$GITHUB_ACTOR" --password-stdin
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Build and push
+        id: build
+        run: |
+          set -euo pipefail
+          image="$REGISTRY/$REPOSITORY_PREFIX/$IMAGE_NAME"
+          push=true
+          [ "${{ inputs.dry_run }}" = "true" ] && push=false
+
+          docker buildx build \
+            --platform linux/amd64 \
+            --file deploy/Odoo.Dockerfile \
+            --build-arg "SOURCE_COMMIT=$GITHUB_SHA" \
+            --build-arg "SOURCE_REF=$GITHUB_REF_NAME" \
+            --tag "$image:$GITHUB_SHA" \
+            --metadata-file metadata.json \
+            --output "type=image,push=$push" \
+            .
+
+          # Take the digest buildx reports rather than re-deriving it: it is the
+          # digest that was actually pushed, and it stays correct if the build
+          # ever becomes multi-platform.
+          digest=$(jq -r '."containerimage.digest"' metadata.json)
+          test -n "$digest" && test "$digest" != "null"
+          echo "image=$image@$digest" >> "$GITHUB_OUTPUT"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+
+      - name: SBOM, vulnerability report and severity gate
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          image='${{ steps.build.outputs.image }}'
+          syft "$image" -o "spdx-json=release/mb-odoo.spdx.json"
+          trivy image --ignore-unfixed --format json --output release/mb-odoo.vulnerability.json "$image"
+          # Publication is refused while a fixable critical finding stands.
+          trivy image --ignore-unfixed --exit-code 1 --severity CRITICAL "$image"
+
+      - name: Sign the image
+        if: ${{ !inputs.dry_run }}
+        run: cosign sign --yes '${{ steps.build.outputs.image }}'
+
+      - name: Release metadata
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          python3 tools/release_metadata.py \
+            --image '${{ steps.build.outputs.image }}' \
+            --output release/release-metadata.json
+          cp contracts/mb_control_v1.json release/
+          cat release/release-metadata.json
+
+      - name: Publish release metadata as an OCI artifact
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          artifact="$REGISTRY/$REPOSITORY_PREFIX/$IMAGE_NAME-release:${GITHUB_SHA}"
+          oras push "$artifact" \
+            --artifact-type application/vnd.makersbrain.odoo-release.v1+json \
+            release/release-metadata.json:application/json \
+            release/mb_control_v1.json:application/json \
+            release/mb-odoo.spdx.json:application/spdx+json \
+            release/mb-odoo.vulnerability.json:application/json
+          # The metadata is not signed separately. Its digest is recorded here
+          # and bound by mb-infra's composed release record, which is the single
+          # provenance anchor (migration plan section 2.6).
+          printf '%s@%s\n' "$artifact" "$(oras resolve "$artifact")" | tee release/artifact-reference.txt
+
+      - name: Summary
+        if: ${{ !inputs.dry_run }}
+        run: |
+          {
+            echo "### Odoo release"
+            echo
+            echo "| field | value |"
+            echo "| --- | --- |"
+            echo "| image | \`${{ steps.build.outputs.image }}\` |"
+            echo "| commit | \`$GITHUB_SHA\` |"
+            echo "| metadata artifact | \`$(cat release/artifact-reference.txt)\` |"
+            echo
+            echo "Consume this digest from \`mb-infra\`. Do not deploy the tag."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: ${{ !inputs.dry_run }}
+        with:
+          name: odoo-release-${{ github.sha }}
+          path: release/
+          retention-days: 90

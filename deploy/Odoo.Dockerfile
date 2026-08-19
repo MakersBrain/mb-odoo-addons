@@ -15,3 +15,18 @@ RUN --mount=type=cache,id=odoo-apt-lists,target=/var/lib/apt/lists,sharing=locke
 COPY --chown=odoo:odoo addons /mnt/makersbrain-addons
 COPY --chown=odoo:odoo --from=oca /server-auth/auth_oidc /mnt/oca-addons/auth_oidc
 USER odoo
+
+# `org.opencontainers.image.source` is what links the published package to this
+# repository on GHCR. Without it an organisation-owned package stays unlinked and
+# the repository's own GITHUB_TOKEN is refused even read access on it, which is
+# how the previous release pipeline came to be unable to push its own images.
+# The remaining labels are the provenance the migration plan requires be carried
+# in standard OCI annotations rather than only in release metadata.
+ARG SOURCE_COMMIT=""
+ARG SOURCE_REF=""
+LABEL org.opencontainers.image.source="https://github.com/MakersBrain/mb-odoo-addons" \
+      org.opencontainers.image.revision="${SOURCE_COMMIT}" \
+      org.opencontainers.image.version="${SOURCE_REF}" \
+      org.opencontainers.image.title="mb-odoo" \
+      org.opencontainers.image.description="Odoo 19 Community with the MakersBrain artisan-workshop addons" \
+      org.opencontainers.image.licenses="LGPL-3.0-only"
