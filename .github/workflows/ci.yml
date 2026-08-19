@@ -128,12 +128,18 @@ jobs:
       # parse fails here even if our parser accepted it.
       - name: gettext validation
         run: |
-          # ubuntu-latest ships gettext. Installing it cost 178s of a 197s job,
-          # almost all of it `apt-get update` fetching indexes for a binary that
-          # was already on the runner, so only reach for apt if it is missing.
-          command -v msgfmt >/dev/null 2>&1 || {
-            sudo apt-get update -qq && sudo apt-get install -y -qq gettext
-          }
+          # No apt here. Installing gettext cost 178s of a 197s job, essentially
+          # all of it `apt-get update` fetching indexes for a binary the
+          # ubuntu-latest image already ships -- and when it was made
+          # conditional the step hung for 18 minutes instead, so this lane is
+          # not going to depend on the package manager at all.
+          #
+          # If msgfmt ever goes missing from the runner image that is a real
+          # regression, so fail loudly rather than skipping a gate in silence.
+          if ! command -v msgfmt >/dev/null 2>&1; then
+            echo "::error::msgfmt is not on the runner. ubuntu-latest used to ship gettext; if that changed, install it in a separate step rather than inline here." >&2
+            exit 1
+          fi
           status=0
           for f in addons/*/i18n/fr.po; do
             msgfmt --check-header --check-format -o /dev/null "$f" || status=1
