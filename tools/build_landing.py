@@ -29,7 +29,7 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-WEB = ROOT / "control-plane" / "web"
+BRAND_ROOT = ROOT
 LANDING = ROOT / "landing"
 
 LATIN = (
@@ -62,12 +62,12 @@ def resolve(subpath: str) -> pathlib.Path:
     try:
         out = subprocess.run(
             ["node", "-e", script],
-            cwd=WEB, check=True, capture_output=True, text=True,
+            cwd=BRAND_ROOT, check=True, capture_output=True, text=True,
         ).stdout
     except subprocess.CalledProcessError:
         sys.exit(
             f"cannot resolve @makersbrain/brand/{subpath}.\n"
-            f"Run `npm install` in {WEB.relative_to(ROOT)} first."
+            f"Run `npm install` in {BRAND_ROOT} first."
         )
     return pathlib.Path(out)
 

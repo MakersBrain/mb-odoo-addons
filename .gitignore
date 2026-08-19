@@ -10,8 +10,6 @@
 backups/
 *.dump
 *.sql
-!control-plane/migrations/
-!control-plane/migrations/*.sql
 *.tar.gz
 
 # Vendored OCA repositories. Upstream code, pinned and reproducible from
@@ -44,3 +42,8 @@ build/imports/
 .vscode/
 *.swp
 .DS_Store
+
+# Development-only npm tree. package.json here exists solely to pin the
+# published @makersbrain/brand version the SCSS mirror and the landing build
+# check against; nothing from it ships in the Odoo image.
+node_modules/

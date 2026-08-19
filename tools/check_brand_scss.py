@@ -32,7 +32,7 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-WEB = ROOT / "control-plane" / "web"
+BRAND_ROOT = ROOT
 SCSS = ROOT / "addons/mb_brand/static/src/scss/primary_variables.scss"
 
 HEX = re.compile(r"#[0-9a-fA-F]{6}")
@@ -43,12 +43,12 @@ def resolve(subpath: str) -> pathlib.Path:
     try:
         out = subprocess.run(
             ["node", "-e", script],
-            cwd=WEB, check=True, capture_output=True, text=True,
+            cwd=BRAND_ROOT, check=True, capture_output=True, text=True,
         ).stdout
     except (subprocess.CalledProcessError, FileNotFoundError):
         print(
             f"cannot resolve @makersbrain/brand/{subpath}; "
-            f"run `npm install` in {WEB.relative_to(ROOT)}. Skipping.",
+            f"run `npm install` in {BRAND_ROOT}. Skipping.",
             file=sys.stderr,
         )
         raise SystemExit(0) from None
