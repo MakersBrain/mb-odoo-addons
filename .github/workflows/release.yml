@@ -7,8 +7,9 @@ name: Odoo release
 #
 # Migration plan section 4.1. The nine requirements map to the steps below:
 # the pinned base and the pinned OCA dependency live in deploy/Odoo.Dockerfile;
-# the addons are copied there too; the full CI suite is the `ci` job this one
-# depends on; SBOM, vulnerability report and the critical-severity gate are the
+# the addons are copied there too; the full CI suite is verified to have passed
+# for this commit by the `verify-ci` job; SBOM, vulnerability report and the
+# critical-severity gate are the
 # `record` steps; signing is keyless cosign with this workflow's OIDC identity;
 # and release metadata comes from tools/release_metadata.py.
 
@@ -34,17 +35,30 @@ env:
   IMAGE_NAME: mb-odoo
 
 jobs:
-  # Publication is gated on the same suite that guards main. A release cannot
-  # be cut from a tree that has not passed static checks, a clean install, an
-  # in-place upgrade, the i18n gate and the server/browser tests.
-  ci:
-    uses: ./.github/workflows/ci.yml
-    permissions:
-      contents: read
-      packages: read
+  # Publication is gated on the same suite that guards main, but by *verifying*
+  # the run that already happened for this commit rather than running it again.
+  # Re-running cost a second full suite (~22 runner minutes) to re-prove what
+  # main had already proven, and CI is a required status check on main, so a
+  # commit cannot be there without it.
+  verify-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: The CI suite passed for this exact commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          conclusion=$(gh api \
+            "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&status=completed" \
+            --jq '[.workflow_runs[] | select(.name == "CI")] | first | .conclusion // "none"')
+          echo "CI conclusion for $GITHUB_SHA: $conclusion"
+          if [ "$conclusion" != "success" ]; then
+            echo "::error::No successful CI run for $GITHUB_SHA (found: $conclusion). Refusing to publish." >&2
+            exit 1
+          fi
 
   build:
-    needs: ci
+    needs: verify-ci
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: release
