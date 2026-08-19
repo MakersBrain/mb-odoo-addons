@@ -1,0 +1,244 @@
+{
+  "contract": "mb_control",
+  "version": "v1",
+  "prefix": "/mb_control/v1",
+  "description": "Private control-plane bridge served by this repository's addons. Surface only: request and response schemas are not yet part of this contract. See tools/bridge_contract.py.",
+  "provider_addons": {
+    "mb_control_bridge": "19.0.1.14.0",
+    "mb_email_bridge": "19.0.1.1.0",
+    "mb_inventory_capture": "19.0.1.1.0",
+    "mb_invoice_capture": "19.0.1.5.3"
+  },
+  "duplicate_paths": [],
+  "endpoint_count": 19,
+  "endpoints": [
+    {
+      "path": "/mb_control/v1/carriers",
+      "methods": [
+        "GET"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::carrier_targets"
+    },
+    {
+      "path": "/mb_control/v1/carriers/bind-secret",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::bind_carrier_secret"
+    },
+    {
+      "path": "/mb_control/v1/carriers/unbind-secret",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::unbind_carrier_secret"
+    },
+    {
+      "path": "/mb_control/v1/entitlements/apply",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::apply_entitlement"
+    },
+    {
+      "path": "/mb_control/v1/health",
+      "methods": [
+        "GET"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::health"
+    },
+    {
+      "path": "/mb_control/v1/inventory-captures/<string:capture_uuid>/assets/<string:asset_uuid>",
+      "methods": [
+        "GET"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_inventory_capture",
+      "handler": "addons/mb_inventory_capture/controllers/main.py::asset"
+    },
+    {
+      "path": "/mb_control/v1/inventory-captures/results",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_inventory_capture",
+      "handler": "addons/mb_inventory_capture/controllers/main.py::result"
+    },
+    {
+      "path": "/mb_control/v1/invoices/capture",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_invoice_capture",
+      "handler": "addons/mb_invoice_capture/controllers/main.py::capture"
+    },
+    {
+      "path": "/mb_control/v1/memberships/reconcile",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::reconcile_membership"
+    },
+    {
+      "path": "/mb_control/v1/modules/enable",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::enable_modules"
+    },
+    {
+      "path": "/mb_control/v1/modules/restrict",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::restrict_modules"
+    },
+    {
+      "path": "/mb_control/v1/privacy/erasure-replay",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::replay_erasure"
+    },
+    {
+      "path": "/mb_control/v1/privacy/export",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::export_personal_data"
+    },
+    {
+      "path": "/mb_control/v1/tenant/bootstrap",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::bootstrap_tenant"
+    },
+    {
+      "path": "/mb_control/v1/webshop/domain",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::project_webshop_domain"
+    },
+    {
+      "path": "/mb_control/v1/webshop/smtp/configure",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_email_bridge",
+      "handler": "addons/mb_email_bridge/controllers/main.py::configure"
+    },
+    {
+      "path": "/mb_control/v1/webshop/smtp/reset",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_email_bridge",
+      "handler": "addons/mb_email_bridge/controllers/main.py::reset"
+    },
+    {
+      "path": "/mb_control/v1/webshop/smtp/status",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_email_bridge",
+      "handler": "addons/mb_email_bridge/controllers/main.py::status"
+    },
+    {
+      "path": "/mb_control/v1/webshop/status",
+      "methods": [
+        "POST"
+      ],
+      "auth": "public",
+      "type": "http",
+      "csrf": false,
+      "save_session": false,
+      "addon": "mb_control_bridge",
+      "handler": "addons/mb_control_bridge/controllers/main.py::webshop_status"
+    }
+  ]
+}
