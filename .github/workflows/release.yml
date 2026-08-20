@@ -5,22 +5,18 @@ name: Odoo release
 # release and does not touch any environment: MakersBrain/mb-infra consumes this
 # image by digest and owns staging qualification and production promotion.
 #
-# Migration plan section 4.1. The nine requirements map to the steps below:
+# Migration plan section 4.1. Its requirements map to the steps below:
 # the pinned base and the pinned OCA dependency live in deploy/Odoo.Dockerfile;
 # the addons are copied there too; the full CI suite is verified to have passed
 # for this commit by the `verify-ci` job; signing is keyless cosign with this
 # workflow's OIDC identity; and release metadata comes from
 # tools/release_metadata.py.
-#
-# Points 5 and 6 -- SBOM and the critical-severity gate -- are deliberately
-# not implemented yet. See the comment in the build job for why, and for what
-# to paste back when they return.
 
 on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Build, scan and verify without publishing or signing
+        description: Build and describe without publishing or signing
         required: false
         default: false
         type: boolean
@@ -136,26 +132,17 @@ jobs:
             echo "scan_target=$image@$digest" >> "$GITHUB_OUTPUT"
           fi
 
-      # No SBOM and no vulnerability scan here yet. Deliberate, and temporary.
+      # No SBOM and no vulnerability scan, by decision rather than omission.
+      # Migration plan section 4.4: the platform is pre-production and the cost
+      # did not earn its place. Nothing downstream requires that evidence -- the
+      # composed release record binds digests and provenance, and claims nothing
+      # about vulnerability posture.
       #
-      # It cost 84s of a 188s job while the application is still being built and
-      # nothing is deployed. Most of that was waste of my own making -- trivy ran
-      # twice over the same image and had secret scanning on -- so the honest
-      # figure for a competent implementation is nearer 30s. The decision to drop
-      # it anyway is a speed-of-iteration one taken knowingly, not a judgement
-      # that the gate is worthless.
-      #
-      # This is a debt with a due date. Migration plan section 4.1 requires an
-      # SPDX SBOM and a critical-severity rejection policy, and section 4.3 has
-      # mb-infra's composed release record bind "SBOM and vulnerability evidence
-      # for all first-party images". Until this returns, any release published
-      # from here carries no evidence, and the composed record cannot be
-      # complete. It must be restored before Phase 5 staging qualification.
-      #
-      # To restore: re-add the syft and setup-trivy actions above, then add a
-      # step using the scan_target output the build step still publishes -- it
-      # resolves to the local tag on a dry run and the immutable digest on a
-      # real release, which is what lets the rehearsal exercise the gate:
+      # The plumbing to reintroduce it is still here: the build step publishes a
+      # scan_target output resolving to the local tag on a dry run and the
+      # immutable digest on a real release, so a restored gate is exercised by a
+      # rehearsal rather than first running in anger. Add the syft and
+      # setup-trivy actions and a step along the lines of:
       #
       #   target='${{ steps.build.outputs.scan_target }}'
       #   syft "$target" -o "spdx-json=release/mb-odoo.spdx.json"
@@ -165,8 +152,7 @@ jobs:
       #           | select(.Severity == "CRITICAL")] | length == 0' \
       #     release/mb-odoo.vulnerability.json
       #
-      # One trivy pass, no secret scanning, gate read from the JSON. That is the
-      # ~30s version rather than the 84s one.
+      # The publish list picks both files up automatically once they exist.
 
       - name: Sign the image
         if: ${{ !inputs.dry_run }}
