@@ -177,6 +177,7 @@ jobs:
       - name: Release metadata
         run: |
           set -euo pipefail
+          mkdir -p release
           python3 tools/release_metadata.py \
             --image '${{ steps.build.outputs.image }}' \
             --output release/release-metadata.json
