@@ -89,13 +89,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Build and push
+      - name: Build
         id: build
         run: |
           set -euo pipefail
           image="$REGISTRY/$REPOSITORY_PREFIX/$IMAGE_NAME"
-          push=true
-          [ "${{ inputs.dry_run }}" = "true" ] && push=false
+
+          # A dry run loads the image into the local daemon instead of pushing,
+          # so everything downstream except signing and publishing still runs
+          # against a real image. Scanning a registry reference would be the
+          # obvious thing to do and is exactly what makes a dry run useless: the
+          # reference does not exist until something is pushed.
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            output="type=docker"
+          else
+            output="type=image,push=true"
+          fi
 
           docker buildx build \
             --platform linux/amd64 \
@@ -104,7 +113,7 @@ jobs:
             --build-arg "SOURCE_REF=$GITHUB_REF_NAME" \
             --tag "$image:$GITHUB_SHA" \
             --metadata-file metadata.json \
-            --output "type=image,push=$push" \
+            --output "$output" \
             .
 
           # Take the digest buildx reports rather than re-deriving it: it is the
@@ -115,23 +124,34 @@ jobs:
           echo "image=$image@$digest" >> "$GITHUB_OUTPUT"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
 
+          # What syft and trivy can actually resolve. On a dry run that is the
+          # local tag; on a real release it is the immutable digest.
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "scan_target=$image:$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+          else
+            echo "scan_target=$image@$digest" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Runs on a dry run too. A dry run that skipped the scan would report
+      # success while proving nothing about the gate that is supposed to stop a
+      # bad release.
       - name: SBOM, vulnerability report and severity gate
-        if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
           mkdir -p release
-          image='${{ steps.build.outputs.image }}'
-          syft "$image" -o "spdx-json=release/mb-odoo.spdx.json"
-          trivy image --ignore-unfixed --format json --output release/mb-odoo.vulnerability.json "$image"
+          target='${{ steps.build.outputs.scan_target }}'
+          syft "$target" -o "spdx-json=release/mb-odoo.spdx.json"
+          trivy image --ignore-unfixed --format json --output release/mb-odoo.vulnerability.json "$target"
           # Publication is refused while a fixable critical finding stands.
-          trivy image --ignore-unfixed --exit-code 1 --severity CRITICAL "$image"
+          trivy image --ignore-unfixed --exit-code 1 --severity CRITICAL "$target"
 
       - name: Sign the image
         if: ${{ !inputs.dry_run }}
         run: cosign sign --yes '${{ steps.build.outputs.image }}'
 
+      # Also runs on a dry run: this is the record mb-infra consumes, and a
+      # release is the wrong moment to discover it cannot be generated.
       - name: Release metadata
-        if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
           python3 tools/release_metadata.py \
@@ -157,22 +177,34 @@ jobs:
           printf '%s@%s\n' "$artifact" "$(oras resolve "$artifact")" | tee release/artifact-reference.txt
 
       - name: Summary
-        if: ${{ !inputs.dry_run }}
         run: |
           {
-            echo "### Odoo release"
+            if [ "${{ inputs.dry_run }}" = "true" ]; then
+              echo "### Odoo release rehearsal (dry run)"
+              echo
+              echo "Built, scanned and described. Nothing was signed or published."
+            else
+              echo "### Odoo release"
+            fi
             echo
             echo "| field | value |"
             echo "| --- | --- |"
             echo "| image | \`${{ steps.build.outputs.image }}\` |"
             echo "| commit | \`$GITHUB_SHA\` |"
-            echo "| metadata artifact | \`$(cat release/artifact-reference.txt)\` |"
+            if [ -f release/artifact-reference.txt ]; then
+              echo "| metadata artifact | \`$(cat release/artifact-reference.txt)\` |"
+            fi
+            if [ -f release/release-metadata.json ]; then
+              echo "| addons described | $(jq -r .addon_count release/release-metadata.json) |"
+              echo "| bridge contract | $(jq -r '.bridge_contract.version' release/release-metadata.json), $(jq -r '.bridge_contract.endpoint_count' release/release-metadata.json) endpoints |"
+            fi
             echo
-            echo "Consume this digest from \`mb-infra\`. Do not deploy the tag."
+            if [ "${{ inputs.dry_run }}" != "true" ]; then
+              echo "Consume this digest from \`mb-infra\`. Do not deploy the tag."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: ${{ !inputs.dry_run }}
         with:
           name: odoo-release-${{ github.sha }}
           path: release/
