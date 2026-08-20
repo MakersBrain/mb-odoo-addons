@@ -147,7 +147,12 @@ def main() -> int:
 
     rendered = json.dumps(metadata, indent=2) + "\n"
     if args.output:
-        pathlib.Path(args.output).write_text(rendered, encoding="utf-8")
+        # Create the directory rather than assume a caller made it. It used to be
+        # created by the SBOM step; when that step was deferred the release
+        # failed here after the image had already been pushed and signed.
+        output = pathlib.Path(args.output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(rendered, encoding="utf-8")
         print(f"wrote {args.output} ({len(addons)} addons)")
     else:
         print(rendered, end="")
