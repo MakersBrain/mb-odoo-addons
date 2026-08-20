@@ -175,6 +175,7 @@ jobs:
       # Also runs on a dry run: this is the record mb-infra consumes, and a
       # release is the wrong moment to discover it cannot be generated.
       - name: Release metadata
+        id: metadata
         run: |
           set -euo pipefail
           mkdir -p release
@@ -184,17 +185,40 @@ jobs:
           cp contracts/mb_control_v1.json release/
           cat release/release-metadata.json
 
+          # Assemble the publish list here, in a step a dry run also executes,
+          # rather than inside the push itself. The push is the one step a
+          # rehearsal can never exercise -- it publishes by definition -- so
+          # anything decided in there is only ever tested in anger. A release
+          # already failed that way: the SBOM step was deferred and the push kept
+          # naming its two output files, which no longer existed.
+          required=(release/release-metadata.json release/mb_control_v1.json)
+          optional=(
+            "release/mb-odoo.spdx.json:application/spdx+json"
+            "release/mb-odoo.vulnerability.json:application/json"
+          )
+
+          for file in "${required[@]}"; do
+            test -s "$file" || { echo "::error::$file is missing or empty" >&2; exit 1; }
+          done
+
+          files="release/release-metadata.json:application/json release/mb_control_v1.json:application/json"
+          for entry in "${optional[@]}"; do
+            path="${entry%%:*}"
+            # Present once the SBOM and scan are restored; absent until then.
+            [ -s "$path" ] && files="$files $entry"
+          done
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+          echo "will publish: $files"
+
       - name: Publish release metadata as an OCI artifact
         if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
           artifact="$REGISTRY/$REPOSITORY_PREFIX/$IMAGE_NAME-release:${GITHUB_SHA}"
+          # Deliberately unquoted: the list was validated in the step above.
           oras push "$artifact" \
             --artifact-type application/vnd.makersbrain.odoo-release.v1+json \
-            release/release-metadata.json:application/json \
-            release/mb_control_v1.json:application/json \
-            release/mb-odoo.spdx.json:application/spdx+json \
-            release/mb-odoo.vulnerability.json:application/json
+            ${{ steps.metadata.outputs.files }}
           # The metadata is not signed separately. Its digest is recorded here
           # and bound by mb-infra's composed release record, which is the single
           # provenance anchor (migration plan section 2.6).
