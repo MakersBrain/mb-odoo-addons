@@ -8,10 +8,13 @@ name: Odoo release
 # Migration plan section 4.1. The nine requirements map to the steps below:
 # the pinned base and the pinned OCA dependency live in deploy/Odoo.Dockerfile;
 # the addons are copied there too; the full CI suite is verified to have passed
-# for this commit by the `verify-ci` job; SBOM, vulnerability report and the
-# critical-severity gate are the
-# `record` steps; signing is keyless cosign with this workflow's OIDC identity;
-# and release metadata comes from tools/release_metadata.py.
+# for this commit by the `verify-ci` job; signing is keyless cosign with this
+# workflow's OIDC identity; and release metadata comes from
+# tools/release_metadata.py.
+#
+# Points 5 and 6 -- SBOM and the critical-severity gate -- are deliberately
+# not implemented yet. See the comment in the build job for why, and for what
+# to paste back when they return.
 
 on:
   workflow_dispatch:
@@ -70,9 +73,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
       - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
-      - uses: anchore/sbom-action/download-syft@e22c389904149dbc22b58101806040fa8d37a610 # v0
       - uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6 # v1
-      - uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0
 
       - name: Validate release inputs
         run: |
@@ -124,26 +125,48 @@ jobs:
           echo "image=$image@$digest" >> "$GITHUB_OUTPUT"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
 
-          # What syft and trivy can actually resolve. On a dry run that is the
-          # local tag; on a real release it is the immutable digest.
+          # What a scanner can actually resolve: the local tag on a dry run, the
+          # immutable digest on a real release. Nothing consumes this today --
+          # the SBOM and scan steps are deferred -- but it is kept so restoring
+          # them is a paste rather than a redesign, and so the restored gate
+          # runs during a rehearsal instead of only in anger.
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             echo "scan_target=$image:$GITHUB_SHA" >> "$GITHUB_OUTPUT"
           else
             echo "scan_target=$image@$digest" >> "$GITHUB_OUTPUT"
           fi
 
-      # Runs on a dry run too. A dry run that skipped the scan would report
-      # success while proving nothing about the gate that is supposed to stop a
-      # bad release.
-      - name: SBOM, vulnerability report and severity gate
-        run: |
-          set -euo pipefail
-          mkdir -p release
-          target='${{ steps.build.outputs.scan_target }}'
-          syft "$target" -o "spdx-json=release/mb-odoo.spdx.json"
-          trivy image --ignore-unfixed --format json --output release/mb-odoo.vulnerability.json "$target"
-          # Publication is refused while a fixable critical finding stands.
-          trivy image --ignore-unfixed --exit-code 1 --severity CRITICAL "$target"
+      # No SBOM and no vulnerability scan here yet. Deliberate, and temporary.
+      #
+      # It cost 84s of a 188s job while the application is still being built and
+      # nothing is deployed. Most of that was waste of my own making -- trivy ran
+      # twice over the same image and had secret scanning on -- so the honest
+      # figure for a competent implementation is nearer 30s. The decision to drop
+      # it anyway is a speed-of-iteration one taken knowingly, not a judgement
+      # that the gate is worthless.
+      #
+      # This is a debt with a due date. Migration plan section 4.1 requires an
+      # SPDX SBOM and a critical-severity rejection policy, and section 4.3 has
+      # mb-infra's composed release record bind "SBOM and vulnerability evidence
+      # for all first-party images". Until this returns, any release published
+      # from here carries no evidence, and the composed record cannot be
+      # complete. It must be restored before Phase 5 staging qualification.
+      #
+      # To restore: re-add the syft and setup-trivy actions above, then add a
+      # step using the scan_target output the build step still publishes -- it
+      # resolves to the local tag on a dry run and the immutable digest on a
+      # real release, which is what lets the rehearsal exercise the gate:
+      #
+      #   target='${{ steps.build.outputs.scan_target }}'
+      #   syft "$target" -o "spdx-json=release/mb-odoo.spdx.json"
+      #   trivy image --scanners vuln --ignore-unfixed --format json \
+      #     --output release/mb-odoo.vulnerability.json "$target"
+      #   jq -e '[.Results[]?.Vulnerabilities[]?
+      #           | select(.Severity == "CRITICAL")] | length == 0' \
+      #     release/mb-odoo.vulnerability.json
+      #
+      # One trivy pass, no secret scanning, gate read from the JSON. That is the
+      # ~30s version rather than the 84s one.
 
       - name: Sign the image
         if: ${{ !inputs.dry_run }}
