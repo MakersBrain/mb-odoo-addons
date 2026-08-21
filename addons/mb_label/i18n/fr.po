@@ -261,12 +261,6 @@ msgid "Binding '%s' is not allowed."
 msgstr "La liaison '%s' n'est pas autorisée."
 
 #. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "Binding “%(binding)s” was imported as “%(target)s”."
-msgstr "La liaison “%(binding)s” a été importée comme “%(target)s”."
-
-#. module: mb_label
 #: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__bindings_snapshot
 msgid "Bindings Snapshot"
 msgstr "Instantané des liaisons"
@@ -594,12 +588,6 @@ msgstr "Avance après l'étiquette (points)"
 
 #. module: mb_label
 #. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "Field “%(field)s” was imported as a manual value."
-msgstr "Le champ “%(field)s” a été importé comme valeur manuelle."
-
-#. module: mb_label
-#. odoo-javascript
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Filled"
 msgstr "Rempli"
@@ -680,15 +668,6 @@ msgstr "ID"
 
 #. module: mb_label
 #. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid ""
-"Image %(element)s used an external brand asset; embed it before importing."
-msgstr ""
-"L'image %(element)s utilisait une ressource de marque externe ; intégrez-la "
-"avant l'import."
-
-#. module: mb_label
-#. odoo-javascript
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Image data URL"
 msgstr "URL de données de l'image"
@@ -709,12 +688,6 @@ msgstr "Version immuable de modèle d'étiquette"
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Import JSON"
 msgstr "Importer un JSON"
-
-#. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/label_editor.js:0
-msgid "Imported with %(count)s warning(s): %(warnings)s"
-msgstr "Importé avec %(count)s avertissement(s) : %(warnings)s"
 
 #. module: mb_label
 #. odoo-python
@@ -1510,18 +1483,6 @@ msgid "The image threshold must be between 0 and 255."
 msgstr "Le seuil de l'image doit être compris entre 0 et 255."
 
 #. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "The imported label needs positive dimensions."
-msgstr "L'étiquette importée doit avoir des dimensions positives."
-
-#. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "The label JSON must contain one object."
-msgstr "Le JSON de l'étiquette doit contenir un seul objet."
-
-#. module: mb_label
 #. odoo-python
 #: code:addons/mb_label/models/label_renderer.py:0
 msgid "The label contains an unreadable image."
@@ -1547,9 +1508,27 @@ msgstr "Le document d'étiquette doit comporter une liste d'éléments."
 
 #. module: mb_label
 #. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "The label resolution must be greater than zero."
-msgstr "La résolution de l'étiquette doit être supérieure à zéro."
+#: code:addons/mb_label/static/src/editor/template_file.js:0
+msgid "The label template dimensions and resolution must be positive."
+msgstr "Les dimensions et la résolution du modèle d’étiquette doivent être positives."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/template_file.js:0
+msgid "The label template file has an invalid document."
+msgstr "Le fichier du modèle d’étiquette contient un document non valide."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/template_file.js:0
+msgid "The label template file has no settings."
+msgstr "Le fichier du modèle d’étiquette ne contient aucun paramètre."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "The label template was imported as immutable version 1."
+msgstr "Le modèle d’étiquette a été importé en tant que version 1 immuable."
 
 #. module: mb_label
 #. odoo-javascript
@@ -1580,12 +1559,6 @@ msgid ""
 msgstr ""
 "La table des modèles choisit le protocole, la largeur de tête, les 203/300 "
 "ppp et l'alignement du rouleau au moment de l'impression."
-
-#. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/label_editor.js:0
-msgid "The old JSON label was imported as immutable version 1."
-msgstr "L'ancienne étiquette JSON a été importée comme version immuable 1."
 
 #. module: mb_label
 #. odoo-python
@@ -1674,12 +1647,6 @@ msgid "Unique Lot/Serial Number"
 msgstr "Lot/numéro de série unique"
 
 #. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "Unknown element type “%(type)s” became text."
-msgstr "Le type d'élément inconnu “%(type)s” est devenu du texte."
-
-#. module: mb_label
 #. odoo-python
 #: code:addons/mb_label/models/label_template.py:0
 msgid "Unsupported element background."
@@ -1720,6 +1687,12 @@ msgstr "Filtre de mise en forme d'étiquette non pris en charge : %s"
 #: code:addons/mb_label/models/label_template.py:0
 msgid "Unsupported label setting: %s"
 msgstr "Réglage d'étiquette non pris en charge : %s"
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/template_file.js:0
+msgid "Unsupported label template file schema."
+msgstr "Schéma de fichier de modèle d’étiquette non pris en charge."
 
 #. module: mb_label
 #. odoo-python

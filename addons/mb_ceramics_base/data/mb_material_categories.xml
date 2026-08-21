@@ -7,16 +7,11 @@
 
        Under Goods, because that is what they are.
 
-       These lived in mb_catalogue_sync until 19.0.1.2.0 and in mb_workshop_base
-       until 19.0.2.0.0. They were in the importer on the reasoning that the
-       families came from the catalogue. They did not: a workshop that never
-       imports anything still buys glaze and still owes a lead-and-cadmium
-       migration test on the food-contact ware it makes with it, and
+       A workshop that never imports anything still buys glaze and still owes a
+       lead-and-cadmium migration test on the food-contact ware it makes with it;
        mb_ceramics_compliance's button_mark_done gate needs to know which lots
-       are glaze to enforce it. Leaving the taxonomy in the importer made a
-       compliance check depend on having installed a connector to a catalogue
-       service - so the taxonomy is here, the compliance addon depends on this
-       one, and the importer maps onto it. -->
+       are glaze to enforce it. The taxonomy therefore lives here, the
+       compliance addon depends on this one, and the importer maps onto it. -->
 
   <record id="categ_ceramic_materials" model="product.category">
     <field name="name">Ceramic materials</field>

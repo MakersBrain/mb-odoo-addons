@@ -4,17 +4,8 @@
     "description": """
 What is true of a workshop before anyone says which craft it practises.
 
-Until 19.0.2.0.0 this addon was also the ceramics vertical: food-contact
-compliance, the material and ware taxonomy, `mb_clay_body_id` and the seeded
-throwing and glazing work centres all lived here. They now live in
-`mb_ceramics_base` and `mb_ceramics_compliance`. The reason for the split was
-`mb_label`, `mb_inventory_capture` and `mb_catalogue_sync` - three addons that
-are craft-neutral in mechanism and could not be installed without pulling in a
-ceramic tableware regulation. `mb_label` no longer depends on this addon at all,
-because it never used anything in it.
-
 The test a module has to pass to sit here is that a leatherworker or a joiner
-would install it unchanged. See CRAFT-PLATFORM-PLAN.md section 2.
+would install it unchanged.
 
 **The menu spine and its label are neutral.** Production, Stock & Quality and
 Configuration are the same three questions in any workshop, so they are declared
@@ -49,9 +40,7 @@ appended to the display name, through context keys so nothing else changes.
     "depends": [
         # tracking and stock.lot, which mb_supplier_lot_required constrains.
         "stock",
-        # resource.calendar, for the continuous calendar. Declared rather than
-        # taken from mrp, which this addon no longer needs: the work centres
-        # that used to be here are in mb_ceramics_base now.
+        # resource.calendar, for the continuous calendar.
         "resource",
         # Quotations show their active pricelist price in product selectors.
         "sale",

@@ -10,7 +10,7 @@ class MbProductionLoss(models.Model):
 
     production_id = fields.Many2one(
         "mrp.production", required=True, ondelete="restrict", index=True,
-        domain=[("mb_workflow_kind", "in", ("bisque", "glazing", "finishing"))],
+        domain=[("mb_workflow_kind", "in", ("bisque", "glazing"))],
         check_company=True)
     product_id = fields.Many2one(related="production_id.product_id", store=True)
     quantity = fields.Float(required=True, digits="Product Unit")

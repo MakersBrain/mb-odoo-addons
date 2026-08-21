@@ -20,8 +20,7 @@ USER odoo
 # repository on GHCR. Without it an organisation-owned package stays unlinked and
 # the repository's own GITHUB_TOKEN is refused even read access on it, which is
 # how the previous release pipeline came to be unable to push its own images.
-# The remaining labels are the provenance the migration plan requires be carried
-# in standard OCI annotations rather than only in release metadata.
+# The remaining labels carry image provenance in standard OCI annotations.
 ARG SOURCE_COMMIT=""
 ARG SOURCE_REF=""
 LABEL org.opencontainers.image.source="https://github.com/MakersBrain/mb-odoo-addons" \

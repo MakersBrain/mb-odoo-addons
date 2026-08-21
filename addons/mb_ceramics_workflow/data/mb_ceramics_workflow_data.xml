@@ -12,13 +12,6 @@
             <field name="padding">4</field>
             <field name="company_id" eval="False" />
         </record>
-        <record id="seq_mb_finishing_session" model="ir.sequence">
-            <field name="name">Finishing session</field>
-            <field name="code">mb.finishing.session</field>
-            <field name="prefix">FIN/%(year)s/</field>
-            <field name="padding">4</field>
-            <field name="company_id" eval="False" />
-        </record>
         <record id="seq_mb_blank_lot" model="ir.sequence">
             <field name="name">Ceramics blank lot</field>
             <field name="code">mb.blank.lot</field>

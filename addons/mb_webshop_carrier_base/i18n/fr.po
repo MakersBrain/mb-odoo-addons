@@ -1238,7 +1238,8 @@ msgstr "URL de suivi"
 #. odoo-python
 #: code:addons/mb_webshop_carrier_base/models/shipment.py:0
 msgid "Tracking was refreshed recently. Wait one minute before trying again."
-msgstr "Le suivi a été actualisé récemment. Attendez une minute avant de réessayer."
+msgstr ""
+"Le suivi a été actualisé récemment. Attendez une minute avant de réessayer."
 
 #. module: mb_webshop_carrier_base
 #. odoo-python

@@ -85,14 +85,14 @@ class MbCommercialProfitabilityReport(models.Model):
                 operation.contract_id,
                 operation.planned_start::date AS operation_date,
                 date_trunc('month', operation.planned_start)::date AS month,
-                COALESCE(scenario.sales_revenue_excl_vat, operation.expected_revenue) AS planned_revenue,
+                COALESCE(scenario.sales_revenue_excl_vat, 0) AS planned_revenue,
                 operation.planned_cost,
                 operation.planned_margin,
                 COALESCE(actual.revenue, 0) AS actual_revenue,
                 COALESCE(actual.cost, 0) AS actual_cost,
                 COALESCE(actual.revenue, 0) - COALESCE(actual.cost, 0) AS actual_margin,
                 COALESCE(actual.revenue, 0)
-                    - COALESCE(scenario.sales_revenue_excl_vat, operation.expected_revenue) AS revenue_variance,
+                    - COALESCE(scenario.sales_revenue_excl_vat, 0) AS revenue_variance,
                 COALESCE(actual.cost, 0) - operation.planned_cost AS cost_variance,
                 (COALESCE(actual.revenue, 0) - COALESCE(actual.cost, 0))
                     - operation.planned_margin AS margin_variance

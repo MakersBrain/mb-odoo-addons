@@ -21,8 +21,6 @@ this workshop actually buys from.
         # ware it makes with it, so a compliance gate must not sit behind a
         # connector. See mb_ceramics_base/data/mb_material_categories.xml.
         #
-        # mb_ceramics_base rather than mb_workshop_base since 19.0.2.0.0: the
-        # taxonomy is ceramic and the base is not.
         "mb_ceramics_base",
         "product",
         "purchase",

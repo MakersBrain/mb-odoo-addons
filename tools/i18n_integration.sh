@@ -2,8 +2,7 @@
 # Coordinator integration run for the English/French translation work.
 #
 # One clean database, French loaded before anything is installed, all addons
-# installed together, then the gates from ODOO-I18N-EN-FR-TRANSLATION-PLAN.md
-# under "Runtime and integration validation".
+# installed together, followed by the runtime and catalogue validation gates.
 #
 #   tools/i18n_integration.sh [DB]      default DB: mb_i18n_integration
 #

@@ -42,10 +42,10 @@ entire element—including its background—is omitted. Required elements contin
 to fail visibly instead of producing an incomplete label.
 
 QR elements are kept square and expose a **Quiet zone** setting. `0` fills the
-entire defined square, matching the old editor. Margins of 2–4 modules improve
+entire defined square. Margins of 2–4 modules improve
 scanning when the QR touches dark artwork; 4 modules is the QR standard.
 
-## Editor and old JSON compatibility
+## Editor and JSON files
 
 Label Studio provides the old editor's practical design features in physical
 millimetres: multi-selection and grouping, keyboard nudging, undo/redo,
@@ -63,14 +63,10 @@ printer applies its default stock size; the dependent **Label stock** selector
 offers die-cut, round and continuous presets while **Custom / manual** keeps
 arbitrary dimensions available.
 
-**Import JSON** accepts the old Ateliera/phomymo version-3 format. Old element
-coordinates are printer dots and are converted using `dotsPerMm` (8 when the
-old file omitted it); the stored Odoo document remains in millimetres. Old
-`name`, `price`, `ref`, `batch`, `qr`, manual and composed fields are converted
-to the allowlisted bindings. Unsupported external brand-asset references are
-reported as warnings rather than silently discarded. The import creates a new
-template and immutable version 1. **Export JSON** writes a version-3 file with
-resolution and media metadata so its physical geometry round-trips.
+**Import JSON** accepts the current schema-1 template file and creates a new
+template with immutable version 1. **Export JSON** writes that same format,
+including the current millimetre-based document, resolution, printer target,
+and media settings.
 
 The canonical `qr` value is `<configured URL>#SKU` for a product-only label and
 `<configured URL>#SKU/LOT` for a lot or serial. The URL prefix is configured per

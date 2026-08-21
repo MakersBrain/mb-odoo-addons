@@ -20,7 +20,6 @@ from ..provider import (
     ShipmentDocument,
     ShipmentRequest,
     TrackingSnapshot,
-    operation_safety,
     provider_class,
 )
 
@@ -363,7 +362,7 @@ class CarrierShipment(models.Model):
         # that the supplied key deduplicates purchases. Other adapters remain
         # unknown after the first ambiguous response.
         mutation = "create_return" if self.direction == "return" else "create_shipment"
-        safety = operation_safety(provider, mutation)
+        safety = provider.operation_safety(mutation)
         attempts = 2 if safety.automatic_retry else 1
         for attempt in range(attempts):
             started = time.monotonic()
@@ -435,7 +434,7 @@ class CarrierShipment(models.Model):
             self._post_operation_failure()
             return
         mutation = "cancel_return" if self.direction == "return" else "cancel_shipment"
-        safety = operation_safety(provider, mutation)
+        safety = provider.operation_safety(mutation)
         attempts = 2 if safety.automatic_retry else 1
         for attempt in range(attempts):
             started = time.monotonic()
@@ -521,7 +520,7 @@ class CarrierShipment(models.Model):
             mutation = (
                 "create_return" if shipment.direction == "return" else "create_shipment"
             )
-            if not operation_safety(provider, mutation).reconciliation_lookup:
+            if not provider.operation_safety(mutation).reconciliation_lookup:
                 raise UserError(_("This provider cannot reconcile an ambiguous purchase automatically."))
             started = time.monotonic()
             try:
@@ -545,7 +544,7 @@ class CarrierShipment(models.Model):
             mutation = (
                 "create_return" if shipment.direction == "return" else "create_shipment"
             )
-            if operation_safety(provider_type, mutation).reconciliation_lookup:
+            if provider_type.operation_safety(mutation).reconciliation_lookup:
                 raise UserError(_("Use provider reconciliation for this shipment."))
             shipment.write({
                 "state": "failed",
@@ -738,13 +737,10 @@ class CarrierShipment(models.Model):
 
     @api.model
     def _cron_progress_active(self):
-        # Odoo 19 uses ir_cron_progress_id/cron_id. Keep the legacy key for
-        # compatibility with older installations and explicit test contexts.
         context = self.env.context
         return bool(
             context.get("ir_cron_progress_id")
             or context.get("cron_id")
-            or context.get("ir_cron_id")
         )
 
     @api.model

@@ -435,16 +435,8 @@ def scan_french_source(path: Path, report: Report) -> None:
 
 
 def is_scannable(path: Path) -> bool:
-    """Files whose text can reach a user.
-
-    Migration scripts cannot: they run headless during an upgrade and render no
-    interface. They also legitimately contain French, because they match data
-    that an earlier release of the addon wrote — a route named "Depot-vente:"
-    stays spelled that way in every database that has one, and rewriting the
-    literal to English would make the migration silently match nothing.
-    """
-    parts = path.parts
-    return "migrations" not in parts and "tests" not in parts
+    """Files whose text can reach a user."""
+    return "tests" not in path.parts
 
 
 def scan_module_source(module: Path, allowlist: dict, report: Report) -> None:

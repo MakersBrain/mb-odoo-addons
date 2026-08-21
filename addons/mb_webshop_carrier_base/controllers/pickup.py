@@ -33,17 +33,6 @@ class MakersBrainPickupDelivery(Delivery):
             mb_pickup_rate_identity=_rate_identity()
         )._set_pickup_location(pickup_location_data)
 
-    @http.route(
-        "/mb_carrier/pickup_points",
-        type="jsonrpc",
-        auth="public",
-        website=True,
-    )
-    def mb_carrier_pickup_points(self, zip_code=None):
-        """Compatibility alias; the native Odoo map/list uses the route above."""
-        return self.website_sale_get_pickup_locations(zip_code=zip_code)
-
-
 class MakersBrainPickupAddressGuard(WebsiteSale):
 
     def _prepare_address_update(self, *args, **kwargs):

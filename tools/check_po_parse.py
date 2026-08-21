@@ -11,16 +11,9 @@ catalogue with a different implementation and checks the header is well formed,
 so a file that our own parser happens to accept because of a shared assumption
 still has to satisfy something that does not share it.
 
-It used to be `msgfmt --check-header --check-format`, which meant installing
-gettext on every run. That cost 178s of a 197s job while the repository was
-private, and once it became public the `apt-get` began hanging outright -- runs
-were cancelled at 18 and 29 minutes. polib is already installed in this lane for
-`check_i18n.py`, so the independent opinion now costs nothing and cannot hang.
-
-What was lost with msgfmt is `--check-format`. That is acceptable precisely
-because it was the weaker of the two format checks: Odoo's exporter omits the
-flags gettext relies on, so `check_i18n.py` is what actually catches a
-`%(product)s` going missing in translation, and it still does.
+Odoo's exporter omits the flags gettext relies on for placeholder validation,
+so `check_i18n.py` owns that check while this independent polib pass validates
+catalogue syntax and headers.
 """
 
 from __future__ import annotations

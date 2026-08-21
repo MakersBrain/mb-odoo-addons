@@ -3,10 +3,6 @@ access_mb_throwing_session_user,mb.throwing.session.user,model_mb_throwing_sessi
 access_mb_throwing_session_manager,mb.throwing.session.manager,model_mb_throwing_session,mrp.group_mrp_manager,1,1,1,1
 access_mb_throwing_session_line_user,mb.throwing.session.line.user,model_mb_throwing_session_line,mrp.group_mrp_user,1,1,1,0
 access_mb_throwing_session_line_manager,mb.throwing.session.line.manager,model_mb_throwing_session_line,mrp.group_mrp_manager,1,1,1,1
-access_mb_finishing_session_user,mb.finishing.session.user,model_mb_finishing_session,mrp.group_mrp_user,1,1,1,0
-access_mb_finishing_session_manager,mb.finishing.session.manager,model_mb_finishing_session,mrp.group_mrp_manager,1,1,1,1
-access_mb_finishing_session_line_user,mb.finishing.session.line.user,model_mb_finishing_session_line,mrp.group_mrp_user,1,1,1,0
-access_mb_finishing_session_line_manager,mb.finishing.session.line.manager,model_mb_finishing_session_line,mrp.group_mrp_manager,1,1,1,1
 access_mb_board_content_user,mb.board.content.user,model_mb_board_content,mrp.group_mrp_user,1,1,1,0
 access_mb_board_content_manager,mb.board.content.manager,model_mb_board_content,mrp.group_mrp_manager,1,1,1,1
 access_mb_production_loss_user,mb.production.loss.user,model_mb_production_loss,mrp.group_mrp_user,1,0,1,0

@@ -151,34 +151,6 @@ class TestCeramicsWorkflow(TransactionCase):
             "firing_hours": 1,
             "cooling_hours": 1,
         })
-        cls.finish_bom = cls.env["mrp.bom"].create({
-            "product_tmpl_id": cls.article.product_tmpl_id.id,
-            "product_qty": 1,
-            "allow_operation_dependencies": True,
-            "bom_line_ids": [Command.create({
-                "product_id": cls.blank.id,
-                "product_qty": 1,
-            })],
-        })
-        cls.decorate_op = cls._operation(
-            "Decorate", cls.env.ref("mb_ceramics_base.mb_workcenter_decorating")
-        )
-        cls.dry_op = cls._operation(
-            "Dry", cls.env.ref("mb_ceramics_base.mb_workcenter_drying"), cls.decorate_op
-        )
-        cls.bisque_op = cls._operation(
-            "Bisque firing", cls.kiln.workcenter_id, cls.dry_op, cls.bisque_program
-        )
-        cls.glaze_op = cls._operation(
-            "Glaze", cls.env.ref("mb_ceramics_base.mb_workcenter_glazing"), cls.bisque_op
-        )
-        cls.glaze_fire_op = cls._operation(
-            "Glaze firing", cls.kiln.workcenter_id, cls.glaze_op, cls.glaze_program
-        )
-        cls.inspect_op = cls._operation(
-            "Inspect", cls.env.ref("mb_ceramics_base.mb_workcenter_decorating"),
-            cls.glaze_fire_op,
-        )
         cls.bisque_bom = cls.env["mrp.bom"].create({
             "product_tmpl_id": cls.bisque_product.product_tmpl_id.id,
             "product_qty": 1,
@@ -256,7 +228,7 @@ class TestCeramicsWorkflow(TransactionCase):
     def _operation(cls, name, workcenter, previous=False, program=False, bom=False):
         values = {
             "name": name,
-            "bom_id": (bom or cls.finish_bom).id,
+            "bom_id": bom.id,
             "workcenter_id": workcenter.id,
             "time_cycle_manual": 10,
         }
@@ -281,22 +253,6 @@ class TestCeramicsWorkflow(TransactionCase):
         })
         session.action_confirm()
         return session
-
-    def _start_finishing(self, blank_lot, quantity=4):
-        session = self.env["mb.finishing.session"].create({
-            "board_id": self.board.id,
-            "source_location_id": self.damp.id,
-            "finished_location_id": self.finished.id,
-            "line_ids": [Command.create({
-                "blank_product_id": self.blank.id,
-                "blank_lot_id": blank_lot.id,
-                "quantity": quantity,
-                "finished_product_id": self.article.id,
-                "bom_id": self.finish_bom.id,
-            })],
-        })
-        session.action_start()
-        return session, session.production_ids
 
     def _start_bisque(self, blank_lot, quantity=4):
         session = self.env["mb.bisque.session"].create({
@@ -369,117 +325,6 @@ class TestCeramicsWorkflow(TransactionCase):
         self.assertEqual(workorder.state, "done")
         return firing
 
-    def test_full_workflow_preserves_quantity_and_traceability(self):
-        throwing = self._throw(10)
-        blank_lot = throwing.line_ids.blank_lot_id
-        self.assertEqual(throwing.production_ids.state, "done")
-        self.assertEqual(
-            self.env["stock.quant"]._get_available_quantity(
-                self.blank, self.damp, lot_id=blank_lot, strict=True
-            ),
-            10,
-        )
-
-        finishing, production = self._start_finishing(blank_lot, 4)
-        self.assertEqual(finishing.state, "progress")
-        self.assertEqual(
-            self.env["stock.quant"]._get_available_quantity(
-                self.blank, self.damp, lot_id=blank_lot, strict=True
-            ),
-            6,
-        )
-        self.assertEqual(self.board.mb_current_board_content_ids.quantity, 4)
-
-        self._finish_until(production, self.bisque_op)
-        bisque = self._fire_board(production, self.bisque_op, self.bisque_program)
-        self._finish_until(production, self.glaze_fire_op)
-        glaze = self._fire_board(production, self.glaze_fire_op, self.glaze_program)
-
-        wizard = self.env["mb.inspection"].create({
-            "production_id": production.id,
-            "accepted_quantity": 2,
-            "second_quantity": 1,
-            "loss_quantity": 1,
-            "seconds_location_id": self.seconds.id,
-            "loss_operation_id": production.workorder_ids.filtered(
-                lambda order: order.operation_id == self.glaze_fire_op
-            ).id,
-            "loss_reason": "Cracked during cooling",
-        })
-        wizard.action_confirm()
-        self.assertEqual(production.state, "done")
-        self.assertTrue(production.mb_inspected)
-        self.assertEqual(finishing.state, "done")
-        self.assertFalse(self.board.mb_current_board_content_ids)
-        self.assertEqual(sum(production.move_finished_ids.filtered(
-            lambda move: move.product_id == self.article
-        ).mapped("quantity")), 2)
-        self.assertEqual(sum(production.move_finished_ids.filtered(
-            lambda move: move.product_id == self.second
-        ).mapped("quantity")), 1)
-        self.assertEqual(production.mb_loss_ids.quantity, 1)
-        self.assertEqual(production.mb_loss_ids.firing_id, glaze)
-        self.assertEqual(
-            set(production.workorder_ids.mapped("mb_firing_id").ids),
-            {bisque.id, glaze.id},
-        )
-        final_lines = production.move_finished_ids.move_line_ids.filtered(
-            lambda line: line.product_id in (self.article | self.second)
-        )
-        self.assertTrue(final_lines.mapped("consume_line_ids").filtered(
-            lambda line: line.lot_id == blank_lot
-        ))
-        output_lots = final_lines.lot_id
-        self.assertEqual(len(output_lots.filtered(
-            lambda lot: lot.product_id == self.article
-        )), 2)
-        self.assertEqual(len(output_lots.filtered(
-            lambda lot: lot.product_id == self.second
-        )), 1)
-        expected_productions = throwing.production_ids | production
-        for lot in output_lots | self.clay_lot:
-            self.assertEqual(lot.mb_production_ids, expected_productions)
-            self.assertEqual(set(lot.mb_firing_ids.ids), {bisque.id, glaze.id})
-            self.assertIn(blank_lot, lot.mb_related_lot_ids | lot)
-            self.assertIn(self.clay_lot, lot.mb_related_lot_ids | lot)
-
-    def test_unavailable_blank_lot_is_rejected(self):
-        throwing = self._throw(2)
-        with self.assertRaises(UserError):
-            self._start_finishing(throwing.line_ids.blank_lot_id, 3)
-
-    def test_board_quantity_can_split_to_a_backorder(self):
-        throwing = self._throw(4)
-        _session, production = self._start_finishing(
-            throwing.line_ids.blank_lot_id, 4
-        )
-        first_content = production.mb_board_content_ids
-        first_content.quantity = 2
-        second_board = self.env["stock.package"].create({
-            "name": "BOARD-02",
-            "package_type_id": self.board_type.id,
-            "company_id": self.env.company.id,
-        })
-        deferred_content = self.env["mb.board.content"].create({
-            "board_id": second_board.id,
-            "production_id": production.id,
-            "quantity": 2,
-            "current_workorder_id": first_content.current_workorder_id.id,
-        })
-        deferred = deferred_content.action_split_for_later()
-        self.assertNotEqual(deferred, production)
-        self.assertEqual(production.product_qty, 2)
-        self.assertEqual(deferred.product_qty, 2)
-        self.assertEqual(deferred_content.production_id, deferred)
-        self.assertEqual(deferred.mb_workflow_kind, "finishing")
-        self.assertEqual(deferred.mb_finishing_session_id, production.mb_finishing_session_id)
-        self.assertEqual(sum(production.mb_board_content_ids.filtered(
-            lambda content: content.state == "current"
-        ).mapped("quantity")), 2)
-        self.assertEqual(sum(deferred.mb_board_content_ids.filtered(
-            lambda content: content.state == "current"
-        ).mapped("quantity")), 2)
-
     def test_bisque_board_split_retains_workflow_session(self):
         throwing = self._throw(4)
         session, production = self._start_bisque(
@@ -505,10 +350,10 @@ class TestCeramicsWorkflow(TransactionCase):
 
     def test_firing_rejects_wrong_program(self):
         throwing = self._throw(2)
-        _session, production = self._start_finishing(
+        _session, production = self._start_bisque(
             throwing.line_ids.blank_lot_id, 2
         )
-        workorder = self._finish_until(production, self.bisque_op)
+        workorder = self._finish_until(production, self.bisque_only_fire_op)
         wrong = self.env["mb.firing"].create({
             "kiln_id": self.kiln.id,
             "program_id": self.glaze_program.id,
@@ -520,11 +365,11 @@ class TestCeramicsWorkflow(TransactionCase):
 
     def test_loss_records_are_immutable(self):
         production = self.env["mrp.production"].create({
-            "product_id": self.article.id,
+            "product_id": self.bisque_product.id,
             "product_qty": 1,
-            "product_uom_id": self.article.uom_id.id,
-            "bom_id": self.finish_bom.id,
-            "mb_workflow_kind": "finishing",
+            "product_uom_id": self.bisque_product.uom_id.id,
+            "bom_id": self.bisque_bom.id,
+            "mb_workflow_kind": "bisque",
         })
         loss = self.env["mb.production.loss"].create({
             "production_id": production.id,
@@ -537,46 +382,53 @@ class TestCeramicsWorkflow(TransactionCase):
             loss.unlink()
 
     def test_food_contact_release_requires_tested_glaze_lot(self):
-        glaze_product = self._product("Food-contact clear glaze", tracking="lot")
-        glaze_product.categ_id = self.env.ref("mb_ceramics_base.categ_glaze")
-        glaze_lot = self.env["stock.lot"].create({
-            "name": "GLAZE-TEST-01",
-            "product_id": glaze_product.id,
-            "company_id": self.env.company.id,
-        })
-        self.env["stock.quant"]._update_available_quantity(
-            glaze_product, self.damp, 10, lot_id=glaze_lot
-        )
-        self.finish_bom.bom_line_ids = [Command.create({
-            "product_id": glaze_product.id,
-            "product_qty": 0.1,
-        })]
         self.article.product_tmpl_id.mb_food_contact = True
-        throwing = self._throw(2)
-        _finishing, production = self._start_finishing(
-            throwing.line_ids.blank_lot_id, 2
+        _bisque_session, _bisque_mo, bisque_lot, _firing, _action = (
+            self._produce_bisque(quantity=2)
         )
-        self._finish_until(production, self.bisque_op)
-        self._fire_board(production, self.bisque_op, self.bisque_program)
-        self._finish_until(production, self.glaze_fire_op)
-        self._fire_board(production, self.glaze_fire_op, self.glaze_program)
+        glazing = self.env["mb.glazing.session"].create({
+            "board_id": self.board.id,
+            "source_location_id": self.bisque_stock.id,
+            "material_location_id": self.stock.id,
+            "finished_location_id": self.finished.id,
+            "line_ids": [Command.create({
+                "bisque_product_id": self.bisque_product.id,
+                "bisque_lot_id": bisque_lot.id,
+                "quantity": 2,
+                "finished_product_id": self.article.id,
+                "bom_id": self.glazing_bom.id,
+                "allocation_ids": [Command.create({
+                    "product_id": self.glaze.id,
+                    "lot_id": self.glaze_lot_a.id,
+                    "quantity": 1,
+                    "uom_id": self.glaze.uom_id.id,
+                })],
+            })],
+        })
+        glazing.action_start()
+        production = glazing.production_ids
+        self._finish_until(production, self.glazing_fire_op)
+        self._fire_board(production, self.glazing_fire_op, self.glaze_program)
         values = {
             "production_id": production.id,
             "accepted_quantity": 2,
             "loss_operation_id": production.workorder_ids.filtered(
-                lambda order: order.operation_id == self.inspect_op
+                lambda order: order.operation_id == self.glazing_inspect_op
             ).id,
         }
         with self.env.cr.savepoint(), self.assertRaises(UserError):
             self.env["mb.inspection"].create(values).action_confirm()
         self.env["mb.migration.test"].create({
-            "lot_id": glaze_lot.id,
+            "lot_id": self.glaze_lot_a.id,
             "migration_limit_class": "cat2",
             "passed": True,
         })
         self.env["mb.inspection"].create(values).action_confirm()
         self.assertEqual(production.state, "done")
-        self.assertEqual(production.lot_producing_ids.mb_glaze_lot_ids, glaze_lot)
+        self.assertEqual(
+            production.lot_producing_ids.mb_glaze_lot_ids,
+            self.glaze_lot_a,
+        )
 
     def test_bisque_stock_boundary_and_wip_label(self):
         throwing = self._throw(10)
@@ -884,14 +736,14 @@ class TestCeramicsWorkflow(TransactionCase):
         attachment = self.env["ir.attachment"].create({
             "name": "firing-sheet.pdf",
             "res_model": "mrp.bom",
-            "res_id": self.finish_bom.id,
+            "res_id": self.glazing_bom.id,
             "raw": b"firing sheet",
         })
         production = self.env["mrp.production"].create({
             "product_id": self.article.id,
             "product_qty": 1,
             "product_uom_id": self.article.uom_id.id,
-            "bom_id": self.finish_bom.id,
+            "bom_id": self.glazing_bom.id,
         })
         production.action_confirm()
         for workorder in production.workorder_ids:

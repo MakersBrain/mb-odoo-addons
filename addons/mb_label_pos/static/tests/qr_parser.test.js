@@ -1,24 +1,18 @@
 import { expect, test } from "@odoo/hoot";
 import {
-    buildAliasIndex, parsePrefixedQr, reconcileOnlineResolution, resolveLocalQr,
+    buildAliasIndex, matchesLabelPrefix, reconcileOnlineResolution, resolveLocalQr,
     validateDraftAvailability,
 } from "@mb_label_pos/qr_parser";
 
 const prefix = "https://instagram.com/username";
 
-test("parses product and lot fragments with URL decoding", () => {
-    expect(parsePrefixedQr(`${prefix}#MUG-001`, [prefix])).toEqual({
-        matched: true, status: "parsed", sku: "MUG-001", lotName: false,
-    });
-    expect(parsePrefixedQr(`${prefix}#MUG-001/PIECE%202026`, [prefix])).toEqual({
-        matched: true, status: "parsed", sku: "MUG-001", lotName: "PIECE 2026",
-    });
+test("recognizes configured label prefixes without interpreting the payload", () => {
+    expect(matchesLabelPrefix(`${prefix}#MUG-001`, [prefix])).toBe(true);
+    expect(matchesLabelPrefix(`${prefix}#MUG-001/PIECE%202026`, [prefix])).toBe(true);
 });
 
 test("does not consume ordinary native barcodes", () => {
-    expect(parsePrefixedQr("3760123456789", [prefix])).toEqual({
-        matched: false, status: "no_match",
-    });
+    expect(matchesLabelPrefix("3760123456789", [prefix])).toBe(false);
 });
 
 test("exact active and retired aliases are authoritative offline", () => {
@@ -36,9 +30,10 @@ test("normalized alias index provides constant-time exact lookup", () => {
     expect(result.productId).toBe(7);
 });
 
-test("compatibility parsing detects duplicate SKUs", () => {
-    const products = [{ id: 1, default_code: "DUP" }, { id: 2, default_code: "DUP" }];
-    expect(resolveLocalQr(`${prefix}#DUP`, { products, prefixes: [prefix] }).status).toBe("ambiguous");
+test("an uncached current label requires authoritative online lookup", () => {
+    expect(resolveLocalQr(`${prefix}#MUG-002`, { prefixes: [prefix] })).toEqual({
+        matched: true, status: "online_lookup", source: "uncached",
+    });
 });
 
 test("offline uses the cached alias while reconnection applies authoritative retirement", () => {
@@ -47,8 +42,8 @@ test("offline uses the cached alias while reconnection applies authoritative ret
     };
     expect(reconcileOnlineResolution(local, { status: "offline" })).toEqual(local);
     expect(reconcileOnlineResolution(local, { status: "retired" }).status).toBe("retired");
-    const compatibility = { ...local, source: "compatibility-local", status: "online_lookup" };
-    expect(reconcileOnlineResolution(compatibility, { status: "offline" }).status)
+    const uncached = { ...local, source: "uncached", status: "online_lookup" };
+    expect(reconcileOnlineResolution(uncached, { status: "offline" }).status)
         .toBe("offline_lookup_required");
 });
 

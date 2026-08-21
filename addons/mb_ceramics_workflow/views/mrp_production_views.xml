@@ -11,7 +11,7 @@
                         invisible="state not in ('confirmed', 'cancel')" />
                 <button name="action_mb_inspect" type="object" string="Unload and inspect"
                         class="oe_highlight"
-                        invisible="mb_workflow_kind not in ('glazing', 'finishing') or state in ('done', 'cancel')" />
+                        invisible="mb_workflow_kind != 'glazing' or state in ('done', 'cancel')" />
                 <button name="action_mb_inspect_bisque" type="object" string="Inspect bisque"
                         class="oe_highlight"
                         invisible="mb_workflow_kind != 'bisque' or state in ('done', 'cancel')" />
@@ -30,7 +30,6 @@
                     <group>
                         <field name="mb_workflow_kind" />
                         <field name="mb_throwing_session_id" />
-                        <field name="mb_finishing_session_id" />
                         <field name="mb_bisque_session_id" />
                         <field name="mb_glazing_session_id" />
                         <field name="mb_inspected" />

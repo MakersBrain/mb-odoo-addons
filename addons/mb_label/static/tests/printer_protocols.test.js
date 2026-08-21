@@ -10,8 +10,8 @@ import {
     allDevices, detectDevice, resolveDevice,
 } from "@mb_label/printer/ateliera_phomemo/devices";
 import { buildNiimbotD110Job, niimbotPacket } from "@mb_label/printer/niimbot_adapter";
-import { exportLegacyTemplate, importLegacyTemplate } from "@mb_label/editor/legacy_template";
 import { shouldClearWorkspaceSelection } from "@mb_label/editor/selection";
+import { parseTemplateFile, serializeTemplateFile } from "@mb_label/editor/template_file";
 import {
     applyPrinterProfile, matchingMediaId, printerProfile, printerProfileId,
 } from "@mb_label/editor/printer_presets";
@@ -179,41 +179,7 @@ test("NIIMBOT D110 job contains page geometry, every row, and print end", () => 
     expect(packets.at(-1)[2]).toBe(0xf3);
 });
 
-test("old version-3 JSON converts printer dots, fields, styles, groups, and media", () => {
-    const imported = importLegacyTemplate({
-        name: "Old cup", version: 3, dotsPerMm: 8, target: "m110",
-        labelSize: { width: 40, height: 30, round: true },
-        fields: [
-            { key: "name", source: "auto", binding: "core.product.title" },
-            { key: "note", source: "manual" },
-        ],
-        elements: [
-            {
-                id: "title", type: "text", x: 8, y: 16, width: 160, height: 32,
-                text: "{{name}} – {{note}}", fontSize: 16, fontFamily: "Georgia, serif",
-                fontStyle: "italic", textDecoration: "underline", groupId: "g1", required: false,
-            },
-            {
-                id: "shape", type: "shape", shapeType: "ellipse", x: 0, y: 0,
-                width: 80, height: 80, fill: "dither-medium",
-            },
-        ],
-    }, "fallback");
-    expect(imported.name).toBe("Old cup");
-    expect(imported.settings.width_mm).toBe(40);
-    expect(imported.settings.dpi).toBe(203);
-    expect(imported.settings.round_media).toBe(true);
-    expect(imported.document.elements[0]).toMatchObject({
-        x: 1, y: 2, width: 20, height: 4,
-        text: "{{product.name}} – {{manual.note}}", font_size: 2,
-        font: "serif", italic: true, underline: true, group_id: "g1", required: false,
-    });
-    expect(imported.document.elements[1]).toMatchObject({
-        type: "ellipse", width: 10, height: 10, filled: true, tint: "50",
-    });
-});
-
-test("Odoo label JSON exports as version 3 and round-trips physical geometry", () => {
+test("current label template files round-trip physical geometry and settings", () => {
     const template = {
         name: "Cup", width_mm: 40, height_mm: 30, dpi: 203,
         printer_target: "system", round_media: false, continuous_media: true,
@@ -222,22 +188,25 @@ test("Odoo label JSON exports as version 3 and round-trips physical geometry", (
         id: "qr", type: "qr", x: 2, y: 3, width: 12, height: 12,
         data: "{{qr}}", rotation: 15, quiet_zone: 2,
     }] };
-    const exported = exportLegacyTemplate(template, document);
-    expect(exported).toMatchObject({ version: 3, widthMm: 40, heightMm: 30, continuous: true });
-    const back = importLegacyTemplate(exported, "Cup");
+    const exported = serializeTemplateFile(template, document);
+    expect(exported).toMatchObject({
+        schema: 1,
+        settings: { width_mm: 40, height_mm: 30, dpi: 203, continuous_media: true },
+    });
+    const back = parseTemplateFile(exported, "Cup");
     expect(Math.abs(back.document.elements[0].x - 2)).toBeLessThan(0.0001);
     expect(Math.abs(back.document.elements[0].width - 12)).toBeLessThan(0.0001);
     expect(back.document.elements[0].data).toBe("{{qr}}");
     expect(back.document.elements[0].quiet_zone).toBe(2);
 });
 
-test("optional element state survives old JSON export and import", () => {
+test("optional element state survives current JSON export and import", () => {
     const template = { name: "Optional lot", width_mm: 40, height_mm: 30, dpi: 203 };
     const document = { schema: 1, elements: [{
         id: "lot", type: "text", x: 1, y: 1, width: 20, height: 5,
         text: "{{lot.name}}", required: false,
     }] };
-    const exported = exportLegacyTemplate(template, document);
-    expect(exported.elements[0].required).toBe(false);
-    expect(importLegacyTemplate(exported).document.elements[0].required).toBe(false);
+    const exported = serializeTemplateFile(template, document);
+    expect(exported.document.elements[0].required).toBe(false);
+    expect(parseTemplateFile(exported).document.elements[0].required).toBe(false);
 });

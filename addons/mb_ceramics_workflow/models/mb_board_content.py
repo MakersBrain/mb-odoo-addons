@@ -22,7 +22,7 @@ class MbBoardContent(models.Model):
         required=True,
         ondelete="restrict",
         index=True,
-        domain=[("mb_workflow_kind", "in", ("bisque", "glazing", "finishing"))],
+        domain=[("mb_workflow_kind", "in", ("bisque", "glazing"))],
         check_company=True,
     )
     product_id = fields.Many2one(

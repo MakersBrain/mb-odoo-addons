@@ -31,7 +31,6 @@ genealogy without replacing Odoo's stock identity.
         "security/mb_ceramics_workflow_security.xml",
         "data/mb_ceramics_workflow_data.xml",
         "views/mb_throwing_session_views.xml",
-        "views/mb_finishing_session_views.xml",
         "views/mb_bisque_session_views.xml",
         "views/mb_glazing_session_views.xml",
         "views/mb_board_views.xml",

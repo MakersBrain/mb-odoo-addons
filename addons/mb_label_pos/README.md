@@ -34,8 +34,8 @@ identifier cannot change the path structure. The full URL is the durable alias.
 ## Resolution order and safety
 
 1. Exact normalized alias from the POS projection.
-2. Authoritative online lookup, including aliases minted after the session
-   opened and URL compatibility parsing.
+2. Authoritative online lookup for exact aliases minted after the session
+   opened.
 3. Native Odoo barcode behavior when the value is not one of the configured
    label prefixes.
 
@@ -46,8 +46,8 @@ lot code, so Odoo keeps its normal lot/serial selection dialog. Lot and serial
 URLs use Odoo's standard tracked-product order-line path; serial quantity is
 forced to one.
 
-Exact aliases already loaded into IndexedDB continue working offline. A legacy
-or newly minted alias that is not cached requires one online scan for
+Exact aliases already loaded into IndexedDB continue working offline. A newly
+minted alias that is not cached requires one online scan for
 authoritative validation. Retirements and reactivations are checked online on
 every scan; when offline, the last successfully loaded projection applies.
 Restarting or reloading the POS refreshes the complete projection.

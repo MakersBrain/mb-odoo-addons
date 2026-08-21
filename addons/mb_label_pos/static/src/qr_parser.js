@@ -8,27 +8,13 @@ function normalizePrefix(value) {
     return normalizeQr(value).replace(/#+$/, "").replace(/\/$/, "");
 }
 
-export function parsePrefixedQr(value, prefixes = []) {
+export function matchesLabelPrefix(value, prefixes = []) {
     const normalized = normalizeQr(value);
     for (const rawPrefix of prefixes) {
         const prefix = normalizePrefix(rawPrefix);
-        const marker = `${prefix}#`;
-        if (!prefix || !normalized.startsWith(marker)) continue;
-        const encodedParts = normalized.slice(marker.length).split("/");
-        if (![1, 2].includes(encodedParts.length) || encodedParts.some((part) => !part)) {
-            return { matched: true, status: "invalid" };
-        }
-        try {
-            const [sku, lotName] = encodedParts.map((part) => decodeURIComponent(part).normalize("NFKC").trim());
-            if (!sku || (encodedParts.length === 2 && !lotName)) {
-                return { matched: true, status: "invalid" };
-            }
-            return { matched: true, status: "parsed", sku, lotName: lotName || false };
-        } catch {
-            return { matched: true, status: "invalid" };
-        }
+        if (prefix && normalized.startsWith(`${prefix}#`)) return true;
     }
-    return { matched: false, status: "no_match" };
+    return false;
 }
 
 function relationId(value) {
@@ -48,12 +34,10 @@ export function buildAliasIndex(aliases = []) {
     return index;
 }
 
-export function resolveLocalQr(
-    value, { aliases = [], aliasIndex = null, products = [], prefixes = [] } = {}) {
+export function resolveLocalQr(value, { aliases = [], aliasIndex = null, prefixes = [] } = {}) {
     const normalized = normalizeQr(value);
     const exact = aliasIndex?.get(normalized)
         || aliases.filter((alias) => normalizeQr(alias.value) === normalized);
-    if (exact.length > 1) return { matched: true, status: "ambiguous" };
     if (exact.length === 1) {
         const alias = exact[0];
         if (alias.active === false) return { matched: true, status: "retired" };
@@ -69,19 +53,10 @@ export function resolveLocalQr(
         };
     }
 
-    const parsed = parsePrefixedQr(normalized, prefixes);
-    if (!parsed.matched || parsed.status !== "parsed") return parsed;
-    const candidates = products.filter((product) => product.default_code === parsed.sku);
-    if (candidates.length > 1) return { matched: true, status: "ambiguous" };
-    if (!candidates.length) return { ...parsed, status: "online_lookup" };
-    return {
-        matched: true,
-        status: "online_lookup",
-        source: "compatibility-local",
-        productId: candidates[0].id,
-        product: candidates[0],
-        lotName: parsed.lotName,
-    };
+    if (matchesLabelPrefix(normalized, prefixes)) {
+        return { matched: true, status: "online_lookup", source: "uncached" };
+    }
+    return { matched: false, status: "no_match" };
 }
 
 export function reconcileOnlineResolution(local, online) {

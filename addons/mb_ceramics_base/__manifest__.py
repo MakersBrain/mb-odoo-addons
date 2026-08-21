@@ -4,27 +4,19 @@
     "description": """
 What a ceramics workshop is configured with before anything else is installed.
 
-This addon and `mb_workshop_base` were one module until 19.0.2.0.0. The split is
-by dependency rather than by vocabulary: what a leatherworker or a joiner would
-install unchanged stayed below, and what is ceramic came here. The reason was
-`mb_label`, `mb_inventory_capture` and `mb_catalogue_sync` — three addons that
-are craft-neutral in mechanism and were nonetheless chained to a ceramic
-tableware regulation. See CRAFT-PLATFORM-PLAN.md section 2.
+This addon contains only ceramics-specific configuration. Craft-neutral
+mechanisms remain in their generic workshop, label, inventory, and catalogue
+addons.
 
 **Material families are categories, not a field of ours.** A second taxonomy
 disagrees with the first the moment anyone edits either, and Odoo already
 filters, groups and reports on `categ_id` everywhere. So a glaze is identified
 by its category and there is no material-type field.
 
-The categories reached this addon by way of `mb_workshop_base`, and
-`mb_catalogue_sync` before that. They were in the importer on the reasoning that
-the families came from the catalogue; they do not. A workshop that never imports
-anything still buys glaze and still owes a lead-and-cadmium migration test on
-the food-contact ware it makes with it, so `mb_ceramics_compliance` reads this
-taxonomy to know which consumed lots need a passing test. A compliance check
-does not belong behind an optional connector, and it no longer is: the importer
-maps onto this taxonomy rather than owning it, and the compliance addon depends
-on this one.
+A workshop that never imports anything still buys glaze and still owes a
+lead-and-cadmium migration test on food-contact ware. This addon therefore owns
+the taxonomy, the importer maps onto it, and `mb_ceramics_compliance` depends on
+it directly.
 
 **No design model.** A piece with its own price gets its own product record,
 which is the artisan's existing practice and keeps pricing entirely native. That

@@ -22,17 +22,9 @@ sheet and no revenue is recognised until the gallery reports a sale, which is th
 legal situation of dépôt-vente. Delivering to the customer location instead would
 derecognise the stock with no counterpart revenue.
 
-A warehouse rather than a bare location, and this was learned the expensive way.
-A depot used to be an internal location parked outside every warehouse, which
-bought exactly one thing — an ordinary delivery cannot reserve a piece standing
-in a gallery — and charged for it everywhere else, because Odoo answers "what is
-on hand and can I sell it" per warehouse nearly universally. That meant patching
-`_read_qties()` so the availability widget stopped claiming the piece could not
-be delivered, patching the product picker's context so On Hand stopped reading
-0.00, and building a route and pull rule per gallery to do what a warehouse does
-for free. A warehouse gives the reservation isolation *and* all of that back:
-deliveries source from their own warehouse's stock, so the atelier never touches
-the gallery's shelf.
+A warehouse provides both reservation isolation and native warehouse-aware
+availability: deliveries source from their selected warehouse, so the atelier
+never reserves a piece standing on a gallery's shelf.
 
 The cost is five picking types and sequences per gallery. That is the whole bill,
 and it is smaller than the one it replaced.
@@ -48,10 +40,9 @@ was sold at all if the report turns out to be wrong. Note the reach:
 `invoice_policy` is a product field with no per-warehouse variant, so this is the
 policy for the existing catalogue and every new product, not only consigned ones.
 Confirmation checks it again and restores the depositary's depot warehouse before
-creating the delivery. It also removes explicit line routes left by the old
-location-based implementation, so an imported product, a manually changed
-warehouse, or legacy sourcing metadata cannot silently bypass the stock movement
-that gates invoicing.
+creating the delivery. It also removes explicit line routes, so an imported
+product, a manually changed warehouse, or stale sourcing metadata cannot silently
+bypass the stock movement that gates invoicing.
 
 A depot **receives and delivers in one step**, pinned by a constraint. Multi-step
 would put a receiving bay and a packing table inside someone else's shop, and

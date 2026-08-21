@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0-20260810\n"
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-15 20:18+0000\n"
-"PO-Revision-Date: 2026-08-15 20:18+0000\n"
+"POT-Creation-Date: 2026-08-21 09:18+0000\n"
+"PO-Revision-Date: 2026-08-21 09:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -80,12 +80,6 @@ msgstr ""
 
 #. module: mb_label_pos
 #. odoo-javascript
-#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
-msgid "The SKU in this label QR code is unknown to this Point of Sale."
-msgstr ""
-
-#. module: mb_label_pos
-#. odoo-javascript
 #: code:addons/mb_label_pos/static/src/scanner_enhancements.js:0
 msgid "The camera rejected the brightness setting: %(message)s"
 msgstr ""
@@ -94,12 +88,6 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mb_label_pos/static/src/scanner_enhancements.js:0
 msgid "The camera rejected the flash setting: %(message)s"
-msgstr ""
-
-#. module: mb_label_pos
-#. odoo-javascript
-#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
-msgid "The lot or serial in this label QR code does not exist."
 msgstr ""
 
 #. module: mb_label_pos
@@ -118,27 +106,19 @@ msgstr ""
 #. module: mb_label_pos
 #. odoo-javascript
 #: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
+msgid "This QR is not cached yet. Reconnect once to validate it."
+msgstr ""
+
+#. module: mb_label_pos
+#. odoo-javascript
+#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
 msgid "This label QR code could not be resolved."
 msgstr ""
 
 #. module: mb_label_pos
 #. odoo-javascript
 #: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
-msgid "This label QR code has an invalid SKU/lot path."
-msgstr ""
-
-#. module: mb_label_pos
-#. odoo-javascript
-#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
 msgid "This label belongs to another company."
-msgstr ""
-
-#. module: mb_label_pos
-#. odoo-javascript
-#: code:addons/mb_label_pos/static/src/product_screen_patch.js:0
-msgid ""
-"This legacy or newly issued QR is not cached yet. Reconnect once to validate"
-" it."
 msgstr ""
 
 #. module: mb_label_pos

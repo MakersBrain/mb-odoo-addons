@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0-20260810\n"
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-15 20:17+0000\n"
-"PO-Revision-Date: 2026-08-15 20:17+0000\n"
+"POT-Creation-Date: 2026-08-21 09:18+0000\n"
+"PO-Revision-Date: 2026-08-21 09:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -246,12 +246,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_label/models/label_template.py:0
 msgid "Binding '%s' is not allowed."
-msgstr ""
-
-#. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "Binding “%(binding)s” was imported as “%(target)s”."
 msgstr ""
 
 #. module: mb_label
@@ -582,12 +576,6 @@ msgstr ""
 
 #. module: mb_label
 #. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "Field “%(field)s” was imported as a manual value."
-msgstr ""
-
-#. module: mb_label
-#. odoo-javascript
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Filled"
 msgstr ""
@@ -668,13 +656,6 @@ msgstr ""
 
 #. module: mb_label
 #. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid ""
-"Image %(element)s used an external brand asset; embed it before importing."
-msgstr ""
-
-#. module: mb_label
-#. odoo-javascript
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Image data URL"
 msgstr ""
@@ -694,12 +675,6 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Import JSON"
-msgstr ""
-
-#. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/label_editor.js:0
-msgid "Imported with %(count)s warning(s): %(warnings)s"
 msgstr ""
 
 #. module: mb_label
@@ -1472,18 +1447,6 @@ msgid "The image threshold must be between 0 and 255."
 msgstr ""
 
 #. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "The imported label needs positive dimensions."
-msgstr ""
-
-#. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "The label JSON must contain one object."
-msgstr ""
-
-#. module: mb_label
 #. odoo-python
 #: code:addons/mb_label/models/label_renderer.py:0
 msgid "The label contains an unreadable image."
@@ -1509,8 +1472,26 @@ msgstr ""
 
 #. module: mb_label
 #. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "The label resolution must be greater than zero."
+#: code:addons/mb_label/static/src/editor/template_file.js:0
+msgid "The label template dimensions and resolution must be positive."
+msgstr ""
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/template_file.js:0
+msgid "The label template file has an invalid document."
+msgstr ""
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/template_file.js:0
+msgid "The label template file has no settings."
+msgstr ""
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/label_editor.js:0
+msgid "The label template was imported as immutable version 1."
 msgstr ""
 
 #. module: mb_label
@@ -1538,12 +1519,6 @@ msgstr ""
 msgid ""
 "The model table selects the protocol, head width, 203/300 dpi and roll "
 "alignment at print time."
-msgstr ""
-
-#. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/label_editor.js:0
-msgid "The old JSON label was imported as immutable version 1."
 msgstr ""
 
 #. module: mb_label
@@ -1627,12 +1602,6 @@ msgid "Unique Lot/Serial Number"
 msgstr ""
 
 #. module: mb_label
-#. odoo-javascript
-#: code:addons/mb_label/static/src/editor/legacy_template.js:0
-msgid "Unknown element type “%(type)s” became text."
-msgstr ""
-
-#. module: mb_label
 #. odoo-python
 #: code:addons/mb_label/models/label_template.py:0
 msgid "Unsupported element background."
@@ -1672,6 +1641,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_label/models/label_template.py:0
 msgid "Unsupported label setting: %s"
+msgstr ""
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/editor/template_file.js:0
+msgid "Unsupported label template file schema."
 msgstr ""
 
 #. module: mb_label

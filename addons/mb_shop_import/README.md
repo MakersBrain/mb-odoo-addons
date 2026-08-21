@@ -71,5 +71,4 @@ rewrite historical data.
   redirects, 15 MB and 50 megapixels.
 - Images are decoded and normalized as a single-frame raster before storage.
 
-The legacy `scripts/import_shop_catalogue.py` remains for transitional command
-line use. The Odoo review workflow is the supported ingestion path.
+The Odoo review workflow is the supported ingestion path.

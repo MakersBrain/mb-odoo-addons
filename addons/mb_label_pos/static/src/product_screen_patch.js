@@ -6,21 +6,18 @@ import { patch } from "@web/core/utils/patch";
 import { useBarcodeReader } from "@point_of_sale/app/hooks/barcode_reader_hook";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import {
-    buildAliasIndex, parsePrefixedQr, reconcileOnlineResolution, resolveLocalQr,
+    buildAliasIndex, reconcileOnlineResolution, resolveLocalQr,
     validateDraftAvailability,
 } from "./qr_parser";
 
 const ERROR_MESSAGES = {
     ambiguous: _t("This QR code matches more than one product or identity."),
-    invalid: _t("This label QR code has an invalid SKU/lot path."),
     retired: _t("This printed QR identity has been retired and cannot be sold."),
     not_available: _t("The product identified by this label is not available in this Point of Sale."),
-    unknown_lot: _t("The lot or serial in this label QR code does not exist."),
-    unknown_product: _t("The SKU in this label QR code is unknown to this Point of Sale."),
     out_of_stock: _t("This product, lot, or serial has no available stock in the POS source location."),
     duplicate_serial: _t("This serial number is already present in a draft POS order."),
     wrong_company: _t("This label belongs to another company."),
-    offline_lookup_required: _t("This legacy or newly issued QR is not cached yet. Reconnect once to validate it."),
+    offline_lookup_required: _t("This QR is not cached yet. Reconnect once to validate it."),
 };
 
 patch(ProductScreen.prototype, {
@@ -49,7 +46,6 @@ patch(ProductScreen.prototype, {
         return {
             aliases,
             aliasIndex: this.mbLabelAliasCache.index,
-            products: this.pos.models["product.product"].getAll(),
             prefixes: this.pos.config.mb_label_qr_prefixes || [],
         };
     },
@@ -155,6 +151,6 @@ patch(ProductScreen.prototype, {
 });
 
 export {
-    buildAliasIndex, parsePrefixedQr, reconcileOnlineResolution, resolveLocalQr,
+    buildAliasIndex, reconcileOnlineResolution, resolveLocalQr,
     validateDraftAvailability,
 };

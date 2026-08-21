@@ -7,6 +7,7 @@ from odoo.tests import TransactionCase, tagged
 
 from ..provider import (
     CredentialStatus,
+    OperationSafety,
     PickupPoint,
     ProviderValidationError,
     ProviderTransientError,
@@ -29,8 +30,8 @@ class FixtureProvider:
     supports_return_label = True
     supports_tracking_lookup = False
     supports_contextual_options = False
-    supports_idempotency = True
-    supports_reconciliation = True
+    create_shipment_safety = OperationSafety(True, True, True)
+    create_return_safety = OperationSafety()
 
     def __init__(self, credentials=None, production=False, carrier=None):
         self.credentials = credentials or {}
@@ -45,6 +46,14 @@ class FixtureProvider:
 
     def list_services(self):
         return [ShippingService("relay", "Fixture relay", supports_pickup_points=True)]
+
+    @classmethod
+    def operation_safety(cls, operation):
+        if operation == "create_shipment":
+            return cls.create_shipment_safety
+        if operation == "create_return":
+            return cls.create_return_safety
+        return OperationSafety()
 
     def search_pickup_points(self, query):
         return [self.get_pickup_point("POINT-1", query.service_code)]
@@ -238,9 +247,9 @@ class TestCarrierRuntime(TransactionCase):
     def test_provider_without_idempotency_is_never_automatically_replayed(self):
         shipment = self._shipment(suffix="unsafe-timeout")
         self.provider.create_result = ProviderTransientError("timeout")
-        original = FixtureProvider.supports_idempotency
-        FixtureProvider.supports_idempotency = False
-        self.addCleanup(setattr, FixtureProvider, "supports_idempotency", original)
+        original = FixtureProvider.create_shipment_safety
+        FixtureProvider.create_shipment_safety = OperationSafety()
+        self.addCleanup(setattr, FixtureProvider, "create_shipment_safety", original)
 
         shipment._process_create()
 
@@ -304,7 +313,7 @@ class TestCarrierRuntime(TransactionCase):
         self.assertTrue(shipments.with_context(ir_cron_progress_id=7)._cron_progress_active())
         self.assertTrue(shipments.with_context(cron_id=7)._cron_progress_active())
         self.assertFalse(shipments.with_context(
-            ir_cron_progress_id=False, cron_id=False, ir_cron_id=False
+            ir_cron_progress_id=False, cron_id=False
         )._cron_progress_active())
 
     def test_orphan_webhook_becomes_terminal_after_bounded_retries(self):
@@ -338,9 +347,9 @@ class TestCarrierRuntime(TransactionCase):
     def test_merchant_can_explicitly_resolve_unknown_for_provider_without_lookup(self):
         shipment = self._shipment(suffix="manual-resolution")
         shipment.state = "unknown"
-        original = FixtureProvider.supports_reconciliation
-        FixtureProvider.supports_reconciliation = False
-        self.addCleanup(setattr, FixtureProvider, "supports_reconciliation", original)
+        original = FixtureProvider.create_shipment_safety
+        FixtureProvider.create_shipment_safety = OperationSafety()
+        self.addCleanup(setattr, FixtureProvider, "create_shipment_safety", original)
 
         shipment.action_confirm_absent()
 
