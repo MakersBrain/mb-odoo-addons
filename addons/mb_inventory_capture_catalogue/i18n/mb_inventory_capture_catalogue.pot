@@ -57,7 +57,7 @@ msgstr ""
 #. module: mb_inventory_capture_catalogue
 #. odoo-python
 #: code:addons/mb_inventory_capture_catalogue/models/inventory_capture_candidate.py:0
-msgid "Only a Makersbrain catalogue candidate can be imported."
+msgid "Only a MakersBrain catalogue candidate can be imported."
 msgstr ""
 
 #. module: mb_inventory_capture_catalogue

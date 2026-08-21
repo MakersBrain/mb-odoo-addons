@@ -10,7 +10,7 @@ accounting documents remain unchanged.
 	"version": "19.0.4.0.1",
 	"license": "LGPL-3",
 	"category": "Accounting/Localizations",
-	"author": "Makersbrain",
+	"author": "MakersBrain",
 	"depends": ["l10n_fr_account", "account_edi_ubl_cii"],
 	"data": [
 		"security/ir.model.access.csv",

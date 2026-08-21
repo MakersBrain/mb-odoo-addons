@@ -73,7 +73,7 @@ class TestBoxtalOdooDispatch(TransactionCase):
         bodies = " ".join(str(body) for body in picking.message_ids.mapped("body"))
         self.assertIn("Carrier label purchase queued", bodies)
 
-    def test_non_makersbrain_carrier_still_uses_core_dispatch(self):
+    def test_non_mb_carrier_still_uses_core_dispatch(self):
         product = self.env["product.product"].create({
             "name": "Native fixed delivery",
             "type": "service",

@@ -1,16 +1,16 @@
 {
-    "name": "Makersbrain Product Photo Inventory Capture",
+    "name": "MakersBrain Product Photo Inventory Capture",
     "summary": "Identify products and supplier lots from reviewed package photographs.",
     "description": """
 Capture one or two sanitized package photographs, decode and look up product
 identifiers, retain append-only extraction evidence, and apply only a human
 confirmed product and supplier lot to a draft incoming receipt. External OCR
-and multimodal providers remain behind the Makersbrain control plane.
+and multimodal providers remain behind the MakersBrain control plane.
 """,
     "version": "19.0.1.1.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         "mail",
         "mb_ai_bridge",

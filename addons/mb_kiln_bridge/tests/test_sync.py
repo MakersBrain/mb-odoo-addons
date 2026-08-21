@@ -556,14 +556,7 @@ class TestTokenReuse(TransactionCase):
 
 @tagged("post_install", "-at_install")
 class TestProgramMapping(TransactionCase):
-    """A controller reports a slot; only the potter knows it is a glaze.
-
-    Rewritten in 19.0.1.2.0. These tests used to create the mapping by hand,
-    because nothing else could - the connector matched programmes and never
-    made one. It now derives them from the firings it imports, so the mapping
-    already exists by the time a test would have created it, and what these
-    check is that the potter's answers still decide what a firing means.
-    """
+    """A controller reports a slot; only the potter knows it is a glaze."""
 
     @classmethod
     def setUpClass(cls):

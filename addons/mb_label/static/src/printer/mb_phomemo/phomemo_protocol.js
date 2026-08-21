@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 // Mechanically transpiled from
-// ateliera-app/apps/mobile/src/lib/label/phomemo-protocol.ts.
+// mb-app/apps/mobile/src/lib/label/phomemo-protocol.ts.
 
 import { deviceDotsPerMm } from "./devices";
 import { pack, padRows, rotateRaster, toBits } from "./raster";

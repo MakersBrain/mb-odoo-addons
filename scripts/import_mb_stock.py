@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Set on-hand stock in Odoo from an Ateliera tenant archive.
+"""Set on-hand stock in Odoo from a MakersBrain tenant archive.
 
 The archive carries a movement ledger, not a stock level: `core/stock_movements`
 holds signed quantities with a type of production, purchase or removal. Summing
@@ -34,8 +34,8 @@ sells from.
 
 Usage:
 
-    python3 scripts/import_ateliera_stock.py ~/Downloads/cmarteau-ceramics-*.tar.gz --dry-run
-    python3 scripts/import_ateliera_stock.py ~/Downloads/cmarteau-ceramics-*.tar.gz
+    python3 scripts/import_mb_stock.py ~/Downloads/cmarteau-ceramics-*.tar.gz --dry-run
+    python3 scripts/import_mb_stock.py ~/Downloads/cmarteau-ceramics-*.tar.gz
 """
 
 import argparse
@@ -45,7 +45,7 @@ import subprocess
 import sys
 import tarfile
 
-ODOO_CONTAINER = "odoo-poc-web"
+ODOO_CONTAINER = "mb-odoo-web"
 TARGET_LOCATION = "AT/Stock/Finished"
 
 # Locations whose stock this import owns and may zero. Anything the archive does
@@ -68,7 +68,7 @@ def read_archive(path):
         for member, key in wanted.items():
             handle = archive.extractfile(member)
             if handle is None:
-                sys.exit(f"{path} has no {member} - is this an Ateliera archive?")
+                sys.exit(f"{path} has no {member} - is this a MakersBrain archive?")
             tables[key] = [json.loads(line) for line in
                            handle.read().decode().splitlines() if line.strip()]
 

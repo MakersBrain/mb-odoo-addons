@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-// Odoo shell around the exact browser print path used by Ateliera:
+// Odoo shell around the exact browser print path used by MakersBrain:
 // phomymo/ble.js + phomymo/printer.js + phomymo/raster.js. Do not replace the
 // transport or re-chunk its writes here; that was the source of the M110
 // regression this port is intended to avoid.
@@ -22,7 +22,7 @@ import {
     headWidthMm,
     reachableOverBle,
     resolveDevice,
-} from "./ateliera_phomemo/devices";
+} from "./mb_phomemo/devices";
 
 const SETTINGS_KEY = "mb_label.phomemo.settings.v3";
 const DEFAULT_SETTINGS = {
@@ -118,7 +118,7 @@ export function assertRasterFitsDevice(image, device) {
     }
 }
 
-// Mirrors Ateliera's phomymo-print.ts rasterFor(). The only Odoo addition is
+// Mirrors MakersBrain's phomymo-print.ts rasterFor(). The only Odoo addition is
 // honouring the explicit paper-side override from the settings panel.
 export function phomymoRasterFor(image, deviceName, printerModel, ditherMode, align) {
     const { data: pixels, width, height } = image;
@@ -174,7 +174,7 @@ async function printImage(link, image, settings, onProgress = () => {}) {
     const deviceName = link.getDeviceName?.() || "";
     // This override is essential for M110S units advertising a Q199… serial.
     // Auto-detection in phomymo otherwise chooses a 72-byte generic head and
-    // the printer feeds without burning. This is exactly Ateliera's fix.
+    // the printer feeds without burning. This is exactly MakersBrain's fix.
     const device = resolveDevice(settings.model, deviceName);
     if (!reachableOverBle(device)) {
         throw new Error(_t("%(device)s requires USB and cannot use Web Bluetooth.", { device: device.name }));
@@ -216,7 +216,7 @@ export async function diagnosePhomemo(options = {}) {
         `Printer: ${deviceName || "unnamed"}`,
         `Model: ${device.name} (${device.protocol})`,
         `Connection: ${Math.round(performance.now() - started)} ms`,
-        `Transport: Ateliera phomymo BLE`,
+        `Transport: MakersBrain phomymo BLE`,
         `Write mode: ${link._useWriteWithResponse ? "with response" : "without response"}`,
         `Battery: ${info.battery ?? "unknown"}`,
         `Paper: ${info.paper ?? "unknown"}`,
@@ -235,7 +235,7 @@ export async function testPrintPhomemo(options = {}) {
 
 registerPrinterAdapter({
     id: "phomemo",
-    label: _t("Phomemo (Ateliera transport)"),
+    label: _t("Phomemo (MB transport)"),
     available: () => BLETransport.isAvailable(),
     models: phomemoModels,
     settings: loadPhomemoSettings,

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Translation workflow helper: one scratch database per agent, French loaded
-# before the addons are installed, POT exported through the mounted addons path.
+# Translation workflow helper: one disposable work database per translation
+# task, with French loaded before install and POT exported through the mounted
+# addons path.
 #
 #   tools/i18n.sh setup   DB MODULE...   create DB, load fr_FR, install MODULEs
 #   tools/i18n.sh upgrade DB MODULE...   upgrade MODULEs in DB
@@ -14,8 +15,8 @@
 # script creates it on the host first.
 set -euo pipefail
 
-CONTAINER="${ODOO_CONTAINER:-makersbrain-odoo-web}"
-DB_CONTAINER="${ODOO_DB_CONTAINER:-makersbrain-odoo-db}"
+CONTAINER="${ODOO_CONTAINER:-mb-odoo-web}"
+DB_CONTAINER="${ODOO_DB_CONTAINER:-mb-odoo-db}"
 CONF="/etc/odoo/odoo.conf"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -70,7 +71,7 @@ import)
     for module in "${modules[@]}"; do
         [ -f "$REPO/addons/$module/i18n/fr.po" ] || { echo "no fr.po for $module" >&2; exit 1; }
         odoo i18n import -c "$CONF" -d "$db" -l fr_FR -w \
-            "/mnt/makersbrain-addons/$module/i18n/fr.po"
+            "/mnt/mb-addons/$module/i18n/fr.po"
     done
     ;;
 refresh)

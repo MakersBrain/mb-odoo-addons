@@ -1,9 +1,9 @@
 {
-    "name": "Makersbrain Commercial Operations - Point of Sale",
+    "name": "MakersBrain Commercial Operations - Point of Sale",
     "summary": "Explicit market POS sessions, revenue analytics, and stock cost",
     "version": "19.0.2.0.1",
     "category": "Sales/Point of Sale",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "license": "LGPL-3",
     "depends": [
         "mb_commercial_operations_stock",

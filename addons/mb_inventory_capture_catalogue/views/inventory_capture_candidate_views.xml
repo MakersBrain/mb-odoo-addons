@@ -10,7 +10,7 @@
                 <button name="action_import_reviewed_product" type="object"
                         string="Import catalogue product"
                         groups="stock.group_stock_manager"
-                        invisible="kind != 'product' or source != 'makersbrain_catalogue' or product_id"/>
+                        invisible="kind != 'product' or source != 'mb_catalogue' or product_id"/>
             </xpath>
         </field>
     </record>

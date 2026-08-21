@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Ceramics Firing",
+    "name": "MakersBrain Ceramics Firing",
     "summary": "The kiln load as its own record, with the cooling hold that gates unloading.",
     "description": """
 A firing is not a work order, and Odoo will not let it be one.
@@ -16,10 +16,11 @@ many orders, each work order sits in one firing.
 
 **Boards, not pieces.** No adhesive label survives a kiln - bisque runs near
 1000 C - so nothing printed can be attached to ware before the last firing.
-Identity through the process is borne by the carrier, and Odoo already models
-that: `stock.package` with a reusable package type is a ware board, and
-`parent_package_id` nests board inside shelf inside load. `stock.quant` already
-joins package to lot, so what is on a board needs no model of ours.
+Identity through the process is borne by the carrier: `stock.package` with a
+reusable package type is a ware board, and `parent_package_id` nests board inside
+shelf inside load. A firing records those reusable packages. Before finished
+stock quants exist, `mb_ceramics_workflow` records the manufacturing quantity on
+each board; standard package and lot links take over once stock exists.
 
 **Cooling is a property of the firing.** `cooling_end` is the earliest moment a
 load may be unloaded and labelled, which is not the same moment the manufacturing
@@ -52,10 +53,9 @@ operation points at a programme, and its duration follows. Cooling counts, on
 by default: a kiln cannot take the next load while it is still hot, and a plan
 that counts only the heating hours will book two firings into one night.
 
-That is also why the programme moved here from `mb_kiln_bridge` in 19.0.1.2.0.
-A programme is a schedule the potter fires to; a workshop with no telemetry has
-them just the same and simply types the hours in. Planning cannot depend on
-having installed a connector for a kiln you do not own.
+A programme is provider-neutral because it is a schedule the potter fires to.
+A workshop with no telemetry defines the same programmes directly, so planning
+does not depend on installing a connector.
 
 Declared, scheduled and measured are kept apart. `firing_hours` is what plans
 rest on; `scheduled_hours` is what the programme's own ramps and holds add up
@@ -68,8 +68,8 @@ power, or a programme nobody has revised.
 **A programme has segments, because a controller has segments.** A ramp rate, a
 target and a hold, per step - which is what a potter reads and argues with, and
 what a duration can be derived from rather than typed. `mb.kiln.program.segment`
-holds them, and 19.0.1.3.0 added them so a connector could refresh a programme
-from the controller that runs it. What the programme *means* stays the potter's:
+holds them, and a connector can refresh them from the controller that runs the
+programme. What the programme *means* stays the potter's:
 bisque or glaze, and how long the load must stand, are questions no controller
 can answer, so no refresh touches them.
 
@@ -87,18 +87,17 @@ the trace is evidence, so it is an attachment. Peak temperature is not only a
 schedule detail - an under-fired glaze is a less mature glaze, and lead release
 rises with immaturity.
 """,
-    "version": "19.0.3.0.0",
+    "version": "19.0.3.0.1",
     "license": "LGPL-3",
     "category": "Manufacturing/Manufacturing",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         # The menu spine, and mb_calendar_continuous - which every kiln work
         # centre runs on, because a firing is unattended and overnight.
         "mb_workshop_base",
         # The seeded work centres and the Firing tag a kiln is created with.
-        # Split out of mb_workshop_base in 19.0.2.0.0; the compliance half of
-        # that module is deliberately not depended on here, because a firing is
-        # a physical event whether or not the ware is meant for food.
+        # The compliance addon is deliberately not depended on here, because a
+        # firing is a physical event whether or not the ware is meant for food.
         "mb_ceramics_base",
         # mrp.workorder, mrp.workcenter and the routing a firing operation sits on.
         "mrp",

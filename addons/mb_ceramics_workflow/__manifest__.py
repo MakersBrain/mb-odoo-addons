@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Ceramics Workflow",
+    "name": "MakersBrain Ceramics Workflow",
     "summary": "Throwing batches, ware boards, kiln loading and final inspection.",
     "description": """
 The ceramicist-facing production layer above Odoo MRP and mb_ceramics_firing.
@@ -12,12 +12,12 @@ genealogy without replacing Odoo's stock identity.
     "version": "19.0.3.0.0",
     "license": "LGPL-3",
     "category": "Manufacturing/Manufacturing",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         # The menu spine and the continuous calendar.
         "mb_workshop_base",
         # mb_clay_body_id, the material taxonomy and the seeded work centres the
-        # sessions are named after. Split out of mb_workshop_base in 19.0.2.0.0.
+        # sessions are named after.
         "mb_ceramics_base",
         # The food-contact gate a finished session eventually has to pass.
         "mb_ceramics_compliance",

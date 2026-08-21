@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Brand",
+    "name": "MakersBrain Brand",
     "summary": "The MakersBrain visual identity, applied to Odoo through its own theming seams.",
     "description": """
 Odoo already has a supported way to be recoloured, and this addon uses it and
@@ -42,7 +42,7 @@ product read as MakersBrain.
     "version": "19.0.1.0.1",
     "license": "LGPL-3",
     "category": "Technical",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         # The asset bundles this addon prepends to are all declared by `web`.
         "web",

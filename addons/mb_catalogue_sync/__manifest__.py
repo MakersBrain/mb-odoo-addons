@@ -1,23 +1,22 @@
 {
-    "name": "Makersbrain Catalogue Sync",
+    "name": "MakersBrain Catalogue Sync",
     "summary": "Read-only import of master catalogue materials into product.template.",
     "description": """
 Pulls curated manufacturer identities from the cross-tenant ceramics catalogue
 service into this tenant's product catalogue, on demand and never in bulk.
 
-The catalogue holds roughly 47,000 supplier listings across 76 shops. None of
-that belongs in an artisan's database. What crosses the boundary is the curated
-manufacturer identity - Mayco SC74 Hot Tamale - plus the offers of the suppliers
-this workshop actually buys from.
+Supplier listings and price history stay in the shared catalogue. What crosses
+the boundary is the selected curated manufacturer identity - Mayco SC74 Hot
+Tamale - plus current offers from suppliers this workshop has mapped.
 """,
-    "version": "19.0.1.5.0",
+    "version": "19.0.1.5.1",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         # The material taxonomy this addon maps catalogue families onto. It is
         # not defined here on purpose: a workshop that never imports anything
-        # still buys glaze and still owes a migration test on the food-contact
+        # still buys glaze and still needs compliance data for the food-contact
         # ware it makes with it, so a compliance gate must not sit behind a
         # connector. See mb_ceramics_base/data/mb_material_categories.xml.
         #

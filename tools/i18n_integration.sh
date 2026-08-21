@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# Coordinator integration run for the English/French translation work.
+# Repository-wide integration run for the English/French catalogues.
 #
 # One clean database, French loaded before anything is installed, all addons
 # installed together, followed by the runtime and catalogue validation gates.
 #
 #   tools/i18n_integration.sh [DB]      default DB: mb_i18n_integration
 #
-# It is destructive about the integration database only, and never touches an
-# agent's scratch database.
+# It is destructive about the allowlisted integration database only and never
+# touches another work database.
 set -euo pipefail
 
 DB="${1:-mb_i18n_integration}"
-CONTAINER="${ODOO_CONTAINER:-makersbrain-odoo-web}"
-DB_CONTAINER="${ODOO_DB_CONTAINER:-makersbrain-odoo-db}"
+CONTAINER="${ODOO_CONTAINER:-mb-odoo-web}"
+DB_CONTAINER="${ODOO_DB_CONTAINER:-mb-odoo-db}"
 CONF="/etc/odoo/odoo.conf"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO"
@@ -49,8 +49,8 @@ step "Upgrade in place"
 odoo -c "$CONF" -d "$DB" -u "$CSV" --stop-after-init --log-level=warn
 
 step "Catalogue freshness: re-export every POT and assert zero drift"
-# This export is the authoritative one. A per-agent scratch database holds only
-# that agent's modules, and Odoo attributes an inherited term to whichever module
+# This export is the authoritative one. A focused work database holds only its
+# selected modules, and Odoo attributes an inherited term to whichever module
 # is installed, so a term can appear only once the whole set is installed
 # together. It is also the only step that compares the POT against the current
 # source rather than against itself: tools/check_i18n.py compares the PO to the

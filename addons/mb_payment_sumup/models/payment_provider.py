@@ -95,7 +95,7 @@ class PaymentProvider(models.Model):
         """Override of `payment` to parse the error message.
 
         SumUp answers with `message` on the checkout endpoints and with
-        `error_message` on the older transaction ones.
+        `error_message` on transaction endpoints.
         """
         if self.code != "sumup":
             return super()._parse_response_error(response)

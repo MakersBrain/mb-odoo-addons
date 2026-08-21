@@ -13,8 +13,8 @@ system: it renders with the same stylesheet the control plane ships, and the
 version it was built against is stamped in a comment at the top of the output.
 Deploying is copying one file.
 
-The design system is a dependency of `control-plane/web`, so `npm install`
-there is what makes this build possible.
+The design system is pinned as this repository's development dependency, so run
+`npm ci` in the repository root before building the page.
 
 ## What it claims, and why each claim is safe
 

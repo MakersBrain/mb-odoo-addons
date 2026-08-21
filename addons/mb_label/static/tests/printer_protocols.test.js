@@ -8,7 +8,7 @@ import {
 } from "@mb_label/printer/phomymo/printer";
 import {
     allDevices, detectDevice, resolveDevice,
-} from "@mb_label/printer/ateliera_phomemo/devices";
+} from "@mb_label/printer/mb_phomemo/devices";
 import { buildNiimbotD110Job, niimbotPacket } from "@mb_label/printer/niimbot_adapter";
 import { shouldClearWorkspaceSelection } from "@mb_label/editor/selection";
 import { parseTemplateFile, serializeTemplateFile } from "@mb_label/editor/template_file";
@@ -103,7 +103,7 @@ test("template filters format money, decimals, defaults, and text in the preview
     expect(formatTemplateText("{{manual.note|default:No note}}", { ...values, "manual.note": "" })).toBe("No note");
 });
 
-test("Ateliera phomymo sends the working M110 command stream", async () => {
+test("MakersBrain phomymo sends the working M110 command stream", async () => {
     await loadPrinterDefinitions();
     const image = whiteImage(8, 2);
     blackPixel(image, 0, 0);
@@ -125,7 +125,7 @@ test("Ateliera phomymo sends the working M110 command stream", async () => {
     expect(writes.slice(4, -1).flat().length).toBe(96);
 });
 
-test("Ateliera Phomemo definitions cover every supported protocol family", () => {
+test("MakersBrain Phomemo definitions cover every supported protocol family", () => {
     const devices = allDevices();
     expect(devices.length).toBe(18);
     expect(new Set(devices.map((device) => device.protocol))).toEqual(new Set([
@@ -136,7 +136,7 @@ test("Ateliera Phomemo definitions cover every supported protocol family", () =>
     expect(resolveDevice("auto", "Q199G4130440005").id).toBe("m110");
 });
 
-test("Ateliera transport falls back to acknowledged writes on this M110 link", async () => {
+test("MakersBrain transport falls back to acknowledged writes on this M110 link", async () => {
     const acknowledged = [];
     const transport = {
         isConnected: () => true,

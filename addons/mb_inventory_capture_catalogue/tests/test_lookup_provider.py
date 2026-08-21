@@ -32,7 +32,7 @@ class TestInventoryCaptureCatalogueLookup(TransactionCase):
 
         lookup.assert_called_once_with("04006381333931", limit=10)
         candidate = capture.candidate_ids.filtered(
-            lambda item: item.source == "makersbrain_catalogue"
+            lambda item: item.source == "mb_catalogue"
         )
         self.assertEqual(result["gtin"], "04006381333931")
         self.assertEqual(candidate.normalized_value, "catalogue:mayco/sc-74/473ml")
@@ -48,7 +48,7 @@ class TestInventoryCaptureCatalogueLookup(TransactionCase):
         with patch.object(type(provider), "lookup", autospec=True, return_value=[{
                 "canonical_id": "catalogue:mayco/sc-74/473ml",
                 "label": "Mayco SC-74 Hot Tamale",
-                "source": "makersbrain_catalogue",
+                "source": "mb_catalogue",
                 "confidence": 1.0,
                 "grounded": True,
         }]):

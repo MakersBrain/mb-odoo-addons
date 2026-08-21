@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ground-truth-blind UPCitemDB product-lookup POC.
+"""Ground-truth-blind UPCitemDB product-lookup evaluation.
 
 The free endpoint permits two identifiers per lookup request and expects a
 sustainable request rate. Expected product data is used only after retrieval to
@@ -174,7 +174,7 @@ def lookup_batch(barcodes: list[str]) -> tuple[list[dict], dict]:
     query = urllib.parse.urlencode({"upc": ",".join(barcodes)})
     request = urllib.request.Request(
         f"{ENDPOINT}?{query}",
-        headers={"Accept": "application/json", "User-Agent": "MakersBrain-Inventory-POC/1.0"},
+        headers={"Accept": "application/json", "User-Agent": "mb-inventory-benchmark/1.0"},
     )
     opener = urllib.request.build_opener(
         NoRedirect(), urllib.request.HTTPSHandler(context=ssl.create_default_context())

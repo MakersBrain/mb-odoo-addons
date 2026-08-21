@@ -44,7 +44,7 @@ a drying piece cannot be sold comes from the tree above, not from the DAMP tag.
 Usage:
 
     python3 scripts/setup_workshop_locations.py
-    python3 scripts/setup_workshop_locations.py --database odoo --dry-run
+    python3 scripts/setup_workshop_locations.py --database mb_odoo --dry-run
 """
 
 import argparse
@@ -52,7 +52,7 @@ import json
 import subprocess
 import sys
 
-ODOO_CONTAINER = "odoo-poc-web"
+ODOO_CONTAINER = "mb-odoo-web"
 
 # name -> storage category, per rack. Order is the order pieces travel in.
 WIP_RACKS = [

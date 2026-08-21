@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Workshop Base",
+    "name": "MakersBrain Workshop Base",
     "summary": "The craft-neutral floor: menu spine, continuous calendar, supplier-lot policy, priced product selectors.",
     "description": """
 What is true of a workshop before anyone says which craft it practises.
@@ -36,7 +36,7 @@ appended to the display name, through context keys so nothing else changes.
     "version": "19.0.2.0.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         # tracking and stock.lot, which mb_supplier_lot_required constrains.
         "stock",

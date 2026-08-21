@@ -14,14 +14,10 @@ class MbKilnProgram(models.Model):
     they know it once rather than per firing - so it belongs here as a setting
     rather than as a field someone re-enters on every imported record.
 
-    **Here rather than in `mb_kiln_bridge`, from 19.0.1.2.0.** The programme
-    started life beside the myKiln connector, on the reasoning that a
-    controller programme is a provider's idea. That was the wrong boundary the
-    moment a firing duration hung off it. A programme is a schedule the potter
-    fires to, and a workshop with no telemetry at all fires to one just the
-    same - it simply types the hours in instead of importing them. Leaving the
-    programme in the bridge would have meant a workshop had to install a
-    connector for a kiln it does not have in order to plan a firing.
+    **Provider-neutral ownership.** A programme is the schedule the potter fires
+    to. Workshops without telemetry define one directly, while an installed
+    connector may populate its controller slot and segments. Planning therefore
+    depends on this ceramics model, never on a specific provider connector.
 
     **Three durations, deliberately not merged.** `firing_hours` is the
     declared one: what plans are built on. `scheduled_hours` is what the

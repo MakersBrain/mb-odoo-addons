@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-// Mechanically transpiled from ateliera-app/apps/mobile/src/lib/label/raster.ts.
+// Mechanically transpiled from mb-app/apps/mobile/src/lib/label/raster.ts.
 //
 // Upstream's `DITHER_LABELS` map is dropped here on purpose: it holds French
 // prose, nothing in this addon imports it, and the dither labels users actually

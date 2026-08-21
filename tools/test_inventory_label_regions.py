@@ -1,4 +1,4 @@
-from poc_inventory_label_regions import candidate_codes, gs1_check_digit_valid, normalized_gtin
+from inventory_label_regions import candidate_codes, gs1_check_digit_valid, normalized_gtin
 
 
 def test_gs1_check_digit_validation():

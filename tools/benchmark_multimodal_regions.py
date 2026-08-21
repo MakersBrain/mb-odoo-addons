@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Send bounded POC evidence crops to Gemini for lot-only transcription."""
+"""Send bounded evaluation evidence crops to Gemini for lot-only transcription."""
 
 import argparse
 import base64

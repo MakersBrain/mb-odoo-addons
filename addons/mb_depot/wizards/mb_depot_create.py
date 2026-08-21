@@ -85,13 +85,8 @@ class MbDepotCreate(models.TransientModel):
 
     def _enable_features(self):
         group_user = self.env.ref("base.group_user")
-        implied = []
-        for xmlid in REQUIRED_FEATURES:
-            group = self.env.ref(xmlid, raise_if_not_found=False)
-            if group:
-                implied.append(fields.Command.link(group.id))
-        if implied:
-            group_user.sudo().write({"implied_ids": implied})
+        implied = [fields.Command.link(self.env.ref(xmlid).id) for xmlid in REQUIRED_FEATURES]
+        group_user.sudo().write({"implied_ids": implied})
         self._default_to_invoicing_on_delivery()
 
     def _default_to_invoicing_on_delivery(self):

@@ -10,7 +10,7 @@ class InventoryCaptureCatalogueCandidate(models.Model):
         if not self.env.user.has_group("stock.group_stock_manager"):
             raise AccessError(_("Only an inventory manager can import a reviewed product."))
         if self.kind != "product" or not self.normalized_value.startswith("catalogue:"):
-            raise UserError(_("Only a Makersbrain catalogue candidate can be imported."))
+            raise UserError(_("Only a MakersBrain catalogue candidate can be imported."))
         if self.capture_id.state != "review":
             raise UserError(_("The capture must be in review before importing a product."))
         service = self.env["mb.catalogue.service"].search([("active", "=", True)], limit=1)

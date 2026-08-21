@@ -58,8 +58,8 @@ msgstr "Aucun service de catalogue n'est configuré."
 #. module: mb_inventory_capture_catalogue
 #. odoo-python
 #: code:addons/mb_inventory_capture_catalogue/models/inventory_capture_candidate.py:0
-msgid "Only a Makersbrain catalogue candidate can be imported."
-msgstr "Seul un candidat du catalogue Makersbrain peut être importé."
+msgid "Only a MakersBrain catalogue candidate can be imported."
+msgstr "Seul un candidat du catalogue MakersBrain peut être importé."
 
 #. module: mb_inventory_capture_catalogue
 #. odoo-python

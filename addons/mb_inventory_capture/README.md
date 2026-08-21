@@ -31,7 +31,7 @@ remain in the control-plane extraction broker.
   supersedes its current image and derived crops without deleting audit evidence.
 - Local primary/alternate GTIN and GS1 AI 01/10/17/30 resolution runs first.
 - The optional `mb_inventory_capture_catalogue` glue addon performs read-only
-  exact GTIN or text lookup in the Makersbrain ceramics catalogue.
+  exact GTIN or text lookup in the MakersBrain ceramics catalogue.
 - An unknown checksum-valid GTIN can progress to the broker's UPCitemDB adapter.
   The shared PostgreSQL cache is keyed by provider/schema/GTIN-14, coalesces
   concurrent misses, and retains only normalized review candidates (30-day
@@ -62,16 +62,7 @@ Document Intelligence. Azure Vision is not provisioned unless a controlled
 benchmark shows a material advantage over the existing development Document
 Intelligence resource.
 
-## Remaining v19 processing work
-
-The following refinement remains release-gated and must not be treated as
-present in the current Owl action:
-
-- automatically locate/rectify barcode-context and text regions, select among
-  measured OCR variants, and ask for a closer detail photo when quality is
-  insufficient. Live video frames are never continuously uploaded.
-
-The product-lookup chain is local Odoo, Makersbrain catalogue, shared cache, then
+The product-lookup chain is local Odoo, MakersBrain catalogue, shared cache, then
 the optional UPCitemDB adapter. Positive entries default to 30
 days, negative entries to 24 hours, and concurrent misses for the same
 provider/schema/GTIN are coalesced. UPCitemDB data is review-only; raw responses,
@@ -90,7 +81,7 @@ Every adapter receives the same bounded sanitized crop/assets and deterministic
 evidence, and must return the same strict versioned schema using `asset_id`.
 Provider/model/version, request ID, latency and usage are normalized. Raw provider
 bodies are held only for the active request and are not stored in the queue,
-control-plane database or Odoo; Odoo's compatibility `raw_response` field contains
+control-plane database or Odoo; Odoo's diagnostic `raw_response` field contains
 only a bounded redacted status such as `{"retained": false}`. A valid `unknown`
 response is not a reason to cascade to another paid model.
 
@@ -119,12 +110,11 @@ photos** and choose an available primary/optional fallback before the broker may
 call a multimodal provider. Local barcode/GS1, OCR, crop, lookup and manual review
 continue to work when it is disabled.
 
-The extraction broker alone receives provider credentials. See
-`control-plane/deploy/release-contract.json` for the currently implemented
-environment contract. Provider-specific Azure-hosted multimodal, Gemini, OpenAI
-and Claude settings are defined there. Add only the approved provider's secret
-delivery and development endpoint to `../makersbrain-infra`; create an Azure
-Vision endpoint only if the benchmark shows it is needed.
+The extraction broker alone receives provider credentials. Its deployment
+release contract defines the provider-specific Azure-hosted multimodal, Gemini,
+OpenAI and Claude settings. Provision only the approved provider's secrets and
+endpoints; create an Azure Vision endpoint only if a controlled benchmark shows
+it is needed.
 
 Unapplied sanitized images are deleted after 30 days by default. Override with
 the system parameter `mb_inventory_capture.unapplied_image_retention_days`

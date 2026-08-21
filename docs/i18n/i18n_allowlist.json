@@ -1,7 +1,7 @@
 {
   "_comment": [
     "Reviewed exceptions for tools/check_i18n.py. Every entry is a decision, not",
-    "a way to make a finding go away. The coordinator owns this file.",
+    "a way to make a finding go away. Changes to this file require review.",
     "",
     "_global applies to every addon, for terms Odoo exports into each module's",
     "catalogue separately but whose French is the English word. Terms marked",

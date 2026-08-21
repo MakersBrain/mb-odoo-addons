@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Workshop Counter",
+    "name": "MakersBrain Workshop Counter",
     "summary": "Give every workshop one Point of Sale counter, so nobody is asked what kind of shop they run.",
     "description": """
 A workshop that sells its own work has a counter. It does not have a shop type.
@@ -46,7 +46,7 @@ and neither is a restaurant.
     "version": "19.0.1.0.0",
     "license": "LGPL-3",
     "category": "Sales/Point of Sale",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         # pos.config, and the onboarding scenario that knows how to build one.
         "point_of_sale",

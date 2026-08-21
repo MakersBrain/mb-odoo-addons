@@ -8,7 +8,7 @@ from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
 
 from ..controllers.auth import credential_matches
-from ..controllers.login import should_redirect_to_makersbrain
+from ..controllers.login import should_redirect_to_mb_sso
 
 
 @tagged("post_install", "-at_install")
@@ -101,17 +101,17 @@ class TestControlBridge(TransactionCase):
         self.assertIn(self.env.ref("point_of_sale.group_pos_user"), user.group_ids)
 
     def test_normal_login_redirects_but_break_glass_and_errors_do_not(self):
-        self.assertTrue(should_redirect_to_makersbrain("GET", False, {}))
+        self.assertTrue(should_redirect_to_mb_sso("GET", False, {}))
         self.assertFalse(
-            should_redirect_to_makersbrain("GET", False, {"local": "1"})
+            should_redirect_to_mb_sso("GET", False, {"local": "1"})
         )
         self.assertFalse(
-            should_redirect_to_makersbrain("GET", False, {"oauth_error": "2"})
+            should_redirect_to_mb_sso("GET", False, {"oauth_error": "2"})
         )
-        self.assertFalse(should_redirect_to_makersbrain("POST", False, {}))
-        self.assertFalse(should_redirect_to_makersbrain("GET", True, {}))
+        self.assertFalse(should_redirect_to_mb_sso("POST", False, {}))
+        self.assertFalse(should_redirect_to_mb_sso("GET", True, {}))
 
-    def test_login_policy_keeps_only_makersbrain_and_disables_password_reset(self):
+    def test_login_policy_keeps_only_mb_sso_and_disables_password_reset(self):
         if "auth.oauth.provider" not in self.env:
             self.skipTest("optional auth_oauth module is not installed")
         providers = self.env["auth.oauth.provider"].sudo()
@@ -124,22 +124,22 @@ class TestControlBridge(TransactionCase):
             "scope": "openid",
             "validation_endpoint": "https://other.example.test/userinfo",
         })
-        makersbrain = providers.create({
+        mb_provider = providers.create({
             "name": "MakersBrain",
-            "client_id": "makersbrain-test-client",
+            "client_id": "mb-test-client",
             "enabled": True,
             "auth_endpoint": "https://auth.example.test/authorize",
             "body": "Log in with MakersBrain",
             "scope": "openid profile email",
             "validation_endpoint": "https://auth.example.test/userinfo",
         })
-        self.company._mb_configure_login_policy(makersbrain)
+        self.company._mb_configure_login_policy(mb_provider)
         parameters = self.env["ir.config_parameter"].sudo()
 
         self.assertFalse(other.enabled)
         self.assertEqual(
             int(parameters.get_param("mb_control.oidc_provider_id")),
-            makersbrain.id,
+            mb_provider.id,
         )
         self.assertFalse(parameters.get_param("auth_signup.reset_password"))
         self.assertEqual(parameters.get_param("auth_signup.invitation_scope"), "b2b")
@@ -169,7 +169,7 @@ class TestControlBridge(TransactionCase):
 
         self.company.mb_bootstrap_tenant({
             "workshop_id": workshop,
-            "oidc_client_id": f"makersbrain-odoo-{workshop}",
+            "oidc_client_id": f"mb-odoo-{workshop}",
             "oidc_issuer": "https://identity.example.test",
             "bridge_token": token,
             "public_hostname": "atelier.makersbrain.fr",

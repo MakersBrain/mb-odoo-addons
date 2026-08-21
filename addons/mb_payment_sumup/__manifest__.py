@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Payment Provider: SumUp",
+    "name": "MakersBrain Payment Provider: SumUp",
     "summary": "SumUp as an Odoo payment provider: hosted checkouts, links and QR codes.",
     "description": """
 SumUp is the card acquirer an artisan already has, because the reader costs
@@ -36,7 +36,7 @@ authoritative transaction events before marking it done.
     "version": "19.0.1.1.1",
     "license": "LGPL-3",
     "category": "Accounting/Payment Providers",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "website": "https://sumup.com",
     "depends": [
         "payment",

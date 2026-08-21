@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 """Fill a tenant's product list from the master catalogue, without the service.
 
-`mb_catalogue_sync` reads its products over HTTP from the catalogue service, and
-that service does not exist yet. This script plays its part: it reads the same
-`catalogue.canonical_catalogue` view the service would serve, and calls the same
-model methods the addon would call. It is a development tool, not the product -
-when the service is running, this goes away and nothing in the addon changes.
+`mb_catalogue_sync` normally reads products over HTTP from the catalogue
+service. This development helper reads the same `catalogue.canonical_catalogue`
+view directly and calls the same model methods, making it useful for populating
+a local database without publishing the service.
 
 Everything travels over docker exec, so nothing needs the two compose stacks to
 share a network:
 
-    catalogue-postgres  --psql-->  this script  --odoo shell-->  odoo-poc-web
+    mb-catalogue-db  --psql-->  this script  --odoo shell-->  mb-odoo-web
 
 Usage:
 
     python3 scripts/seed_from_catalogue.py --manufacturer mayco --limit 40
-    python3 scripts/seed_from_catalogue.py --database odoo --sku SC74,SC15,PC-20
+    python3 scripts/seed_from_catalogue.py --database mb_odoo --sku SC74,SC15,PC-20
     python3 scripts/seed_from_catalogue.py --list-sources
 """
 
@@ -24,10 +23,10 @@ import json
 import subprocess
 import sys
 
-CATALOGUE_CONTAINER = "catalogue-postgres"
+CATALOGUE_CONTAINER = "mb-catalogue-db"
 CATALOGUE_USER = "catalogue"
-CATALOGUE_DB = "ateliera"
-ODOO_CONTAINER = "odoo-poc-web"
+CATALOGUE_DB = "mb_catalogue"
+ODOO_CONTAINER = "mb-odoo-web"
 
 # The standard VAT rate of the country each shop sells from, used to convert its
 # published gross prices to the net figure Odoo stores.
@@ -164,7 +163,7 @@ for source_id, config in vendors.items():
 service = env["mb.catalogue.service"].search([], limit=1)
 if not service:
     service = env["mb.catalogue.service"].create({{
-        "name": "Makersbrain catalogue (seeded locally)",
+        "name": "MakersBrain catalogue (seeded locally)",
         "base_url": "http://catalogue.invalid/seeded-by-script",
     }})
 

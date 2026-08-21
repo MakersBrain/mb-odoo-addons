@@ -65,7 +65,7 @@ def resolve(subpath: str) -> pathlib.Path:
     except subprocess.CalledProcessError:
         sys.exit(
             f"cannot resolve @makersbrain/brand/{subpath}.\n"
-            f"Run `npm install` in {BRAND_ROOT} first."
+            f"Run `npm ci` in {BRAND_ROOT} first."
         )
     return pathlib.Path(out)
 

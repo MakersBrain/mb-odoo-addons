@@ -1,6 +1,6 @@
 # Product Photo Inventory Capture: Remaining Release Plan
 
-Status: implementation complete; release evidence open
+Status: core workflow implemented; refinement and release evidence open
 
 The implemented behavior is specified in `SPEC.md` and documented operationally
 in `addons/mb_inventory_capture/README.md`. This file contains only work that is

@@ -49,7 +49,7 @@ def manifest_of(addon: pathlib.Path) -> dict | None:
 
 
 def installed_addons() -> dict[str, str]:
-    """Every addon the image copies into /mnt/makersbrain-addons."""
+    """Every addon the image copies into /mnt/mb-addons."""
     versions: dict[str, str] = {}
     for addon in sorted(ADDONS.iterdir()):
         if not addon.is_dir():

@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Ceramics Compliance",
+    "name": "MakersBrain Ceramics Compliance",
     "summary": "84/500/EEC food contact: the declaration, the derived tracking and the migration test.",
     "description": """
 The one regulation a ceramics workshop cannot file away.
@@ -12,10 +12,10 @@ that follows, but nothing in Odoo says
 *why* an article is tracked, and without the reason the setting drifts. So
 `mb_food_contact` is declared and `tracking` is derived from it.
 
-Note the boundary with `mb_ceramics_material`: that addon owns whether a *glaze*
-is food-safe, which is a property of a material. This one owns whether an
-*article* is intended for food, which is a property of a product for sale. A
-food-safe glaze on a decorative vase is both true and irrelevant.
+This addon owns whether an *article* is intended for food, which is a property
+of a product for sale. Glaze suitability is evidenced separately by passing
+migration tests on the consumed glaze lots. A tested glaze on a decorative vase
+is valid evidence but does not make the article food-contact ware.
 
 **Compliance is not a craft-neutral base.** This addon is ceramics-specific;
 generic workshop, label, inventory, and catalogue addons do not depend on it.
@@ -40,10 +40,10 @@ so the verdict stays auditable.
 article made from that lot. Recording it per piece would mean copying the same
 figures onto every mug in a firing and having no single place to correct them.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         # The glaze, underglaze and engobe categories the mark-done gate reads,
         # and the Configuration menu the migration test list hangs under.

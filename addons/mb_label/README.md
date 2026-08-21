@@ -1,4 +1,4 @@
-# Makersbrain Label Studio
+# MakersBrain Label Studio
 
 `mb_label` adds a versioned thermal-label editor and product/lot printing to
 Odoo 19. It deliberately separates the document, renderer and printer
@@ -26,7 +26,7 @@ The expression language is an allowlist, not Python or arbitrary ORM access:
 - `{{qr.path}}`, the URL-encoded `SKU` or `SKU/LOT` fragment path
 - `{{manual.<name>}}`, for a value entered in the print wizard
 
-Safe print-time expressions from the old editor are also supported:
+The editor also supports safe print-time expressions:
 `[[date]]`, `[[time]]`, `[[datetime]]`, `[[iso]]`, `[[month]]`,
 `[[monthyear]]`, and formatted values such as `[[date|DD.MM.YY]]`.
 
@@ -47,8 +47,8 @@ scanning when the QR touches dark artwork; 4 modules is the QR standard.
 
 ## Editor and JSON files
 
-Label Studio provides the old editor's practical design features in physical
-millimetres: multi-selection and grouping, keyboard nudging, undo/redo,
+Label Studio provides its design features in physical millimetres:
+multi-selection and grouping, keyboard nudging, undo/redo,
 rotation, z-order, rectangles, ellipses, triangles and lines, three bundled
 font families, horizontal/vertical text alignment, bold/italic/underline,
 background knockout, inverted ink, thermal tint patterns, image paste/upload,
@@ -78,7 +78,7 @@ template and snapshotted in each immutable version. Every rendered value is mate
 - **System/PDF:** supported in normal desktop and mobile browsers. The PDF page
   is exactly the template size. Browser print requests the same size with zero
   margin; the driver still needs scale 100% and matching media.
-- **Phomemo:** Ateliera's vendored `phomymo` browser transport, raster packer
+- **Phomemo:** MakersBrain's vendored `phomymo` browser transport, raster packer
   and protocol implementation, plus its 18 model definitions across the M,
   M02, M04, M110, D, P12/A30 and TSPL families. PM-241 remains listed as
   USB-only; the other definitions are reachable through Web Bluetooth.
@@ -91,13 +91,13 @@ device does not change stored templates or the renderer.
 
 The Phomemo settings expose explicit model override, paper position on the
 head (model default/left/centre/right), die-cut versus continuous media,
-post-label feed, density, speed and four dithering modes. **Test Ateliera
+post-label feed, density, speed and four dithering modes. **Test printer
 connection** uses the same persistent transport, service/characteristic
-selection, notification setup and write-mode fallback as Ateliera and reports
+selection, notification setup and write-mode fallback as MakersBrain and reports
 printer status. **Print hardware test pattern** bypasses the label renderer so
 a blank result isolates the transport/protocol/hardware path.
 
-Do not substitute a generic MTU wrapper for this transport. Ateliera's browser
+Do not substitute a generic MTU wrapper for this transport. MakersBrain's browser
 fix hands the complete print to its vendored `phomymo` implementation, keeps
 one connection for the session, selects the write mode from the actual
 characteristic, and falls back from unacknowledged to acknowledged writes when

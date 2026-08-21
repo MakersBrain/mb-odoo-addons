@@ -11,7 +11,7 @@ SDKs, routing, quotas, and retries remain outside Odoo in the extraction broker.
     "version": "19.0.1.0.1",
     "license": "LGPL-3",
     "category": "Technical/Technical",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": ["mb_control_bridge"],
     "data": [],
     "installable": True,

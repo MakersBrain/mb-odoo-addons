@@ -34,7 +34,7 @@ import json
 import subprocess
 import sys
 
-ODOO_CONTAINER = "odoo-poc-web"
+ODOO_CONTAINER = "mb-odoo-web"
 
 # Fixture products to remove, by name. Deliberately a name list and not a
 # pattern: everything else in this database is real stock.

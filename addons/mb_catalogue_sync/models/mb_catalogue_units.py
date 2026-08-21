@@ -30,8 +30,8 @@ _TO_BASE = {
 }
 
 # Odoo's own units, by the base this addon reduces to. Verified against the
-# running Odoo 19 image: these xmlids exist, and uom.uom there is the reworked
-# model with relative_factor/relative_uom_id rather than the old category_id.
+# running Odoo 19 image: these xmlids exist and the model uses
+# relative_factor/relative_uom_id.
 _BASE_UOM_XMLID = {
     "ml": "uom.product_uom_milliliter",
     "g": "uom.product_uom_gram",

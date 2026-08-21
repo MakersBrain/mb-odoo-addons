@@ -927,8 +927,8 @@ msgstr "Position du papier sur la tête d'impression"
 #. module: mb_label
 #. odoo-javascript
 #: code:addons/mb_label/static/src/printer/phomemo_adapter.js:0
-msgid "Phomemo (Ateliera transport)"
-msgstr "Phomemo (transport Ateliera)"
+msgid "Phomemo (MB transport)"
+msgstr "Phomemo (transport MB)"
 
 #. module: mb_label
 #: model:ir.model.fields.selection,name:mb_label.selection__mb_label_print_job__printer_adapter__phomemo
@@ -1007,8 +1007,8 @@ msgstr "Imprimer l'étiquette de lot ou de pièce"
 
 #. module: mb_label
 #: model:ir.actions.server,name:mb_label.server_action_mb_product_print_label
-msgid "Print Makersbrain Label"
-msgstr "Imprimer une étiquette Makersbrain"
+msgid "Print MakersBrain Label"
+msgstr "Imprimer une étiquette MakersBrain"
 
 #. module: mb_label
 #. odoo-python
@@ -1407,12 +1407,6 @@ msgstr "Modèles"
 
 #. module: mb_label
 #. odoo-javascript
-#: code:addons/mb_label/static/src/printer/device_print.xml:0
-msgid "Test Ateliera connection"
-msgstr "Tester la connexion Ateliera"
-
-#. module: mb_label
-#. odoo-javascript
 #: code:addons/mb_label/static/src/printer/device_print.js:0
 msgid "Test pattern sent: %(bytes)s bytes, %(ink)s ink coverage."
 msgstr ""
@@ -1423,6 +1417,12 @@ msgstr ""
 #: code:addons/mb_label/static/src/printer/device_print.js:0
 msgid "Test print failed."
 msgstr "L'impression de test a échoué."
+
+#. module: mb_label
+#. odoo-javascript
+#: code:addons/mb_label/static/src/printer/device_print.xml:0
+msgid "Test printer connection"
+msgstr "Tester la connexion à l’imprimante"
 
 #. module: mb_label
 #. odoo-javascript

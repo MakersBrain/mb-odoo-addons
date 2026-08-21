@@ -1,9 +1,9 @@
 {
-    "name": "Makersbrain Commercial Operations - Fleet",
+    "name": "MakersBrain Commercial Operations - Fleet",
     "summary": "Vehicle assignment and route-cost defaults for commercial operations",
     "version": "19.0.2.0.1",
     "category": "Human Resources/Fleet",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "license": "LGPL-3",
     "depends": ["mb_commercial_operations", "fleet"],
     "data": [

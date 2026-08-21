@@ -45,7 +45,7 @@ def request(
 ) -> tuple[int, dict, bytes]:
     headers = {
         "Ocp-Apim-Subscription-Key": key,
-        "User-Agent": "makersbrain-inventory-benchmark/1",
+        "User-Agent": "mb-inventory-benchmark/1",
     }
     if mimetype:
         headers["Content-Type"] = mimetype

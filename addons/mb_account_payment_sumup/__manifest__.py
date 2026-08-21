@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Invoice Payment: SumUp link and QR code",
+    "name": "MakersBrain Invoice Payment: SumUp link and QR code",
     "summary": "Pay an invoice by scanning it: a SumUp checkout, or the Odoo portal, as a QR code.",
     "description": """
 An invoice handed over at the studio door is paid by someone holding a phone.
@@ -32,7 +32,7 @@ from outside when the PDF is printed.
     "version": "19.0.1.1.1",
     "license": "LGPL-3",
     "category": "Accounting/Accounting",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         "mb_payment_sumup",
         # The transaction has to know which invoice it settles, and the portal

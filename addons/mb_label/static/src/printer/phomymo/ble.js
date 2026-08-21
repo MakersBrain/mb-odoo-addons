@@ -1,4 +1,4 @@
-// Vendored from phomymo, unmodified except where marked "ateliera:".
+// Vendored from phomymo, unmodified except where marked "mb:".
 // https://github.com/transcriptionstream/phomymo @ 1f58d3f (2026-05-17), ISC.
 // Do not edit to fix a bug here - fix it upstream and re-vendor, or the next
 // re-vendor silently undoes it.

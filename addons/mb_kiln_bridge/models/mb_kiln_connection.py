@@ -46,16 +46,7 @@ def _newest_programs(observations):
 
 
 class MbKilnConnection(models.Model):
-    """One workshop's link to a kiln provider.
-
-    POC-PLAN section 10.7 kept the provider client outside Odoo so no tenant
-    database would hold a credential. That was reversed deliberately on
-    6 August 2026 in favour of the ordinary Odoo shape - a connection record, a
-    cron and a Python client - because a single workshop does not need a
-    fan-out sidecar and the standard shape is the one an Odoo developer can
-    maintain. The cost is this password field, and it is a real cost: see the
-    note on `password` below.
-    """
+    """One workshop's connection, credentials, and sync state for a provider."""
 
     _name = "mb.kiln.connection"
     _description = "Kiln provider connection"
@@ -70,7 +61,8 @@ class MbKilnConnection(models.Model):
     username = fields.Char(required=True)
     password = fields.Char(
         # Odoo has no secret store, so this is a column like any other. It is
-        # never logged, never exported and never returned to the provider; it
+        # never logged or exported; it is sent only to the provider's
+        # authentication endpoint. It
         # is restricted to the manager group in ir.model.access. If this
         # product goes multi-tenant, the credential moves to the connected
         # account gateway and this field goes away.
@@ -78,11 +70,9 @@ class MbKilnConnection(models.Model):
         help="Stored in this database. Restricted to manufacturing managers.",
     )
     provider_token = fields.Char(
-        # A second secret at rest, and a deliberate one. POC-PLAN 10.7 said
-        # tokens must not be persisted; kept anyway because myKiln issues
-        # Django REST Framework tokens, which have no expiry, so the cron can
-        # reuse one indefinitely instead of logging in on every wake. Same
-        # group restriction as the password, never logged, cleared whenever
+        # myKiln issues reusable Django REST Framework tokens, so the cron keeps
+        # the token instead of logging in on every wake. It has the same group
+        # restriction as the password, is never logged, and is cleared whenever
         # the provider refuses it.
         groups="mrp.group_mrp_manager", copy=False, readonly=True)
     provider_token_at = fields.Datetime(readonly=True, copy=False)

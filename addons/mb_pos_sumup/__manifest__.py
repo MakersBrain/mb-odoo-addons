@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain POS SumUp (mobile app)",
+    "name": "MakersBrain POS SumUp (mobile app)",
     "summary": "Take a card in the POS by handing the payment to the SumUp app on the same phone.",
     "description": """
 The artisan already owns a SumUp reader and a phone. This makes the phone the
@@ -22,8 +22,7 @@ The POS page is left and reloaded, which is the part that has to be got right.
 The payment line is written to IndexedDB *before* the handover, the callback
 returns to the payment screen's own route so the router lands there, and the
 line is found again by `foreign-tx-id` - the one parameter SumUp echoes back
-unchanged. Falling back on the pending-line lookup covers SumUp app versions
-older than 1.53.2, which do not echo it.
+unchanged. A callback without that identifier is rejected.
 
 **What is trusted.** `smp-status` in the callback is a URL parameter, and a URL
 parameter is a claim, not evidence. When the payment method names a SumUp
@@ -49,10 +48,10 @@ identifier belongs on the key next to your own - otherwise iOS opens the SumUp
 app and it fails at the reader with a server error, which reads like a
 connectivity fault and is not one.
 """,
-    "version": "19.0.1.1.1",
+    "version": "19.0.1.1.2",
     "license": "LGPL-3",
     "category": "Sales/Point of Sale",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         "point_of_sale",
         # The provider holds the secret key and the merchant code that verify a
