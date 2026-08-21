@@ -8,7 +8,7 @@ except ImportError:
     from odoo.addons.auth_oauth.controllers.main import OAuthLogin as OAuthLoginBase
 
 
-def should_redirect_to_makersbrain(method, authenticated, params):
+def should_redirect_to_mb_sso(method, authenticated, params):
     return (
         method == "GET"
         and not authenticated
@@ -17,11 +17,11 @@ def should_redirect_to_makersbrain(method, authenticated, params):
     )
 
 
-class MakersBrainLogin(OAuthLoginBase):
+class MBLogin(OAuthLoginBase):
     @http.route()
     def web_login(self, *args, **kwargs):
         ensure_db()
-        if should_redirect_to_makersbrain(
+        if should_redirect_to_mb_sso(
             request.httprequest.method,
             bool(request.session.uid),
             request.params,

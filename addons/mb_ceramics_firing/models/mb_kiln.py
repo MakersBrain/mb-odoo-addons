@@ -143,11 +143,10 @@ class MbKiln(models.Model):
     @api.model
     def _continuous_calendar(self, company_id):
         """Return the 24/7 calendar owned by the kiln's company."""
-        template = self.env.ref(
-            "mb_workshop_base.mb_calendar_continuous", raise_if_not_found=False)
+        template = self.env.ref("mb_workshop_base.mb_calendar_continuous")
         company = self.env["res.company"].browse(company_id).exists()
-        if not template or not company:
-            return template
+        if not company:
+            return self.env["resource.calendar"].browse()
         if template.company_id == company:
             return template
         calendar = self.env["resource.calendar"].with_company(company).search([
@@ -171,16 +170,13 @@ class MbKiln(models.Model):
         """
         company_id = values.get("company_id") or self.env.company.id
         calendar = self._continuous_calendar(company_id)
-        tag = self.env.ref(
-            "mb_ceramics_base.mb_workcenter_tag_firing", raise_if_not_found=False)
+        tag = self.env.ref("mb_ceramics_base.mb_workcenter_tag_firing")
         workcenter_values = {
             "name": values.get("name"),
             "company_id": company_id,
         }
-        if calendar:
-            workcenter_values["resource_calendar_id"] = calendar.id
-        if tag:
-            workcenter_values["tag_ids"] = [fields.Command.link(tag.id)]
+        workcenter_values["resource_calendar_id"] = calendar.id
+        workcenter_values["tag_ids"] = [fields.Command.link(tag.id)]
         return workcenter_values
 
     @api.model
@@ -199,9 +195,7 @@ class MbKiln(models.Model):
         win, and should, once a workshop knows it fits sixty test tiles or
         twelve casseroles.
         """
-        unit = self.env.ref("uom.product_uom_unit", raise_if_not_found=False)
-        if not unit:
-            return
+        unit = self.env.ref("uom.product_uom_unit")
         for kiln in self:
             workcenter = kiln.workcenter_id
             if not workcenter:

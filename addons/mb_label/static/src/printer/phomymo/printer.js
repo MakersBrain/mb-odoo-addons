@@ -1,4 +1,4 @@
-// Vendored from phomymo, unmodified except where marked "ateliera:".
+// Vendored from phomymo, unmodified except where marked "mb:".
 // https://github.com/transcriptionstream/phomymo @ 1f58d3f (2026-05-17), ISC.
 // Do not edit to fix a bug here - fix it upstream and re-vendor, or the next
 // re-vendor silently undoes it.
@@ -12,10 +12,10 @@
  */
 
 import { STORAGE_KEYS } from './constants.js';
-// ateliera: bundled rather than fetched. Upstream serves printers.json next to
+// mb: bundled rather than fetched. Upstream serves printers.json next to
 // the page; this app has to print with no network, and the bundler inlines it.
 // Odoo serves static JSON directly but does not transform JSON ESM imports.
-// This is the only Odoo port deviation from Ateliera's vendored file.
+// This is the only Odoo port deviation from MakersBrain's vendored file.
 const DEFINITIONS_URL = '/mb_label/static/src/printer/phomymo/printers.json';
 
 // =============================================================================

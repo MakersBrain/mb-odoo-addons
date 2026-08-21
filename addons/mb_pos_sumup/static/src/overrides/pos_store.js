@@ -28,13 +28,10 @@ patch(PosStore.prototype, {
         cleanUrl.search = "";
         history.replaceState({}, "", cleanUrl);
 
-        // `foreign-tx-id` is the payment line's own uuid, echoed back. Falling
-        // back on the pending line covers SumUp app versions older than 1.53.2,
-        // which do not echo it; there is only ever one line waiting.
+        // `foreign-tx-id` is the payment line's own uuid, echoed back by the
+        // supported SumUp app and required to identify the payment safely.
         const uuid = params.get("foreign-tx-id");
-        const paymentLine =
-            (uuid && this.models["pos.payment"].find((line) => line.uuid === uuid)) ||
-            this.getPendingPaymentLine("sumup_mobile");
+        const paymentLine = uuid && this.models["pos.payment"].find((line) => line.uuid === uuid);
         if (!paymentLine) {
             this.env.services.notification.add(
                 _t("SumUp returned a payment that matches no open order."),

@@ -1,17 +1,17 @@
 """Point a database at a SumUp account, reading the credential from sumup.env.
 
-Run from odoo-poc, with sumup.env exported into the shell first:
+Run from this repository, with a local ignored credential file exported into
+the shell first:
 
-    set -a && . ../makersbrain-odoo/sumup.env && set +a
+    set -a && . sumup.env && set +a
     docker compose exec -T \
         -e SUMUP_API_KEY -e SUMUP_MERCHANT_CODE \
-        odoo odoo shell -d odoo --no-http --log-level=warn \
-        < ../makersbrain-odoo/scripts/setup_sumup.py
+        odoo odoo shell -d mb_odoo --no-http --log-level=warn \
+        < scripts/setup_sumup.py
 
-The key never appears in this file, in a fixture or in the log. POC-PLAN 10.7
-allows exactly one development credential, in one ignored file; this script is
-what carries it from there into the two records that need it, and it fails
-rather than proceeding when the environment does not have it.
+The key never appears in this file, in a fixture, or in the log. Keep the
+development credential in one ignored environment file; this script carries it
+from there into the two records that need it and fails when it is absent.
 
 The affiliate key is a separate credential - it comes from Developer settings in
 the SumUp dashboard, is tied to an application identifier, and is only needed

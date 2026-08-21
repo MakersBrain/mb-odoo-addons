@@ -25,8 +25,7 @@
   <menuitem id="menu_depot_configuration" name="Configuration"
             parent="menu_depot_root" sequence="50"/>
 
-  <!-- Preserve the former Record a sale menu and its list/form action as the
-       audit-trail entry point; the direct-create menu receives a new XML ID. -->
+  <!-- Sale Reports opens the audit trail; Record a Sale opens a new report. -->
   <menuitem id="menu_depot_record_sale"
             name="Sale Reports"
             parent="menu_depot_operations"

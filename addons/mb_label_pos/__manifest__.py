@@ -1,11 +1,11 @@
 {
-    "name": "Makersbrain Label QR for Point of Sale",
+    "name": "MakersBrain Label QR for Point of Sale",
     "summary": "Resolve versioned product and lot QR aliases in Odoo POS.",
     "description": "Offline-first QR alias resolution with native barcode fallback for Odoo 19 POS.",
     "version": "19.0.1.1.2",
     "license": "LGPL-3",
     "category": "Sales/Point of Sale",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": ["mb_label", "point_of_sale"],
     "data": ["security/ir.model.access.csv"],
     "assets": {

@@ -41,7 +41,7 @@ import json
 import subprocess
 import sys
 
-ODOO_CONTAINER = "odoo-poc-web"
+ODOO_CONTAINER = "mb-odoo-web"
 PARENT = "Ceramic pieces"
 
 # SKU prefix -> subcategory. The prefix is the form, the middle token is the

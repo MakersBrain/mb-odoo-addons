@@ -1,4 +1,4 @@
-/* Makersbrain inventory capture worker. No network access and no frame retention. */
+/* MakersBrain inventory capture worker. No network access and no frame retention. */
 const FORMATS = ["ean_8", "ean_13", "upc_a", "upc_e", "code_128", "qr_code", "data_matrix"];
 let detector;
 

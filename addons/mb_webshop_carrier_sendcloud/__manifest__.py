@@ -4,7 +4,7 @@
     "version": "19.0.1.0.0",
     "license": "LGPL-3",
     "category": "Website/eCommerce",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": ["mb_webshop_carrier_base"],
     "data": ["views/delivery_carrier_views.xml"],
     "installable": True,

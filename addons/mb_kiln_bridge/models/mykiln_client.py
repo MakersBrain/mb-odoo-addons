@@ -1,9 +1,6 @@
 """HTTP client for the JSON API used by ROHDE's myKiln service.
 
-Ported from the tested TypeScript client in `ateliera-app`
-(`apps/api/src/modules/ceramics/providers/mykiln.ts`) rather than rediscovered,
-as POC-PLAN section 10.7 requires. The endpoint set and the join between kilns,
-controllers and firings are that file's findings, not guesses:
+The endpoint set and joins between kilns, controllers and firings are:
 
     POST /api/v1/authenticate/       {"username": ..., "password": ...} -> token
     Authorization: Token <token>
@@ -15,7 +12,7 @@ controllers and firings are that file's findings, not guesses:
     GET  /api/v1/firings/<id>/data   its samples, as parallel arrays
 
 **There is no programme library to read.** Two endpoints look like one and
-neither is, checked against the live service on 7 August 2026:
+neither is:
 
 * `/api/v1/programs/` answers, and returns one row per firing ever recorded -
   seventy-two rows for seventy-two firings, ids ascending with the firings.
@@ -30,8 +27,8 @@ So the programme list a workshop actually fires is derived, not fetched: every
 firing reports the controller slot it ran on (`program_number`) and embeds the
 programme as it ran (`program.segments`). Group the firings by slot, take the
 most recent one in each, and that is the current programme. It costs one
-listing call plus one detail call per distinct slot - three, on the live
-account - rather than a call per firing.
+listing call plus one detail call per distinct slot rather than a call per
+firing.
 
 Deliberately free of Odoo imports: it can be exercised by tests with a fake
 transport and no database. It is also read-only - there is no method here that
@@ -48,8 +45,8 @@ _logger = logging.getLogger(__name__)
 MYKILN_BASE_URL = "https://mykiln.eu"
 DEFAULT_TIMEOUT = 120
 FIRING_PAGE_SIZE = 100
-# The catalogue held 315 rows on 7 August 2026 and is paginated at 50 by
-# default. Asked for in one call because it is a lookup table, not a feed.
+# Asked for in one call because kiln types are a bounded lookup table, not a
+# chronological feed.
 KILN_TYPE_PAGE_SIZE = 1000
 
 
@@ -143,7 +140,7 @@ class MykilnClient:
     def _request(self, path, method="GET", json_body=None, authenticated=True):
         headers = {
             "Accept": "application/json",
-            "User-Agent": "makersbrain-kiln-bridge/1.0",
+            "User-Agent": "mb-kiln-bridge/1.0",
         }
         if authenticated:
             if not self._token:

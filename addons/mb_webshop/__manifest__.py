@@ -10,10 +10,10 @@ catalogue, checkout, stock validation, delivery and click-and-collect flows.
 The control plane can restrict and re-enable the complete storefront without
 uninstalling modules or deleting historical orders.
 """,
-    "version": "19.0.1.5.0",
+    "version": "19.0.1.5.1",
     "license": "LGPL-3",
     "category": "Website/eCommerce",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         "mb_brand",
         "mb_control_bridge",

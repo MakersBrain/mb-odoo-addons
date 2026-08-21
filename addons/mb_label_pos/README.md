@@ -1,4 +1,4 @@
-# Makersbrain label QR in Odoo 19 POS
+# MakersBrain label QR in Odoo 19 POS
 
 `mb_label_pos` is an upgrade-safe companion to `mb_label`. It extends Odoo 19
 through supported addon seams and does not replace or edit Point of Sale core:

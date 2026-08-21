@@ -64,10 +64,7 @@ class CapabilityPolicy(models.Model):
             created |= rules.create({
                 "name": f"MakersBrain restricted: {module_key}",
                 "model_id": model_id,
-                # The canonical match-nothing domain. `[(1, '=', 0)]` meant the
-                # same thing to older Odoo and is rejected outright by 19's
-                # Domain parser, which accepts only (0, '=', 1) for false and
-                # (1, '=', 1) for true.
+                # Odoo 19's canonical match-nothing domain.
                 "domain_force": "[(0, '=', 1)]",
                 "global": True,
                 "perm_read": False,

@@ -96,7 +96,7 @@ class DeliveryCarrier(models.Model):
         token_path = os.environ.get("MB_CARRIER_CONTROL_TOKEN_FILE")
         if not token_path:
             token_root = os.environ.get(
-                "MB_CARRIER_CONTROL_TOKEN_ROOT", "/run/makersbrain-odoo-client-secrets"
+                "MB_CARRIER_CONTROL_TOKEN_ROOT", "/run/mb-odoo-client-secrets"
             )
             token_path = str(Path(token_root) / company.mb_control_workshop_id)
         if not base_url:

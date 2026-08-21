@@ -3,8 +3,8 @@ pricelist.
 
 Run it against a database with mb_depot installed:
 
-    docker compose exec -T odoo odoo shell -d odoo --no-http --log-level=warn \
-        < ../makersbrain-odoo/scripts/setup_depot_fixture.py
+    docker compose exec -T odoo odoo shell -d mb_odoo --no-http --log-level=warn \
+        < scripts/setup_depot_fixture.py
 
 Idempotent: re-running updates rather than duplicates, except for the sale order
 at the end, which is only created if the gallery has none.

@@ -1,6 +1,5 @@
-# Provider credentials. POC-PLAN section 10.7 permits one development
-# credential in a local ignored file and nowhere else - never in fixtures,
-# addon data, logs, Git or ir.config_parameter.
+# Provider credentials belong only in local ignored environment files - never
+# in fixtures, addon data, logs, Git, or ir.config_parameter.
 *.env
 !.env.example
 
@@ -14,7 +13,8 @@ backups/
 
 # Vendored OCA repositories. Upstream code, pinned and reproducible from
 # tools/vendor-oca.sh, so committing it would only duplicate someone else's
-# history. No addon here depends on one; see README.md.
+# history. No addon here depends on one; the licence boundary is documented in
+# SPEC.md.
 oca/
 
 __pycache__/
@@ -30,11 +30,8 @@ __pycache__/
 # checkout rebuilds it offline with one command.
 landing/index.html
 
-# Generated Odoo import scripts. scripts/import_shop_catalogue.py writes the
-# code it feeds to `odoo shell` here before running it, so a run can be read
-# back afterwards - but each file inlines that run's whole payload, which makes
-# it an artifact of a run rather than an input to one. The inputs are the
-# catalogue dump and the script that generated this.
+# Local import run artifacts. These may inline a run's payload, so they are
+# operational output rather than repository input.
 build/imports/
 
 # Editor and OS noise.

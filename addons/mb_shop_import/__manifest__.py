@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Shop Catalogue Import",
+    "name": "MakersBrain Shop Catalogue Import",
     "summary": "Review scraper catalogue artifacts before creating products and stock.",
     "description": """
 Upload catalogue-ceramics scraper artifacts, normalize them into persistent
@@ -11,7 +11,7 @@ overwriting newer Odoo activity.
     "version": "19.0.1.0.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": ["mail", "stock", "sale_stock", "account"],
     "data": [
         "security/mb_shop_import_security.xml",

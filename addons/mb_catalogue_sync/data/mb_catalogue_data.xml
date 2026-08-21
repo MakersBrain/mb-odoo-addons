@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <!-- The material taxonomy moved to mb_workshop_base in 19.0.1.3.0; this addon
-       maps catalogue families onto it rather than owning it. See
-       mb_workshop_base/data/mb_material_categories.xml for why. -->
+  <!-- Material categories belong to mb_ceramics_base. This connector maps
+       catalogue families onto that taxonomy rather than owning another one. -->
 
   <!-- The pack size an artisan buys, as a product attribute.
 

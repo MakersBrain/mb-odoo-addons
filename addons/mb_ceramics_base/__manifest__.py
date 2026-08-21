@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Ceramics Base",
+    "name": "MakersBrain Ceramics Base",
     "summary": "The ceramics vertical's floor: material taxonomy, ware taxonomy, seeded work centres.",
     "description": """
 What a ceramics workshop is configured with before anything else is installed.
@@ -54,7 +54,7 @@ reasoning as the categories: one taxonomy, and it is Odoo's.
     "version": "19.0.1.0.0",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         # The menu spine this addon renames, and the continuous calendar the
         # drying work centre runs on.

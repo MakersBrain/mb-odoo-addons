@@ -1,6 +1,6 @@
 # Webshop, Domain, and Email: Remaining Qualification Plan
 
-Status: paid-release implementation complete locally; external qualification open
+Status: Odoo implementation complete; integrated external qualification open
 
 Implemented architecture and behavior are described by `SPEC.md`, addon READMEs,
 and the control-plane release contract. The first paid release still requires a

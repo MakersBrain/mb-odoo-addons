@@ -1,10 +1,10 @@
 {
-    "name": "Makersbrain Commercial Operations",
+    "name": "MakersBrain Commercial Operations",
     "summary": "Plan markets and site obligations, travel costs, and profitability.",
     "version": "19.0.2.2.0",
     "license": "LGPL-3",
     "category": "Services/Project",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": ["account", "project", "hr_timesheet"],
     "data": [
         "security/mb_commercial_operations_security.xml",

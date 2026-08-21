@@ -120,14 +120,11 @@ class WebshopReturn(models.Model):
         return request_record
 
     def _mb_queue_customer_update(self):
-        template = self.env.ref(
-            "mb_webshop.mail_template_return_status", raise_if_not_found=False
-        )
-        if template:
-            for request_record in self.filtered("partner_id.email"):
-                template.send_mail(
-                    request_record.id, force_send=False, raise_exception=False
-                )
+        template = self.env.ref("mb_webshop.mail_template_return_status")
+        for request_record in self.filtered("partner_id.email"):
+            template.send_mail(
+                request_record.id, force_send=False, raise_exception=False
+            )
 
     def action_approve(self):
         for request_record in self:

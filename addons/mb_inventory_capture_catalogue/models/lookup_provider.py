@@ -30,7 +30,7 @@ class InventoryCaptureCatalogueLookup(models.AbstractModel):
                         "canonical_id": f"catalogue:{canonical_id}",
                         "label": variant.display_name,
                         "product_id": variant.id,
-                        "source": "makersbrain_catalogue",
+                        "source": "mb_catalogue",
                         "confidence": 1.0 if barcode else 0.85,
                         "grounded": True,
                         "explanation": _("Verified catalogue identity %(identity)s", identity=canonical_id),
@@ -39,7 +39,7 @@ class InventoryCaptureCatalogueLookup(models.AbstractModel):
                 candidates.append({
                     "canonical_id": f"catalogue:{canonical_id}",
                     "label": label,
-                    "source": "makersbrain_catalogue",
+                    "source": "mb_catalogue",
                     "confidence": 1.0 if barcode else 0.75,
                     "grounded": True,
                     "explanation": _("Catalogue match; import or map it before applying inventory."),

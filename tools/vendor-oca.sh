@@ -13,7 +13,8 @@
 # directories land on disk - and pinned to a commit rather than tracking the
 # 19.0 branch head, so today's checkout is the same code as last week's.
 #
-# ./oca is gitignored. Run this after a fresh checkout, then `make restart`.
+# ./oca is gitignored. Run this after a fresh checkout, then restart the stack
+# with `make down && make up`.
 #
 # To add a module: put it in the MODULES field of its repository below, bump the
 # pinned commit if the module landed after it, and re-run.

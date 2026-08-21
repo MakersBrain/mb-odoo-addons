@@ -1,9 +1,9 @@
 {
-    "name": "Makersbrain Commercial Operations - URSSAF",
+    "name": "MakersBrain Commercial Operations - URSSAF",
     "summary": "Read-only legal recognition status for commercial operations",
     "version": "19.0.2.0.1",
     "category": "Accounting/Localizations",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "license": "LGPL-3",
     "depends": [
         "l10n_fr_micro_urssaf",

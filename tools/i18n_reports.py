@@ -41,7 +41,7 @@ except ImportError:  # pragma: no cover
     )
 
 REPO = Path(__file__).resolve().parent.parent
-CONTAINER_DEFAULT = "makersbrain-odoo-web"
+CONTAINER_DEFAULT = "mb-odoo-web"
 
 # Minimal records for models that have none in a demo-less database, so the
 # document body renders and the catalogue assertion has something to bite on.

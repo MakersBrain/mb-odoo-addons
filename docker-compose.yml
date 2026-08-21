@@ -1,15 +1,13 @@
-name: makersbrain-odoo
+name: mb-odoo
 
 # A self-contained development stack: Postgres, Odoo, and the addons in this
-# repository. It publishes nothing and holds no credential, which is the
-# difference between it and the sibling `odoo-poc/` stack — that one adds a
-# cloudflared tunnel and is reachable from the internet, so it is hardened
-# differently and is not what you want for running tests.
+# repository. It publishes no application data externally and contains only
+# local development credentials. It is not a production deployment.
 
 services:
   db:
     image: postgres:17-alpine
-    container_name: makersbrain-odoo-db
+    container_name: mb-odoo-db
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: ${DB_USER:-odoo}
@@ -34,7 +32,7 @@ services:
 
   odoo:
     image: odoo:${ODOO_VERSION:-19}
-    container_name: makersbrain-odoo-web
+    container_name: mb-odoo-web
     depends_on:
       db:
         condition: service_healthy
@@ -62,7 +60,7 @@ services:
       # Mounted rather than copied into an image, so an edit is one restart away
       # rather than one rebuild away. This is a development stack; a deployment
       # would bake the addons in.
-      - ./addons:/mnt/makersbrain-addons
+      - ./addons:/mnt/mb-addons
       # Third-party OCA modules, vendored by tools/vendor-oca.sh and not
       # committed. Read-only: they are upstream code, and an edit here would be
       # silently lost on the next re-vendor. The directory is created by the
@@ -85,7 +83,7 @@ services:
   # development cannot reach a real address. Opt in with `make mail`.
   mailpit:
     image: axllent/mailpit:latest
-    container_name: makersbrain-odoo-mailpit
+    container_name: mb-odoo-mailpit
     profiles: ["tools"]
     ports:
       - "${MAILPIT_UI_PORT:-8125}:8025"

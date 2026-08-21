@@ -81,7 +81,7 @@ def _request(url: str, allowed_hosts: set[str]) -> tuple[bytes, str, str | None]
     try:
         connection.request(
             "GET", target,
-            headers={"Host": host, "User-Agent": "Makersbrain-Shop-Import/1"},
+            headers={"Host": host, "User-Agent": "mb-shop-import/1"},
         )
         response = connection.getresponse()
         location = response.getheader("Location")

@@ -45,7 +45,7 @@ class MailMail(models.Model):
 
     def _mb_control_token(self, company):
         root = os.environ.get(
-            "MB_ODOO_CLIENT_TOKEN_ROOT", "/run/makersbrain-odoo-client-secrets"
+            "MB_ODOO_CLIENT_TOKEN_ROOT", "/run/mb-odoo-client-secrets"
         )
         try:
             token_file = (Path(root) / company.mb_control_workshop_id).resolve(strict=True)

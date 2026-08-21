@@ -12,14 +12,13 @@ RUN --mount=type=cache,id=odoo-apt-lists,target=/var/lib/apt/lists,sharing=locke
     rm -f /etc/apt/apt.conf.d/docker-clean && \
     apt-get update && \
     apt-get install -y --no-install-recommends python3-jose
-COPY --chown=odoo:odoo addons /mnt/makersbrain-addons
+COPY --chown=odoo:odoo addons /mnt/mb-addons
 COPY --chown=odoo:odoo --from=oca /server-auth/auth_oidc /mnt/oca-addons/auth_oidc
 USER odoo
 
 # `org.opencontainers.image.source` is what links the published package to this
 # repository on GHCR. Without it an organisation-owned package stays unlinked and
-# the repository's own GITHUB_TOKEN is refused even read access on it, which is
-# how the previous release pipeline came to be unable to push its own images.
+# the repository's own GITHUB_TOKEN can be refused read access.
 # The remaining labels carry image provenance in standard OCI annotations.
 ARG SOURCE_COMMIT=""
 ARG SOURCE_REF=""

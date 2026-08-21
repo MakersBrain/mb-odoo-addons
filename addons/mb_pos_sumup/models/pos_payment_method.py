@@ -151,9 +151,8 @@ class PosPaymentMethod(models.Model):
         currency = self.journal_id.currency_id or self.company_id.currency_id
         params = {
             "affiliate-key": self.sumup_affiliate_key,
-            # `total` is what the Android app reads; `amount` is what iOS reads
-            # and what older Android versions fall back to. Sending both is how
-            # one URL serves both platforms.
+            # `total` is what Android reads and `amount` is what iOS reads, so
+            # one URL needs both platform-specific parameters.
             "total": currency.round(amount),
             "amount": currency.round(amount),
             "currency": currency.name,
@@ -191,14 +190,9 @@ class PosPaymentMethod(models.Model):
         """
         self.ensure_one()
 
-        transaction_code = callback_params.get("smp-tx-code") or ""
         provider_sudo = self._sumup_provider_sudo()
 
         transaction = self._sumup_find_transaction(foreign_transaction_id=payment_uuid)
-        if not transaction and transaction_code:
-            # SumUp app versions before 1.53.2 do not echo `foreign-tx-id`, so
-            # the transaction code is the only handle left.
-            transaction = self._sumup_find_transaction(transaction_code=transaction_code)
         if not transaction:
             return {
                 "successful": False,
@@ -240,7 +234,7 @@ class PosPaymentMethod(models.Model):
         return {
             "successful": successful,
             "verified": True,
-            "transaction_code": transaction.get("transaction_code") or transaction_code,
+            "transaction_code": transaction.get("transaction_code") or "",
             "transaction_uid": transaction.get("id") or "",
             "card_no": card.get("last_4_digits") or "",
             "card_brand": card.get("type") or "",

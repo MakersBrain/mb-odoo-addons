@@ -2,8 +2,8 @@
 
 Run after scripts/setup_depot_fixture.py:
 
-    docker compose exec -T odoo odoo shell -d odoo --no-http --log-level=warn \
-        < ../makersbrain-odoo/scripts/demo_depot_monthly.py
+    docker compose exec -T odoo odoo shell -d mb_odoo --no-http --log-level=warn \
+        < scripts/demo_depot_monthly.py
 
 The shape it demonstrates:
 

@@ -4,15 +4,10 @@ Upstream: <https://github.com/transcriptionstream/phomymo>
 Commit: `1f58d3f0e7f941b9143277cda828380149e56855` (2026-05-17)
 Licence: ISC (`package.json`; upstream ships no LICENSE file)
 
-Printing in the browser goes through this code rather than through
-`phomemo-protocol.ts`. The app's own encoder produces, for the M110, the same
-bytes as `bridge/print_label.py` - which prints - and still would not print
-from the browser, so the whole job was handed to upstream instead of bisecting
-a stream that already matched a working one. `../phomymo-print.ts` is the only
-thing that imports from here.
-
-Native builds do not use this: `ble.js` is `navigator.bluetooth` throughout,
-which a Capacitor build has no access to. Native keeps `phomemo.ts`.
+Browser printing enters this vendored transport through
+`../phomemo_adapter.js`. That adapter supplies Odoo's settings, raster and
+print-job shell; this directory owns the Web Bluetooth transport and device
+protocol commands. No other addon code imports these files directly.
 
 ## Files
 
@@ -26,7 +21,7 @@ which a Capacitor build has no access to. Native keeps `phomemo.ts`.
 
 ## Deviations
 
-Every one is marked `ateliera:` in the source. There are two.
+Every one is marked `mb:` in the source. There are two.
 
 1. `printer.js` imports `printers.json` instead of `fetch`ing it. Upstream
    serves the file next to the page; this app has to print with no network,
@@ -35,10 +30,12 @@ Every one is marked `ateliera:` in the source. There are two.
    otherwise a DOM-bound editor class we have no use for. The methods are
    standalone functions and `this._x(` reads `_x(`; the bodies are unchanged.
 
-Each file also carries `// @ts-nocheck`, because the project sets `checkJs`.
+Each file also carries `// @ts-nocheck` so JavaScript-aware type checkers do not
+rewrite or reject upstream's untyped implementation.
 
 ## Re-vendoring
 
 Do not fix bugs here - fix them upstream and re-vendor, or the next re-vendor
-silently undoes the fix. `phomymo-print.test.ts` pins the behaviour this app
-depends on; run it after any re-vendor.
+silently undoes the fix. `../../../tests/printer_protocols.test.js` pins the
+transport, raster and M110 command behavior this addon depends on; run the
+`mb_label` web unit tests after any re-vendor.

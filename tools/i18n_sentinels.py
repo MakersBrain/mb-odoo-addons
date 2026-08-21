@@ -35,7 +35,7 @@ except ImportError:  # pragma: no cover
 
 REPO = Path(__file__).resolve().parent.parent
 MANIFEST = REPO / "docs" / "i18n" / "sentinels.json"
-CONTAINER_DEFAULT = "makersbrain-odoo-web"
+CONTAINER_DEFAULT = "mb-odoo-web"
 
 # How many sentinels to keep per addon. Enough to cover more than one surface,
 # few enough that the manifest stays reviewable by hand.

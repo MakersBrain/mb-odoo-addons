@@ -2,8 +2,8 @@
 
 Read-only import of master catalogue materials into a tenant's product list.
 
-Status: working. It installs on Odoo 19 Community, its tests pass, and it runs
-against the catalogue read API in `catalogue-ceramics/catalogue-service/`.
+It installs on Odoo 19 Community and reads the configured catalogue service over
+its bounded HTTP API.
 
 ## Importing
 
@@ -23,15 +23,14 @@ somebody who bought four glazes.
 
 ## What crosses the boundary, and what does not
 
-The master catalogue holds ~47,000 supplier listings across 76 shops, with price
-history. None of that belongs in an artisan's database: it is cross-tenant
-reference data, it is volatile, and it is the most independent asset in the
-product. What crosses is the curated manufacturer identity and the offers of the
-suppliers this workshop actually buys from.
+The master catalogue's supplier listings and price history do not belong in an
+artisan's database: they are cross-tenant reference data and volatile. What
+crosses is the curated manufacturer identity and the current offers of suppliers
+this workshop has explicitly mapped.
 
 | Catalogue | Odoo |
 | --- | --- |
-| `canonical_products` (1,748 today) | `product.template`, on demand, one per import |
+| canonical product | `product.template`, on demand, one per import |
 | pack size, from `parent_external_id` | `product.product`, via the `Pack size` attribute |
 | latest offer, mapped sources only | `product.supplierinfo` |
 | price history, unmapped sources, stock at the distributor | stays in the catalogue |
@@ -109,25 +108,20 @@ Each product carries `canonical_product_id`, `brand`, `manufacturer_sku`,
 `vat_status`, `vat_rate`, `package_quantity`, `package_unit`,
 `min_order_quantity`.
 
-That is exactly the `catalogue.canonical_catalogue` view in
-`catalogue-ceramics/catalogue-dump/catalogue-canonical-promotion.sql`, and
-`catalogue-ceramics/catalogue-service/app.py` serves it from there.
-
-Odoo reaches it at `http://catalogue-service:8686` by joining the
-catalogue-ceramics compose network — see the `catalogue` network in
-`odoo-poc/docker-compose.yml`. The service is not published on the host: the only
-thing that needs it is that container.
+Configure the service URL and optional bearer API key under **Purchase →
+Configuration → Master catalogue → Service**. Network placement and publication
+are deployment concerns; the addon does not assume a hostname.
 
 ## Bulk seeding, for development
 
-`makersbrain-odoo/scripts/seed_from_catalogue.py` fills a database without the
+`scripts/seed_from_catalogue.py` fills a database without the
 picker, for when you want a populated instance to look at rather than a
 workshop's real material list.
 
 ```bash
-python3 scripts/seed_from_catalogue.py --database odoo --manufacturer mayco --limit 40
-python3 scripts/seed_from_catalogue.py --database odoo --sku SC74,PC-20
-python3 scripts/seed_from_catalogue.py --database odoo --purge
+python3 scripts/seed_from_catalogue.py --database mb_odoo --manufacturer mayco --limit 40
+python3 scripts/seed_from_catalogue.py --database mb_odoo --sku SC74,PC-20
+python3 scripts/seed_from_catalogue.py --database mb_odoo --purge
 python3 scripts/seed_from_catalogue.py --list-sources
 ```
 
@@ -135,14 +129,15 @@ python3 scripts/seed_from_catalogue.py --list-sources
 any that stock moves, orders, invoices or a bill of materials refer to — those
 are part of a history, not a stray import.
 
-## Not done here
+## Boundaries
 
-- Ceramics fields — firing range, cone, atmosphere, shrinkage, food-safe — belong
-  to `mb_ceramics_material` per POC-PLAN section 4. This addon calls
-  `_mb_apply_ceramics`, a no-op hook, rather than declaring a competing set.
-- The artisan-facing picker. `action_search` is the backend for it.
-- Refresh scheduling. Import is on demand; nothing runs on a cron yet.
-- `api_key` is a stand-in until `mb_connected_account` exists (POC-PLAN 5.1).
+- The addon maps catalogue families onto the material categories owned by
+  `mb_ceramics_base`; it does not declare another material taxonomy.
+- `_mb_apply_ceramics` is an extension hook and is a no-op in this addon.
+- Search and import are available through the **Import materials** wizard.
+- Import is on demand; the addon does not schedule refreshes.
+- The optional API key is stored on the catalogue service record and visible
+  only to system administrators.
 
 ## Tests
 
@@ -151,7 +146,7 @@ docker compose exec odoo odoo -d <db> -u mb_catalogue_sync \
   --test-enable --stop-after-init --http-port=8199 --no-http
 ```
 
-Seven tests, from a trimmed real payload: external-id idempotency, the same jar
-published twice landing on one variant, VAT-inclusive prices stored net, an
-offer without a VAT basis refused, an unmapped source producing no vendor, and
-the pack conversions.
+The suite covers search-without-import, selection and held-product behavior,
+external-id idempotency, category and manufacturer-code ownership, native vendor
+quantity tiers, duplicate pack normalization, net-price conversion, refused
+offers, source mapping, and pack conversions.

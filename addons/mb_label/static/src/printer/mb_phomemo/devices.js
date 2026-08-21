@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
-// Mechanically transpiled from ateliera-app/apps/mobile/src/lib/label/devices.ts.
-// Keep this table synchronized with Ateliera; it is the shared Phomemo model source.
+// Mechanically transpiled from mb-app/apps/mobile/src/lib/label/devices.ts.
+// Keep this table synchronized with MakersBrain; it is the shared Phomemo model source.
 //
 // Two fields of the upstream table are dropped here on purpose: `group` and
 // `description` hold French prose, nothing in this addon reads either, and a

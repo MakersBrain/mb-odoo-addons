@@ -15,7 +15,7 @@ past schemas, retired formats, or upgrade paths.
 | Family | Addons | Current responsibility |
 | --- | --- | --- |
 | Workshop foundation | `mb_workshop_base`, `mb_workshop_pos`, `mb_brand` | Shared workshop navigation, continuous calendar, supplier-lot policy, priced selectors, default POS counter, and branding |
-| Ceramics | `mb_ceramics_base`, `mb_ceramics_compliance`, `mb_ceramics_firing`, `mb_ceramics_workflow`, `mb_kiln_bridge` | Ceramics taxonomy, food-contact compliance, kiln loads/programmes, throwing and board workflows, inspection, genealogy, and ROHDE myKiln import |
+| Ceramics | `mb_ceramics_base`, `mb_ceramics_compliance`, `mb_ceramics_firing`, `mb_ceramics_workflow`, `mb_kiln_bridge` | Ceramics taxonomy, food-contact compliance, kiln loads/programmes, throwing, bisque, glazing and board workflows, inspection, genealogy, and ROHDE myKiln import |
 | Labels and identity | `mb_label`, `mb_label_pos` | Current-schema label documents, immutable template versions, durable exact QR aliases, rendering, printing, and POS resolution |
 | Catalogue and capture | `mb_catalogue_sync`, `mb_inventory_capture`, `mb_inventory_capture_catalogue` | Master-material import and reviewed product/package photo identification |
 | Shop import | `mb_shop_import`, `mb_shop_import_ceramics`, `mb_shop_import_depot` | Reviewed ingestion of scraper artifacts with ceramics and consignment policy integrations |
@@ -23,7 +23,7 @@ past schemas, retired formats, or upgrade paths.
 | Commercial operations | `mb_commercial_operations` and its `stock`, `depot`, `mrp`, `purchase`, `sale`, `pos`, `fleet`, `expense`, and `urssaf` integrations | Markets and site obligations, scenario-owned cost/revenue planning, travel, stock preparation, evidence, and profitability |
 | Payments | `mb_payment_sumup`, `mb_pos_sumup`, `mb_account_payment_sumup` | SumUp hosted checkout, mobile POS handoff, invoice links, and QR payments |
 | French micro-enterprise | `l10n_fr_micro_enterprise`, `l10n_fr_micro_urssaf` | Franchise-en-base tax configuration, Factur-X exemption treatment, cash-basis turnover declarations, receipt book, and threshold monitoring |
-| Webshop and shipping | `mb_webshop`, `mb_webshop_carrier_base`, `mb_webshop_carrier_boxtal`, `mb_webshop_carrier_sendcloud` | Switchable native Odoo webshop and durable provider-neutral carrier operations |
+| Webshop and shipping | `mb_webshop`, `mb_webshop_carrier_base`, `mb_webshop_carrier_boxtal`, `mb_webshop_carrier_sendcloud` | Switchable native Odoo webshop, customer returns, and durable provider-neutral carrier operations through Boxtal or Sendcloud |
 | Platform bridges | `mb_control_bridge`, `mb_dbfilter_gateway`, `mb_email_bridge`, `mb_ai_bridge`, `mb_invoice_capture` | Tenant identity and entitlement reconciliation, trusted database routing, transactional email, AI jobs, and reviewed supplier-bill extraction |
 
 ## Current addon versions
@@ -32,23 +32,23 @@ past schemas, retired formats, or upgrade paths.
 | --- | --- | --- | --- |
 | `l10n_fr_micro_enterprise` | 19.0.4.0.1 | `l10n_fr_micro_urssaf` | 19.0.2.0.1 |
 | `mb_account_payment_sumup` | 19.0.1.1.1 | `mb_ai_bridge` | 19.0.1.0.1 |
-| `mb_brand` | 19.0.1.0.1 | `mb_catalogue_sync` | 19.0.1.5.0 |
-| `mb_ceramics_base` | 19.0.1.0.0 | `mb_ceramics_compliance` | 19.0.1.0.0 |
-| `mb_ceramics_firing` | 19.0.3.0.0 | `mb_ceramics_workflow` | 19.0.3.0.0 |
+| `mb_brand` | 19.0.1.0.1 | `mb_catalogue_sync` | 19.0.1.5.1 |
+| `mb_ceramics_base` | 19.0.1.0.0 | `mb_ceramics_compliance` | 19.0.1.0.1 |
+| `mb_ceramics_firing` | 19.0.3.0.1 | `mb_ceramics_workflow` | 19.0.3.0.0 |
 | `mb_commercial_operations` | 19.0.2.2.0 | `mb_commercial_operations_depot` | 19.0.2.1.0 |
 | `mb_commercial_operations_expense` | 19.0.2.0.1 | `mb_commercial_operations_fleet` | 19.0.2.0.1 |
 | `mb_commercial_operations_mrp` | 19.0.2.0.1 | `mb_commercial_operations_pos` | 19.0.2.0.1 |
 | `mb_commercial_operations_purchase` | 19.0.2.0.1 | `mb_commercial_operations_sale` | 19.0.2.0.1 |
 | `mb_commercial_operations_stock` | 19.0.2.0.1 | `mb_commercial_operations_urssaf` | 19.0.2.0.1 |
 | `mb_control_bridge` | 19.0.1.14.0 | `mb_dbfilter_gateway` | 19.0.1.0.1 |
-| `mb_depot` | 19.0.4.0.7 | `mb_email_bridge` | 19.0.1.1.0 |
-| `mb_inventory_capture` | 19.0.1.1.0 | `mb_inventory_capture_catalogue` | 19.0.1.0.2 |
+| `mb_depot` | 19.0.4.0.8 | `mb_email_bridge` | 19.0.1.1.1 |
+| `mb_inventory_capture` | 19.0.1.1.0 | `mb_inventory_capture_catalogue` | 19.0.1.0.3 |
 | `mb_invoice_capture` | 19.0.1.5.3 | `mb_kiln_bridge` | 19.0.1.3.0 |
-| `mb_label` | 19.0.1.2.0 | `mb_label_pos` | 19.0.1.1.2 |
-| `mb_payment_sumup` | 19.0.1.1.1 | `mb_pos_sumup` | 19.0.1.1.1 |
+| `mb_label` | 19.0.1.2.1 | `mb_label_pos` | 19.0.1.1.2 |
+| `mb_payment_sumup` | 19.0.1.1.1 | `mb_pos_sumup` | 19.0.1.1.2 |
 | `mb_shop_import` | 19.0.1.0.0 | `mb_shop_import_ceramics` | 19.0.1.0.0 |
-| `mb_shop_import_depot` | 19.0.1.0.0 | `mb_webshop` | 19.0.1.5.0 |
-| `mb_webshop_carrier_base` | 19.0.1.1.0 | `mb_webshop_carrier_boxtal` | 19.0.1.1.0 |
+| `mb_shop_import_depot` | 19.0.1.0.0 | `mb_webshop` | 19.0.1.5.1 |
+| `mb_webshop_carrier_base` | 19.0.1.1.1 | `mb_webshop_carrier_boxtal` | 19.0.1.1.0 |
 | `mb_webshop_carrier_sendcloud` | 19.0.1.0.0 | `mb_workshop_base` | 19.0.2.0.0 |
 | `mb_workshop_pos` | 19.0.1.0.0 |  |  |
 

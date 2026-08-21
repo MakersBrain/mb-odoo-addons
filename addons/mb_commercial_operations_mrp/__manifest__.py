@@ -1,9 +1,9 @@
 {
-    "name": "Makersbrain Commercial Operations - Manufacturing",
+    "name": "MakersBrain Commercial Operations - Manufacturing",
     "summary": "Reviewed manufacturing supply for market stock shortages",
     "version": "19.0.2.0.1",
     "category": "Manufacturing/Manufacturing",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "license": "LGPL-3",
     "depends": ["mb_commercial_operations_stock", "mrp", "project_mrp"],
     "data": [

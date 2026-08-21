@@ -5,7 +5,8 @@ English is the source language and lives in the code. French lives in
 extracted English source catalogue and is committed so source-string drift is
 reviewable.
 
-Shared files, owned by the coordinator and not edited by addon work:
+Shared files are maintained centrally so terminology and exceptions remain
+consistent across addons:
 
 | File | Purpose |
 |---|---|
@@ -17,7 +18,7 @@ Shared files, owned by the coordinator and not edited by addon work:
 | `tools/i18n.sh` | Scratch database, install, upgrade, export, import. |
 | `tools/i18n_sentinels.py` | Picks owned UI strings per addon and asserts they render in French. |
 | `tools/i18n_reports.py` | Renders every report as HTML and PDF in both languages. |
-| `tools/i18n_integration.sh` | The coordinator's end-to-end run over all addons at once. |
+| `tools/i18n_integration.sh` | The end-to-end run over all addons at once. |
 | `docs/i18n/sentinels.json` | The generated sentinel manifest. |
 
 ## The loop
@@ -48,10 +49,10 @@ keys, SKU values, provider identifiers, file paths, URLs, or test fixtures.
 
 ### 2. Build the scratch database
 
-Each agent uses its own database and never touches another's:
+Use a dedicated disposable database for the modules being translated:
 
 ```bash
-tools/i18n.sh setup "$AGENT_DB" MODULE_A MODULE_B
+tools/i18n.sh setup "$WORK_DB" MODULE_A MODULE_B
 ```
 
 That creates the database, loads `fr_FR` *before* the addons are installed — so
@@ -64,7 +65,7 @@ Database-backed view and model terms must match the current source, so upgrade
 before every export:
 
 ```bash
-tools/i18n.sh refresh "$AGENT_DB" MODULE_A MODULE_B   # upgrade + export POT
+tools/i18n.sh refresh "$WORK_DB" MODULE_A MODULE_B   # upgrade + export POT
 ```
 
 This writes `addons/<module>/i18n/<module>.pot`.
@@ -94,7 +95,7 @@ uv run --no-project --with polib python tools/check_i18n.py --all --module MODUL
 `--all` runs both the catalogue gate and the source scanner. A finding the
 scanner reports that is genuinely not user-facing is a signal to look again, not
 to suppress. When it really is a false positive — a barcode symbology name, a
-device model, a table of protocol constants — the coordinator records it in
+device model, a table of protocol constants — record it in
 `docs/i18n/i18n_allowlist.json`:
 
 - `identical`: msgids whose French is legitimately the same as the English;
@@ -102,13 +103,13 @@ device model, a table of protocol constants — the coordinator records it in
 - `source.texts`: exact literals the scanner should stop flagging;
 - `source.files`: path prefixes that hold data rather than interface.
 
-Agents request entries; they do not add them.
+Every exception needs review and a narrow, documented match.
 
 ### 7. Import and verify at runtime
 
 ```bash
-tools/i18n.sh import "$AGENT_DB" MODULE_A MODULE_B
-tools/i18n.sh upgrade "$AGENT_DB" MODULE_A MODULE_B
+tools/i18n.sh import "$WORK_DB" MODULE_A MODULE_B
+tools/i18n.sh upgrade "$WORK_DB" MODULE_A MODULE_B
 ```
 
 Python and web translation bundles are cached, so restart the Odoo process
@@ -122,8 +123,8 @@ complete, following the repository's Odoo 19 version policy.
 
 ## Integration
 
-Once every addon's catalogue is in, the coordinator runs one clean database with
-all addons installed together:
+For repository-wide verification, run one clean database with all addons
+installed together:
 
 ```bash
 tools/i18n_integration.sh
@@ -162,6 +163,8 @@ Worth knowing before trusting a green run:
   image is not, so the JavaScript catalogues are proven by extraction and by
   Python-side rendering, not by a browser.
 - A live POS session with the SumUp and label extensions loaded together.
-- Reports whose model has no record: four of the six are asserted only as far as
-  "renders and produces a valid PDF in both languages".
-- Deployment to `odoo_test`, which is a separate, authorised operation.
+- Reports whose model has no record are asserted only as far as "renders and
+  produces a valid PDF in both languages"; the integration summary names each
+  body that could not be checked against its catalogue.
+- Deployment to any shared environment, which remains a separate, authorised
+  operation.

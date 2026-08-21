@@ -2,7 +2,8 @@
 
 Run with:
 
-    odoo shell -d odoo_test --no-http < scripts/configure_bisque_workflow.py
+    docker compose exec -T odoo odoo shell -d mb_odoo --no-http \
+        < scripts/configure_bisque_workflow.py
 
 The validation phase completes before any write. Product names are never used
 as identifiers; missing or duplicate internal references abort the script.

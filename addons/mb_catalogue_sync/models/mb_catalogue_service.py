@@ -1,9 +1,8 @@
 """The catalogue service this tenant reads, and the import it performs.
 
-Import is on demand and per product. The catalogue holds ~47,000 supplier
-listings over 76 shops; an artisan uses a few dozen materials. Pulling the
-catalogue into a tenant would be both useless to them and a copy of the
-strongest asset in the product sitting in a database we hand to a customer.
+Import is on demand and per product. An artisan uses a small subset of the
+shared catalogue, so only explicitly selected identities and mapped supplier
+offers cross into the tenant database.
 """
 
 import logging
@@ -24,13 +23,12 @@ class MbCatalogueService(models.Model):
     _name = "mb.catalogue.service"
     _description = "Master catalogue service"
 
-    name = fields.Char(required=True, default="Makersbrain catalogue")
+    name = fields.Char(required=True, default="MakersBrain catalogue")
     base_url = fields.Char(
         string="Base URL", required=True,
         help="Root URL of the catalogue read API.")
-    # TODO(control-plane): per POC-PLAN section 5.1 a tenant should hold a
-    # reference to a credential, not the credential. This field is the stand-in
-    # until mb_connected_account exists.
+    # Optional bearer credential for this configured catalogue service. Access
+    # is restricted to system administrators by the field's group.
     api_key = fields.Char(string="API key", groups="base.group_system")
     active = fields.Boolean(default=True)
     last_import_at = fields.Datetime(string="Last import", readonly=True)

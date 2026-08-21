@@ -1,9 +1,9 @@
 {
-    "name": "Makersbrain Commercial Operations - Sales",
+    "name": "MakersBrain Commercial Operations - Sales",
     "summary": "Market sales, revenue analytics, and outbound product cost",
     "version": "19.0.2.0.1",
     "category": "Sales/Sales",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "license": "LGPL-3",
     "depends": [
         "mb_commercial_operations_stock",

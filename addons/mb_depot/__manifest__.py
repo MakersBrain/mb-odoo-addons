@@ -1,5 +1,5 @@
 {
-    "name": "Makersbrain Consignment",
+    "name": "MakersBrain Consignment",
     "summary": "Consignment stock held at galleries and shops, and the statement that settles it.",
     "description": """
 Odoo has no outbound consignment. Its built-in Consignment setting is the other
@@ -56,10 +56,10 @@ _show_discount(). The wizard sets both.
 Sourcing needs no third-party module: a sale from a depot is a sale from that
 warehouse, which is Odoo's own Warehouse field on the quotation.
 """,
-    "version": "19.0.4.0.7",
+    "version": "19.0.4.0.8",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         "stock",
         # The commission is a pricelist and the statement values sold pieces

@@ -8,10 +8,9 @@
           overnight and a board dries over a weekend, and on a nine-to-five
           calendar Odoo fragments a fourteen-hour firing across three days.
 
-          Nothing about that is ceramic, which is why this record stayed here
-          when the work centres that use it moved to `mb_ceramics_base` in
-          19.0.2.0.0. A dye bath, a tanning pit and a lumber drier all want the
-          same calendar for the same reason.
+          Nothing about that is ceramic, so the calendar belongs to the shared
+          workshop base. A dye bath, a tanning pit and a lumber drier all want
+          the same calendar for the same reason.
 
           UTC, deliberately. Nothing on this calendar keeps office hours, so a
           local timezone would only introduce a daylight-saving discontinuity

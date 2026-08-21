@@ -49,10 +49,9 @@ FAMILY_FALLBACK = "mb_ceramics_base.categ_ceramic_materials"
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-    # Provenance only. The ceramics fields - firing range, cone, atmosphere,
-    # shrinkage, food-safe - belong to mb_ceramics_material per POC-PLAN section
-    # 4, and this addon writes them through the hook at the bottom rather than
-    # declaring a second, competing set.
+    # Catalogue provenance only. Domain extensions may consume the catalogue
+    # record through _mb_apply_ceramics without this connector declaring a
+    # second set of ceramics fields.
     mb_canonical_id = fields.Char(
         string="Catalogue id", index=True, copy=False, readonly=True,
         help="Identifier of the curated identity in the master catalogue.")
@@ -340,7 +339,9 @@ class ProductTemplate(models.Model):
     # -- hook --------------------------------------------------------------
 
     def _mb_apply_ceramics(self, record):
-        """Overridden by mb_ceramics_material to write firing range, cone,
-        family and the rest. A no-op here so this addon stays installable on its
-        own and owns no ceramics field it does not define."""
+        """Extension hook for domain-specific catalogue attributes.
+
+        It is intentionally a no-op here: this connector owns catalogue
+        provenance and supplier offers, not another set of ceramics fields.
+        """
         return

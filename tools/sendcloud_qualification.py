@@ -60,7 +60,7 @@ class Client:
             "Accept": "application/json",
             "Authorization": f"Basic {encoded}",
             "Content-Type": "application/json",
-            "User-Agent": "MakersBrain-Sendcloud-Qualification/1",
+            "User-Agent": "mb-sendcloud-qualification/1",
         }
         self.opener = build_opener(
             HTTPSHandler(context=ssl.create_default_context()), NoRedirect()

@@ -1,4 +1,4 @@
-from benchmark_multimodal_region_poc import region_priority, select_crop_paths
+from benchmark_multimodal_regions import region_priority, select_crop_paths
 
 
 def region(source, score, path, text=""):

@@ -12,7 +12,7 @@ def _rate_identity():
     return f"{session_id}:{remote}"
 
 
-class MakersBrainPickupDelivery(Delivery):
+class MBPickupDelivery(Delivery):
 
     @http.route()
     def website_sale_get_pickup_locations(self, zip_code=None, **kwargs):
@@ -33,7 +33,7 @@ class MakersBrainPickupDelivery(Delivery):
             mb_pickup_rate_identity=_rate_identity()
         )._set_pickup_location(pickup_location_data)
 
-class MakersBrainPickupAddressGuard(WebsiteSale):
+class MBPickupAddressGuard(WebsiteSale):
 
     def _prepare_address_update(self, *args, **kwargs):
         partner, address_type = super()._prepare_address_update(*args, **kwargs)

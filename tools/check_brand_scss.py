@@ -48,7 +48,7 @@ def resolve(subpath: str) -> pathlib.Path:
     except (subprocess.CalledProcessError, FileNotFoundError):
         print(
             f"cannot resolve @makersbrain/brand/{subpath}; "
-            f"run `npm install` in {BRAND_ROOT}. Skipping.",
+            f"run `npm ci` in {BRAND_ROOT}. Skipping.",
             file=sys.stderr,
         )
         raise SystemExit(0) from None

@@ -1,9 +1,9 @@
 # French glossary (`fr_FR`)
 
 Authority for French terminology across every addon in this repository. One
-English source term maps to exactly one French UI form. An agent that needs a
-term not listed here proposes it to the coordinator rather than choosing
-silently, and the coordinator adds it below.
+Each English source term maps to exactly one French UI form. Add a missing term
+here as part of review rather than choosing a translation silently in one
+catalogue.
 
 English is the source language. It stays in Python, XML, QWeb, JavaScript,
 manifests, help text, exceptions, reports, and emails. French lives only in
@@ -191,9 +191,9 @@ paraphrase.
 
 Odoo namespaces code translations by module and stores model terms per record, so
 the same msgid may legitimately differ between addons when the concept differs.
-That is not licence to diverge: the coordinator reconciled every cross-addon
-difference at integration, and these are the ones that survived, each with the
-reason it is not an inconsistency.
+That is not licence to diverge: review reconciles every cross-addon difference,
+and these are the ones that survive, each with the reason it is not an
+inconsistency.
 
 | English | French | Where, and why it differs |
 |---|---|---|

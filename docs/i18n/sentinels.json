@@ -84,6 +84,27 @@
   "fr": "Importer des matières"
  },
  {
+  "module": "mb_ceramics_base",
+  "surface": "field",
+  "locator": "mb_ceramics_base.field_product_product__mb_clay_body_id",
+  "msgid": "Clay body",
+  "fr": "Terre"
+ },
+ {
+  "module": "mb_ceramics_compliance",
+  "surface": "field",
+  "locator": "mb_ceramics_compliance.field_mb_migration_test__cadmium_result",
+  "msgid": "Cadmium migration",
+  "fr": "Migration de cadmium"
+ },
+ {
+  "module": "mb_ceramics_compliance",
+  "surface": "action",
+  "locator": "mb_ceramics_compliance.mb_migration_test_action",
+  "msgid": "Migration tests",
+  "fr": "Essais de migration"
+ },
+ {
   "module": "mb_ceramics_firing",
   "surface": "python",
   "locator": "",
@@ -148,6 +169,13 @@
  },
  {
   "module": "mb_commercial_operations_depot",
+  "surface": "python",
+  "locator": "",
+  "msgid": "Accept the travel quote, or enter the trip cost by hand.",
+  "fr": "Acceptez le devis de déplacement, ou saisissez le coût du trajet à la main."
+ },
+ {
+  "module": "mb_commercial_operations_depot",
   "surface": "field",
   "locator": "mb_commercial_operations_depot.field_mb_commercial_rent_period__active_days",
   "msgid": "Active Days",
@@ -159,13 +187,6 @@
   "locator": "mb_commercial_operations_depot.menu_commercial_depot_rules",
   "msgid": "Assortment Rules",
   "fr": "Règles d'assortiment"
- },
- {
-  "module": "mb_commercial_operations_depot",
-  "surface": "python",
-  "locator": "",
-  "msgid": "Choose a category for an assortment-bucket depot rule.",
-  "fr": "Choisissez une catégorie pour une règle de dépôt par segment d'assortiment."
  },
  {
   "module": "mb_commercial_operations_expense",
@@ -283,8 +304,8 @@
   "module": "mb_control_bridge",
   "surface": "python",
   "locator": "",
-  "msgid": "French accounting cannot be initialized after journal items exist.",
-  "fr": "La comptabilité française ne peut pas être initialisée une fois que des écritures comptables existent."
+  "msgid": "Erased data subject",
+  "fr": "Personne concernée effacée"
  },
  {
   "module": "mb_depot",
@@ -306,6 +327,20 @@
   "locator": "mb_depot.menu_depot_root",
   "msgid": "Depot Sales",
   "fr": "Dépôt-vente"
+ },
+ {
+  "module": "mb_email_bridge",
+  "surface": "python",
+  "locator": "",
+  "msgid": "MakersBrain transactional email submission failed.",
+  "fr": "L'envoi de l'e-mail transactionnel MakersBrain a échoué."
+ },
+ {
+  "module": "mb_email_bridge",
+  "surface": "field",
+  "locator": "mb_email_bridge.field_ir_mail_server__mb_webshop_smtp",
+  "msgid": "MakersBrain webshop SMTP",
+  "fr": "SMTP de la boutique MakersBrain"
  },
  {
   "module": "mb_inventory_capture",
@@ -448,24 +483,115 @@
   "fr": "SumUp n'a aucune trace du paiement à rembourser."
  },
  {
-  "module": "mb_workshop_base",
+  "module": "mb_shop_import",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A completed or cancelled import is immutable.",
+  "fr": "Une importation terminée ou annulée est immuable."
+ },
+ {
+  "module": "mb_shop_import",
   "surface": "field",
-  "locator": "mb_workshop_base.field_mb_migration_test__cadmium_result",
-  "msgid": "Cadmium migration",
-  "fr": "Migration de cadmium"
+  "locator": "mb_shop_import.field_mb_shop_import_batch__adapter_key",
+  "msgid": "Adapter Key",
+  "fr": "Clé adaptateur"
+ },
+ {
+  "module": "mb_shop_import",
+  "surface": "action",
+  "locator": "mb_shop_import.action_shop_sources",
+  "msgid": "Scraped shop sources",
+  "fr": "Sources de boutiques collectées"
+ },
+ {
+  "module": "mb_shop_import_depot",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A scraper stock snapshot cannot target a depot warehouse. Import into atelier stock, then use a placement transfer.",
+  "fr": "Un instantané de stock Scraper ne peut pas cibler un entrepôt de dépôt. Importez dans le stock de l'atelier, puis utilisez un transfert de placement."
+ },
+ {
+  "module": "mb_webshop",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A cart stock hold expired. Availability will be checked again before payment.",
+  "fr": "Une retenue de stock de panier a expiré. La disponibilité sera à nouveau vérifiée avant le paiement."
+ },
+ {
+  "module": "mb_webshop",
+  "surface": "field",
+  "locator": "mb_webshop.field_res_config_settings__mb_launch_ready",
+  "msgid": "Application launch ready",
+  "fr": "Lancement de l'application prêt"
+ },
+ {
+  "module": "mb_webshop",
+  "surface": "action",
+  "locator": "mb_webshop.action_webshop_payment_exceptions",
+  "msgid": "Payment Exceptions",
+  "fr": "Anomalies de paiement"
+ },
+ {
+  "module": "mb_webshop_carrier_base",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A carrier pickup-point address cannot be edited.",
+  "fr": "L'adresse d'un point de retrait d'un transporteur ne peut pas être modifiée."
+ },
+ {
+  "module": "mb_webshop_carrier_base",
+  "surface": "field",
+  "locator": "mb_webshop_carrier_base.field_mb_carrier_webhook_event__attempts",
+  "msgid": "Attempts",
+  "fr": "Tentatives"
+ },
+ {
+  "module": "mb_webshop_carrier_base",
+  "surface": "action",
+  "locator": "mb_webshop_carrier_base.action_mb_carrier_manifests",
+  "msgid": "Handover Worksheets",
+  "fr": "Feuilles de travail de transfert"
+ },
+ {
+  "module": "mb_webshop_carrier_boxtal",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A public HTTPS web base URL is required for Boxtal webhooks.",
+  "fr": "Une URL de base Web HTTPS publique est requise pour les webhooks Boxtal."
+ },
+ {
+  "module": "mb_webshop_carrier_boxtal",
+  "surface": "field",
+  "locator": "mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_commercial_readiness_confirmed",
+  "msgid": "Boxtal commercial readiness confirmed",
+  "fr": "La préparation commerciale de Boxtal confirmée"
+ },
+ {
+  "module": "mb_webshop_carrier_sendcloud",
+  "surface": "python",
+  "locator": "",
+  "msgid": "A public HTTPS web base URL is required for Sendcloud webhooks.",
+  "fr": "Une URL Web HTTPS publique est requise pour les webhooks Sendcloud."
+ },
+ {
+  "module": "mb_webshop_carrier_sendcloud",
+  "surface": "field",
+  "locator": "mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_height_cm",
+  "msgid": "Default parcel height (cm)",
+  "fr": "Hauteur du colis par défaut (cm)"
  },
  {
   "module": "mb_workshop_base",
   "surface": "menu",
   "locator": "mb_workshop_base.menu_mb_workshop_root",
-  "msgid": "Ceramics",
-  "fr": "Céramique"
+  "msgid": "Workshop",
+  "fr": "Atelier"
  },
  {
   "module": "mb_workshop_base",
-  "surface": "action",
-  "locator": "mb_workshop_base.mb_migration_test_action",
-  "msgid": "Migration tests",
-  "fr": "Essais de migration"
+  "surface": "field",
+  "locator": "mb_workshop_base.field_product_product__mb_supplier_lot_required",
+  "msgid": "Supplier lot required",
+  "fr": "Lot fournisseur obligatoire"
  }
 ]

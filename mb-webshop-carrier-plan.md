@@ -1,13 +1,14 @@
 # Webshop Carrier: Remaining Work
 
-Status: current runtime and Sendcloud provider implemented; open work only
+Status: current runtime and Boxtal/Sendcloud providers implemented; open work only
 
 Current behavior belongs in `SPEC.md` and the carrier addon documentation. The
 remaining roadmap is:
 
-1. Qualify charged outbound and return labels with merchant-approved production
-   accounts, including cancellation, webhook loss, delayed documents, tracking,
-   refunds, and provider-support escalation.
+1. Qualify charged outbound labels for both providers and Sendcloud return
+   labels with merchant-approved production accounts, including cancellation,
+   webhook loss, delayed documents, tracking, refunds, and provider-support
+   escalation.
 2. Decide whether Boxtal return labels are commercially and technically
    available for the merchant account. Implement them only against a documented
    current API; otherwise keep Boxtal outbound-only.

@@ -1,6 +1,6 @@
 name: CI
 
-# Five jobs, ordered around the fast static gate. `static`
+# Six jobs, ordered around the fast static gate. `static`
 # needs no container and finishes in seconds, so a broken manifest never costs
 # an eight-minute image pull. The four Odoo jobs run in parallel behind it.
 #
@@ -178,10 +178,10 @@ jobs:
           MODULES=$(find addons -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | paste -sd, -)
           docker run --rm --network host \
             -e HOST=localhost \
-            -v "$PWD/addons:/mnt/makersbrain-addons:ro" \
+            -v "$PWD/addons:/mnt/mb-addons:ro" \
             -v "$PWD/oca:/mnt/oca-addons:ro" \
             "$ODOO_IMAGE" \
-            odoo --addons-path=/mnt/makersbrain-addons,/usr/lib/python3/dist-packages/odoo/addons \
+            odoo --addons-path=/mnt/mb-addons,/usr/lib/python3/dist-packages/odoo/addons \
                  --db_host=localhost --db_port=5432 --db_user=odoo --db_password=odoo \
                  --data-dir=/tmp/odoo \
                  -d ci_install -i "$MODULES" \
@@ -219,10 +219,10 @@ jobs:
           run_odoo() {
             docker run --rm --network host \
             -e HOST=localhost \
-              -v "$PWD/addons:/mnt/makersbrain-addons:ro" \
+              -v "$PWD/addons:/mnt/mb-addons:ro" \
               -v odoo-ci-data:/var/lib/odoo \
               "$ODOO_IMAGE" \
-              odoo --addons-path=/mnt/makersbrain-addons,/usr/lib/python3/dist-packages/odoo/addons \
+              odoo --addons-path=/mnt/mb-addons,/usr/lib/python3/dist-packages/odoo/addons \
                    --db_host=localhost --db_port=5432 --db_user=odoo --db_password=odoo \
                    "$@"
           }
@@ -286,7 +286,7 @@ jobs:
           conf_dir=$(mktemp -d)
           {
             echo "[options]"
-            echo "addons_path = /mnt/makersbrain-addons,/usr/lib/python3/dist-packages/odoo/addons"
+            echo "addons_path = /mnt/mb-addons,/usr/lib/python3/dist-packages/odoo/addons"
             echo "db_host = localhost"
             echo "db_port = 5432"
             echo "db_user = odoo"
@@ -304,7 +304,7 @@ jobs:
           # tree.
           odoo_ci() {
             docker run --rm --network host --user root --entrypoint odoo \
-              -v "$PWD/addons:/mnt/makersbrain-addons" \
+              -v "$PWD/addons:/mnt/mb-addons" \
               -v "$conf_dir/odoo-ci.conf:/tmp/odoo-ci.conf:ro" \
               "$ODOO_IMAGE" "$@"
           }
@@ -334,7 +334,7 @@ jobs:
             || { echo "::error::Committed POT files are stale. Re-export them."; exit 1; }
 
   test:
-    name: Server and browser tests
+    name: Server tests
     runs-on: ubuntu-latest
     needs: [static, changes]
     if: needs.changes.outputs.odoo == 'true'
@@ -376,9 +376,9 @@ jobs:
           TEST_TAGS=$(printf '%s' "$MODULES" | sed 's#^#/#; s#,#,/#g')
           docker run --rm --network host \
             -e HOST=localhost \
-            -v "$PWD/addons:/mnt/makersbrain-addons:ro" \
+            -v "$PWD/addons:/mnt/mb-addons:ro" \
             "$ODOO_IMAGE" \
-            odoo --addons-path=/mnt/makersbrain-addons,/usr/lib/python3/dist-packages/odoo/addons \
+            odoo --addons-path=/mnt/mb-addons,/usr/lib/python3/dist-packages/odoo/addons \
                  --db_host=localhost --db_port=5432 --db_user=odoo --db_password=odoo \
                  --data-dir=/tmp/odoo \
                  -d ci_test -i "$MODULES" \

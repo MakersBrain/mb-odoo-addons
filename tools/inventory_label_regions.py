@@ -9,7 +9,7 @@
 #   "zxing-cpp>=2.2,<3",
 # ]
 # ///
-"""POC: isolate, rotate, and enhance barcode and lot-label regions.
+"""Experimental evaluator: isolate, rotate, and enhance barcode and lot-label regions.
 
 The source ZIP is read without extracting its members. Sanitized images and
 derived evidence crops are written only beneath the explicitly supplied output

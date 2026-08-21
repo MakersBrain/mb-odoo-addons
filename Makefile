@@ -8,7 +8,7 @@ endif
 
 COMPOSE := docker compose
 ODOO    := $(COMPOSE) exec -T odoo odoo
-DB_NAME ?= makersbrain
+DB_NAME ?= mb_odoo
 DISPOSABLE_DB ?= mb_scratch
 
 # Discover every addon from its manifest so local and CI coverage cannot drift
@@ -34,7 +34,7 @@ TAGS_ARG := $(subst $(space),$(comma),$(TAGS))
 
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \
-        test check lint format oca reset-poc brand-check landing
+        test check lint format oca reset-test-db brand-check landing
 
 help: ## Show available targets
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  %-12s %s\n", $$1, $$2}'
@@ -45,7 +45,7 @@ bootstrap: ## Prepare a clean checkout: .env, oca/, images, database, addons
 	$(COMPOSE) pull --quiet
 	$(COMPOSE) up -d
 	@echo "waiting for Odoo to answer /web/health..."
-	@until [ "$$(docker inspect -f '{{.State.Health.Status}}' makersbrain-odoo-web 2>/dev/null)" = healthy ]; do sleep 2; done
+	@until [ "$$(docker inspect -f '{{.State.Health.Status}}' mb-odoo-web 2>/dev/null)" = healthy ]; do sleep 2; done
 	@$(MAKE) --no-print-directory install
 	@$(MAKE) --no-print-directory configure-ui
 	@echo
@@ -98,7 +98,7 @@ configure-ui: ## Apply the streamlined artisan app-switcher layout
 		< scripts/configure_app_visibility.py
 
 test: ## Install MODULES on a fresh disposable database and run their tests
-	@$(MAKE) --no-print-directory reset-poc
+	@$(MAKE) --no-print-directory reset-test-db
 	$(ODOO) -d $(DISPOSABLE_DB) -i $(MODULES_ARG) \
 		--test-tags "$(TAGS_ARG)" \
 		--stop-after-init --http-port=0 --gevent-port=0 --log-level=test
@@ -106,11 +106,10 @@ test: ## Install MODULES on a fresh disposable database and run their tests
 check: lint i18n-check brand-check ## Everything CI runs that needs no container
 	python3 tools/check_addons.py
 
-# The design system is `@makersbrain/brand`, pinned by this repository's own
-# development-only package.json so the check needs no sibling checkout. It used
-# to live here as brand/ and be copied into its consumers; there is nothing left
-# to copy, and the only hand-maintained mirror is the Odoo SCSS, which cannot
-# read CSS custom properties at compile time. Run `npm install` once first.
+# The design system is `@makersbrain/brand`, pinned by this repository's
+# development-only package.json. The Odoo SCSS mirror cannot read CSS custom
+# properties at compile time, so this gate compares it explicitly. Run
+# `npm ci` first.
 brand-check: ## Fail if the Odoo SCSS mirror has fallen behind the brand package
 	python3 tools/check_brand_scss.py
 
@@ -140,7 +139,7 @@ oca: ## Vendor the pinned OCA modules into ./oca
 # would silently destroy a demonstration database instead of a scratch one. So
 # the name is checked against a fixed allowlist and nothing else is droppable
 # through this Makefile, whatever the environment says.
-reset-poc: ## Drop and recreate DISPOSABLE_DB (allowlisted names only)
+reset-test-db: ## Drop and recreate DISPOSABLE_DB (allowlisted names only)
 	@case "$(DISPOSABLE_DB)" in \
 	  mb_scratch|mb_ci|mb_test) ;; \
 	  *) echo "refusing to drop '$(DISPOSABLE_DB)': not in the allowlist" \

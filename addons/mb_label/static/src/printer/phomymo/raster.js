@@ -1,10 +1,10 @@
-// Vendored from phomymo, unmodified except where marked "ateliera:".
+// Vendored from phomymo, unmodified except where marked "mb:".
 // https://github.com/transcriptionstream/phomymo @ 1f58d3f (2026-05-17), ISC.
 // Do not edit to fix a bug here - fix it upstream and re-vendor, or the next
 // re-vendor silently undoes it.
 // @ts-nocheck
 //
-// ateliera: lifted from canvas.js lines 1885-2248, which is a class; the
+// mb: lifted from canvas.js lines 1885-2248, which is a class; the
 // methods are standalone functions here and `this._x(` reads `_x(`. Bodies are
 // byte-for-byte upstream.
 

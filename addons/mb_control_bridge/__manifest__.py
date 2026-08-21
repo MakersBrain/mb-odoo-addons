@@ -10,7 +10,7 @@ general remote-administration API and stores no Rauthy administration secret.
     "version": "19.0.1.14.0",
     "license": "LGPL-3",
     "category": "Administration",
-    "author": "Makersbrain",
+    "author": "MakersBrain",
     "depends": [
         "account",
         "l10n_fr_account",
