@@ -89,7 +89,7 @@ install: ## Install MODULES on DB_NAME, creating the database if needed
 	$(ODOO) -d $(DB_NAME) -i $(MODULES_ARG) --stop-after-init \
 		--http-port=0 --gevent-port=0 --log-level=warn
 
-upgrade: ## Upgrade MODULES on DB_NAME, running any migration scripts
+upgrade: ## Upgrade MODULES on DB_NAME
 	$(ODOO) -d $(DB_NAME) -u $(MODULES_ARG) --stop-after-init \
 		--http-port=0 --gevent-port=0 --log-level=warn
 

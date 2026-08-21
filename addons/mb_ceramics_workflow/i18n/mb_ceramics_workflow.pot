@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0-20260810\n"
+"Project-Id-Version: Odoo Server 19.0-20260803\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-15 20:18+0000\n"
-"PO-Revision-Date: 2026-08-15 20:18+0000\n"
+"POT-Creation-Date: 2026-08-21 09:18+0000\n"
+"PO-Revision-Date: 2026-08-21 09:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -280,13 +280,11 @@ msgid "Bisque ware"
 msgstr ""
 
 #. module: mb_ceramics_workflow
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__blank_lot_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__blank_lot_id
 msgid "Blank Lot"
 msgstr ""
 
 #. module: mb_ceramics_workflow
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__blank_product_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__blank_product_id
 msgid "Blank Product"
 msgstr ""
@@ -311,7 +309,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__board_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__board_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__board_id
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__board_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__board_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__board_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__board_id
@@ -332,7 +329,6 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__bom_id
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__bom_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__bom_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__bom_id
 msgid "Bom"
@@ -363,11 +359,6 @@ msgstr ""
 #. module: mb_ceramics_workflow
 #: model:ir.model,name:mb_ceramics_workflow.model_mb_bisque_session
 msgid "Ceramics bisque preparation session"
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#: model:ir.model,name:mb_ceramics_workflow.model_mb_finishing_session
-msgid "Ceramics finishing session"
 msgstr ""
 
 #. module: mb_ceramics_workflow
@@ -434,8 +425,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__company_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__company_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__company_id
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__company_id
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__company_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__company_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__company_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__company_id
@@ -483,8 +472,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__create_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__create_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__create_uid
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__create_uid
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__create_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__create_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__create_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__create_uid
@@ -501,8 +488,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__create_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__create_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__create_date
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__create_date
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__create_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__create_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__create_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__create_date
@@ -543,7 +528,6 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__date
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__date
@@ -567,8 +551,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_ceramics_session_line_mixin__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_ceramics_session_mixin__display_name
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__display_name
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__display_name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__display_name
@@ -597,14 +579,12 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_bisque_session__state__done
-#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_finishing_session__state__done
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_glazing_session__state__done
 msgid "Done"
 msgstr ""
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_bisque_session__state__draft
-#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_finishing_session__state__draft
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_glazing_session__state__draft
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_throwing_session__state__draft
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_bom__mb_recipe_state__draft
@@ -653,13 +633,11 @@ msgid "Express dry ingredients and water as percentages of dry batch weight."
 msgstr ""
 
 #. module: mb_ceramics_workflow
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__finished_location_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__finished_location_id
 msgid "Finished Location"
 msgstr ""
 
 #. module: mb_ceramics_workflow
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__finished_product_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__finished_product_id
 msgid "Finished Product"
 msgstr ""
@@ -672,21 +650,6 @@ msgstr ""
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__product_template__mb_ceramics_stage__finished
 msgid "Finished ware"
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mrp_production__mb_workflow_kind__finishing
-msgid "Finishing (legacy)"
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#: model:ir.model,name:mb_ceramics_workflow.model_mb_finishing_session_line
-msgid "Finishing session selection"
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#: model:ir.actions.act_window,name:mb_ceramics_workflow.mb_finishing_session_action
-msgid "Finishing sessions"
 msgstr ""
 
 #. module: mb_ceramics_workflow
@@ -803,8 +766,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_ceramics_session_line_mixin__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_ceramics_session_mixin__id
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__id
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__id
@@ -833,7 +794,6 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_bisque_session__state__progress
-#: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_finishing_session__state__progress
 #: model:ir.model.fields.selection,name:mb_ceramics_workflow.selection__mb_glazing_session__state__progress
 msgid "In progress"
 msgstr ""
@@ -872,8 +832,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__write_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__write_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__write_uid
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__write_uid
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__write_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__write_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__write_uid
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__write_uid
@@ -890,8 +848,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__write_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__write_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__write_date
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__write_date
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__write_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_firing_load__write_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__write_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__write_date
@@ -901,11 +857,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__write_date
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__write_date
 msgid "Last Updated on"
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#: model:ir.ui.menu,name:mb_ceramics_workflow.menu_mb_finishing_session
-msgid "Legacy Finish Blanks"
 msgstr ""
 
 #. module: mb_ceramics_workflow
@@ -997,7 +948,6 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__production_ids
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__production_ids
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__production_ids
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__production_ids
 msgid "Manufacturing orders"
@@ -1056,11 +1006,6 @@ msgid "Mb Document Count"
 msgstr ""
 
 #. module: mb_ceramics_workflow
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_production__mb_finishing_session_id
-msgid "Mb Finishing Session"
-msgstr ""
-
-#. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_stock_lot__mb_firing_count
 msgid "Mb Firing Count"
 msgstr ""
@@ -1103,7 +1048,6 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__name
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__name
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__name
 msgid "Name"
@@ -1112,7 +1056,6 @@ msgstr ""
 #. module: mb_ceramics_workflow
 #. odoo-python
 #: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
-#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
 #: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
 #: code:addons/mb_ceramics_workflow/models/mb_throwing_session.py:0
 msgid "New"
@@ -1248,7 +1191,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_inspection__production_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__production_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__production_id
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__production_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__production_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__production_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__production_id
@@ -1286,7 +1228,6 @@ msgstr ""
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__quantity
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__quantity
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__quantity
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_material_allocation__quantity
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__quantity
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_production_loss__quantity
@@ -1413,12 +1354,6 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
-msgid "Select at least one damp-box blank."
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#. odoo-python
 #: code:addons/mb_ceramics_workflow/models/mb_bisque_session.py:0
 msgid "Select at least one green-ware lot."
 msgstr ""
@@ -1429,7 +1364,6 @@ msgid "Selected bisque ware"
 msgstr ""
 
 #. module: mb_ceramics_workflow
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__line_ids
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_inspection__selected_quantity
 msgid "Selected blanks"
 msgstr ""
@@ -1447,7 +1381,6 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session_line__session_id
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session_line__session_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session_line__session_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session_line__session_id
 msgid "Session"
@@ -1466,7 +1399,6 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__source_location_id
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__source_location_id
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__source_location_id
 msgid "Source Location"
 msgstr ""
@@ -1485,7 +1417,6 @@ msgstr ""
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_bisque_session__state
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_board_content__state
-#: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_finishing_session__state
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_glazing_session__state
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mb_throwing_session__state
 msgid "State"
@@ -1494,11 +1425,6 @@ msgstr ""
 #. module: mb_ceramics_workflow
 #: model:ir.model.fields,field_description:mb_ceramics_workflow.field_mrp_bom__mb_successor_revision_ids
 msgid "Successor revisions"
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#: model_terms:ir.ui.view,arch_db:mb_ceramics_workflow.mb_finishing_session_view_form
-msgid "Take blanks for finishing"
 msgstr ""
 
 #. module: mb_ceramics_workflow
@@ -1521,7 +1447,6 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
 #: code:addons/mb_ceramics_workflow/models/mb_glazing_session.py:0
 msgid "The bill of materials does not produce this article."
 msgstr ""
@@ -1544,13 +1469,6 @@ msgstr ""
 msgid ""
 "The bill of materials of %(product)s does not consume the selected bisque "
 "ware."
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#. odoo-python
-#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
-msgid ""
-"The bill of materials of %(product)s does not consume the selected blank."
 msgstr ""
 
 #. module: mb_ceramics_workflow
@@ -1590,12 +1508,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
 msgid "The bisque order needs manual review before its loss can be scrapped."
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#. odoo-python
-#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
-msgid "The blank lot belongs to another product."
 msgstr ""
 
 #. module: mb_ceramics_workflow
@@ -1709,17 +1621,6 @@ msgstr ""
 #. module: mb_ceramics_workflow
 #: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_glazing_session_line_positive_quantity
 msgid "The selected bisque quantity must be positive."
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#. odoo-python
-#: code:addons/mb_ceramics_workflow/models/mb_finishing_session.py:0
-msgid "The selected blank lot does not have enough available stock."
-msgstr ""
-
-#. module: mb_ceramics_workflow
-#: model:ir.model.constraint,message:mb_ceramics_workflow.constraint_mb_finishing_session_line_positive_quantity
-msgid "The selected blank quantity must be positive."
 msgstr ""
 
 #. module: mb_ceramics_workflow

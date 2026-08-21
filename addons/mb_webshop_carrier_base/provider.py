@@ -228,22 +228,6 @@ class ShippingProvider(Protocol):
     ) -> ShipmentSubmission: ...
 
 
-def operation_safety(provider: ShippingProvider | type[ShippingProvider], operation: str) -> OperationSafety:
-    """Return per-operation mutation guarantees with a legacy-safe fallback.
-
-    Existing adapters keep their old behavior while they migrate, but return
-    creation never inherits an outbound provider-wide idempotency declaration.
-    """
-    resolver = getattr(provider, "operation_safety", None)
-    if resolver:
-        return resolver(operation)
-    if operation == "create_shipment":
-        idempotent = bool(getattr(provider, "supports_idempotency", False))
-        reconcilable = bool(getattr(provider, "supports_reconciliation", False))
-        return OperationSafety(idempotent, reconcilable, idempotent)
-    return OperationSafety()
-
-
 _REGISTRY: dict[str, type[ShippingProvider]] = {}
 
 

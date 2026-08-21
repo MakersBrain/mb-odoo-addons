@@ -21,7 +21,7 @@ from .mb_catalogue_service import IMD_MODULE
 
 _logger = logging.getLogger(__name__)
 
-# The catalogue's material families, mapped onto the taxonomy mb_workshop_base
+# The catalogue's material families, mapped onto the taxonomy mb_ceramics_base
 # owns. Odoo already filters, groups and reports on categ_id everywhere, so a
 # family field of our own would be a second taxonomy saying the same thing - and
 # the two would disagree the first time anyone touched either.
@@ -29,7 +29,8 @@ _logger = logging.getLogger(__name__)
 # The categories are not defined here, and that is the point of the dependency:
 # a workshop that imports nothing still buys glaze and still owes a migration
 # test on the food-contact ware it makes with it, so the taxonomy cannot live
-# behind a connector. This addon maps onto it; mb_workshop_base enforces with it.
+# behind a connector. This addon maps onto it; mb_ceramics_compliance enforces
+# the food-contact gate with it.
 #
 # A family this addon has never heard of lands on the parent category rather than
 # nowhere, so it is visible and correctable instead of silently uncategorised.

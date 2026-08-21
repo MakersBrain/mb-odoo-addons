@@ -40,8 +40,8 @@ Seeding never raises. A counter that could not be created leaves the artisan
 looking at the shop-type screen, which is a cosmetic defect; an exception here
 would abort loading a chart of accounts, which is not.
 
-Craft-neutral by the test in CRAFT-PLATFORM-PLAN.md section 2: a leatherworker
-and a joiner both sell over a counter, and neither is a restaurant.
+This is craft-neutral: a leatherworker and a joiner both sell over a counter,
+and neither is a restaurant.
 """,
     "version": "19.0.1.0.0",
     "license": "LGPL-3",

@@ -2,7 +2,7 @@ import math
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_compare, formatLang
+from odoo.tools import formatLang
 
 from .profitability_verdict import VERDICT_SELECTION
 
@@ -42,38 +42,10 @@ class MbCommercialProfitabilityScenario(models.Model):
     revision = fields.Integer(related="operation_id.planning_revision", store=True)
     approved_by_id = fields.Many2one("res.users", copy=False, readonly=True)
     approved_at = fields.Datetime(copy=False, readonly=True)
-    route_cost_mode = fields.Selection(
-        [
-            ("provider_total", "Accepted TollQuote total"),
-            ("components", "Selected route components"),
-            ("manual", "Manual travel total"),
-        ],
-        required=True,
-        default="manual",
-    )
     travel_estimate_id = fields.Many2one(
         "mb.travel.estimate", check_company=True, ondelete="restrict",
     )
-    toll_cost = fields.Monetary()
-    fuel_cost = fields.Monetary()
-    planned_travel_hours = fields.Float()
-    planned_travel_km = fields.Float(
-        string="Planned Travel Distance (km)",
-        help="Distance this market actually costs, counted the same way as the travel "
-             "cost: a return trip is entered as the full return distance.",
-    )
-    travel_hourly_cost = fields.Monetary()
-    ferry_cost = fields.Monetary()
-    zone_cost = fields.Monetary()
-    other_route_cost = fields.Monetary()
-    manual_travel_total = fields.Monetary()
     accepted_travel_cost = fields.Monetary(compute="_compute_results", store=True)
-    planned_work_hours = fields.Float()
-    work_hourly_cost = fields.Monetary()
-    stall_rent = fields.Monetary()
-    parking_cost = fields.Monetary()
-    accommodation_cost = fields.Monetary()
-    other_fixed_cost = fields.Monetary()
     weighted_unit_revenue = fields.Monetary(compute="_compute_results", store=True)
     weighted_unit_contribution = fields.Monetary(compute="_compute_results", store=True)
     contribution_margin_ratio = fields.Float(compute="_compute_results", store=True)
@@ -122,13 +94,7 @@ class MbCommercialProfitabilityScenario(models.Model):
     recommendation_note = fields.Char(compute="_compute_results", store=True)
 
     _values_nonnegative = models.Constraint(
-        "CHECK(target_margin_per_hour >= 0 "
-        "AND toll_cost >= 0 AND fuel_cost >= 0 AND planned_travel_hours >= 0 "
-        "AND planned_travel_km >= 0 "
-        "AND travel_hourly_cost >= 0 AND ferry_cost >= 0 AND zone_cost >= 0 "
-        "AND other_route_cost >= 0 AND manual_travel_total >= 0 "
-        "AND planned_work_hours >= 0 AND work_hourly_cost >= 0 AND stall_rent >= 0 "
-        "AND parking_cost >= 0 AND accommodation_cost >= 0 AND other_fixed_cost >= 0)",
+        "CHECK(target_margin_per_hour >= 0)",
         "Scenario cost values cannot be negative.",
     )
 
@@ -145,13 +111,10 @@ class MbCommercialProfitabilityScenario(models.Model):
         return super().create(values_list)
 
     @api.depends(
-        "route_cost_mode", "travel_estimate_id.total_operating_cost", "toll_cost",
-        "fuel_cost", "planned_travel_hours", "travel_hourly_cost", "ferry_cost",
-        "zone_cost", "other_route_cost", "manual_travel_total", "planned_work_hours",
-        "work_hourly_cost", "stall_rent", "parking_cost", "accommodation_cost",
-        "other_fixed_cost", "calculation_mode", "target_margin_per_hour",
+        "travel_estimate_id.state", "travel_estimate_id.incomplete",
+        "travel_estimate_id.incomplete_acknowledged", "calculation_mode",
+        "target_margin_per_hour",
         "travel_estimate_id.duration_hours",
-        "planned_travel_km",
         "travel_estimate_id.distance_km",
         "cost_line_ids.category", "cost_line_ids.calculation", "cost_line_ids.quantity",
         "cost_line_ids.planned_amount",
@@ -162,24 +125,11 @@ class MbCommercialProfitabilityScenario(models.Model):
     )
     def _compute_results(self):
         for scenario in self:
-            if scenario.route_cost_mode == "provider_total":
-                travel = scenario.travel_estimate_id.total_operating_cost
-            elif scenario.route_cost_mode == "components":
-                travel = (
-                    scenario.toll_cost + scenario.fuel_cost
-                    + scenario.planned_travel_hours * scenario.travel_hourly_cost
-                    + scenario.ferry_cost + scenario.zone_cost + scenario.other_route_cost
-                )
-            else:
-                travel = scenario.manual_travel_total
-            legacy_fixed = (
-                travel + scenario.planned_work_hours * scenario.work_hourly_cost
-                + scenario.stall_rent + scenario.parking_cost
-                + scenario.accommodation_cost + scenario.other_fixed_cost
-            )
-            fixed = sum(scenario.cost_line_ids.mapped("planned_amount")) or legacy_fixed
+            travel = sum(scenario.cost_line_ids.filtered(
+                lambda line: line.category == "travel"
+            ).mapped("planned_amount"))
+            fixed = sum(scenario.cost_line_ids.mapped("planned_amount"))
             units = sum(scenario.line_ids.mapped("expected_sold_qty"))
-            use_legacy_mix = not units and any(scenario.line_ids.mapped("mix_share"))
             sales = sum(
                 line.sale_price_excluded_tax * line.expected_sold_qty
                 for line in scenario.line_ids
@@ -194,33 +144,20 @@ class MbCommercialProfitabilityScenario(models.Model):
                 for line in scenario.line_ids
             )
             contribution = sales - variable_cost
-            if use_legacy_mix:
-                mix_total = sum(scenario.line_ids.mapped("mix_share"))
-                weighted_revenue = sum(
-                    line.mix_share / 100.0 * line.net_unit_revenue for line in scenario.line_ids
-                )
-                weighted_contribution = sum(
-                    line.mix_share / 100.0 * line.unit_contribution for line in scenario.line_ids
-                )
-            else:
-                mix_total = 100.0 if units else 0.0
-                weighted_revenue = sales / units if units else 0.0
-                weighted_contribution = contribution / units if units else 0.0
+            weighted_revenue = sales / units if units else 0.0
+            weighted_contribution = contribution / units if units else 0.0
             note = False
             blocked = False
             if not scenario.line_ids:
                 blocked, note = True, _("Add at least one sales-mix line.")
-            elif use_legacy_mix and float_compare(mix_total, 100.0, precision_digits=4) != 0:
-                blocked, note = True, _("Sales-mix shares must total 100%%.")
-            elif not use_legacy_mix and units <= 0:
+            elif units <= 0:
                 blocked, note = True, _("Expected sold quantity must be positive.")
             elif scenario.line_ids.filtered("calculation_blocked"):
                 blocked, note = True, _("Complete the missing product costs and prices.")
             elif weighted_revenue <= 0 or weighted_contribution <= 0:
                 blocked, note = True, _("Weighted revenue and contribution must be positive.")
-            elif scenario.route_cost_mode == "provider_total" and (
-                not scenario.travel_estimate_id
-                or scenario.travel_estimate_id.state != "accepted"
+            elif scenario.travel_estimate_id and (
+                scenario.travel_estimate_id.state != "accepted"
                 or scenario.travel_estimate_id.incomplete
                 and not scenario.travel_estimate_id.incomplete_acknowledged
             ):
@@ -285,11 +222,11 @@ class MbCommercialProfitabilityScenario(models.Model):
                 # instead of storing an undefined/infinite ratio.
                 scenario.break_even_headroom_ratio = 1.0
             scenario.recommendation, scenario.recommendation_note = (
-                scenario._evaluate_recommendation(blocked, note, use_legacy_mix, units)
+                scenario._evaluate_recommendation(blocked, note, units)
             )
 
     def _resolved_work_hours(self):
-        """Stand hours, from the scenario itself or its own hourly labour lines.
+        """Stand hours from the scenario's hourly labour cost lines.
 
         Never from the operation: these feed stored computes, which are written by
         _write() and so never meet the immutability guard in write(). A scenario
@@ -297,7 +234,7 @@ class MbCommercialProfitabilityScenario(models.Model):
         rewritten the next time somebody moved the market's dates.
         """
         self.ensure_one()
-        return self.planned_work_hours or sum(
+        return sum(
             line.quantity for line in self.cost_line_ids
             if line.category == "labour" and line.calculation == "hour"
         )
@@ -305,20 +242,23 @@ class MbCommercialProfitabilityScenario(models.Model):
     def _resolved_travel_hours(self):
         """Door-to-door travel hours behind this scenario's own route cost."""
         self.ensure_one()
-        if self.route_cost_mode == "provider_total":
+        if self.travel_estimate_id:
             return self.travel_estimate_id.duration_hours
-        return self.planned_travel_hours
+        return max((
+            line.quantity for line in self.cost_line_ids
+            if line.category == "travel" and line.calculation == "hour"
+        ), default=0.0)
 
     def _resolved_travel_km(self):
         """Kilometres behind the accepted route cost, mirroring _resolved_travel_hours."""
         self.ensure_one()
-        if self.route_cost_mode == "provider_total":
+        if self.travel_estimate_id:
             quoted = self.travel_estimate_id.distance_km
         else:
             # Per-kilometre cost lines are not additive as distance: two vehicles
             # costed separately drive the same road once, so take the longest leg
             # rather than their sum.
-            quoted = self.planned_travel_km or max(
+            quoted = max(
                 (
                     line.quantity for line in self.cost_line_ids
                     if line.category == "travel" and line.calculation == "kilometre"
@@ -327,12 +267,12 @@ class MbCommercialProfitabilityScenario(models.Model):
             )
         return quoted
 
-    def _evaluate_recommendation(self, blocked, note, use_legacy_mix, units):
+    def _evaluate_recommendation(self, blocked, note, units):
         """Turn the break-even figures into a verdict a stallholder can act on."""
         self.ensure_one()
         verdict, reason = self._verdict(
             blocked=blocked,
-            judgeable=not use_legacy_mix and units > 0,
+            judgeable=units > 0,
             margin=self.projected_margin,
             below_break_even=units < self.break_even_units,
             effort_hours=self.effort_hours,
@@ -347,11 +287,6 @@ class MbCommercialProfitabilityScenario(models.Model):
         headroom_percent = self.break_even_headroom_ratio * 100.0
         if reason == "blocked":
             return verdict, note or _("Complete the scenario before judging this market.")
-        if reason == "not_judgeable":
-            return verdict, _(
-                "Enter expected sold quantities: an average-basket mix without volumes "
-                "cannot be judged."
-            )
         if reason == "below_break_even":
             return verdict, _(
                 "Projected margin %(margin)s: %(units)s planned units against %(break_even)s "
@@ -420,7 +355,6 @@ class MbCommercialProfitabilityScenario(models.Model):
             })
             scenario.operation_id.with_context(mb_scenario_approval=True).write({
                 "primary_scenario_id": scenario.id,
-                "expected_revenue": scenario.sales_revenue_excl_vat,
             })
 
     def write(self, vals):
@@ -456,7 +390,6 @@ class MbCommercialProfitabilityScenarioLine(models.Model):
         "mb.market.stock.plan.line", ondelete="restrict", check_company=True,
         domain="[('operation_id', '=', parent.operation_id), ('target_type', '=', 'product')]",
     )
-    mix_share = fields.Float(required=True, default=100.0, digits=(16, 4))
     expected_sold_qty = fields.Float(default=0.0)
     sale_price_excluded_tax = fields.Monetary(required=True)
     vat_rate = fields.Float(digits=(16, 4), help="Percentage applied to the customer price.")
@@ -490,7 +423,7 @@ class MbCommercialProfitabilityScenarioLine(models.Model):
     cost_date = fields.Date(required=True, default=fields.Date.context_today)
 
     _values_nonnegative = models.Constraint(
-        "CHECK(mix_share >= 0 AND expected_sold_qty >= 0 AND sale_price_excluded_tax >= 0 "
+        "CHECK(expected_sold_qty >= 0 AND sale_price_excluded_tax >= 0 "
         "AND vat_rate >= 0 AND turnover_levy_rate >= 0 "
         "AND channel_fee_rate >= 0 AND channel_fee_rate <= 100 "
         "AND product_unit_cost >= 0 AND product_cost_rate >= 0 AND product_cost_rate <= 100 "

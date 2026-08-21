@@ -5,12 +5,12 @@ import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardActionServiceProps } from "@web/webclient/actions/action_service";
-import { exportLegacyTemplate, importLegacyTemplate } from "@mb_label/editor/legacy_template";
 import {
     applyMediaPreset, applyPrinterProfile, matchingMediaId, PRINTER_PROFILES,
     printerProfile, printerProfileId,
 } from "@mb_label/editor/printer_presets";
 import { shouldClearWorkspaceSelection } from "@mb_label/editor/selection";
+import { parseTemplateFile, serializeTemplateFile } from "@mb_label/editor/template_file";
 import { formatTemplateText } from "@mb_label/editor/template_formatters";
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -490,7 +490,7 @@ export class LabelEditor extends Component {
             return;
         }
         try {
-            const imported = importLegacyTemplate(
+            const imported = parseTemplateFile(
                 JSON.parse(await file.text()), file.name.replace(/\.json$/i, ""));
             const ids = await this.orm.create("mb.label.template", [{
                 name: imported.name,
@@ -505,13 +505,9 @@ export class LabelEditor extends Component {
                 ids, imported.document, imported.settings,
             ]);
             await this.load(ids[0]);
-            const message = imported.warnings.length
-                ? _t("Imported with %(count)s warning(s): %(warnings)s", {
-                    count: imported.warnings.length,
-                    warnings: imported.warnings.join(" "),
-                })
-                : _t("The old JSON label was imported as immutable version 1.");
-            this.notification.add(message, { type: imported.warnings.length ? "warning" : "success", sticky: imported.warnings.length > 0 });
+            this.notification.add(_t("The label template was imported as immutable version 1."), {
+                type: "success",
+            });
         } catch (error) {
             this.notification.add(error.message || _t("The JSON label could not be imported."), { type: "danger" });
         }
@@ -519,7 +515,7 @@ export class LabelEditor extends Component {
 
     exportJson() {
         if (!this.template) return;
-        const payload = exportLegacyTemplate(this.template, clone(this.state.document));
+        const payload = serializeTemplateFile(this.template, this.state.document);
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement("a");

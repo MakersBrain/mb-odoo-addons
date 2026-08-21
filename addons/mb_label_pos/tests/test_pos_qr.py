@@ -91,17 +91,11 @@ class TestLabelPosQr(TransactionCase):
         self.assertIn(self.prefix, data["pos.config"][0]["mb_label_qr_prefixes"])
         self.assertIn(self.alias.id, [row["id"] for row in data["mb.label.qr.alias"]])
 
-    def test_exact_alias_and_compatibility_path_resolve(self):
+    def test_exact_alias_resolves(self):
         exact = self.env["mb.label.qr.alias"].pos_resolve(self.alias.value, self.config.id)
         self.assertEqual(exact["status"], "resolved")
         self.assertEqual(exact["source"], "alias")
         self.assertEqual(exact["lot_name"], "PIECE 1")
-
-        compatibility = self.env["mb.label.qr.alias"].pos_resolve(
-            "%s#POS-CUP" % self.prefix, self.config.id)
-        self.assertEqual(compatibility["status"], "resolved")
-        self.assertEqual(compatibility["source"], "compatibility")
-        self.assertEqual(compatibility["product_id"], self.product.id)
 
     def test_retired_alias_is_loaded_and_rejected(self):
         self.alias.action_retire()
@@ -111,16 +105,10 @@ class TestLabelPosQr(TransactionCase):
         row = next(item for item in rows if item["id"] == self.alias.id)
         self.assertFalse(row["active"])
 
-    def test_unknown_lot_and_unknown_product_fail_visibly(self):
-        unknown_lot = self.env["mb.label.qr.alias"].pos_resolve(
+    def test_unknown_alias_does_not_resolve_from_its_payload(self):
+        result = self.env["mb.label.qr.alias"].pos_resolve(
             "%s#POS-CUP/UNKNOWN" % self.prefix, self.config.id)
-        unknown_product = self.env["mb.label.qr.alias"].pos_resolve(
-            "%s#UNKNOWN" % self.prefix, self.config.id)
-        self.assertEqual(unknown_lot["status"], "unknown_lot")
-        self.assertEqual(unknown_product["status"], "unknown_product")
-        malformed = self.env["mb.label.qr.alias"].pos_resolve(
-            "%s#POS-CUP/A/B" % self.prefix, self.config.id)
-        self.assertEqual(malformed["status"], "invalid")
+        self.assertEqual(result["status"], "no_match")
 
     def test_alias_from_another_company_is_rejected(self):
         other_company = self.env["res.company"].create({"name": "Other label company"})
@@ -161,24 +149,19 @@ class TestLabelPosQr(TransactionCase):
         })
         self.env["stock.quant"]._update_available_quantity(
             empty_product, other_location, 5)
+        empty_alias = self.env["mb.label.qr.alias"].create({
+            "value": "%s#EMPTY-CUP" % self.prefix,
+            "company_id": self.config.company_id.id,
+            "product_id": empty_product.id,
+            "template_version_id": self.version.id,
+        })
         result = self.env["mb.label.qr.alias"].pos_resolve(
-            "%s#EMPTY-CUP" % self.prefix, self.config.id)
+            empty_alias.value, self.config.id)
         self.assertEqual(result["status"], "out_of_stock")
 
     def test_ordinary_ean_is_not_claimed(self):
         result = self.env["mb.label.qr.alias"].pos_resolve("3760123456789", self.config.id)
         self.assertEqual(result["status"], "no_match")
-
-    def test_duplicate_sku_is_ambiguous(self):
-        self.env["product.product"].create({
-            "name": "Duplicate POS cup",
-            "default_code": "POS-CUP",
-            "available_in_pos": True,
-            "sale_ok": True,
-        })
-        result = self.env["mb.label.qr.alias"].pos_resolve(
-            "%s#POS-CUP" % self.prefix, self.config.id)
-        self.assertEqual(result["status"], "ambiguous")
 
     def test_projection_of_one_thousand_aliases_is_bounded(self):
         self.env["mb.label.qr.alias"].create([{

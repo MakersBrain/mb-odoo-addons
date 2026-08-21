@@ -5,9 +5,8 @@
       every craft. Vertical addons hang their entries under these three menus
       without overwriting the shared root.
 
-      The IDs were menu_mb_ceramics_* until 19.0.2.0.0, in a module that no
-      longer holds anything ceramic. menu_mb_workshop_root keeps its ID because
-      scripts/configure_app_visibility.py names it.
+      scripts/configure_app_visibility.py uses menu_mb_workshop_root as its
+      stable entry point.
     -->
     <menuitem
         id="menu_mb_workshop_root"

@@ -21,7 +21,4 @@
     <menuitem id="menu_mb_production_loss" name="Production Losses"
               parent="mb_workshop_base.menu_mb_workshop_stock_quality"
               action="mb_production_loss_action" sequence="40" />
-    <menuitem id="menu_mb_finishing_session" name="Legacy Finish Blanks"
-              parent="mb_workshop_base.menu_mb_workshop_configuration"
-              action="mb_finishing_session_action" sequence="90" />
 </odoo>

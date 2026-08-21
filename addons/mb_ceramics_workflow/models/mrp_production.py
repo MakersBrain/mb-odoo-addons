@@ -10,16 +10,12 @@ class MrpProduction(models.Model):
             ("throwing", "Blank production"),
             ("bisque", "Bisque production"),
             ("glazing", "Glazing"),
-            ("finishing", "Finishing (legacy)"),
         ],
         copy=False,
         index=True,
     )
     mb_throwing_session_id = fields.Many2one(
         "mb.throwing.session", copy=False, index=True, ondelete="set null",
-        check_company=True)
-    mb_finishing_session_id = fields.Many2one(
-        "mb.finishing.session", copy=False, index=True, ondelete="set null",
         check_company=True)
     mb_bisque_session_id = fields.Many2one(
         "mb.bisque.session", copy=False, index=True, ondelete="set null",
@@ -113,7 +109,6 @@ class MrpProduction(models.Model):
     def write(self, values):
         session_fields = {
             "mb_throwing_session_id",
-            "mb_finishing_session_id",
             "mb_bisque_session_id",
             "mb_glazing_session_id",
         }
@@ -180,7 +175,7 @@ class MrpProduction(models.Model):
                 lambda move: move.state == "done").move_line_ids
             for production in self.filtered(
                 lambda production: production.mb_workflow_kind
-                in ("bisque", "glazing", "finishing"))
+                in ("bisque", "glazing"))
         }
         result = super()._post_inventory(cancel_backorder=cancel_backorder)
         for production in self:
@@ -254,7 +249,7 @@ class MrpProduction(models.Model):
         completed inside `_post_inventory`; without this union the genealogy is
         correct but the early input cost is absent from the next stock stage.
         """
-        if self.mb_workflow_kind in ("bisque", "glazing", "finishing"):
+        if self.mb_workflow_kind in ("bisque", "glazing"):
             consumed_moves |= self.move_raw_ids.filtered(
                 lambda move: move.state == "done"
             )
@@ -263,12 +258,11 @@ class MrpProduction(models.Model):
     def _get_backorder_mo_vals(self):
         """Keep ceramics workflow ownership on Odoo 19 MO splits."""
         values = super()._get_backorder_mo_vals()
-        if self.mb_workflow_kind in ("bisque", "glazing", "finishing"):
+        if self.mb_workflow_kind in ("bisque", "glazing"):
             values.update({
                 "mb_workflow_kind": self.mb_workflow_kind,
                 "mb_bisque_session_id": self.mb_bisque_session_id.id,
                 "mb_glazing_session_id": self.mb_glazing_session_id.id,
-                "mb_finishing_session_id": self.mb_finishing_session_id.id,
                 "mb_bom_revision_id": self.mb_bom_revision_id.id,
             })
         return values

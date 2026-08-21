@@ -3,11 +3,6 @@
 
     python3 tools/release_metadata.py --image ghcr.io/makersbrain/mb-odoo@sha256:...
 
-Migration plan section 4.1 point 9: the Odoo repository must publish "compact
-machine-readable release metadata containing the image digest, source
-repository, source commit, Odoo version, bridge contract version and installed
-add-on versions".
-
 This is the record `mb-infra` reads when it composes a platform release, and the
 only place the control plane can learn which add-on versions are actually inside
 a given image digest. It is deliberately small: evidence that is large (SBOM,
@@ -147,9 +142,6 @@ def main() -> int:
 
     rendered = json.dumps(metadata, indent=2) + "\n"
     if args.output:
-        # Create the directory rather than assume a caller made it. It used to be
-        # created by the SBOM step; when that step was deferred the release
-        # failed here after the image had already been pushed and signed.
         output = pathlib.Path(args.output)
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(rendered, encoding="utf-8")

@@ -71,18 +71,6 @@ STOCK_CHILDREN = [
 ]
 CATEGORIES = ["RAW-CLAY", "RAW-GLAZE", "DAMP", "DRYING", "BISQUE", "GLAZE", "FINISHED"]
 
-# Categories that already exist under a different spelling. Renaming rather than
-# creating a second one keeps the locations that already point at them attached.
-CATEGORY_RENAMES = {"Bisque": "BISQUE"}
-
-# Locations that already exist somewhere else. Moved rather than recreated, so
-# that any stock, move history or putaway rule on them travels along.
-#   current complete_name -> (new parent, new name, category)
-MIGRATIONS = [
-    ("AT/Bisque", "AT-WIP", "BISQUE-01", "BISQUE"),
-    ("AT/WIP-DAMP-01", "AT-WIP", "DAMP-01", "DAMP"),
-]
-
 SETUP_TEMPLATE = '''
 import json
 
@@ -100,30 +88,14 @@ AT_STOCK = warehouse.lot_stock_id
 print("INFO warehouse", warehouse.name, "code", warehouse.code,
       "view", AT.complete_name, "lot_stock", AT_STOCK.complete_name)
 
-
-def by_complete_name(name):
-    return Location.with_context(active_test=False).search(
-        [("complete_name", "=", name)], limit=1)
-
-
 # --- storage categories -----------------------------------------------------
-# Odoo 19 has no group_stock_storage_categories - it went away, and asking
-# has_group() for a missing xmlid answers False rather than raising, which
-# reads convincingly like a disabled feature. What actually gates both the
-# Configuration > Storage Categories menu and the field on the location form is
-# group_stock_multi_locations. Check that, and only that.
+# group_stock_multi_locations gates both the Configuration > Storage Categories
+# menu and the field on the location form.
 if not env.user.has_group("stock.group_stock_multi_locations"):
     print("SETTING Storage Locations is OFF - categories will be invisible in "
           "the interface; enable it in Inventory > Configuration > Settings")
 else:
     print("SETTING Storage Locations on, categories visible")
-
-for old, new in CONFIG["category_renames"].items():
-    existing = Category.search([("name", "=", old)], limit=1)
-    if existing and not Category.search([("name", "=", new)], limit=1):
-        if not DRY_RUN:
-            existing.name = new
-        print("CATEGORY renamed", old, "->", new)
 
 categories = {{}}
 for name in CONFIG["categories"]:
@@ -185,24 +157,8 @@ def ensure(name, parent, usage="internal", category=None, root=False, label=None
     return location
 
 
-# --- the WIP view, then anything that has to move into it -------------------
+# --- the WIP view and racks -------------------------------------------------
 wip_root = ensure(CONFIG["wip_root"], None, usage="view", root=True)
-
-for current, parent_name, new_name, category in CONFIG["migrations"]:
-    location = by_complete_name(current)
-    if not location:
-        print("MIGRATE skipped", current, "- not found")
-        continue
-    parent = by_complete_name(parent_name) or wip_root
-    if DRY_RUN:
-        print("MIGRATE would move", current, "->", parent_name + "/" + new_name)
-        continue
-    quantity = sum(env["stock.quant"].search(
-        [("location_id", "=", location.id)]).mapped("quantity"))
-    location.write({{"name": new_name, "location_id": parent.id,
-                    "storage_category_id": categories[category].id}})
-    print("MIGRATE moved", current, "->", location.complete_name,
-          "carrying", quantity, "units")
 
 for name, category in CONFIG["wip_racks"]:
     ensure(name, wip_root, category=category, label=CONFIG["wip_root"])
@@ -272,20 +228,16 @@ def main():
     parser.add_argument("--database", default="odoo")
     parser.add_argument("--wip-root", default="AT-WIP",
                         help="name of the root-level view holding the racks")
-    parser.add_argument("--depots-root", default="Dépôts")
     parser.add_argument("--dry-run", action="store_true",
                         help="report what would change, write nothing")
     options = parser.parse_args()
 
     config = {
         "categories": CATEGORIES,
-        "category_renames": CATEGORY_RENAMES,
         "wip_root": options.wip_root,
         "wip_racks": WIP_RACKS,
         "stock_children": STOCK_CHILDREN,
-        "depots_root": options.depots_root,
         "depots": ["Galerie Démo", "La Méduse Électrique Sète"],
-        "migrations": [(c, options.wip_root, n, g) for c, _, n, g in MIGRATIONS],
     }
     script = SETUP_TEMPLATE.format(
         config=json.dumps(config), dry_run=options.dry_run)
@@ -293,7 +245,7 @@ def main():
           f"in '{options.database}' ...")
     run_in_odoo(script, options.database,
                 prefixes=("INFO", "SETTING", "CATEGORY", "LOCATION",
-                          "MIGRATE", "DEPOT", "TREE"))
+                          "DEPOT", "TREE"))
 
 
 if __name__ == "__main__":

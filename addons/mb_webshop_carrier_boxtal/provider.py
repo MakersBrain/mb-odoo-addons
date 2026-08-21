@@ -45,9 +45,6 @@ class BoxtalProvider:
     supports_contextual_options = False
     # The current OpenAPI has neither an idempotency header nor lookup by
     # Shipment.externalId. An ambiguous POST must therefore remain unknown.
-    supports_idempotency = False
-    supports_reconciliation = False
-
     @staticmethod
     def operation_safety(operation):
         return OperationSafety()

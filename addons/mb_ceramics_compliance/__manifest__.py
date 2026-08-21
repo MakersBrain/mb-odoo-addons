@@ -8,7 +8,7 @@ The one regulation a ceramics workshop cannot file away.
 applies to ceramic articles intended to come into contact with foodstuffs and to
 nothing else, so a mug carries lead and cadmium limits and a decorative plate
 carries none. Odoo's `tracking` field is the right mechanism for the traceability
-that follows - see IDENTITY-SPINE-DESIGN.md section 1 - but nothing in Odoo says
+that follows, but nothing in Odoo says
 *why* an article is tracked, and without the reason the setting drifts. So
 `mb_food_contact` is declared and `tracking` is derived from it.
 
@@ -17,13 +17,8 @@ is food-safe, which is a property of a material. This one owns whether an
 *article* is intended for food, which is a property of a product for sale. A
 food-safe glaze on a decorative vase is both true and irrelevant.
 
-**This addon exists because compliance is not a base.** All of it lived in
-`mb_workshop_base` until 19.0.2.0.0, which meant `mb_label`,
-`mb_inventory_capture` and `mb_catalogue_sync` - none of which has any interest
-in tableware - could not be installed without it. The rule the split follows is
-in CRAFT-PLATFORM-PLAN.md section 2: a module sits below the craft line only if
-a leatherworker would install it unchanged. Nothing here passes that test, and
-nothing here should.
+**Compliance is not a craft-neutral base.** This addon is ceramics-specific;
+generic workshop, label, inventory, and catalogue addons do not depend on it.
 
 **The gate is at mark-done, and it reads the taxonomy.** A food-contact order
 needs a lot number before it can be closed, and every glaze lot it consumed
@@ -32,11 +27,8 @@ needs a passing migration test. Which consumed lots are glaze is answered by
 our own, because a second taxonomy disagrees with the first the moment anyone
 edits either.
 
-That dependency runs the safe way round. The taxonomy is seed data in a module
-with no connector and no service behind it, so the gate is always enforceable.
-It used to run the other way - the categories were in `mb_catalogue_sync` and
-the gate silently checked less when the importer was absent - and moving them
-out was the fix.
+The taxonomy is seed data in a module with no connector or external service, so
+the gate is always enforceable.
 
 **The verdict is recorded, not computed.** `mb.migration.test.passed` is what
 the laboratory issued against the limits in force on the test date. Deriving it

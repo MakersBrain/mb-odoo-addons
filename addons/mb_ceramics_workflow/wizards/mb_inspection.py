@@ -10,7 +10,7 @@ class MbInspection(models.TransientModel):
     production_id = fields.Many2one(
         "mrp.production",
         required=True,
-        domain=[("mb_workflow_kind", "in", ("glazing", "finishing"))],
+        domain=[("mb_workflow_kind", "=", "glazing")],
     )
     selected_quantity = fields.Float(
         related="production_id.product_qty", string="Selected blanks", readonly=True)
@@ -175,9 +175,6 @@ class MbInspection(models.TransientModel):
         production.write({"mb_inspected": True})
         production.mb_board_content_ids.filtered(
             lambda content: content.state == "current").action_remove()
-        session = production.mb_finishing_session_id
-        if session and all(order.state == "done" for order in session.production_ids):
-            session.state = "done"
         glazing_session = production.mb_glazing_session_id
         if glazing_session and all(
             order.state == "done" for order in glazing_session.production_ids

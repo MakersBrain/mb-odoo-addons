@@ -5,12 +5,9 @@ name: Odoo release
 # release and does not touch any environment: MakersBrain/mb-infra consumes this
 # image by digest and owns staging qualification and production promotion.
 #
-# Migration plan section 4.1. Its requirements map to the steps below:
-# the pinned base and the pinned OCA dependency live in deploy/Odoo.Dockerfile;
-# the addons are copied there too; the full CI suite is verified to have passed
-# for this commit by the `verify-ci` job; signing is keyless cosign with this
-# workflow's OIDC identity; and release metadata comes from
-# tools/release_metadata.py.
+# The base and OCA dependency are digest/commit pinned in deploy/Odoo.Dockerfile.
+# The full CI suite must pass for this commit, images are signed with keyless
+# cosign, and tools/release_metadata.py emits the machine-readable release record.
 
 on:
   workflow_dispatch:
@@ -121,39 +118,6 @@ jobs:
           echo "image=$image@$digest" >> "$GITHUB_OUTPUT"
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
 
-          # What a scanner can actually resolve: the local tag on a dry run, the
-          # immutable digest on a real release. Nothing consumes this today --
-          # the SBOM and scan steps are deferred -- but it is kept so restoring
-          # them is a paste rather than a redesign, and so the restored gate
-          # runs during a rehearsal instead of only in anger.
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            echo "scan_target=$image:$GITHUB_SHA" >> "$GITHUB_OUTPUT"
-          else
-            echo "scan_target=$image@$digest" >> "$GITHUB_OUTPUT"
-          fi
-
-      # No SBOM and no vulnerability scan, by decision rather than omission.
-      # Migration plan section 4.4: the platform is pre-production and the cost
-      # did not earn its place. Nothing downstream requires that evidence -- the
-      # composed release record binds digests and provenance, and claims nothing
-      # about vulnerability posture.
-      #
-      # The plumbing to reintroduce it is still here: the build step publishes a
-      # scan_target output resolving to the local tag on a dry run and the
-      # immutable digest on a real release, so a restored gate is exercised by a
-      # rehearsal rather than first running in anger. Add the syft and
-      # setup-trivy actions and a step along the lines of:
-      #
-      #   target='${{ steps.build.outputs.scan_target }}'
-      #   syft "$target" -o "spdx-json=release/mb-odoo.spdx.json"
-      #   trivy image --scanners vuln --ignore-unfixed --format json \
-      #     --output release/mb-odoo.vulnerability.json "$target"
-      #   jq -e '[.Results[]?.Vulnerabilities[]?
-      #           | select(.Severity == "CRITICAL")] | length == 0' \
-      #     release/mb-odoo.vulnerability.json
-      #
-      # The publish list picks both files up automatically once they exist.
-
       - name: Sign the image
         if: ${{ !inputs.dry_run }}
         run: cosign sign --yes '${{ steps.build.outputs.image }}'
@@ -171,28 +135,13 @@ jobs:
           cp contracts/mb_control_v1.json release/
           cat release/release-metadata.json
 
-          # Assemble the publish list here, in a step a dry run also executes,
-          # rather than inside the push itself. The push is the one step a
-          # rehearsal can never exercise -- it publishes by definition -- so
-          # anything decided in there is only ever tested in anger. A release
-          # already failed that way: the SBOM step was deferred and the push kept
-          # naming its two output files, which no longer existed.
           required=(release/release-metadata.json release/mb_control_v1.json)
-          optional=(
-            "release/mb-odoo.spdx.json:application/spdx+json"
-            "release/mb-odoo.vulnerability.json:application/json"
-          )
 
           for file in "${required[@]}"; do
             test -s "$file" || { echo "::error::$file is missing or empty" >&2; exit 1; }
           done
 
           files="release/release-metadata.json:application/json release/mb_control_v1.json:application/json"
-          for entry in "${optional[@]}"; do
-            path="${entry%%:*}"
-            # Present once the SBOM and scan are restored; absent until then.
-            [ -s "$path" ] && files="$files $entry"
-          done
           echo "files=$files" >> "$GITHUB_OUTPUT"
           echo "will publish: $files"
 
@@ -206,8 +155,7 @@ jobs:
             --artifact-type application/vnd.makersbrain.odoo-release.v1+json \
             ${{ steps.metadata.outputs.files }}
           # The metadata is not signed separately. Its digest is recorded here
-          # and bound by mb-infra's composed release record, which is the single
-          # provenance anchor (migration plan section 2.6).
+          # and bound by mb-infra's composed release record.
           printf '%s@%s\n' "$artifact" "$(oras resolve "$artifact")" | tee release/artifact-reference.txt
 
       - name: Summary

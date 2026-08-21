@@ -626,37 +626,8 @@ class MbCommercialPlanningWizard(models.TransientModel):
                 "calculation": line.calculation, "quantity": line.quantity,
                 "rate": line.rate, "percentage": line.percentage,
                 "source_kind": "manual",
-            }) for line in self._seeded_cost_lines(scenario)],
+            }) for line in scenario.cost_line_ids],
         }
-
-    @api.model
-    def _seeded_cost_lines(self, scenario):
-        """The source's fixed costs, whichever shape they were planned in.
-
-        A scenario costed before cost lines existed holds its fixed costs in the
-        scalar fields instead, and _compute_results falls back to them. Seeding
-        only the lines would carry last year's sales forward with none of last
-        year's costs, and hand back a verdict that says every market is worth it.
-        """
-        if scenario.cost_line_ids:
-            return scenario.cost_line_ids
-        legacy = [
-            (_("Travel"), "travel", "fixed", 1.0, scenario.accepted_travel_cost),
-            (_("Stand work"), "labour", "hour",
-             scenario.planned_work_hours, scenario.work_hourly_cost),
-            (_("Stall"), "venue", "fixed", 1.0, scenario.stall_rent),
-            (_("Parking"), "parking", "fixed", 1.0, scenario.parking_cost),
-            (_("Accommodation"), "accommodation", "fixed", 1.0, scenario.accommodation_cost),
-            (_("Other fixed cost"), "other", "fixed", 1.0, scenario.other_fixed_cost),
-        ]
-        return [
-            self.env["mb.commercial.cost.line"].new({
-                "name": name, "category": category, "calculation": calculation,
-                "quantity": quantity, "rate": rate,
-            })
-            for name, category, calculation, quantity, rate in legacy
-            if quantity and rate
-        ]
 
     def _new_preview_scenario(self):
         """Build an in-memory scenario so preview and saved records use one engine."""
@@ -827,7 +798,6 @@ class MbCommercialPlanningWizard(models.TransientModel):
         operation.write({
             "primary_scenario_id": scenario.id,
             "travel_estimate_id": self.travel_estimate_id.id,
-            "expected_revenue": scenario.sales_revenue_excl_vat,
         })
         self._after_operation_saved(operation, scenario)
         return {

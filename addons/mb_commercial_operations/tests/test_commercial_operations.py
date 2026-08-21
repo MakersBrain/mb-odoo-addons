@@ -147,17 +147,26 @@ class TestCommercialOperations(TransactionCase):
         operation = self._operation()
         scenario = self.env["mb.commercial.profitability.scenario"].create({
             "operation_id": operation.id,
-            "route_cost_mode": "components",
-            "toll_cost": 20.0,
-            "fuel_cost": 30.0,
-            "planned_travel_hours": 2.0,
-            "travel_hourly_cost": 15.0,
-            "planned_work_hours": 8.0,
-            "work_hourly_cost": 20.0,
-            "stall_rent": 60.0,
+            "cost_line_ids": [
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Travel",
+                    "category": "travel", "calculation": "fixed",
+                    "quantity": 1.0, "rate": 80.0,
+                }),
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Stand work",
+                    "category": "labour", "calculation": "hour",
+                    "quantity": 8.0, "rate": 20.0,
+                }),
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Stall",
+                    "category": "venue", "calculation": "fixed",
+                    "quantity": 1.0, "rate": 60.0,
+                }),
+            ],
             "line_ids": [fields.Command.create({
                 "product_id": self.product.id,
-                "mix_share": 100.0,
+                "expected_sold_qty": 20.0,
                 "sale_price_excluded_tax": 40.0,
                 "channel_fee_rate": 2.5,
                 "product_unit_cost": 10.0,
@@ -173,16 +182,19 @@ class TestCommercialOperations(TransactionCase):
         self.assertEqual(scenario.break_even_units, 11)
         scenario.action_approve()
         with self.assertRaises(UserError):
-            scenario.stall_rent = 70.0
+            scenario.cost_line_ids.filtered(lambda line: line.category == "venue").rate = 70.0
 
     def test_invalid_mix_and_nonpositive_contribution_block_approval(self):
         operation = self._operation()
         scenario = self.env["mb.commercial.profitability.scenario"].create({
             "operation_id": operation.id,
-            "manual_travel_total": 20.0,
+            "cost_line_ids": [fields.Command.create({
+                "operation_id": operation.id, "name": "Travel",
+                "category": "travel", "calculation": "fixed",
+                "quantity": 1.0, "rate": 20.0,
+            })],
             "line_ids": [fields.Command.create({
                 "product_id": self.product.id,
-                "mix_share": 50.0,
                 "sale_price_excluded_tax": 10.0,
                 "product_unit_cost": 10.0,
                 "cost_source": "product",
@@ -294,12 +306,44 @@ class TestCommercialOperations(TransactionCase):
     def _verdict_scenario(self, operation, **values):
         """A market selling 20 mugs at 40 with 10 of product cost, over 8 + 2 hours."""
         line = values.pop("line", {})
+        travel_cost = values.pop("travel_cost", 50.0)
+        venue_cost = values.pop("venue_cost", 50.0)
+        work_hours = values.pop("work_hours", 8.0)
+        travel_hours = values.pop("travel_hours", 2.0)
+        travel_km = values.pop("travel_km", 0.0)
+        cost_line_ids = values.pop("cost_line_ids", None)
+        if cost_line_ids is None:
+            cost_line_ids = [
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Travel",
+                    "category": "travel", "calculation": "fixed",
+                    "quantity": 1.0, "rate": travel_cost,
+                }),
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Travel time",
+                    "category": "travel", "calculation": "hour",
+                    "quantity": travel_hours, "rate": 0.0,
+                }),
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Stand work",
+                    "category": "labour", "calculation": "hour",
+                    "quantity": work_hours, "rate": 0.0,
+                }),
+                fields.Command.create({
+                    "operation_id": operation.id, "name": "Stall",
+                    "category": "venue", "calculation": "fixed",
+                    "quantity": 1.0, "rate": venue_cost,
+                }),
+            ]
+            if travel_km:
+                cost_line_ids.append(fields.Command.create({
+                    "operation_id": operation.id, "name": "Travel distance",
+                    "category": "travel", "calculation": "kilometre",
+                    "quantity": travel_km, "rate": 0.0,
+                }))
         return self.env["mb.commercial.profitability.scenario"].create({
             "operation_id": operation.id,
-            "manual_travel_total": 50.0,
-            "planned_travel_hours": 2.0,
-            "planned_work_hours": 8.0,
-            "stall_rent": 50.0,
+            "cost_line_ids": cost_line_ids,
             "line_ids": [fields.Command.create({
                 "product_id": self.product.id,
                 "expected_sold_qty": 20,
@@ -340,7 +384,7 @@ class TestCommercialOperations(TransactionCase):
 
     def test_market_below_break_even_is_not_worth_attending(self):
         operation = self._operation()
-        scenario = self._verdict_scenario(operation, stall_rent=900.0)
+        scenario = self._verdict_scenario(operation, venue_cost=900.0)
         self.assertEqual(scenario.break_even_units, 32)
         self.assertEqual(scenario.projected_margin, -350.0)
         self.assertEqual(scenario.recommendation, "no_go")
@@ -348,7 +392,7 @@ class TestCommercialOperations(TransactionCase):
 
     def test_thin_break_even_headroom_is_only_marginal(self):
         operation = self._operation()
-        scenario = self._verdict_scenario(operation, stall_rent=480.0)
+        scenario = self._verdict_scenario(operation, venue_cost=480.0)
         self.assertEqual(scenario.break_even_units, 18)
         self.assertEqual(scenario.projected_margin, 70.0)
         self.assertAlmostEqual(scenario.break_even_headroom_ratio, 2 / 18, places=6)
@@ -359,8 +403,8 @@ class TestCommercialOperations(TransactionCase):
         operation = self._operation()
         scenario = self._verdict_scenario(
             operation,
-            manual_travel_total=0.0,
-            stall_rent=0.0,
+            travel_cost=0.0,
+            venue_cost=0.0,
         )
         self.assertEqual(scenario.fixed_event_cost, 0.0)
         self.assertEqual(scenario.break_even_units, 0)
@@ -368,21 +412,19 @@ class TestCommercialOperations(TransactionCase):
         self.assertEqual(scenario.break_even_headroom_ratio, 1.0)
         self.assertEqual(scenario.recommendation, "go")
 
-    def test_mix_without_quantities_cannot_be_judged(self):
+    def test_sales_without_quantities_are_blocked(self):
         operation = self._operation()
         scenario = self._verdict_scenario(
-            operation, line={"expected_sold_qty": 0, "mix_share": 100.0},
+            operation, line={"expected_sold_qty": 0},
         )
-        self.assertFalse(scenario.calculation_blocked)
+        self.assertTrue(scenario.calculation_blocked)
         self.assertEqual(scenario.recommendation, "unknown")
-        self.assertIn("expected sold quantities", scenario.recommendation_note)
+        self.assertIn("positive", scenario.recommendation_note)
 
     def test_effort_hours_fall_back_to_hourly_labour_cost_lines(self):
         operation = self._operation()
         scenario = self._verdict_scenario(
             operation,
-            planned_work_hours=0.0,
-            planned_travel_hours=0.0,
             cost_line_ids=[
                 fields.Command.create({
                     "operation_id": operation.id, "name": "Stand crew",
@@ -402,9 +444,9 @@ class TestCommercialOperations(TransactionCase):
         self.assertAlmostEqual(scenario.margin_per_effort_hour, 73.33, places=2)
         self.assertEqual(scenario.recommendation, "go")
 
-    def test_margin_per_kilometre_uses_the_scenario_distance_in_manual_mode(self):
+    def test_margin_per_kilometre_uses_the_scenario_cost_line_distance(self):
         operation = self._operation()
-        scenario = self._verdict_scenario(operation, planned_travel_km=120.0)
+        scenario = self._verdict_scenario(operation, travel_km=120.0)
         self.assertEqual(scenario.travel_distance_km, 120.0)
         self.assertTrue(scenario.travel_distance_known)
         self.assertEqual(scenario.margin_per_travel_km, 4.17)
@@ -451,7 +493,6 @@ class TestCommercialOperations(TransactionCase):
         self.assertEqual(estimate.distance_km, 200.0)
         scenario = self._verdict_scenario(
             operation,
-            route_cost_mode="provider_total",
             travel_estimate_id=estimate.id,
         )
         self.assertFalse(scenario.calculation_blocked)
@@ -465,7 +506,6 @@ class TestCommercialOperations(TransactionCase):
         operation = self._operation()
         scenario = self._verdict_scenario(
             operation,
-            planned_travel_km=0.0,
             cost_line_ids=[
                 fields.Command.create({
                     "operation_id": operation.id, "name": "Mileage allowance",
@@ -482,7 +522,7 @@ class TestCommercialOperations(TransactionCase):
 
     def test_operation_mirrors_margin_per_kilometre_from_the_primary_scenario(self):
         operation = self._operation()
-        scenario = self._verdict_scenario(operation, planned_travel_km=120.0)
+        scenario = self._verdict_scenario(operation, travel_km=120.0)
         operation.primary_scenario_id = scenario
         self.assertEqual(operation.planning_margin_per_km, 4.17)
         self.assertEqual(operation.planning_travel_distance_km, 120.0)
@@ -491,17 +531,19 @@ class TestCommercialOperations(TransactionCase):
 
     def test_approved_scenario_keeps_its_kilometre_kpi(self):
         operation = self._operation(profitability_required=True)
-        scenario = self._verdict_scenario(operation, planned_travel_km=120.0)
+        scenario = self._verdict_scenario(operation, travel_km=120.0)
         scenario.action_approve()
         self.assertEqual(scenario.state, "approved")
         with self.assertRaises(UserError):
-            scenario.planned_travel_km = 999.0
+            scenario.cost_line_ids.filtered(
+                lambda line: line.calculation == "kilometre"
+            ).quantity = 999.0
         self.assertEqual(scenario.travel_distance_km, 120.0)
         self.assertEqual(scenario.margin_per_travel_km, 4.17)
 
     def test_planning_snapshot_digest_is_unchanged_by_the_kilometre_kpi(self):
         operation = self._operation(profitability_required=True)
-        scenario = self._verdict_scenario(operation, planned_travel_km=120.0)
+        scenario = self._verdict_scenario(operation, travel_km=120.0)
         scenario.action_approve()
         snapshot = operation.report_snapshot_ids.filtered(
             lambda item: item.report_kind == "planning" and item.state == "current"
@@ -848,7 +890,7 @@ class TestCommercialOperations(TransactionCase):
         self.assertEqual(estimate.provider_version, "0.2.0")
 
     def test_profitability_report_reads_only_operation_task_evidence(self):
-        operation = self._operation(expected_revenue=200)
+        operation = self._operation()
         self.env["account.analytic.line"].create({
             "name": "Market revenue",
             "account_id": operation.analytic_account_id.id,
@@ -903,9 +945,9 @@ class TestCommercialOperations(TransactionCase):
         strong = self._operation(name="Strong fair")
         strong.primary_scenario_id = self._verdict_scenario(strong)
         weak = self._operation(name="Weak fair")
-        weak.primary_scenario_id = self._verdict_scenario(weak, stall_rent=480.0)
+        weak.primary_scenario_id = self._verdict_scenario(weak, venue_cost=480.0)
         loss = self._operation(name="Loss-making fair")
-        loss.primary_scenario_id = self._verdict_scenario(loss, stall_rent=900.0)
+        loss.primary_scenario_id = self._verdict_scenario(loss, venue_cost=900.0)
         uncosted = self._operation(name="Uncosted fair")
         self.assertEqual(weak.planning_recommendation, "marginal")
         self.assertEqual(loss.planning_recommendation, "no_go")
@@ -1058,31 +1100,6 @@ class TestCommercialOperations(TransactionCase):
         self.assertFalse(operation.travel_estimate_id)
         self.assertEqual(source.primary_scenario_id.line_ids.source_stock_plan_line_id, target)
 
-    def test_seeding_carries_costs_planned_in_the_legacy_scalar_fields(self):
-        # A plan costed before cost lines existed keeps its fixed costs in the
-        # scalar fields; seeding only the lines would carry last year's sales
-        # forward with none of last year's costs.
-        source = self._past_market()
-        scenario = source.primary_scenario_id
-        source.state = "draft"
-        scenario.cost_line_ids.unlink()
-        scenario.write({
-            "stall_rent": 120.0, "parking_cost": 15.0,
-            "planned_work_hours": 8.0, "work_hourly_cost": 20.0,
-            "manual_travel_total": 45.0,
-        })
-        source.state = "done"
-
-        wizard = self._plan_wizard(self._operation(name="This Autumn Market"))
-
-        self.assertEqual(wizard.source_operation_id, source)
-        seeded = {(line.category, line.quantity * line.rate) for line in wizard.cost_ids}
-        self.assertIn(("venue", 120.0), seeded)
-        self.assertIn(("parking", 15.0), seeded)
-        self.assertIn(("labour", 160.0), seeded)
-        self.assertIn(("travel", 45.0), seeded)
-        self.assertEqual(sum(line.quantity * line.rate for line in wizard.cost_ids), 340.0)
-
     def test_seeded_lines_keep_the_default_opening_quantity(self):
         # The source line has no stock target, so nothing should overwrite the
         # field's own default with a zero.
@@ -1109,7 +1126,7 @@ class TestCommercialOperations(TransactionCase):
         # meet the immutability guard; the operation's dates and quote stay
         # editable long after a scenario is approved.
         operation = self._operation()
-        scenario = self._verdict_scenario(operation, planned_travel_km=100.0)
+        scenario = self._verdict_scenario(operation, travel_km=100.0)
         scenario.action_approve()
         margin_per_hour = scenario.margin_per_effort_hour
         margin_per_km = scenario.margin_per_travel_km

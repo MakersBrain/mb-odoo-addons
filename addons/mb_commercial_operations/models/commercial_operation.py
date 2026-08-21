@@ -89,7 +89,6 @@ class MbCommercialOperation(models.Model):
     )
     stock_preparation_deadline = fields.Datetime(tracking=True)
     expected_visitors = fields.Integer()
-    expected_revenue = fields.Monetary(tracking=True)
     cost_line_ids = fields.One2many(
         "mb.commercial.cost.line", "operation_id", string="Planned Costs",
     )
@@ -289,7 +288,7 @@ class MbCommercialOperation(models.Model):
             "teardown_duration_hours", "expected_return", "application_deadline",
             "payment_deadline",
             "travel_estimate_id", "stock_preparation_deadline", "expected_visitors",
-            "expected_revenue", "primary_scenario_id", "profitability_required",
+            "primary_scenario_id", "profitability_required",
             "profitability_opt_out_reason",
         }
         if plan_fields.intersection(vals):
@@ -331,7 +330,7 @@ class MbCommercialOperation(models.Model):
                 operation.planned_work_hours = 0.0
 
     @api.depends(
-        "expected_revenue", "cost_line_ids.planned_amount", "primary_scenario_id",
+        "cost_line_ids.planned_amount", "primary_scenario_id",
         "primary_scenario_id.sales_revenue_excl_vat",
         "primary_scenario_id.fixed_event_cost",
         "primary_scenario_id.projected_margin",
@@ -346,7 +345,7 @@ class MbCommercialOperation(models.Model):
                 operation.planned_cost = sum(operation.cost_line_ids.filtered(
                     lambda line: not line.scenario_id
                 ).mapped("planned_amount"))
-                operation.planned_margin = operation.expected_revenue - operation.planned_cost
+                operation.planned_margin = -operation.planned_cost
 
     @api.depends(
         "task_id.timesheet_ids.amount", "analytic_evidence_ids.amount",
@@ -474,31 +473,6 @@ class MbCommercialOperation(models.Model):
             warnings.append(("cost_plan_only", "info", self.profitability_opt_out_reason))
         if scenario and scenario.calculation_blocked:
             warnings.append(("scenario_blocked", "blocking", scenario.calculation_note or _("The primary scenario is incomplete.")))
-        if scenario:
-            legacy_operation_cost = sum(self.cost_line_ids.filtered(
-                lambda line: not line.scenario_id
-            ).mapped("planned_amount"))
-            legacy_scenario_cost = (
-                scenario.accepted_travel_cost
-                + scenario.planned_work_hours * scenario.work_hourly_cost
-                + scenario.stall_rent + scenario.parking_cost
-                + scenario.accommodation_cost + scenario.other_fixed_cost
-            )
-            scenario_cost = sum(scenario.cost_line_ids.mapped("planned_amount"))
-            if (
-                scenario_cost and legacy_scenario_cost
-                and not self.currency_id.is_zero(scenario_cost - legacy_scenario_cost)
-            ) or (
-                scenario_cost and legacy_operation_cost
-                and not self.currency_id.is_zero(scenario_cost - legacy_operation_cost)
-            ) or (
-                not scenario_cost and legacy_scenario_cost and legacy_operation_cost
-                and not self.currency_id.is_zero(legacy_scenario_cost - legacy_operation_cost)
-            ):
-                warnings.append((
-                    "legacy_cost_reconciliation", "blocking",
-                    _("Legacy and scenario-owned fixed costs differ; review the baseline explicitly."),
-                ))
         if scenario and scenario.line_ids.filtered("exclude_product_cost"):
             warnings.append((
                 "product_cost_excluded", "warning",
@@ -573,8 +547,7 @@ class MbCommercialOperation(models.Model):
         "primary_scenario_id.break_even_units", "primary_scenario_id.planned_units",
         "activity_ids.date_deadline",
         "cost_line_ids.planned_amount", "primary_scenario_id.cost_line_ids.planned_amount",
-        "primary_scenario_id.accepted_travel_cost", "primary_scenario_id.stall_rent",
-        "primary_scenario_id.other_fixed_cost",
+        "primary_scenario_id.accepted_travel_cost",
         "primary_scenario_id.travel_estimate_id.state",
     )
     def _compute_planning_warnings(self):
@@ -903,7 +876,6 @@ class MbCommercialCostLine(models.Model):
     source_kind = fields.Selection([
         ("manual", "Manual"), ("travel", "Travel Quote"),
         ("contract", "Contract"), ("template", "Template"),
-        ("migration", "Legacy Migration"),
     ], required=True, default="manual")
     travel_estimate_id = fields.Many2one("mb.travel.estimate", check_company=True, ondelete="restrict")
     assumption_date = fields.Date(default=fields.Date.context_today)
@@ -915,12 +887,12 @@ class MbCommercialCostLine(models.Model):
 
     @api.depends(
         "calculation", "quantity", "rate", "percentage",
-        "operation_id.expected_revenue", "scenario_id.sales_revenue_excl_vat",
+        "scenario_id.sales_revenue_excl_vat",
     )
     def _compute_planned_amount(self):
         for line in self:
             if line.calculation == "revenue_percent":
-                revenue = line.scenario_id.sales_revenue_excl_vat or line.operation_id.expected_revenue
+                revenue = line.scenario_id.sales_revenue_excl_vat
                 amount = revenue * line.percentage / 100.0
             else:
                 amount = line.quantity * line.rate
@@ -931,9 +903,7 @@ class MbCommercialCostLine(models.Model):
         scenarios = self.env["mb.commercial.profitability.scenario"].browse(
             [vals.get("scenario_id") for vals in vals_list if vals.get("scenario_id")]
         )
-        if not self.env.context.get("mb_planning_migration") and scenarios.filtered(
-            lambda scenario: scenario.state != "draft"
-        ):
+        if scenarios.filtered(lambda scenario: scenario.state != "draft"):
             raise UserError(_("Approved scenario costs are immutable; create a revision."))
         for vals in vals_list:
             scenario = self.env["mb.commercial.profitability.scenario"].browse(vals.get("scenario_id"))
@@ -942,9 +912,7 @@ class MbCommercialCostLine(models.Model):
         operations = self.env["mb.commercial.operation"].browse(
             [vals.get("operation_id") for vals in vals_list if vals.get("operation_id")]
         )
-        if not self.env.context.get("mb_planning_migration") and operations.filtered(
-            lambda operation: operation.state not in ("draft", "quoted")
-        ):
+        if operations.filtered(lambda operation: operation.state not in ("draft", "quoted")):
             raise UserError(_("Reopen the operation before adding planned costs."))
         return super().create(vals_list)
 

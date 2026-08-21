@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0-20260803\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-18 05:49+0000\n"
-"PO-Revision-Date: 2026-08-18 05:49+0000\n"
+"POT-Creation-Date: 2026-08-21 09:18+0000\n"
+"PO-Revision-Date: 2026-08-21 09:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -179,11 +179,6 @@ msgid "Accepted"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_profitability_scenario__route_cost_mode__provider_total
-msgid "Accepted TollQuote total"
-msgstr ""
-
-#. module: mb_commercial_operations
 #. odoo-python
 #: code:addons/mb_commercial_operations/models/planning_report.py:0
 msgid "Accepted TollQuote travel total"
@@ -208,15 +203,8 @@ msgid "Accepted travel estimates are immutable; calculate a new revision."
 msgstr ""
 
 #. module: mb_commercial_operations
-#. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_cost_line__category__accommodation
 msgid "Accommodation"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__accommodation_cost
-msgid "Accommodation Cost"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -1495,13 +1483,6 @@ msgid "Distance Km"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model:ir.model.fields,help:mb_commercial_operations.field_mb_commercial_profitability_scenario__planned_travel_km
-msgid ""
-"Distance this market actually costs, counted the same way as the travel "
-"cost: a return trip is entered as the full return distance."
-msgstr ""
-
-#. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_contract_form
 msgid "Documents"
 msgstr ""
@@ -1581,14 +1562,6 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/profitability_scenario.py:0
-msgid ""
-"Enter expected sold quantities: an average-basket mix without volumes cannot"
-" be judged."
-msgstr ""
-
-#. module: mb_commercial_operations
-#. odoo-python
 #: code:addons/mb_commercial_operations/models/planning_report.py:0
 msgid "Enter usable origin and destination coordinates."
 msgstr ""
@@ -1634,11 +1607,6 @@ msgid "Expected Return"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__expected_revenue
-msgid "Expected Revenue"
-msgstr ""
-
-#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard_line__expected_sold_qty
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_plan_template_product__expected_sold_qty
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario_line__expected_sold_qty
@@ -1678,11 +1646,6 @@ msgid "Expected return"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_list
-msgid "Expected revenue"
-msgstr ""
-
-#. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
 msgid "Expected sold"
 msgstr ""
@@ -1715,7 +1678,6 @@ msgid "Fee / Commission"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__ferry_cost
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_travel_estimate__ferry_cost
 msgid "Ferry Cost"
 msgstr ""
@@ -1864,7 +1826,6 @@ msgid "Fuel Consumption L Per 100Km"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__fuel_cost
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_travel_estimate__fuel_cost
 msgid "Fuel Cost"
 msgstr ""
@@ -2129,19 +2090,6 @@ msgid "Last Updated on"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_cost_line__source_kind__migration
-msgid "Legacy Migration"
-msgstr ""
-
-#. module: mb_commercial_operations
-#. odoo-python
-#: code:addons/mb_commercial_operations/models/commercial_operation.py:0
-msgid ""
-"Legacy and scenario-owned fixed costs differ; review the baseline "
-"explicitly."
-msgstr ""
-
-#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard__line_ids
 msgid "Line"
 msgstr ""
@@ -2159,16 +2107,6 @@ msgstr ""
 #. module: mb_commercial_operations
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_market_stock_plan_line__supply_method__manual
 msgid "Manual Selection"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__manual_travel_total
-msgid "Manual Travel Total"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_profitability_scenario__route_cost_mode__manual
-msgid "Manual travel total"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -2283,11 +2221,6 @@ msgid ""
 "Minimum planned margin per hour of effort (work plus travel) below which a "
 "market is only worth attending for reasons other than money. Leave at zero "
 "to judge markets on break-even headroom alone."
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario_line__mix_share
-msgid "Mix Share"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -2756,12 +2689,6 @@ msgid "Other"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__other_fixed_cost
-msgid "Other Fixed Cost"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__other_route_cost
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_travel_estimate__other_route_cost
 msgid "Other Route Cost"
 msgstr ""
@@ -2770,12 +2697,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard_line__other_variable_unit_cost
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario_line__other_variable_unit_cost
 msgid "Other Variable Unit Cost"
-msgstr ""
-
-#. module: mb_commercial_operations
-#. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
-msgid "Other fixed cost"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -2809,15 +2730,8 @@ msgid "Overview"
 msgstr ""
 
 #. module: mb_commercial_operations
-#. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_cost_line__category__parking
 msgid "Parking"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__parking_cost
-msgid "Parking Cost"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -2994,13 +2908,7 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planning_travel_distance_km
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__planned_travel_km
 msgid "Planned Travel Distance (km)"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__planned_travel_hours
-msgid "Planned Travel Hours"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -3021,7 +2929,6 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation__planned_work_hours
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__planned_work_hours
 msgid "Planned Work Hours"
 msgstr ""
 
@@ -3053,6 +2960,7 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
+#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_list
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_profitability_report_list
 msgid "Planned revenue"
 msgstr ""
@@ -3699,16 +3607,6 @@ msgid "Route"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_profitability_scenario_form
-msgid "Route Components"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__route_cost_mode
-msgid "Route Cost Mode"
-msgstr ""
-
-#. module: mb_commercial_operations
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_planning_wizard_form
 msgid "Route Quote"
 msgstr ""
@@ -3779,12 +3677,6 @@ msgid ""
 msgstr ""
 
 #. module: mb_commercial_operations
-#. odoo-python
-#: code:addons/mb_commercial_operations/models/profitability_scenario.py:0
-msgid "Sales-mix shares must total 100%%."
-msgstr ""
-
-#. module: mb_commercial_operations
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_obligation__preferred_weekday__5
 msgid "Saturday"
 msgstr ""
@@ -3846,11 +3738,6 @@ msgstr ""
 #. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_operation_plan_wizard__source_operation_id
 msgid "Seeded From"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_profitability_scenario__route_cost_mode__components
-msgid "Selected route components"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -3958,23 +3845,6 @@ msgstr ""
 #. module: mb_commercial_operations
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_tollquote_connector__environment__staging
 msgid "Staging"
-msgstr ""
-
-#. module: mb_commercial_operations
-#. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
-msgid "Stall"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__stall_rent
-msgid "Stall Rent"
-msgstr ""
-
-#. module: mb_commercial_operations
-#. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
-msgid "Stand work"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -4231,7 +4101,6 @@ msgid "Timeout Seconds"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__toll_cost
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_travel_estimate__toll_cost
 msgid "Toll Cost"
 msgstr ""
@@ -4319,8 +4188,6 @@ msgid "Total Variable Cost"
 msgstr ""
 
 #. module: mb_commercial_operations
-#. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
 #: model:ir.model.fields.selection,name:mb_commercial_operations.selection__mb_commercial_cost_line__category__travel
 #: model:ir.ui.menu,name:mb_commercial_operations.menu_commercial_travel
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.report_commercial_operation
@@ -4361,11 +4228,6 @@ msgstr ""
 #: model:ir.actions.act_window,name:mb_commercial_operations.action_travel_estimates
 #: model:ir.ui.menu,name:mb_commercial_operations.menu_commercial_travel_estimates
 msgid "Travel Estimates"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__travel_hourly_cost
-msgid "Travel Hourly Cost"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -4663,18 +4525,8 @@ msgid "Wizard"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_profitability_scenario_form
-msgid "Work & Fixed Costs"
-msgstr ""
-
-#. module: mb_commercial_operations
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__effort_hours
 msgid "Work + Travel Hours"
-msgstr ""
-
-#. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__work_hourly_cost
-msgid "Work Hourly Cost"
 msgstr ""
 
 #. module: mb_commercial_operations
@@ -4693,7 +4545,6 @@ msgid "Worth it"
 msgstr ""
 
 #. module: mb_commercial_operations
-#: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_commercial_profitability_scenario__zone_cost
 #: model:ir.model.fields,field_description:mb_commercial_operations.field_mb_travel_estimate__zone_cost
 msgid "Zone Cost"
 msgstr ""

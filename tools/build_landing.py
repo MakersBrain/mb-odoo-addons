@@ -16,10 +16,8 @@ Fonts are inlined as data URIs rather than linked because the page has to work
 as a single file -- deploying it is copying one file, and a linked font URL
 would fail silently and render the specimen in a fallback face.
 
-This used to be `brand/build-pages.py`, which built this page and the two
-reference pages together while the brand lived inside this repository. The
-reference pages moved out with the brand; this one stayed, because it is a
-MakersBrain marketing page and not part of the design system.
+This repository owns the marketing page; the shared package owns the design
+system and its reference material.
 """
 
 import base64

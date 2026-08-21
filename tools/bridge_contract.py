@@ -21,11 +21,9 @@ It is the authoritative *surface*: which paths exist, which methods they accept,
 how they authenticate and whether they keep a session. Changing any of those is
 a contract change and shows up as a diff here.
 
-It is not yet the full contract of migration plan section 4.2: request and
-response schemas, idempotency-key semantics, payload size bounds and error-body
-shapes are not derivable from the route decorator and still have to be written
-by hand. Adding them is the remaining work for 4.2; the surface is the part that
-can be generated and therefore the part that should never drift silently.
+Request and response schemas, idempotency-key semantics, payload size bounds,
+and error-body shapes are not derivable from route decorators and are therefore
+outside this generated surface contract.
 """
 
 from __future__ import annotations
@@ -193,10 +191,8 @@ def main() -> int:
             print(
                 f"{CONTRACT.relative_to(ROOT)} is out of date. The bridge surface "
                 "changed.\n\nThis is a contract change: mb-control-plane is the "
-                "client of every path below. Follow the compatibility-first "
-                "sequence in the migration plan -- ship the backward-compatible "
-                "provider change first, or add a new versioned endpoint and "
-                "retire the old one after the supported window.\n\n"
+                "client of every path below. Update that client and this "
+                "contract together.\n\n"
                 "Then run `python3 tools/bridge_contract.py --write`.",
                 file=sys.stderr,
             )

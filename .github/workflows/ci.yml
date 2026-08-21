@@ -210,13 +210,8 @@ jobs:
       # Install then upgrade in one container so the filestore and data-dir are
       # the same on both passes.
       #
-      # This proves `-u` is a no-op rather than a crash, which catches a broken
-      # data file or a field that cannot be recomputed. It does not prove
-      # migration from a previously released version, and is not meant to:
-      # nothing is released, so there is no prior version to migrate from, and
-      # development databases are rebuilt rather than migrated. See SPEC.md,
-      # "Migration scripts start at first release" — that is when this lane
-      # needs a second database restored from the last tag.
+      # This catches broken data files and fields that cannot be recomputed by
+      # Odoo's ordinary module-update path.
       - name: Install, then upgrade
         run: |
           mkdir -p oca
@@ -362,13 +357,8 @@ jobs:
       # which implies `--stop-after-init`. Odoo exits non-zero when a test
       # fails, so the result needs no log scraping.
       #
-      # The 23 Hoot tests are NOT in this lane. They run inside a browser,
-      # driven by `web`'s own WebSuite.test_unit_desktop, and the odoo:19 image
-      # ships no browser — so the tag needed is `/web:WebSuite.test_unit_desktop
-      # [@mb_label,@mb_label_pos]` against an image that has Chromium. Building
-      # that image is a real task and is deliberately not faked here with a lane
-      # that would pass by running nothing. Until then the Hoot suite is run by
-      # hand; see README.md.
+      # Browser-based Hoot tests are outside this server-test lane because the
+      # Odoo runtime image does not contain a browser.
       #
       # The database must be new for this to mean anything: `-i` on a database
       # where the modules are already installed is a no-op, and at_install tests
