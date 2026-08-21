@@ -1,0 +1,28 @@
+{
+  "schema": "makersbrain.odoo.dependencies.v1",
+  "python": {
+    "implementation": "cpython",
+    "abi": "cp312",
+    "platforms": ["linux/amd64"]
+  },
+  "extension_packages": [],
+  "runtime_imports": {
+    "PIL": {"distribution": "Pillow", "version": "10.2.0"},
+    "PyPDF2": {"distribution": "PyPDF2", "version": "2.12.1"},
+    "babel": {"distribution": "Babel", "version": "2.10.3"},
+    "dateutil": {"distribution": "python-dateutil", "version": "2.8.2"},
+    "lxml": {"distribution": "lxml", "version": "5.2.1"},
+    "markupsafe": {"distribution": "MarkupSafe", "version": "2.1.5"},
+    "psycopg2": {"distribution": "psycopg2", "version": "2.9.9"},
+    "pytz": {"distribution": "pytz", "version": "2024.1"},
+    "qrcode": {"distribution": "qrcode", "version": "7.4.2"},
+    "reportlab": {"distribution": "reportlab", "version": "4.1.0"},
+    "requests": {"distribution": "requests", "version": "2.31.0"},
+    "werkzeug": {"distribution": "Werkzeug", "version": "3.0.1"}
+  },
+  "import_to_distribution": {
+    "PIL": "Pillow",
+    "dateutil": "python-dateutil",
+    "psycopg2": "psycopg2"
+  }
+}

@@ -1,193 +1,216 @@
-name: Odoo release
-
-# Publishes one signed, digest-addressed Odoo runtime image and the release
-# metadata that describes it. This repository does not compose a platform
-# release and does not touch any environment: MakersBrain/mb-infra consumes this
-# image by digest and owns staging qualification and production promotion.
-#
-# The base and OCA dependency are digest/commit pinned in deploy/Odoo.Dockerfile.
-# The full CI suite must pass for this commit, images are signed with keyless
-# cosign, and tools/release_metadata.py emits the machine-readable release record.
+name: Odoo extension release
 
 on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Build and describe without publishing or signing
+        description: Build and qualify without publishing or signing
         required: false
         default: false
         type: boolean
 
-permissions:
-  contents: read
-
-concurrency:
-  group: odoo-release
-  cancel-in-progress: false
+permissions: {contents: read}
+concurrency: {group: odoo-extension-release, cancel-in-progress: false}
 
 env:
   REGISTRY: ${{ vars.OCI_REGISTRY }}
   REPOSITORY_PREFIX: ${{ vars.OCI_REPOSITORY_PREFIX }}
-  IMAGE_NAME: mb-odoo
+  IMAGE_NAME: mb-odoo-extension
+  ODOO_IMAGE: docker.io/library/odoo@sha256:94a4f480b8039dc9ca2bca9e77e59f97d3311f66e2aad663cf2670be9c66d4ea
+  SYFT_IMAGE: anchore/syft:v1.29.0@sha256:e86b0ba0b1d2fe8a2e9f96ed9b22033df9781f43b9a7eb27c57e6c89234946bc
+  GRYPE_IMAGE: anchore/grype:v0.96.0@sha256:b565beceb9c741b248ecdc071a4b91716fa8fb3b744676855cf89aae754db8f2
 
 jobs:
-  # Publication is gated on the same suite that guards main, but by *verifying*
-  # the run that already happened for this commit rather than running it again.
-  # Re-running cost a second full suite (~22 runner minutes) to re-prove what
-  # main had already proven, and CI is a required status check on main, so a
-  # commit cannot be there without it.
   verify-ci:
     runs-on: ubuntu-latest
     steps:
-      - name: The CI suite passed for this exact commit
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Exact commit passed CI
+        env: {GH_TOKEN: "${{ github.token }}"}
         run: |
-          set -euo pipefail
-          conclusion=$(gh api \
-            "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&status=completed" \
+          conclusion=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&status=completed" \
             --jq '[.workflow_runs[] | select(.name == "CI")] | first | .conclusion // "none"')
-          echo "CI conclusion for $GITHUB_SHA: $conclusion"
-          if [ "$conclusion" != "success" ]; then
-            echo "::error::No successful CI run for $GITHUB_SHA (found: $conclusion). Refusing to publish." >&2
-            exit 1
-          fi
+          test "$conclusion" = success
 
   build:
     needs: verify-ci
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: release
-    permissions:
-      contents: read
-      id-token: write   # keyless cosign signing
-      packages: write
+    permissions: {contents: read, id-token: write, packages: write}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
       - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
       - uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6 # v1
 
-      - name: Validate release inputs
+      - name: Resolve exact official runtime platform
+        id: runtime
         run: |
-          set -eu
-          test -n "$REGISTRY"
-          test -n "$REPOSITORY_PREFIX"
-          # The metadata generator refuses a tag, but fail early and loudly here
-          # rather than after a ten-minute build.
-          grep -q '^FROM odoo:[0-9]\+@sha256:[0-9a-f]\{64\}' deploy/Odoo.Dockerfile
-          python3 tools/bridge_contract.py --check
+          set -euo pipefail
+          mkdir -p release
+          subject=${ODOO_IMAGE##*@}
+          raw=$(docker buildx imagetools inspect --raw "$ODOO_IMAGE")
+          manifest=$(jq -r '.manifests[] | select(.platform.os=="linux" and .platform.architecture=="amd64") | .digest' <<<"$raw")
+          config=$(docker buildx imagetools inspect --raw "docker.io/library/odoo@$manifest" | jq -r .config.digest)
+          jq -n --arg ref "$ODOO_IMAGE" --arg subject "$subject" --arg manifest "$manifest" --arg config "$config" '{
+            official_source_ref:$ref, deployment_ref:$ref, subject_digest:$subject,
+            subject_kind:"image_index", version:"19.0", platforms:[{
+              platform:{os:"linux",architecture:"amd64"}, manifest_digest:$manifest,
+              config_digest:$config, evidence:{}
+            }]
+          }' > release/runtime-descriptor.base.json
+          docker pull "$ODOO_IMAGE"
+          echo "subject=$subject" >> "$GITHUB_OUTPUT"
+          echo "manifest=$manifest" >> "$GITHUB_OUTPUT"
+          echo "config=$config" >> "$GITHUB_OUTPUT"
 
-      - name: Authenticate to the controlled registry
+      - name: Authenticate registry
         run: printf '%s' "$GITHUB_TOKEN" | docker login "$REGISTRY" --username "$GITHUB_ACTOR" --password-stdin
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+        env: {GITHUB_TOKEN: "${{ github.token }}"}
 
-      - name: Build
+      - name: Build extension transport image
         id: build
         run: |
           set -euo pipefail
           image="$REGISTRY/$REPOSITORY_PREFIX/$IMAGE_NAME"
+          if [ "${{ inputs.dry_run }}" = true ]; then output=type=docker; else output=type=image,push=true; fi
+          docker buildx build --platform linux/amd64 --file deploy/Odoo.Dockerfile \
+            --build-arg TARGETARCH=amd64 --build-arg "SOURCE_COMMIT=$GITHUB_SHA" \
+            --build-arg "SOURCE_REF=$GITHUB_REF_NAME" \
+            --build-arg "ODOO_RUNTIME_SOURCE_REF=$ODOO_IMAGE" \
+            --build-arg "ODOO_RUNTIME_DEPLOYMENT_REF=$ODOO_IMAGE" \
+            --build-arg "ODOO_RUNTIME_SUBJECT_DIGEST=${{ steps.runtime.outputs.subject }}" \
+            --build-arg ODOO_RUNTIME_SUBJECT_KIND=image_index \
+            --build-arg "ODOO_RUNTIME_MANIFEST_DIGEST=${{ steps.runtime.outputs.manifest }}" \
+            --build-arg "ODOO_RUNTIME_CONFIG_DIGEST=${{ steps.runtime.outputs.config }}" \
+            --tag "$image:$GITHUB_SHA" --metadata-file release/build-metadata.json \
+            --output "$output" .
+          digest=$(jq -r '."containerimage.digest"' release/build-metadata.json)
+          ref="$image@$digest"
+          local_ref="$image:$GITHUB_SHA"
+          if [ "${{ inputs.dry_run }}" != true ]; then docker pull "$ref"; local_ref="$ref"; fi
+          config=$(docker image inspect "$local_ref" --format '{{.Id}}')
+          container=$(docker create "$local_ref")
+          docker cp "$container:/payload/manifest.json" release/payload-manifest.json
+          docker rm "$container"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "config=$config" >> "$GITHUB_OUTPUT"
+          echo "scan_ref=$local_ref" >> "$GITHUB_OUTPUT"
 
-          # A dry run loads the image into the local daemon instead of pushing,
-          # so everything downstream except signing and publishing still runs
-          # against a real image. Scanning a registry reference would be the
-          # obvious thing to do and is exactly what makes a dry run useless: the
-          # reference does not exist until something is pushed.
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            output="type=docker"
+      - name: Sign extension image
+        if: ${{ !inputs.dry_run }}
+        run: cosign sign --yes '${{ steps.build.outputs.ref }}'
+
+      - name: Qualify runtime capabilities against the exact selected pair
+        run: |
+          set -euo pipefail
+          mkdir -p release/qualified-payload
+          source_container=$(docker create '${{ steps.build.outputs.scan_ref }}')
+          trap 'docker rm -f "$source_container" >/dev/null 2>&1 || true' EXIT
+          docker cp "$source_container:/payload/." release/qualified-payload/
+          docker run --rm --network none --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+            --entrypoint python3 -e PYTHONPATH=/opt/mb-extension/python \
+            -v "$PWD:/src:ro" -v "$PWD/release/qualified-payload:/opt/mb-extension:ro" \
+            "$ODOO_IMAGE" /src/tools/dependency_policy.py --runtime
+          docker run --rm --network none --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+            --entrypoint python3 -e PYTHONPATH=/opt/mb-extension/python \
+            -v "$PWD/release/qualified-payload:/opt/mb-extension:ro" \
+            "$ODOO_IMAGE" -c 'import qrcode, reportlab; assert qrcode and reportlab'
+          entrypoint=$(docker image inspect "$ODOO_IMAGE" --format '{{json .Config.Entrypoint}}')
+          test "$entrypoint" != null && test "$entrypoint" != '[]'
+          jq -n --arg runtime "$ODOO_IMAGE" --arg extension '${{ steps.build.outputs.ref }}' '{
+            status:"passed",runtime:$runtime,extension:$extension,python:"cp312",
+            qrcode:true,reportlab:true,read_only_root:true,network_disabled:true,
+            dependency_policy:true,official_entrypoint:true
+          }' > release/runtime-capability-checks.json
+
+      - name: Generate observed SBOMs and vulnerability reports
+        run: |
+          set -euo pipefail
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/release:/out" "$SYFT_IMAGE" \
+            "docker:$ODOO_IMAGE" -o spdx-json=/out/runtime-sbom.spdx.json
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/release:/out" "$SYFT_IMAGE" \
+            'docker:${{ steps.build.outputs.scan_ref }}' -o spdx-json=/out/extension-sbom.spdx.json
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/release:/out" "$GRYPE_IMAGE" \
+            "docker:$ODOO_IMAGE" --only-fixed --fail-on critical -o json --file /out/runtime-vulnerabilities.json
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/release:/out" "$GRYPE_IMAGE" \
+            'docker:${{ steps.build.outputs.scan_ref }}' --only-fixed --fail-on critical -o json --file /out/extension-vulnerabilities.json
+          if [ "${{ inputs.dry_run }}" = true ]; then
+            printf '{"dry_run":true}\n' > release/extension-signature.json
           else
-            output="type=image,push=true"
+            cosign download signature '${{ steps.build.outputs.ref }}' > release/extension-signature.json
           fi
 
-          docker buildx build \
-            --platform linux/amd64 \
-            --file deploy/Odoo.Dockerfile \
-            --build-arg "SOURCE_COMMIT=$GITHUB_SHA" \
-            --build-arg "SOURCE_REF=$GITHUB_REF_NAME" \
-            --tag "$image:$GITHUB_SHA" \
-            --metadata-file metadata.json \
-            --output "$output" \
-            .
-
-          # Take the digest buildx reports rather than re-deriving it: it is the
-          # digest that was actually pushed, and it stays correct if the build
-          # ever becomes multi-platform.
-          digest=$(jq -r '."containerimage.digest"' metadata.json)
-          test -n "$digest" && test "$digest" != "null"
-          echo "image=$image@$digest" >> "$GITHUB_OUTPUT"
-          echo "digest=$digest" >> "$GITHUB_OUTPUT"
-
-      - name: Sign the image
-        if: ${{ !inputs.dry_run }}
-        run: cosign sign --yes '${{ steps.build.outputs.image }}'
-
-      # Also runs on a dry run: this is the record mb-infra consumes, and a
-      # release is the wrong moment to discover it cannot be generated.
-      - name: Release metadata
+      - name: Publish immutable evidence and compose release metadata
         id: metadata
         run: |
           set -euo pipefail
-          mkdir -p release
+          evidence_ref() {
+            name=$1; file=$2; kind=$3
+            digest=sha256:$(sha256sum "$file" | cut -d' ' -f1)
+            if [ "${{ inputs.dry_run }}" = true ]; then
+              printf 'dry-run.invalid/%s@%s' "$name" "$digest"
+            else
+              tag="$REGISTRY/$REPOSITORY_PREFIX/$IMAGE_NAME-evidence:${GITHUB_SHA}-$name"
+              oras push "$tag" --artifact-type "$kind" "$file" >/dev/null
+              printf '%s@%s' "${tag%:*}" "$(oras resolve "$tag")"
+            fi
+          }
+          runtime_sbom=$(evidence_ref runtime-sbom release/runtime-sbom.spdx.json application/spdx+json)
+          runtime_vulns=$(evidence_ref runtime-vulnerabilities release/runtime-vulnerabilities.json application/vnd.makersbrain.vulnerability-report+json)
+          ext_sbom=$(evidence_ref extension-sbom release/extension-sbom.spdx.json application/spdx+json)
+          ext_vulns=$(evidence_ref extension-vulnerabilities release/extension-vulnerabilities.json application/vnd.makersbrain.vulnerability-report+json)
+          signature=$(evidence_ref extension-signature release/extension-signature.json application/vnd.dev.cosign.simplesigning.v1+json)
+          signature_content=sha256:$(sha256sum release/extension-signature.json | cut -d' ' -f1)
+          runtime_sbom_content=sha256:$(sha256sum release/runtime-sbom.spdx.json | cut -d' ' -f1)
+          runtime_vuln_content=sha256:$(sha256sum release/runtime-vulnerabilities.json | cut -d' ' -f1)
+          sbom_content=sha256:$(sha256sum release/extension-sbom.spdx.json | cut -d' ' -f1)
+          vuln_content=sha256:$(sha256sum release/extension-vulnerabilities.json | cut -d' ' -f1)
+          policy_digest=sha256:$(sha256sum dependencies/vulnerability-policy.json | cut -d' ' -f1)
+          capability_digest=sha256:$(sha256sum release/runtime-capability-checks.json | cut -d' ' -f1)
+          snapshot=$(date -u +%FT%TZ)
+          jq --arg sbom_ref "$runtime_sbom" --arg sbom_content "$runtime_sbom_content" \
+            --arg vuln_ref "$runtime_vulns" --arg vuln_content "$runtime_vuln_content" \
+            --arg snapshot "$snapshot" --arg policy "$policy_digest" --arg capability "$capability_digest" '
+            .platforms[0].evidence={
+              sbom:{reference:$sbom_ref,subject_digest:($sbom_ref|split("@")|last),sha256_digest:$sbom_content},
+              vulnerability_report:{reference:$vuln_ref,subject_digest:($vuln_ref|split("@")|last),sha256_digest:$vuln_content},
+              scanner:"syft 1.29.0 / grype 0.96.0",advisory_snapshot_at:$snapshot,
+              policy_digest:$policy,sbom_kind:"observed",capability_checks_digest:$capability
+            }' release/runtime-descriptor.base.json > release/runtime-descriptor.json
+          jq -n --arg signature "$signature" --arg signature_content "$signature_content" \
+            --arg sbom "$ext_sbom" --arg sbom_content "$sbom_content" \
+            --arg vulns "$ext_vulns" --arg vuln_content "$vuln_content" '{
+            signature_bundle:{reference:$signature,subject_digest:($signature|split("@")|last),sha256_digest:$signature_content},
+            sbom:{reference:$sbom,subject_digest:($sbom|split("@")|last),sha256_digest:$sbom_content},
+            vulnerability_report:{reference:$vulns,subject_digest:($vulns|split("@")|last),sha256_digest:$vuln_content}
+          }' > release/extension-evidence.json
           python3 tools/release_metadata.py \
-            --image '${{ steps.build.outputs.image }}' \
+            --extension-ref '${{ steps.build.outputs.ref }}' \
+            --extension-subject-kind image_manifest \
+            --extension-manifest-digest '${{ steps.build.outputs.digest }}' \
+            --extension-config-digest '${{ steps.build.outputs.config }}' \
+            --payload-manifest release/payload-manifest.json \
+            --runtime-descriptor release/runtime-descriptor.json \
+            --evidence release/extension-evidence.json \
             --output release/release-metadata.json
-          cp contracts/mb_control_v1.json release/
-          cat release/release-metadata.json
+          cp contracts/mb_control_v1.json dependencies/python-requirements.lock \
+            dependencies/inventory.json dependencies/vulnerability-policy.json release/
 
-          required=(release/release-metadata.json release/mb_control_v1.json)
-
-          for file in "${required[@]}"; do
-            test -s "$file" || { echo "::error::$file is missing or empty" >&2; exit 1; }
-          done
-
-          files="release/release-metadata.json:application/json release/mb_control_v1.json:application/json"
-          echo "files=$files" >> "$GITHUB_OUTPUT"
-          echo "will publish: $files"
-
-      - name: Publish release metadata as an OCI artifact
+      - name: Publish signed release admission
         if: ${{ !inputs.dry_run }}
         run: |
-          set -euo pipefail
           artifact="$REGISTRY/$REPOSITORY_PREFIX/$IMAGE_NAME-release:${GITHUB_SHA}"
-          # Deliberately unquoted: the list was validated in the step above.
-          oras push "$artifact" \
-            --artifact-type application/vnd.makersbrain.odoo-release.v1+json \
-            ${{ steps.metadata.outputs.files }}
-          # The metadata is not signed separately. Its digest is recorded here
-          # and bound by mb-infra's composed release record.
-          printf '%s@%s\n' "$artifact" "$(oras resolve "$artifact")" | tee release/artifact-reference.txt
-
-      - name: Summary
-        run: |
-          {
-            if [ "${{ inputs.dry_run }}" = "true" ]; then
-              echo "### Odoo release rehearsal (dry run)"
-              echo
-              echo "Built, scanned and described. Nothing was signed or published."
-            else
-              echo "### Odoo release"
-            fi
-            echo
-            echo "| field | value |"
-            echo "| --- | --- |"
-            echo "| image | \`${{ steps.build.outputs.image }}\` |"
-            echo "| commit | \`$GITHUB_SHA\` |"
-            if [ -f release/artifact-reference.txt ]; then
-              echo "| metadata artifact | \`$(cat release/artifact-reference.txt)\` |"
-            fi
-            if [ -f release/release-metadata.json ]; then
-              echo "| addons described | $(jq -r .addon_count release/release-metadata.json) |"
-              echo "| bridge contract | $(jq -r '.bridge_contract.version' release/release-metadata.json), $(jq -r '.bridge_contract.endpoint_count' release/release-metadata.json) endpoints |"
-            fi
-            echo
-            if [ "${{ inputs.dry_run }}" != "true" ]; then
-              echo "Consume this digest from \`mb-infra\`. Do not deploy the tag."
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+          oras push "$artifact" --artifact-type application/vnd.makersbrain.odoo.extension-release.v2+json \
+            release/release-metadata.json:application/json \
+            release/mb_control_v1.json:application/json \
+            release/python-requirements.lock:text/plain \
+            release/inventory.json:application/json \
+            release/vulnerability-policy.json:application/json
+          ref="${artifact%:*}@$(oras resolve "$artifact")"
+          cosign sign --yes "$ref"
+          printf '%s\n' "$ref" > release/artifact-reference.txt
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: odoo-release-${{ github.sha }}
-          path: release/
-          retention-days: 90
+        with: {name: "odoo-extension-release-${{ github.sha }}", path: release/, retention-days: 90}

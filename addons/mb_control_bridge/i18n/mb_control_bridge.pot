@@ -117,6 +117,7 @@ msgid "Created on"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__display_name
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__display_name
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__display_name
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__display_name
@@ -171,6 +172,11 @@ msgid "Evidence"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__mb_issuer
+msgid "Exact OIDC issuer"
+msgstr ""
+
+#. module: mb_control_bridge
 #: model:ir.model.fields,help:mb_control_bridge.field_res_company__mb_control_public_hostname
 msgid "Exact hostname assigned by the trusted MakersBrain tenant gateway."
 msgstr ""
@@ -182,6 +188,7 @@ msgid "French accounting cannot be initialized after journal items exist."
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__id
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__id
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__id
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__id
@@ -199,6 +206,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__write_date
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__write_date
 msgid "Last Updated on"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__mb_code_flow
+msgid "MakersBrain authorization-code flow"
 msgstr ""
 
 #. module: mb_control_bridge
@@ -227,9 +239,19 @@ msgid "Modules"
 msgstr ""
 
 #. module: mb_control_bridge
+#: model:ir.model,name:mb_control_bridge.model_auth_oauth_provider
+msgid "OAuth2 provider"
+msgstr ""
+
+#. module: mb_control_bridge
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_company.py:0
 msgid "OIDC client and trusted issuer are required"
+msgstr ""
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__mb_token_endpoint
+msgid "OIDC token endpoint"
 msgstr ""
 
 #. module: mb_control_bridge
@@ -488,12 +510,6 @@ msgstr ""
 
 #. module: mb_control_bridge
 #. odoo-python
-#: code:addons/mb_control_bridge/models/res_company.py:0
-msgid "the authorization-code OIDC module is not installed"
-msgstr ""
-
-#. module: mb_control_bridge
-#. odoo-python
 #: code:addons/mb_control_bridge/models/capability_policy.py:0
 msgid "the capability exposes no enforceable owned model"
 msgstr ""
@@ -508,12 +524,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_company.py:0
 msgid "the entitlement version already contains different data"
-msgstr ""
-
-#. module: mb_control_bridge
-#. odoo-python
-#: code:addons/mb_control_bridge/models/res_company.py:0
-msgid "the installed OAuth provider does not support authorization-code OIDC"
 msgstr ""
 
 #. module: mb_control_bridge

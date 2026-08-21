@@ -51,7 +51,7 @@ jobs:
             changed=$(git diff --name-only "${{ github.event.before }}" HEAD 2>/dev/null || echo FORCE_ALL)
           fi
           printf 'changed paths:\n%s\n' "$changed"
-          if printf '%s\n' "$changed" | grep -qE '^(addons/|config/|fixtures/|deploy/|docker-compose\.yml|\.github/workflows/ci\.yml)|FORCE_ALL'; then
+          if printf '%s\n' "$changed" | grep -qE '^(addons/|config/|dependencies/|fixtures/|deploy/|tools/(ci_extension|dependency_policy|extension_manifest)\.sh|tools/(dependency_policy|extension_manifest)\.py|docker-compose\.yml|\.github/workflows/ci\.yml)|FORCE_ALL'; then
             echo "odoo=true" >> "$GITHUB_OUTPUT"
           else
             echo "odoo=false" >> "$GITHUB_OUTPUT"
@@ -82,6 +82,13 @@ jobs:
 
       - name: Manifests, data paths, assets, XML, access rules, dependency graph
         run: python3 tools/check_addons.py
+
+      - name: Addon dependency inventory and hash-checked lock
+        run: |
+          python3 tools/dependency_policy.py
+          docker run --rm --entrypoint python3 \
+            -v "$PWD:/src:ro" -w /src "$ODOO_IMAGE" \
+            tools/dependency_policy.py --runtime
 
       # The Odoo SCSS mirror is maintained by hand because SCSS cannot read the
       # brand package's CSS custom properties at compile time, so nothing but
@@ -175,13 +182,14 @@ jobs:
         # what proves it. See SPEC.md, "Licence boundary".
         run: |
           mkdir -p oca
-          MODULES=$(find addons -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | paste -sd, -)
+          EXTENSION_ROOT=$(tools/ci_extension.sh)
+          MODULES=$(find "$EXTENSION_ROOT/addons" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | paste -sd, -)
           docker run --rm --network host \
             -e HOST=localhost \
-            -v "$PWD/addons:/mnt/mb-addons:ro" \
-            -v "$PWD/oca:/mnt/oca-addons:ro" \
+            -e PYTHONPATH=/opt/mb-extension/python \
+            -v "$EXTENSION_ROOT:/opt/mb-extension:ro" \
             "$ODOO_IMAGE" \
-            odoo --addons-path=/mnt/mb-addons,/usr/lib/python3/dist-packages/odoo/addons \
+            odoo --addons-path=/opt/mb-extension/addons,/usr/lib/python3/dist-packages/odoo/addons \
                  --db_host=localhost --db_port=5432 --db_user=odoo --db_password=odoo \
                  --data-dir=/tmp/odoo \
                  -d ci_install -i "$MODULES" \
@@ -215,14 +223,16 @@ jobs:
       - name: Install, then upgrade
         run: |
           mkdir -p oca
-          MODULES=$(find addons -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | paste -sd, -)
+          EXTENSION_ROOT=$(tools/ci_extension.sh)
+          MODULES=$(find "$EXTENSION_ROOT/addons" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | paste -sd, -)
           run_odoo() {
             docker run --rm --network host \
-            -e HOST=localhost \
-              -v "$PWD/addons:/mnt/mb-addons:ro" \
+              -e HOST=localhost \
+              -e PYTHONPATH=/opt/mb-extension/python \
+              -v "$EXTENSION_ROOT:/opt/mb-extension:ro" \
               -v odoo-ci-data:/var/lib/odoo \
               "$ODOO_IMAGE" \
-              odoo --addons-path=/mnt/mb-addons,/usr/lib/python3/dist-packages/odoo/addons \
+              odoo --addons-path=/opt/mb-extension/addons,/usr/lib/python3/dist-packages/odoo/addons \
                    --db_host=localhost --db_port=5432 --db_user=odoo --db_password=odoo \
                    "$@"
           }
@@ -372,13 +382,15 @@ jobs:
       - name: Run the suite
         run: |
           mkdir -p oca
-          MODULES=$(find addons -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | paste -sd, -)
+          EXTENSION_ROOT=$(tools/ci_extension.sh)
+          MODULES=$(find "$EXTENSION_ROOT/addons" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | paste -sd, -)
           TEST_TAGS=$(printf '%s' "$MODULES" | sed 's#^#/#; s#,#,/#g')
           docker run --rm --network host \
             -e HOST=localhost \
-            -v "$PWD/addons:/mnt/mb-addons:ro" \
+            -e PYTHONPATH=/opt/mb-extension/python \
+            -v "$EXTENSION_ROOT:/opt/mb-extension:ro" \
             "$ODOO_IMAGE" \
-            odoo --addons-path=/mnt/mb-addons,/usr/lib/python3/dist-packages/odoo/addons \
+            odoo --addons-path=/opt/mb-extension/addons,/usr/lib/python3/dist-packages/odoo/addons \
                  --db_host=localhost --db_port=5432 --db_user=odoo --db_password=odoo \
                  --data-dir=/tmp/odoo \
                  -d ci_test -i "$MODULES" \

@@ -57,7 +57,8 @@ git diff --check
 ```
 
 `make check` runs Ruff, translation validation, the brand-token mirror check,
-and addon metadata/source checks. `make test` installs all current manifests on
+the addon dependency inventory/hash lock, and addon metadata/source checks.
+`make test` installs all current manifests on
 a fresh disposable database and restricts Odoo's test selection to tests owned
 by this repository.
 
@@ -76,7 +77,8 @@ Translation conventions and review commands are documented in
 | `addons/` | Odoo addons, tests, and addon-level documentation |
 | `config/` | Local Odoo configuration |
 | `contracts/` | Generated private bridge API contract |
-| `deploy/` | Published Odoo image and deployment assets |
+| `dependencies/` | Runtime inventory, hash-checked extension lock, and offline wheelhouse |
+| `deploy/` | Immutable extension-bundle transport build (not an Odoo runtime image) |
 | `docs/` | Cross-addon operational documentation |
 | `scripts/` | Repeatable development and operational utilities |
 | `tools/` | Static checks, translations, contract generation, and release tooling |
@@ -85,3 +87,8 @@ Translation conventions and review commands are documented in
 
 Third-party OCA sources are reproducibly vendored into the ignored `oca/`
 directory with `make oca`; no current addon manifest depends on an OCA addon.
+
+Releases run the exact digest-pinned official Odoo image. MakersBrain code is a
+separately signed transport image containing `/payload/addons`, an empty-by-
+default `/payload/python`, and a complete digest-bound manifest. The transport
+image is copied by the deployment helper and is never used as the Odoo runtime.

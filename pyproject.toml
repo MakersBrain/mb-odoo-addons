@@ -4,7 +4,7 @@
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"          # matches python3.11 in the odoo:19 image
+target-version = "py312"          # exact official odoo:19 runtime ABI
 extend-exclude = ["oca", ".direnv", ".venv"]
 
 [tool.ruff.lint]

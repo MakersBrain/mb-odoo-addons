@@ -125,6 +125,7 @@ msgid "Created on"
 msgstr "Créé le"
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__display_name
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__display_name
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__display_name
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__display_name
@@ -179,6 +180,11 @@ msgid "Evidence"
 msgstr "Justificatif"
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__mb_issuer
+msgid "Exact OIDC issuer"
+msgstr "Émetteur OIDC exact"
+
+#. module: mb_control_bridge
 #: model:ir.model.fields,help:mb_control_bridge.field_res_company__mb_control_public_hostname
 msgid "Exact hostname assigned by the trusted MakersBrain tenant gateway."
 msgstr "Nom d’hôte exact attribué par la passerelle de locataire MakersBrain de confiance."
@@ -192,6 +198,7 @@ msgstr ""
 "écritures comptables existent."
 
 #. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__id
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_capability_policy__id
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__id
 #: model:ir.model.fields,field_description:mb_control_bridge.field_res_company__id
@@ -210,6 +217,11 @@ msgstr "Mis à jour par"
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__write_date
 msgid "Last Updated on"
 msgstr "Mis à jour le"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__mb_code_flow
+msgid "MakersBrain authorization-code flow"
+msgstr "Flux de code d’autorisation MakersBrain"
 
 #. module: mb_control_bridge
 #: model_terms:ir.ui.view,arch_db:mb_control_bridge.view_company_form_control_plane
@@ -237,10 +249,20 @@ msgid "Modules"
 msgstr "Modules"
 
 #. module: mb_control_bridge
+#: model:ir.model,name:mb_control_bridge.model_auth_oauth_provider
+msgid "OAuth2 provider"
+msgstr "Fournisseur OAuth2"
+
+#. module: mb_control_bridge
 #. odoo-python
 #: code:addons/mb_control_bridge/models/res_company.py:0
 msgid "OIDC client and trusted issuer are required"
 msgstr "le client OIDC et un émetteur de confiance sont obligatoires"
+
+#. module: mb_control_bridge
+#: model:ir.model.fields,field_description:mb_control_bridge.field_auth_oauth_provider__mb_token_endpoint
+msgid "OIDC token endpoint"
+msgstr "Point de terminaison de jeton OIDC"
 
 #. module: mb_control_bridge
 #: model:ir.model.fields,field_description:mb_control_bridge.field_mb_control_operation_receipt__operation_key
@@ -499,12 +521,6 @@ msgstr ""
 
 #. module: mb_control_bridge
 #. odoo-python
-#: code:addons/mb_control_bridge/models/res_company.py:0
-msgid "the authorization-code OIDC module is not installed"
-msgstr "le module OIDC à code d'autorisation n'est pas installé"
-
-#. module: mb_control_bridge
-#. odoo-python
 #: code:addons/mb_control_bridge/models/capability_policy.py:0
 msgid "the capability exposes no enforceable owned model"
 msgstr "la capacité n'expose aucun modèle propre applicable"
@@ -520,14 +536,6 @@ msgstr "la capacité est déjà restreinte différemment"
 #: code:addons/mb_control_bridge/models/res_company.py:0
 msgid "the entitlement version already contains different data"
 msgstr "la version des droits contient déjà des données différentes"
-
-#. module: mb_control_bridge
-#. odoo-python
-#: code:addons/mb_control_bridge/models/res_company.py:0
-msgid "the installed OAuth provider does not support authorization-code OIDC"
-msgstr ""
-"le fournisseur OAuth installé ne prend pas en charge OIDC à code "
-"d'autorisation"
 
 #. module: mb_control_bridge
 #. odoo-python
