@@ -171,24 +171,17 @@ class ResCompany(models.Model):
             raise ValidationError(_("OIDC client and trusted issuer are required"))
         if not 48 <= len(bridge_token) <= 128 or not bridge_token.isalnum():
             raise ValidationError(_("a high-entropy tenant bridge credential is required"))
-        if "auth.oauth.provider" not in self.env:
-            raise ValidationError(_("the authorization-code OIDC module is not installed"))
         provider_model = self.env["auth.oauth.provider"].sudo()
-        required = {"flow", "token_endpoint", "jwks_uri", "client_secret"}
-        if not required.issubset(provider_model._fields):
-            raise ValidationError(_("the installed OAuth provider does not support authorization-code OIDC"))
         values = {
             "name": "MakersBrain",
             "client_id": client_id,
-            "client_secret": False,
-            "flow": "id_token_code",
+            "mb_code_flow": True,
+            "mb_issuer": issuer,
+            "mb_token_endpoint": f"{issuer}/oidc/token",
             "enabled": True,
             "auth_endpoint": f"{issuer}/oidc/authorize",
-            "token_endpoint": f"{issuer}/oidc/token",
-            "jwks_uri": f"{issuer}/oidc/certs",
             "validation_endpoint": f"{issuer}/oidc/userinfo",
             "scope": "openid profile email",
-            "token_map": "sub:user_id",
             "body": "Log in with MakersBrain",
             "css_class": "fa fa-fw fa-sign-in",
         }

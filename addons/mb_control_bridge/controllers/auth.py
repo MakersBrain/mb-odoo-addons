@@ -1,6 +1,8 @@
 import hashlib
 import hmac
 import os
+import stat
+from pathlib import Path
 
 from werkzeug.exceptions import BadRequest, ServiceUnavailable, Unauthorized
 
@@ -8,7 +10,38 @@ from odoo.http import request
 
 
 TOKEN_ENV = "MB_CONTROL_BRIDGE_TOKEN"
+TOKEN_FILE_ENV = "MB_CONTROL_BRIDGE_TOKEN_FILE"
+MAX_SECRET_BYTES = 64 * 1024
 MAX_BODY_BYTES = 26 * 1024 * 1024
+
+
+def read_single_line_secret(path):
+    """Read a control-plane compatible secret without following symlinks."""
+    secret_path = Path(path)
+    metadata = secret_path.lstat()
+    if not stat.S_ISREG(metadata.st_mode) or metadata.st_size > MAX_SECRET_BYTES:
+        raise ValueError("secret reference is not a bounded regular file")
+    value = secret_path.read_text(encoding="utf-8")
+    if value.endswith("\n"):
+        value = value[:-1]
+        if value.endswith("\r"):
+            value = value[:-1]
+    if not value or any(character in value for character in ("\x00", "\r", "\n")):
+        raise ValueError("secret must contain exactly one non-empty text line")
+    return value
+
+
+def bootstrap_credential(environ=None):
+    environ = os.environ if environ is None else environ
+    plaintext = environ.get(TOKEN_ENV, "")
+    secret_file = environ.get(TOKEN_FILE_ENV, "")
+    if plaintext and secret_file:
+        raise ValueError(
+            f"{TOKEN_ENV} and {TOKEN_FILE_ENV} are mutually exclusive"
+        )
+    if secret_file:
+        return read_single_line_secret(secret_file)
+    return plaintext
 
 
 def credential_matches(supplied, expected_hash, bootstrap_token, allow_initial_bootstrap):
@@ -34,7 +67,12 @@ def authenticate_control_request(allow_initial_bootstrap=False):
         raise Unauthorized("a bearer service credential is required")
     company = request.env.company.sudo()
     expected_hash = company.mb_control_bridge_token_hash or ""
-    bootstrap_token = os.environ.get(TOKEN_ENV, "")
+    try:
+        bootstrap_token = bootstrap_credential()
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise ServiceUnavailable(
+            "control-plane bootstrap credential is unavailable"
+        ) from exc
     if not expected_hash and allow_initial_bootstrap and not bootstrap_token:
         raise ServiceUnavailable("control-plane bootstrap credential is not configured")
     if not expected_hash and not allow_initial_bootstrap:

@@ -1,14 +1,28 @@
 import base64
 import hashlib
+import json
+import os
+import tempfile
 import uuid
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from odoo.addons.base.models.ir_module import IrModuleModule
-from odoo.exceptions import ValidationError
+from odoo.exceptions import AccessDenied, ValidationError
 from odoo.tests import TransactionCase, tagged
 
-from ..controllers.auth import credential_matches
-from ..controllers.login import should_redirect_to_mb_sso
+from ..controllers.auth import (
+    bootstrap_credential,
+    credential_matches,
+    read_single_line_secret,
+)
+from ..controllers.login import (
+    ATTEMPT_SESSION_KEY,
+    MBCodeFlowController,
+    OAuthControllerBase,
+    _base64url,
+    _safe_return_target,
+    should_redirect_to_mb_sso,
+)
 
 
 @tagged("post_install", "-at_install")
@@ -158,11 +172,6 @@ class TestControlBridge(TransactionCase):
         ]))
 
     def test_tenant_bootstrap_stores_only_the_bridge_credential_hash(self):
-        if "auth.oauth.provider" not in self.env:
-            self.skipTest("optional auth_oauth module is not installed")
-        required = {"flow", "token_endpoint", "jwks_uri", "client_secret"}
-        if not required.issubset(self.env["auth.oauth.provider"]._fields):
-            self.skipTest("authorization-code OIDC provider is unavailable")
         workshop = str(uuid.uuid4())
         token = "A" * 64
         self.company.write({"mb_control_workshop_id": workshop})
@@ -183,6 +192,18 @@ class TestControlBridge(TransactionCase):
         self.assertEqual(
             self.company.mb_control_public_hostname,
             "atelier.makersbrain.fr",
+        )
+        provider_id = int(
+            self.env["ir.config_parameter"].sudo().get_param(
+                "mb_control.oidc_provider_id"
+            )
+        )
+        provider = self.env["auth.oauth.provider"].browse(provider_id)
+        self.assertTrue(provider.mb_code_flow)
+        self.assertEqual(provider.mb_issuer, "https://identity.example.test")
+        self.assertEqual(
+            provider.mb_token_endpoint,
+            "https://identity.example.test/oidc/token",
         )
 
     def test_tenant_public_hostname_is_strict_and_immutable(self):
@@ -211,6 +232,70 @@ class TestControlBridge(TransactionCase):
         self.assertFalse(
             credential_matches(global_token, tenant_hash, global_token, True)
         )
+
+    def test_bridge_credential_file_is_strict_and_exclusive(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "bridge-token")
+            with open(path, "w", encoding="utf-8") as stream:
+                stream.write("fixture-secret\n")
+            self.assertEqual(read_single_line_secret(path), "fixture-secret")
+            self.assertEqual(
+                bootstrap_credential({"MB_CONTROL_BRIDGE_TOKEN_FILE": path}),
+                "fixture-secret",
+            )
+            with self.assertRaises(ValueError):
+                bootstrap_credential({
+                    "MB_CONTROL_BRIDGE_TOKEN": "plaintext",
+                    "MB_CONTROL_BRIDGE_TOKEN_FILE": path,
+                })
+            with open(path, "w", encoding="utf-8") as stream:
+                stream.write("first\nsecond\n")
+            with self.assertRaises(ValueError):
+                read_single_line_secret(path)
+            os.unlink(path)
+            os.symlink("missing", path)
+            with self.assertRaises(ValueError):
+                read_single_line_secret(path)
+
+    def test_oidc_helpers_enforce_pkce_encoding_and_local_redirects(self):
+        self.assertEqual(_base64url(b"\xff"), "_w")
+        self.assertEqual(_safe_return_target("/odoo/action-1"), "/odoo/action-1")
+        for target in ("https://evil.test", "//evil.test", "relative"):
+            self.assertEqual(_safe_return_target(target), "/odoo")
+
+    def test_oidc_attempt_is_consumed_before_any_upstream_request(self):
+        attempt = {
+            "state": "expected-state",
+            "created_at": 100,
+        }
+        fake_request = MagicMock()
+        fake_request.session = {ATTEMPT_SESSION_KEY: attempt}
+        with (
+            patch("odoo.addons.mb_control_bridge.controllers.login.request", fake_request),
+            patch("odoo.addons.mb_control_bridge.controllers.login.time.time", return_value=101),
+        ):
+            controller = MBCodeFlowController()
+            self.assertEqual(controller._consume_attempt("expected-state"), attempt)
+            self.assertNotIn(ATTEMPT_SESSION_KEY, fake_request.session)
+            with self.assertRaises(AccessDenied):
+                controller._consume_attempt("expected-state")
+
+    def test_implicit_callback_for_configured_provider_fails_closed(self):
+        fake_request = MagicMock()
+        fake_request.session = {}
+        fake_request.env.__getitem__.return_value.sudo.return_value.get_param.return_value = "42"
+        redirect = MagicMock()
+        fake_request.redirect.return_value = redirect
+        with (
+            patch("odoo.addons.mb_control_bridge.controllers.login.request", fake_request),
+            patch("odoo.addons.mb_control_bridge.controllers.login.ensure_db"),
+            patch.object(OAuthControllerBase, "signin", side_effect=AssertionError),
+        ):
+            result = MBCodeFlowController.signin.original_endpoint(
+                MBCodeFlowController(),
+                state=json.dumps({"p": 42}), access_token="must-not-be-used"
+            )
+        self.assertIs(result, redirect)
 
     def test_same_epoch_cannot_change_authority(self):
         self.Users.mb_reconcile_membership(self.membership())

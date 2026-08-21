@@ -64,7 +64,7 @@ ACCESS_HEADER = [
 # actually depended on, so an unexpected new dependency is worth a look rather
 # than waved through.
 KNOWN_EXTERNAL = {
-    "account", "account_edi_ubl_cii", "account_payment", "base", "l10n_fr_account",
+    "account", "account_edi_ubl_cii", "account_payment", "auth_oauth", "base", "l10n_fr_account",
     "fleet", "hr_expense", "hr_timesheet", "maintenance", "mail", "mrp", "mrp_account",
     "payment", "point_of_sale", "product", "product_expiry", "project", "project_hr_expense", "project_mrp",
     "project_purchase", "project_stock_account", "purchase", "purchase_stock", "resource",

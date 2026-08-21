@@ -1,0 +1,5 @@
+# MakersBrain extension Python payload lock, format version 1.
+#
+# Intentionally empty. Future entries must use exact `name==version` pins and
+# one or more `--hash=sha256:...` fragments. The bundle build always invokes
+# pip with --no-index --require-hashes against dependencies/wheelhouse.
