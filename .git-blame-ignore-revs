@@ -12,4 +12,4 @@
 # Repo-wide adoption of `ruff format` plus isort: 272 files reformatted, 139
 # import blocks sorted, 3,328 tab-indentation violations cleared from the two
 # l10n_fr_micro_* addons. No behaviour change.
-# <hash>  <- fill in after committing the reformat, then delete this line
+73b744ecf1d4da03dcacd3628bbab8b6e347f2b0
