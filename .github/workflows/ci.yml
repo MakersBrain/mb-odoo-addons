@@ -72,13 +72,36 @@ jobs:
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
-          python-version: "3.11"
+          # Matches the odoo:19 runtime, and the `target-version`/`python_version`
+          # that ruff and mypy are configured against in pyproject.toml.
+          python-version: "3.12"
 
-      - name: Install ruff
-        run: pipx install ruff
+      # Pinned, not `@latest`. `ruff format --check` is a blocking gate, so a
+      # newer ruff that reflows one expression differently would fail a branch
+      # that is green on the contributor's machine. Bump in lockstep with the
+      # RUFF_VERSION / MYPY_VERSION in the Makefile.
+      - name: Install ruff and mypy
+        run: |
+          pipx install ruff==0.16.4
+          pipx install mypy==2.3.1
 
       - name: Ruff
         run: ruff check --output-format=github .
+
+      - name: Formatting and import order
+        run: |
+          ruff format --check .
+          ruff check --select I --output-format=github .
+
+      # tools/ is enforced. See the mypy block in pyproject.toml for why addons/
+      # is advisory: `odoo` ships no stubs, so a green addons run would certify
+      # 424 files that were never really checked.
+      - name: Types (tools/, blocking)
+        run: mypy tools
+
+      - name: Types (addons/, advisory)
+        continue-on-error: true
+        run: mypy addons
 
       - name: Manifests, data paths, assets, XML, access rules, dependency graph
         run: python3 tools/check_addons.py

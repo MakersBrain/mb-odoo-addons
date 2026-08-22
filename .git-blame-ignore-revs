@@ -1,0 +1,15 @@
+# Commits that changed formatting only, and should be stepped over by blame.
+#
+# Enable locally once:
+#
+#     git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub reads this file automatically. Only add a commit here if it is provably
+# formatting-only -- for the reformat below, every one of the 273 changed Python
+# files was checked to have an identical AST modulo import order and one
+# docstring whitespace fix.
+
+# Repo-wide adoption of `ruff format` plus isort: 272 files reformatted, 139
+# import blocks sorted, 3,328 tab-indentation violations cleared from the two
+# l10n_fr_micro_* addons. No behaviour change.
+# <hash>  <- fill in after committing the reformat, then delete this line

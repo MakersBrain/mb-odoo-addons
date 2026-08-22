@@ -11,6 +11,15 @@ ODOO    := $(COMPOSE) exec -T odoo odoo
 DB_NAME ?= mb_odoo
 DISPOSABLE_DB ?= mb_scratch
 
+# Pinned on purpose. `ruff format` is a gate, not a suggestion, so an unpinned
+# `@latest` that reflows one expression differently from CI turns a green branch
+# red for a reason nobody can reproduce locally. Bump both here and in
+# .github/workflows/ci.yml in the same commit.
+RUFF_VERSION := 0.16.4
+MYPY_VERSION := 2.3.1
+RUFF := uvx ruff@$(RUFF_VERSION)
+MYPY := uvx mypy@$(MYPY_VERSION)
+
 # Discover every addon from its manifest so local and CI coverage cannot drift
 # when a module is added. Odoo resolves dependency order itself.
 ADDON_MANIFESTS := $(wildcard addons/*/__manifest__.py)
@@ -34,7 +43,8 @@ TAGS_ARG := $(subst $(space),$(comma),$(TAGS))
 
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \
-        test check lint format oca reset-test-db brand-check landing dependency-check
+        test check lint format format-check typecheck oca reset-test-db brand-check landing \
+        dependency-check
 
 help: ## Show available targets
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  %-12s %s\n", $$1, $$2}'
@@ -103,7 +113,7 @@ test: ## Install MODULES on a fresh disposable database and run their tests
 		--test-tags "$(TAGS_ARG)" \
 		--stop-after-init --http-port=0 --gevent-port=0 --log-level=test
 
-check: lint i18n-check brand-check dependency-check ## Everything CI runs that needs no container
+check: lint format-check typecheck i18n-check brand-check dependency-check ## Everything CI runs that needs no container
 	python3 tools/check_addons.py
 
 dependency-check: ## Validate declared imports and the hash-checked empty lock
@@ -128,11 +138,26 @@ i18n-pot: ## Re-export every POT from DB_NAME; the catalogue-freshness gate
 	./tools/i18n.sh pot $(DB_NAME) $(shell ls addons)
 	uv run --no-project --with polib python tools/i18n_seed_po.py $(shell ls addons)
 
-lint: ## Ruff, using the narrow correctness ruleset in pyproject.toml
-	@command -v ruff >/dev/null 2>&1 && ruff check . || uvx ruff@latest check .
+lint: ## Ruff, using the correctness ruleset in pyproject.toml
+	$(RUFF) check .
 
-format: ## Show what ruff would change; does not write
-	@command -v ruff >/dev/null 2>&1 && ruff check --diff . || uvx ruff@latest check --diff .
+format: ## Apply the formatter and import order in place
+	$(RUFF) check --select I --fix .
+	$(RUFF) format .
+
+format-check: ## Fail if anything is unformatted or the imports are unsorted
+	$(RUFF) format --check .
+	$(RUFF) check --select I .
+
+# `tools/` is real Python and is enforced. `addons/` is advisory: `odoo` ships no
+# stubs and is not importable outside the container, so every ORM symbol is
+# `Any` and a green run there proves very little. It is still worth running --
+# the typed pure-Python modules (carrier providers, shop-import fetchers) are
+# genuinely checked -- but it must not gate a merge on a false negative.
+typecheck: ## mypy: blocking on tools/, advisory on addons/
+	$(MYPY) tools
+	@echo "--- addons/ (advisory; does not fail the build) ---"
+	@$(MYPY) addons || true
 
 oca: ## Vendor the pinned OCA modules into ./oca
 	./tools/vendor-oca.sh
