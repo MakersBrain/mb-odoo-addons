@@ -14,39 +14,40 @@ class MbCommercialOperation(models.Model):
         compute="_compute_urssaf_recognition_status",
         string="URSSAF Recognition",
     )
-    urssaf_source_ids = fields.Many2many(
+    urssaf_source_ids = fields.One2many(
         "l10n.fr.micro.urssaf.declaration.source",
-        compute="_compute_urssaf_recognition_status",
+        "mb_commercial_operation_id",
         string="URSSAF Evidence",
+        readonly=True,
     )
 
-    @api.depends("analytic_account_id", "company_id")
+    @api.depends(
+        "analytic_account_id",
+        "urssaf_source_ids",
+        "urssaf_source_ids.declaration_state",
+        # The `pending` branch asks whether any revenue exists yet, via
+        # `_get_operation_profitability_items()`. That is a registry which
+        # optional bridge addons extend, so no single addon can name its whole
+        # dependency set; `analytic_evidence_ids` is the native revenue source
+        # every installation has. An operation whose only revenue arrives
+        # through another bridge's evidence may therefore read `pending` one
+        # transaction late. That is a display lag on a computed indicator, not
+        # a declared figure -- the declaration itself is built by
+        # l10n_fr_micro_urssaf from the sources, not from this field.
+        "analytic_evidence_ids.amount",
+    )
     def _compute_urssaf_recognition_status(self):
-        source_model = self.env["l10n.fr.micro.urssaf.declaration.source"].sudo()
         for operation in self:
-            account = operation.analytic_account_id
-            if not account:
-                operation.urssaf_source_ids = False
-                operation.urssaf_recognition_status = "not_applicable"
-                continue
-            candidates = source_model.search(
-                [
-                    ("company_id", "=", operation.company_id.id),
-                ]
-            )
-            sources = candidates.filtered(
-                lambda source, current_operation=operation: (
-                    source.pos_order_id.mb_commercial_operation_id == current_operation
-                    or source.origin_move_id.mb_commercial_operation_id == current_operation
-                )
-            )
-            operation.urssaf_source_ids = sources
+            sources = operation.urssaf_source_ids
             if sources:
                 operation.urssaf_recognition_status = (
                     "filed"
                     if all(source.declaration_state == "filed" for source in sources)
                     else "computed"
                 )
+                continue
+            if not operation.analytic_account_id:
+                operation.urssaf_recognition_status = "not_applicable"
                 continue
             has_revenue = any(
                 item["component"] == "revenue"

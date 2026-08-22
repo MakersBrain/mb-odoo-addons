@@ -3,6 +3,8 @@ from datetime import timedelta
 from odoo import fields
 from odoo.tests import TransactionCase, tagged
 
+from odoo.addons.l10n_fr_micro_urssaf.models.internal import internal_context
+
 
 @tagged("post_install", "-at_install")
 class TestCommercialUrssaf(TransactionCase):
@@ -40,7 +42,6 @@ class TestCommercialUrssaf(TransactionCase):
                 "amount": 100,
             }
         )
-        operation.invalidate_recordset(["urssaf_recognition_status", "urssaf_source_ids"])
         self.assertEqual(operation.urssaf_recognition_status, "pending")
 
         invoice = self.env["account.move"].create(
@@ -87,9 +88,16 @@ class TestCommercialUrssaf(TransactionCase):
                 "receipt_method": "transfer",
             }
         )
-        operation.invalidate_recordset(["urssaf_recognition_status", "urssaf_source_ids"])
         self.assertEqual(operation.urssaf_recognition_status, "computed")
         self.assertEqual(operation.urssaf_source_ids, source)
+
+        # The whole point of the relation: filing the declaration has to
+        # move the operation without anyone flushing the cache by hand.
+        # Written through the module's own internal context rather than
+        # action_file(), which additionally needs manager rights and a
+        # anomaly-free declaration -- neither is what this asserts.
+        declaration.with_context(**internal_context()).state = "filed"
+        self.assertEqual(operation.urssaf_recognition_status, "filed")
 
     def test_wizard_snapshots_dated_goods_rates_without_reimplementing_rules(self):
         start = fields.Datetime.now() + timedelta(days=10)
