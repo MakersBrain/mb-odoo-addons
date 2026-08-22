@@ -86,6 +86,7 @@ jobs:
             --tag "$image:$GITHUB_SHA" --metadata-file release/build-metadata.json \
             --output "$output" .
           digest=$(jq -r '."containerimage.digest"' release/build-metadata.json)
+          test -n "$digest" && test "$digest" != null
           ref="$image@$digest"
           local_ref="$image:$GITHUB_SHA"
           if [ "${{ inputs.dry_run }}" != true ]; then docker pull "$ref"; local_ref="$ref"; fi
@@ -97,10 +98,6 @@ jobs:
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
           echo "config=$config" >> "$GITHUB_OUTPUT"
           echo "scan_ref=$local_ref" >> "$GITHUB_OUTPUT"
-
-      - name: Sign extension image
-        if: ${{ !inputs.dry_run }}
-        run: cosign sign --yes '${{ steps.build.outputs.ref }}'
 
       - name: Qualify runtime capabilities against the exact selected pair
         run: |
@@ -124,6 +121,10 @@ jobs:
             qrcode:true,reportlab:true,read_only_root:true,network_disabled:true,
             dependency_policy:true,official_entrypoint:true
           }' > release/runtime-capability-checks.json
+
+      - name: Sign extension image
+        if: ${{ !inputs.dry_run }}
+        run: cosign sign --yes '${{ steps.build.outputs.ref }}'
 
       - name: Generate observed SBOMs and vulnerability reports
         run: |
