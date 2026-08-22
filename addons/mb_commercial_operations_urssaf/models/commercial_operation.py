@@ -38,7 +38,20 @@ class MbCommercialOperation(models.Model):
     )
     def _compute_urssaf_recognition_status(self):
         for operation in self:
-            sources = operation.urssaf_source_ids
+            # Read privileged, assign to the record in `self`. The field is
+            # rendered on the operation form, which `group_commercial_operations_user`
+            # opens, but both inputs sit behind accounting rights: the source
+            # model is readable only by the accounting groups (and narrowed
+            # further by a record rule), and the revenue test reaches
+            # `analytic_evidence_ids` on account.analytic.line. The indicator
+            # says whether the operation has been picked up by a declaration,
+            # not what the declaration says, so it is derivable without
+            # granting sight of either.
+            privileged = operation.sudo()
+            sources = privileged.urssaf_source_ids
+            # Evidence outranks the analytic account: an operation a
+            # declaration has already recognised is not "no recognizable
+            # revenue" merely because its project carries no analytic account.
             if sources:
                 operation.urssaf_recognition_status = (
                     "filed"
@@ -46,12 +59,12 @@ class MbCommercialOperation(models.Model):
                     else "computed"
                 )
                 continue
-            if not operation.analytic_account_id:
+            if not privileged.analytic_account_id:
                 operation.urssaf_recognition_status = "not_applicable"
                 continue
             has_revenue = any(
                 item["component"] == "revenue"
-                for item in operation._get_operation_profitability_items()
+                for item in privileged._get_operation_profitability_items()
             )
             operation.urssaf_recognition_status = "pending" if has_revenue else "not_applicable"
 

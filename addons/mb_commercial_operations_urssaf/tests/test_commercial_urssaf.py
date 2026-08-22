@@ -99,6 +99,45 @@ class TestCommercialUrssaf(TransactionCase):
         declaration.with_context(**internal_context()).state = "filed"
         self.assertEqual(operation.urssaf_recognition_status, "filed")
 
+        # Evidence outranks the analytic account. Losing the account must not
+        # relabel an operation a filed declaration has already recognised as
+        # having no recognizable revenue.
+        operation.project_id.account_id = False
+        operation.invalidate_recordset()
+        self.assertFalse(operation.analytic_account_id)
+        self.assertEqual(operation.urssaf_recognition_status, "filed")
+
+    def test_status_is_readable_without_sight_of_the_declaration_sources(self):
+        operation = self.env["mb.commercial.operation"].create(
+            {
+                "name": "URSSAF ACL market",
+                "partner_id": self.env.company.partner_id.id,
+                "planned_start": fields.Datetime.now() + timedelta(days=3),
+                "planned_end": fields.Datetime.now() + timedelta(days=3, hours=8),
+            }
+        )
+        # The field is rendered on the operation form, which this group opens;
+        # the source model is readable only by the accounting groups.
+        user = self.env["res.users"].create(
+            {
+                "name": "Operations only",
+                "login": "urssaf-operations-only",
+                "group_ids": [
+                    fields.Command.link(self.env.ref("base.group_user").id),
+                    fields.Command.link(
+                        self.env.ref("mb_commercial_operations.group_commercial_operations_user").id
+                    ),
+                ],
+            }
+        )
+        self.assertFalse(
+            self.env["l10n.fr.micro.urssaf.declaration.source"].with_user(user).has_access("read")
+        )
+        self.assertEqual(
+            operation.with_user(user).urssaf_recognition_status,
+            "not_applicable",
+        )
+
     def test_wizard_snapshots_dated_goods_rates_without_reimplementing_rules(self):
         start = fields.Datetime.now() + timedelta(days=10)
         operation = self.env["mb.commercial.operation"].create(
