@@ -166,15 +166,24 @@ class MbKilnConnection(models.Model):
             )
 
     def _compute_counts(self):
+        # Two aggregates over every connection's kilns at once, rather than two
+        # search_count per connection.
+        kilns = self.kiln_ids
+        firings = dict(
+            self.env["mb.firing"]._read_group(
+                [("kiln_id", "in", kilns.ids)], groupby=["kiln_id"], aggregates=["__count"]
+            )
+        )
+        programs = dict(
+            self.env["mb.kiln.program"]._read_group(
+                [("kiln_id", "in", kilns.ids)], groupby=["kiln_id"], aggregates=["__count"]
+            )
+        )
         for connection in self:
-            kilns = connection.kiln_ids
-            connection.kiln_count = len(kilns)
-            connection.firing_count = self.env["mb.firing"].search_count(
-                [("kiln_id", "in", kilns.ids)]
-            )
-            connection.program_count = self.env["mb.kiln.program"].search_count(
-                [("kiln_id", "in", kilns.ids)]
-            )
+            connection_kilns = connection.kiln_ids
+            connection.kiln_count = len(connection_kilns)
+            connection.firing_count = sum(firings.get(kiln, 0) for kiln in connection_kilns)
+            connection.program_count = sum(programs.get(kiln, 0) for kiln in connection_kilns)
 
     # -- provider access ---------------------------------------------------
 

@@ -123,18 +123,17 @@ class PaymentTransaction(models.Model):
 
     def _check_amount_and_confirm_order(self):
         confirmed = self.env["sale.order"]
+        # One lookup for the batch. This runs on every payment confirmation, so
+        # a provider callback carrying several transactions used to issue a
+        # query per transaction just to find out none of them had an exception.
+        with_exception = set(
+            self.env["mb.webshop.payment.exception"]
+            .sudo()
+            .search([("transaction_id", "in", self.ids)])
+            .transaction_id.ids
+        )
         for transaction in self:
-            existing = (
-                self.env["mb.webshop.payment.exception"]
-                .sudo()
-                .search(
-                    [
-                        ("transaction_id", "=", transaction.id),
-                    ],
-                    limit=1,
-                )
-            )
-            if existing:
+            if transaction.id in with_exception:
                 confirmed |= transaction.sale_order_ids
                 continue
             try:

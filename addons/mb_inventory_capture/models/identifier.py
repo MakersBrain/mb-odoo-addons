@@ -291,29 +291,42 @@ class ProductProduct(models.Model):
 
     def _register_mb_primary_barcodes(self):
         registry = self.env["mb.product.identifier"].sudo()
+        normalized_by_product = {}
         for product in self.filtered("barcode"):
             normalized = normalize_any_gtin(product.barcode)
-            if not normalized:
+            if normalized:
+                normalized_by_product[product] = normalized
+        if not normalized_by_product:
+            return
+        # One lookup and one create for the batch, instead of a search and a
+        # create per product. `_check_mb_barcode_identifier_conflict` has
+        # already rejected any value another product holds, so taking the first
+        # holder of a value here is the same arbitrary choice the previous
+        # `limit=1` search made.
+        claimed = {}
+        for holder in registry.search(
+            [
+                ("comparison_scheme", "=", "gtin"),
+                ("normalized_value", "in", list(normalized_by_product.values())),
+            ]
+        ):
+            claimed.setdefault(holder.normalized_value, holder.product_id)
+        pending = []
+        for product, normalized in normalized_by_product.items():
+            owner = claimed.get(normalized)
+            if owner is not None:
+                if owner != product:
+                    raise ValidationError(
+                        _("This GTIN is already assigned to %s.", owner.display_name)
+                    )
                 continue
             digits = re.sub(r"[\s-]", "", product.barcode)
             scheme = next(key for key, length in GTIN_SCHEMES.items() if len(digits) == length)
-            existing = registry.search(
-                [
-                    ("comparison_scheme", "=", "gtin"),
-                    ("normalized_value", "=", normalized),
-                ],
-                limit=1,
-            )
-            if existing:
-                if existing.product_id != product:
-                    raise ValidationError(
-                        _(
-                            "This GTIN is already assigned to %s.",
-                            existing.product_id.display_name,
-                        )
-                    )
-                continue
-            registry.create(
+            # Claim it for the rest of this batch too: two products carrying the
+            # same GTIN in one write must still collide, as they did when each
+            # product ran its own query.
+            claimed[normalized] = product
+            pending.append(
                 {
                     "product_id": product.id,
                     "scheme": scheme,
@@ -322,19 +335,40 @@ class ProductProduct(models.Model):
                     "verification_state": "verified",
                 }
             )
+        if pending:
+            registry.create(pending)
 
     def _check_mb_barcode_identifier_conflict(self):
+        normalized_by_product = {}
         for product in self.filtered("barcode"):
             normalized = normalize_any_gtin(product.barcode)
-            if not normalized:
-                continue
-            conflict = self.env["mb.product.identifier"].search(
-                [
-                    ("comparison_scheme", "=", "gtin"),
-                    ("normalized_value", "=", normalized),
-                    ("product_id", "!=", product.id),
-                ],
-                limit=1,
+            if normalized:
+                normalized_by_product[product] = normalized
+        if not normalized_by_product:
+            return
+        # One lookup for the whole batch. A write that renumbers a hundred
+        # products used to issue a hundred searches before rejecting the first
+        # collision.
+        holders = self.env["mb.product.identifier"].search(
+            [
+                ("comparison_scheme", "=", "gtin"),
+                ("normalized_value", "in", list(normalized_by_product.values())),
+            ]
+        )
+        # Uniqueness is per (scope_key, scheme, value), so one value may have
+        # several holders. Keep them all: picking an arbitrary one could return
+        # the product's own identifier and mask a genuine collision.
+        holders_by_value = {}
+        for holder in holders:
+            holders_by_value.setdefault(holder.normalized_value, []).append(holder)
+        for product, normalized in normalized_by_product.items():
+            conflict = next(
+                (
+                    holder
+                    for holder in holders_by_value.get(normalized, [])
+                    if holder.product_id != product
+                ),
+                None,
             )
             if conflict:
                 raise ValidationError(
