@@ -14,10 +14,13 @@ class PosConfig(models.Model):
         domain="[('operation_type', '=', 'market'), ('state', 'in', ('approved', 'scheduled', 'in_progress'))]",
     )
     mb_regular_picking_type_id = fields.Many2one(
-        "stock.picking.type", check_company=True, copy=False,
+        "stock.picking.type",
+        check_company=True,
+        copy=False,
     )
     mb_market_product_ids = fields.Many2many(
-        "product.product", compute="_compute_mb_market_product_ids",
+        "product.product",
+        compute="_compute_mb_market_product_ids",
     )
 
     @api.depends("mb_commercial_operation_id", "mb_commercial_operation_id.market_location_id")
@@ -29,9 +32,12 @@ class PosConfig(models.Model):
                 continue
             available = [
                 product.id
-                for product, quantity, reserved in self.env["stock.quant"].sudo()._read_group(
+                for product, quantity, reserved in self.env["stock.quant"]
+                .sudo()
+                ._read_group(
                     [("location_id", "child_of", location.id)],
-                    ["product_id"], ["quantity:sum", "reserved_quantity:sum"],
+                    ["product_id"],
+                    ["quantity:sum", "reserved_quantity:sum"],
                 )
                 if quantity - reserved > 0
             ]
@@ -48,13 +54,17 @@ class PosConfig(models.Model):
             operation = config.mb_commercial_operation_id
             if not operation:
                 if config.mb_regular_picking_type_id:
-                    config.with_context(mb_pos_operation_sync=True).write({
-                        "picking_type_id": config.mb_regular_picking_type_id.id,
-                        "mb_regular_picking_type_id": False,
-                    })
+                    config.with_context(mb_pos_operation_sync=True).write(
+                        {
+                            "picking_type_id": config.mb_regular_picking_type_id.id,
+                            "mb_regular_picking_type_id": False,
+                        }
+                    )
                 continue
             if operation.company_id != config.company_id:
-                raise ValidationError(_("The Point of Sale and market operation must share a company."))
+                raise ValidationError(
+                    _("The Point of Sale and market operation must share a company.")
+                )
             picking_type = operation._ensure_pos_picking_types()
             values = {"picking_type_id": picking_type.id}
             if not config.mb_regular_picking_type_id:
@@ -63,7 +73,9 @@ class PosConfig(models.Model):
         return True
 
     def write(self, vals):
-        changing_operation = "mb_commercial_operation_id" in vals and not self.env.context.get("mb_pos_operation_sync")
+        changing_operation = "mb_commercial_operation_id" in vals and not self.env.context.get(
+            "mb_pos_operation_sync"
+        )
         if changing_operation:
             self._check_no_active_session_for_reconfiguration()
         result = super().write(vals)

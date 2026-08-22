@@ -12,13 +12,12 @@ from __future__ import annotations
 import argparse
 import base64
 import json
-from pathlib import Path
 import ssl
 import sys
+from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
-from urllib.request import HTTPSHandler, HTTPRedirectHandler, Request, build_opener
-
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
 
 BASE_URL = "https://panel.sendcloud.sc"
 MAX_RESPONSE = 2 * 1024 * 1024
@@ -62,15 +61,11 @@ class Client:
             "Content-Type": "application/json",
             "User-Agent": "mb-sendcloud-qualification/1",
         }
-        self.opener = build_opener(
-            HTTPSHandler(context=ssl.create_default_context()), NoRedirect()
-        )
+        self.opener = build_opener(HTTPSHandler(context=ssl.create_default_context()), NoRedirect())
 
     def request(self, method: str, path: str, payload: dict | None = None) -> dict | list:
         body = json.dumps(payload, separators=(",", ":")).encode() if payload else None
-        request = Request(
-            f"{BASE_URL}{path}", data=body, headers=self.headers, method=method
-        )
+        request = Request(f"{BASE_URL}{path}", data=body, headers=self.headers, method=method)
         try:
             with self.opener.open(request, timeout=20) as response:
                 declared = response.headers.get("Content-Length", "")
@@ -78,7 +73,9 @@ class Client:
                     raise QualificationError("Sendcloud response exceeded the size limit")
                 raw = response.read(MAX_RESPONSE + 1)
         except HTTPError as error:
-            raise QualificationError(f"Sendcloud rejected a read-only check (HTTP {error.code})") from error
+            raise QualificationError(
+                f"Sendcloud rejected a read-only check (HTTP {error.code})"
+            ) from error
         except URLError as error:
             raise QualificationError("Sendcloud is unavailable for qualification") from error
         if len(raw) > MAX_RESPONSE:
@@ -115,12 +112,14 @@ def qualify(values: dict[str, str], client: Client) -> dict:
     postal = values.get("SENDCLOUD_QUALIFICATION_POSTAL_CODE", "")
     city = values.get("SENDCLOUD_QUALIFICATION_CITY", "")
     if country and postal and city:
-        query = urlencode({
-            "country_code": country,
-            "address_postal_code": postal,
-            "address_city": city,
-            "limit": 10,
-        })
+        query = urlencode(
+            {
+                "country_code": country,
+                "address_postal_code": postal,
+                "address_city": city,
+                "limit": 10,
+            }
+        )
         result["service_point_count"] = len(
             rows(client.request("GET", f"/api/v3/service-points?{query}"))
         )
@@ -132,7 +131,9 @@ def qualify(values: dict[str, str], client: Client) -> dict:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--env-file", type=Path, default=Path("sendcloud.env"),
+        "--env-file",
+        type=Path,
+        default=Path("sendcloud.env"),
         help="ignored env file containing Sendcloud keys and optional qualification destination",
     )
     args = parser.parse_args(argv)

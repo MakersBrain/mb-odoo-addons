@@ -10,8 +10,5 @@ class ProductTemplate(models.Model):
         domain = Domain(super()._load_pos_data_domain(data, config))
         if config.mb_commercial_operation_id:
             allowed_templates = config.mb_market_product_ids.product_tmpl_id
-            domain &= (
-                Domain("is_storable", "=", False)
-                | Domain("id", "in", allowed_templates.ids)
-            )
+            domain &= Domain("is_storable", "=", False) | Domain("id", "in", allowed_templates.ids)
         return domain

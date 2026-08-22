@@ -58,8 +58,10 @@ def route_decorators(tree: ast.Module):
                 continue
             func = decorator.func
             name = (
-                func.attr if isinstance(func, ast.Attribute)
-                else func.id if isinstance(func, ast.Name)
+                func.attr
+                if isinstance(func, ast.Attribute)
+                else func.id
+                if isinstance(func, ast.Name)
                 else None
             )
             if name == "route":
@@ -80,9 +82,7 @@ def endpoints_in(path: pathlib.Path, addon: str):
             continue
 
         options = {
-            keyword.arg: literal(keyword.value)
-            for keyword in decorator.keywords
-            if keyword.arg
+            keyword.arg: literal(keyword.value) for keyword in decorator.keywords if keyword.arg
         }
         for route in routes:
             if not isinstance(route, str) or not route.startswith(PREFIX):
@@ -164,8 +164,7 @@ def main() -> int:
         return 1
     if contract["duplicate_paths"]:
         print(
-            "the same bridge path is declared more than once: "
-            f"{contract['duplicate_paths']}",
+            f"the same bridge path is declared more than once: {contract['duplicate_paths']}",
             file=sys.stderr,
         )
         return 1

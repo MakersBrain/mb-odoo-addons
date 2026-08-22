@@ -15,7 +15,6 @@ class ResPartner(models.Model):
     mb_house_number_addition = fields.Char(string="House number addition")
 
     def _can_be_edited_by_current_customer(self, **kwargs):
-        return (
-            super()._can_be_edited_by_current_customer(**kwargs)
-            and not any(self.mapped("mb_pickup_ref"))
+        return super()._can_be_edited_by_current_customer(**kwargs) and not any(
+            self.mapped("mb_pickup_ref")
         )

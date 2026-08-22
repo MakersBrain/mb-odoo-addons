@@ -11,34 +11,36 @@ class TestDepotNavigation(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.manager = cls.env["res.users"].create({
-            "name": "Depot navigation manager",
-            "login": "depot-navigation-manager",
-            "group_ids": [fields.Command.set(
-                cls.env.ref("mb_depot.group_depot_sale_manager").ids
-            )],
-        })
-        cls.inventory_user = cls.env["res.users"].create({
-            "name": "Depot navigation inventory user",
-            "login": "depot-navigation-inventory",
-            "group_ids": [fields.Command.set(
-                cls.env.ref("stock.group_stock_user").ids
-            )],
-        })
-        cls.accounting_user = cls.env["res.users"].create({
-            "name": "Depot navigation accounting user",
-            "login": "depot-navigation-accounting",
-            "group_ids": [fields.Command.set(
-                cls.env.ref("account.group_account_invoice").ids
-            )],
-        })
-        cls.inventory_manager = cls.env["res.users"].create({
-            "name": "Depot navigation inventory manager",
-            "login": "depot-navigation-inventory-manager",
-            "group_ids": [fields.Command.set(
-                cls.env.ref("stock.group_stock_manager").ids
-            )],
-        })
+        cls.manager = cls.env["res.users"].create(
+            {
+                "name": "Depot navigation manager",
+                "login": "depot-navigation-manager",
+                "group_ids": [
+                    fields.Command.set(cls.env.ref("mb_depot.group_depot_sale_manager").ids)
+                ],
+            }
+        )
+        cls.inventory_user = cls.env["res.users"].create(
+            {
+                "name": "Depot navigation inventory user",
+                "login": "depot-navigation-inventory",
+                "group_ids": [fields.Command.set(cls.env.ref("stock.group_stock_user").ids)],
+            }
+        )
+        cls.accounting_user = cls.env["res.users"].create(
+            {
+                "name": "Depot navigation accounting user",
+                "login": "depot-navigation-accounting",
+                "group_ids": [fields.Command.set(cls.env.ref("account.group_account_invoice").ids)],
+            }
+        )
+        cls.inventory_manager = cls.env["res.users"].create(
+            {
+                "name": "Depot navigation inventory manager",
+                "login": "depot-navigation-inventory-manager",
+                "group_ids": [fields.Command.set(cls.env.ref("stock.group_stock_manager").ids)],
+            }
+        )
 
     def _visible_menu_ids(self, user):
         return self.env["ir.ui.menu"].with_user(user)._visible_menu_ids()
@@ -110,9 +112,9 @@ class TestDepotNavigation(TransactionCase):
 
         self.assertEqual(reports.view_mode, "list,form")
         self.assertEqual(record_sale.view_mode, "form")
-        self.assertEqual(record_sale.view_id, self.env.ref(
-            "mb_depot.view_mb_depot_sale_report_form"
-        ))
+        self.assertEqual(
+            record_sale.view_id, self.env.ref("mb_depot.view_mb_depot_sale_report_form")
+        )
 
     def test_statement_is_a_full_page_reporting_action(self):
         statement = self.env.ref("mb_depot.action_mb_depot_statement")
@@ -128,10 +130,7 @@ class TestDepotNavigation(TransactionCase):
         view = self.env.ref("mb_depot.view_depot_sale_order_search")
         arch = view._get_combined_arch()
 
-        fields_by_name = {
-            node.get("name"): node
-            for node in arch.xpath("//searchpanel/field")
-        }
+        fields_by_name = {node.get("name"): node for node in arch.xpath("//searchpanel/field")}
         self.assertEqual(
             set(fields_by_name),
             {"partner_id", "warehouse_id", "state"},
@@ -187,15 +186,13 @@ class TestDepotNavigation(TransactionCase):
         view = self.env.ref("mb_depot.view_mb_depot_sale_report_form")
         arch = etree.fromstring(view.arch_db.encode())
 
-        self.assertTrue(arch.xpath(
-            "//field[@name='line_ids']/list/field[@name='available_product_ids']"
-        ))
-        self.assertTrue(arch.xpath(
-            "//field[@name='line_ids']/list/field[@name='available_lot_ids']"
-        ))
-        product_fields = arch.xpath(
-            "//field[@name='line_ids']/list/field[@name='product_id']"
+        self.assertTrue(
+            arch.xpath("//field[@name='line_ids']/list/field[@name='available_product_ids']")
         )
+        self.assertTrue(
+            arch.xpath("//field[@name='line_ids']/list/field[@name='available_lot_ids']")
+        )
+        product_fields = arch.xpath("//field[@name='line_ids']/list/field[@name='product_id']")
         self.assertEqual(len(product_fields), 1)
         self.assertIn(
             "mb_depot_warehouse_id",

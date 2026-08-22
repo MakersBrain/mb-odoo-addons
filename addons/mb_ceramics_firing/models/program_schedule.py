@@ -54,14 +54,16 @@ def schedule(segments, ambient=AMBIENT_C):
         if target is None:
             target = start_temperature
         climb = ramp_minutes(rate, start_temperature, target)
-        rows.append({
-            "start_temperature": start_temperature,
-            "target_temperature": target,
-            "ramp_minutes": climb,
-            "soak_minutes": soak,
-            "start_minutes": elapsed,
-            "end_minutes": elapsed + climb + soak,
-        })
+        rows.append(
+            {
+                "start_temperature": start_temperature,
+                "target_temperature": target,
+                "ramp_minutes": climb,
+                "soak_minutes": soak,
+                "start_minutes": elapsed,
+                "end_minutes": elapsed + climb + soak,
+            }
+        )
         elapsed += climb + soak
         start_temperature = target
     return rows
@@ -74,16 +76,14 @@ def total_minutes(segments, ambient=AMBIENT_C):
 
 def peak_temperature(segments):
     """The highest target the programme asks for, or None if it asks for none."""
-    targets = [
-        _read(segment, "target_temperature") for segment in segments]
+    targets = [_read(segment, "target_temperature") for segment in segments]
     targets = [target for target in targets if target is not None]
     return max(targets) if targets else None
 
 
 def _read(segment, key):
     """One field, from a dict or from anything with attributes."""
-    value = segment.get(key) if isinstance(segment, dict) else getattr(
-        segment, key, None)
+    value = segment.get(key) if isinstance(segment, dict) else getattr(segment, key, None)
     if isinstance(value, bool) or value is None:
         return None
     try:

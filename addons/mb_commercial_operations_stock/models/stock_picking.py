@@ -31,7 +31,9 @@ class StockMove(models.Model):
 
     def _prepare_analytic_line_values(self, account_field_values, amount, unit_amount):
         values = super()._prepare_analytic_line_values(
-            account_field_values, amount, unit_amount,
+            account_field_values,
+            amount,
+            unit_amount,
         )
         if self.picking_id.mb_commercial_operation_id:
             values["mb_commercial_operation_id"] = self.picking_id.mb_commercial_operation_id.id

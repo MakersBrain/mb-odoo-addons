@@ -1,7 +1,8 @@
-from types import SimpleNamespace
 import hashlib
 import hmac
 import json
+from types import SimpleNamespace
+
 import requests
 
 from odoo.tests import TransactionCase, tagged
@@ -62,18 +63,20 @@ def address(name="Recipient", number="3"):
 
 
 def sender_payload():
-    return {"data": {
-        "id": 7,
-        "name": "Workshop",
-        "company_name": "Workshop",
-        "address_line_1": "rue de l'Atelier",
-        "house_number": "1",
-        "postal_code": "75011",
-        "city": "Paris",
-        "country_code": "FR",
-        "phone_number": "+33102030405",
-        "email": "workshop@example.test",
-    }}
+    return {
+        "data": {
+            "id": 7,
+            "name": "Workshop",
+            "company_name": "Workshop",
+            "address_line_1": "rue de l'Atelier",
+            "house_number": "1",
+            "postal_code": "75011",
+            "city": "Paris",
+            "country_code": "FR",
+            "phone_number": "+33102030405",
+            "email": "workshop@example.test",
+        }
+    }
 
 
 def request(direction="outbound", service="sendcloud:letter"):
@@ -84,11 +87,19 @@ def request(direction="outbound", service="sendcloud:letter"):
         recipient=address("Customer", "3") if direction == "outbound" else address("Workshop", "1"),
         parcels=(Parcel(1.2, 30, 20, 15, 25, "EUR"),),
         metadata={"picking": "WH/OUT/0001", "direction": direction},
-        items=({
-            "description": "Ceramic cup", "quantity": 1, "weight_kg": 1.2,
-            "value": 25, "currency": "EUR", "hs_code": "691200",
-            "origin_country": "FR", "sku": "CUP", "product_id": "1",
-        },),
+        items=(
+            {
+                "description": "Ceramic cup",
+                "quantity": 1,
+                "weight_kg": 1.2,
+                "value": 25,
+                "currency": "EUR",
+                "hs_code": "691200",
+                "origin_country": "FR",
+                "sku": "CUP",
+                "product_id": "1",
+            },
+        ),
     )
 
 
@@ -118,20 +129,27 @@ class TestSendcloudProvider(TransactionCase):
         )
 
     def test_outbound_payload_uses_v3_reference_sender_and_document(self):
-        shipment = {"data": {
-            "id": "shipment-1",
-            "parcels": [{
-                "id": 8,
-                "tracking_number": "TRACK-1",
-                "tracking_url": "https://tracking.sendcloud.sc/test",
-                "documents": [{
-                    "type": "label",
-                    "link": "https://panel.sendcloud.sc/api/v3/parcels/8/documents/label",
-                }],
-            }],
-        }}
+        shipment = {
+            "data": {
+                "id": "shipment-1",
+                "parcels": [
+                    {
+                        "id": 8,
+                        "tracking_number": "TRACK-1",
+                        "tracking_url": "https://tracking.sendcloud.sc/test",
+                        "documents": [
+                            {
+                                "type": "label",
+                                "link": "https://panel.sendcloud.sc/api/v3/parcels/8/documents/label",
+                            }
+                        ],
+                    }
+                ],
+            }
+        }
         session = Session(
-            Response(payload=sender_payload()), Response(status=201, payload=shipment),
+            Response(payload=sender_payload()),
+            Response(status=201, payload=shipment),
             documents=[Response(content=b"%PDF-1.4 label", content_type="application/pdf")],
         )
 
@@ -162,7 +180,8 @@ class TestSendcloudProvider(TransactionCase):
     def test_return_uses_customer_to_selected_sender_and_return_endpoint(self):
         returned = {"return_id": 42, "parcel_id": 9, "multi_collo_ids": []}
         session = Session(
-            Response(payload=sender_payload()), Response(status=201, payload=returned),
+            Response(payload=sender_payload()),
+            Response(status=201, payload=returned),
             documents=[Response(content=b"%PDF-1.4 return", content_type="application/pdf")],
         )
         result = self.provider(session, production=True).create_return_label(
@@ -190,18 +209,26 @@ class TestSendcloudProvider(TransactionCase):
             provider.create_return_label(request(direction="return", service="dpd:return/return"))
 
     def test_tracking_endpoint_normalizes_terminal_status(self):
-        session = Session(Response(payload={
-            "tracking_numbers": [{
-                "tracking_number": "TRACK-1",
-                "tracking_url": "https://tracking.sendcloud.sc/track",
-            }],
-            "details": {"expected_delivery_date": "2026-08-18"},
-            "events": [{
-                "status_code": "delivered",
-                "status_description": "Delivered",
-                "event_at": "2026-08-18T10:00:00Z",
-            }],
-        }))
+        session = Session(
+            Response(
+                payload={
+                    "tracking_numbers": [
+                        {
+                            "tracking_number": "TRACK-1",
+                            "tracking_url": "https://tracking.sendcloud.sc/track",
+                        }
+                    ],
+                    "details": {"expected_delivery_date": "2026-08-18"},
+                    "events": [
+                        {
+                            "status_code": "delivered",
+                            "status_description": "Delivered",
+                            "event_at": "2026-08-18T10:00:00Z",
+                        }
+                    ],
+                }
+            )
+        )
         snapshot = self.provider(session).retrieve_tracking("TRACK-1")
         self.assertEqual(snapshot.category, "delivered")
         self.assertEqual(snapshot.status_code, "DELIVERED")
@@ -209,17 +236,22 @@ class TestSendcloudProvider(TransactionCase):
         self.assertEqual(snapshot.tracking_url, "https://tracking.sendcloud.sc/track")
 
     def test_shipping_options_use_multicollo_v3_shape_and_quote_total(self):
-        options = {"data": [{
-            "code": "postnl:standard",
-            "name": "PostNL Standard",
-            "carrier": {"code": "postnl"},
-            "quotes": [{"price": {"total": {"value": "6.25", "currency": "EUR"}}}],
-            "requirements": {"is_service_point_required": False},
-            "functionalities": {"returns": True},
-        }]}
+        options = {
+            "data": [
+                {
+                    "code": "postnl:standard",
+                    "name": "PostNL Standard",
+                    "carrier": {"code": "postnl"},
+                    "quotes": [{"price": {"total": {"value": "6.25", "currency": "EUR"}}}],
+                    "requirements": {"is_service_point_required": False},
+                    "functionalities": {"returns": True},
+                }
+            ]
+        }
         session = Session(Response(payload=sender_payload()), Response(payload=options))
         query = ShippingOptionQuery(
-            sender=address("Workshop", "1"), recipient=address("Customer", "3"),
+            sender=address("Workshop", "1"),
+            recipient=address("Customer", "3"),
             parcels=(Parcel(1.2, 30, 20, 15),),
         )
 
@@ -232,16 +264,25 @@ class TestSendcloudProvider(TransactionCase):
         self.assertEqual(result[0].price, 6.25)
 
     def test_service_point_search_uses_structured_v3_parameters(self):
-        points = {"data": {"results": [{
-            "id": 1000001,
-            "name": "Parcel Shop",
-            "address": {
-                "street": "rue du Test", "house_number": "12",
-                "postal_code": "75011", "city": "Paris", "country_code": "FR",
-            },
-            "position": {"latitude": 48.8, "longitude": 2.3},
-            "opening_times": {"monday": []},
-        }]}}
+        points = {
+            "data": {
+                "results": [
+                    {
+                        "id": 1000001,
+                        "name": "Parcel Shop",
+                        "address": {
+                            "street": "rue du Test",
+                            "house_number": "12",
+                            "postal_code": "75011",
+                            "city": "Paris",
+                            "country_code": "FR",
+                        },
+                        "position": {"latitude": 48.8, "longitude": 2.3},
+                        "opening_times": {"monday": []},
+                    }
+                ]
+            }
+        }
         session = Session(Response(payload=points))
 
         result = self.provider(session, production=True).search_pickup_points(
@@ -256,27 +297,35 @@ class TestSendcloudProvider(TransactionCase):
         raw = b'{"parcel":{"shipment_id":"shipment-1","status":{"code":"IN_TRANSIT"}}}'
         secret = "w" * 24
         signature = hmac.new(secret.encode(), raw, hashlib.sha256).hexdigest()
-        self.assertTrue(SendcloudProvider.verify_webhook(
-            raw, {"Sendcloud-Signature": signature}, secret
-        ))
-        self.assertFalse(SendcloudProvider.verify_webhook(
-            raw + b" ", {"Sendcloud-Signature": signature}, secret
-        ))
+        self.assertTrue(
+            SendcloudProvider.verify_webhook(raw, {"Sendcloud-Signature": signature}, secret)
+        )
+        self.assertFalse(
+            SendcloudProvider.verify_webhook(raw + b" ", {"Sendcloud-Signature": signature}, secret)
+        )
 
     def test_webhook_payload_uses_shared_tracking_category(self):
-        event = SendcloudProvider.parse_webhook(json.dumps({
-            "id": "event-1",
-            "source_id": "journal-outbound",
-            "tracking_numbers": [{
-                "tracking_number": "TRACK-1",
-                "tracking_url": "https://tracking.sendcloud.sc/track",
-            }],
-            "events": [{
-                "status_code": "driver-on-route",
-                "status_description": "On its way",
-                "event_at": "2026-08-18T10:00:00Z",
-            }],
-        }).encode())
+        event = SendcloudProvider.parse_webhook(
+            json.dumps(
+                {
+                    "id": "event-1",
+                    "source_id": "journal-outbound",
+                    "tracking_numbers": [
+                        {
+                            "tracking_number": "TRACK-1",
+                            "tracking_url": "https://tracking.sendcloud.sc/track",
+                        }
+                    ],
+                    "events": [
+                        {
+                            "status_code": "driver-on-route",
+                            "status_description": "On its way",
+                            "event_at": "2026-08-18T10:00:00Z",
+                        }
+                    ],
+                }
+            ).encode()
+        )
         self.assertEqual(event.provider_ref, "journal-outbound")
         self.assertEqual(event.tracking_number, "TRACK-1")
         self.assertEqual(event.status_category, "out_for_delivery")

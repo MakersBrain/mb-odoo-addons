@@ -10,4 +10,3 @@ class StockLot(models.Model):
         copy=False,
         index=True,
     )
-

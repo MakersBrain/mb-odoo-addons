@@ -49,8 +49,7 @@ PARENT = "Ceramic pieces"
 # they are both boxes, so the collision is harmless.
 FORMS = {
     "Boxes": ["BA", "BB", "BD", "BO", "BP", "BRM", "BTL", "BTV"],
-    "Tableware": ["CO", "GS", "MD", "MH", "MP", "MT",
-                  "TH", "TM", "TP", "TRM", "TTV"],
+    "Tableware": ["CO", "GS", "MD", "MH", "MP", "MT", "TH", "TM", "TP", "TRM", "TTV"],
     "Decorative": ["LM", "PDB", "PDC", "PDP", "PDT", "SP", "VA"],
     "Accessories": ["GAS", "GAT", "OPE", "PAS", "PC", "PRC", "RC", "SLP"],
 }
@@ -152,9 +151,23 @@ print("TOTAL uncategorised remaining",
 def run_in_odoo(script, database, prefixes):
     """Pipe a script into `odoo shell` and echo the lines it meant to report."""
     result = subprocess.run(
-        ["docker", "exec", "-i", ODOO_CONTAINER, "odoo", "shell",
-         "-d", database, "--log-level=error", "--http-port=8199", "--no-http"],
-        input=script, capture_output=True, text=True)
+        [
+            "docker",
+            "exec",
+            "-i",
+            ODOO_CONTAINER,
+            "odoo",
+            "shell",
+            "-d",
+            database,
+            "--log-level=error",
+            "--http-port=8199",
+            "--no-http",
+        ],
+        input=script,
+        capture_output=True,
+        text=True,
+    )
     for line in result.stdout.splitlines():
         if line.startswith(prefixes):
             print("  " + line)
@@ -164,20 +177,22 @@ def run_in_odoo(script, database, prefixes):
 
 def main():
     parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--database", default="odoo")
     parser.add_argument("--parent", default=PARENT)
-    parser.add_argument("--dry-run", action="store_true",
-                        help="report what would change, write nothing")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="report what would change, write nothing"
+    )
     options = parser.parse_args()
 
     script = ASSIGN_TEMPLATE.format(
-        config=json.dumps({"parent": options.parent, "forms": FORMS}),
-        dry_run=options.dry_run)
-    print(f"{'checking' if options.dry_run else 'assigning'} categories "
-          f"in '{options.database}' ...")
-    run_in_odoo(script, options.database,
-                prefixes=("INFO", "CATEGORY", "ASSIGN", "SKIP", "TOTAL"))
+        config=json.dumps({"parent": options.parent, "forms": FORMS}), dry_run=options.dry_run
+    )
+    print(
+        f"{'checking' if options.dry_run else 'assigning'} categories in '{options.database}' ..."
+    )
+    run_in_odoo(script, options.database, prefixes=("INFO", "CATEGORY", "ASSIGN", "SKIP", "TOTAL"))
 
 
 if __name__ == "__main__":

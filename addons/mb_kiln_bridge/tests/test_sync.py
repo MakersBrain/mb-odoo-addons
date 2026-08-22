@@ -9,8 +9,9 @@ from . import fixtures
 class FakeClient:
     """Stands in for MykilnClient. Records that nothing is ever written."""
 
-    def __init__(self, detail=None, samples=None, token="fake-token",
-                 token_changed=True, details=None):
+    def __init__(
+        self, detail=None, samples=None, token="fake-token", token_changed=True, details=None
+    ):
         # `details` for the cases that need more than one firing in a page -
         # newest-wins across programme snapshots needs at least two.
         self.details = list(details) if details else [detail or fixtures.FIRING_DETAIL]
@@ -40,10 +41,13 @@ class FakeClient:
     def list_firings(self, limit=100, offset=0):
         self.calls.append("list_firings")
         return [
-            {"id": detail["id"], "kiln": detail.get("kiln"),
-             "program_number": detail.get("program_number"),
-             "start_date_time": detail.get("start_date_time")}
-            for detail in self.details[offset:offset + limit]
+            {
+                "id": detail["id"],
+                "kiln": detail.get("kiln"),
+                "program_number": detail.get("program_number"),
+                "start_date_time": detail.get("start_date_time"),
+            }
+            for detail in self.details[offset : offset + limit]
         ]
 
     def get_firing(self, firing_id):
@@ -63,19 +67,20 @@ class TestKilnSync(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.connection = cls.env["mb.kiln.connection"].create({
-            "name": "myKiln test",
-            "username": "someone",
-            "password": "not-a-real-password",
-        })
+        cls.connection = cls.env["mb.kiln.connection"].create(
+            {
+                "name": "myKiln test",
+                "username": "someone",
+                "password": "not-a-real-password",
+            }
+        )
 
     def _sync(self, client):
         with patch.object(type(self.connection), "_client", return_value=client):
             self.connection._sync_one()
 
     def test_routine_sync_cron_is_active(self):
-        self.assertTrue(
-            self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_sync").active)
+        self.assertTrue(self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_sync").active)
 
     def test_import_creates_kilns_and_firing(self):
         client = FakeClient()
@@ -93,13 +98,14 @@ class TestKilnSync(TransactionCase):
         """The Increment 4 gate: replaying produces no duplicates."""
         self._sync(FakeClient())
         self._sync(FakeClient())
-        self.assertEqual(self.env["mb.kiln"].search_count(
-            [("connection_id", "=", self.connection.id)]), 2)
-        self.assertEqual(self.env["mb.firing"].search_count(
-            [("external_id", "=", "4417")]), 1)
+        self.assertEqual(
+            self.env["mb.kiln"].search_count([("connection_id", "=", self.connection.id)]), 2
+        )
+        self.assertEqual(self.env["mb.firing"].search_count([("external_id", "=", "4417")]), 1)
         firing = self.env["mb.firing"].search([("external_id", "=", "4417")])
-        attachments = self.env["ir.attachment"].search([
-            ("res_model", "=", "mb.firing"), ("res_id", "=", firing.id)])
+        attachments = self.env["ir.attachment"].search(
+            [("res_model", "=", "mb.firing"), ("res_id", "=", firing.id)]
+        )
         # One curve and one provider payload, however many times it is polled.
         self.assertEqual(len(attachments), 2)
 
@@ -110,15 +116,13 @@ class TestKilnSync(TransactionCase):
         self.assertEqual(firing.state, "firing")
 
         self._sync(FakeClient())
-        self.assertEqual(self.env["mb.firing"].search_count(
-            [("external_id", "=", "4417")]), 1)
+        self.assertEqual(self.env["mb.firing"].search_count([("external_id", "=", "4417")]), 1)
         self.assertEqual(firing.state, "done")
 
     def test_renaming_a_kiln_survives_the_next_poll(self):
         """The artisan's name for a kiln is theirs, not the provider's."""
         self._sync(FakeClient())
-        kiln = self.env["mb.kiln"].search(
-            [("provider_external_id", "=", "41")], limit=1)
+        kiln = self.env["mb.kiln"].search([("provider_external_id", "=", "41")], limit=1)
         kiln.name = "Grand four"
         self._sync(FakeClient())
         self.assertEqual(kiln.name, "Grand four")
@@ -138,14 +142,19 @@ class TestKilnSync(TransactionCase):
         self.assertTrue(client.calls)
         self.assertLessEqual(
             set(client.calls),
-            {"list_kilns", "list_controllers", "list_kiln_types",
-             "list_firings", "get_firing", "get_firing_samples"},
+            {
+                "list_kilns",
+                "list_controllers",
+                "list_kiln_types",
+                "list_firings",
+                "get_firing",
+                "get_firing_samples",
+            },
         )
 
     def test_kiln_specification_is_imported(self):
         self._sync(FakeClient())
-        kiln = self.env["mb.kiln"].search(
-            [("provider_external_id", "=", "41")], limit=1)
+        kiln = self.env["mb.kiln"].search([("provider_external_id", "=", "41")], limit=1)
         self.assertEqual(kiln.manufacturer, "Rohde")
         self.assertEqual(kiln.model_number, "TE 80 S")
         self.assertEqual(kiln.chamber_litres, 80.0)
@@ -165,8 +174,7 @@ class TestKilnSync(TransactionCase):
         """An account with the kiln details never filled in is an ordinary
         account, not a failure - and must not wipe what someone typed here."""
         self._sync(FakeClient())
-        kiln = self.env["mb.kiln"].search(
-            [("provider_external_id", "=", "42")], limit=1)
+        kiln = self.env["mb.kiln"].search([("provider_external_id", "=", "42")], limit=1)
         self.assertFalse(kiln.manufacturer)
         self.assertFalse(kiln.chamber_litres)
         kiln.chamber_litres = 140.0
@@ -191,19 +199,20 @@ class TestProgramImport(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.connection = cls.env["mb.kiln.connection"].create({
-            "name": "myKiln programmes",
-            "username": "someone",
-            "password": "not-a-real-password",
-        })
+        cls.connection = cls.env["mb.kiln.connection"].create(
+            {
+                "name": "myKiln programmes",
+                "username": "someone",
+                "password": "not-a-real-password",
+            }
+        )
 
     def _sync(self, client):
         with patch.object(type(self.connection), "_client", return_value=client):
             self.connection._sync_one()
 
     def _programs(self):
-        return self.env["mb.kiln.program"].search([
-            ("kiln_id.provider_external_id", "=", "41")])
+        return self.env["mb.kiln.program"].search([("kiln_id.provider_external_id", "=", "41")])
 
     def test_a_firing_creates_the_programme_it_ran(self):
         self._sync(FakeClient())
@@ -238,8 +247,7 @@ class TestProgramImport(TransactionCase):
         """The same slot appears once per firing that ran it, and the profiles
         differ because a potter edits in place. The current programme is the
         one most recently fired, whatever order the page arrives in."""
-        self._sync(FakeClient(details=[
-            fixtures.FIRING_DETAIL_OLDER, fixtures.FIRING_DETAIL]))
+        self._sync(FakeClient(details=[fixtures.FIRING_DETAIL_OLDER, fixtures.FIRING_DETAIL]))
         program = self._programs()
         self.assertEqual(len(program), 1)
         self.assertEqual(program.peak_temperature, 1000.0)
@@ -258,9 +266,12 @@ class TestProgramImport(TransactionCase):
         self._sync(FakeClient(detail=fixtures.FIRING_DETAIL_OLDER))
         program = self._programs()
         self.assertEqual(program.peak_temperature, 1040.0)
-        newer = dict(fixtures.FIRING_DETAIL_OLDER, id=4420,
-                     start_date_time="2026-08-05T06:00:00Z",
-                     program=fixtures.BISQUE_PROGRAM)
+        newer = dict(
+            fixtures.FIRING_DETAIL_OLDER,
+            id=4420,
+            start_date_time="2026-08-05T06:00:00Z",
+            program=fixtures.BISQUE_PROGRAM,
+        )
         self._sync(FakeClient(detail=newer))
         self.assertEqual(program.peak_temperature, 1000.0)
         self.assertEqual(len(program.segment_ids), 2)
@@ -271,11 +282,15 @@ class TestProgramImport(TransactionCase):
         must not touch either."""
         self._sync(FakeClient())
         program = self._programs()
-        program.write({"name": "Biscuit lent", "kind": "other",
-                       "cooling_hours": 48.0, "firing_hours": 14.0})
-        newer = dict(fixtures.FIRING_DETAIL, id=4421,
-                     start_date_time="2026-08-09T06:00:00Z",
-                     program=fixtures.BISQUE_PROGRAM_REVISED)
+        program.write(
+            {"name": "Biscuit lent", "kind": "other", "cooling_hours": 48.0, "firing_hours": 14.0}
+        )
+        newer = dict(
+            fixtures.FIRING_DETAIL,
+            id=4421,
+            start_date_time="2026-08-09T06:00:00Z",
+            program=fixtures.BISQUE_PROGRAM_REVISED,
+        )
         self._sync(FakeClient(detail=newer))
         self.assertEqual(program.name, "Biscuit lent")
         self.assertEqual(program.kind, "other")
@@ -290,8 +305,7 @@ class TestProgramImport(TransactionCase):
         self._sync(FakeClient())
         program = self._programs()
         program.name = "Gres 1230"
-        newer = dict(fixtures.FIRING_DETAIL, id=4422,
-                     start_date_time="2026-08-10T06:00:00Z")
+        newer = dict(fixtures.FIRING_DETAIL, id=4422, start_date_time="2026-08-10T06:00:00Z")
         self._sync(FakeClient(detail=newer))
         self.assertEqual(len(self._programs()), 1)
         firing = self.env["mb.firing"].search([("external_id", "=", "4422")])
@@ -299,18 +313,41 @@ class TestProgramImport(TransactionCase):
 
     def test_hand_typed_segments_are_never_replaced(self):
         kiln = self.env["mb.kiln"].create({"name": "Typed in"})
-        program = self.env["mb.kiln.program"].create({
-            "kiln_id": kiln.id, "name": "Programme 3", "kind": "bisque",
-            "segment_ids": [(0, 0, {"number": 1, "ramp_rate": 80.0,
-                                    "target_temperature": 960.0,
-                                    "soak_time": 20.0})],
-        })
-        self.env["mb.kiln.program"]._apply_provider(kiln, {
-            "program_number": 3, "name": "Programme 3",
-            "segments": [{"number": 1, "ramp_rate": 100.0,
-                          "target_temperature": 1000.0, "soak_time": 0.0}],
-            "fired_at": False,
-        })
+        program = self.env["mb.kiln.program"].create(
+            {
+                "kiln_id": kiln.id,
+                "name": "Programme 3",
+                "kind": "bisque",
+                "segment_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "number": 1,
+                            "ramp_rate": 80.0,
+                            "target_temperature": 960.0,
+                            "soak_time": 20.0,
+                        },
+                    )
+                ],
+            }
+        )
+        self.env["mb.kiln.program"]._apply_provider(
+            kiln,
+            {
+                "program_number": 3,
+                "name": "Programme 3",
+                "segments": [
+                    {
+                        "number": 1,
+                        "ramp_rate": 100.0,
+                        "target_temperature": 1000.0,
+                        "soak_time": 0.0,
+                    }
+                ],
+                "fired_at": False,
+            },
+        )
         self.assertEqual(program.source, "manual")
         self.assertEqual(len(program.segment_ids), 1)
         self.assertEqual(program.segment_ids.ramp_rate, 80.0)
@@ -328,13 +365,21 @@ class TestProgramImport(TransactionCase):
         seventy-two. The listing already says which slot each firing ran."""
         details = []
         for index in range(6):
-            details.append(dict(
-                fixtures.FIRING_DETAIL, id=7000 + index,
-                start_date_time="2026-08-0%dT06:00:00Z" % (index + 1)))
+            details.append(
+                dict(
+                    fixtures.FIRING_DETAIL,
+                    id=7000 + index,
+                    start_date_time="2026-08-0%dT06:00:00Z" % (index + 1),
+                )
+            )
         for index in range(4):
-            details.append(dict(
-                fixtures.FIRING_DETAIL_GLAZE, id=7100 + index,
-                start_date_time="2026-08-0%dT20:00:00Z" % (index + 1)))
+            details.append(
+                dict(
+                    fixtures.FIRING_DETAIL_GLAZE,
+                    id=7100 + index,
+                    start_date_time="2026-08-0%dT20:00:00Z" % (index + 1),
+                )
+            )
         client = FakeClient(details=details)
         with patch.object(type(self.connection), "_client", return_value=client):
             self.connection.action_refresh_programs()
@@ -343,8 +388,7 @@ class TestProgramImport(TransactionCase):
         self.assertEqual(client.calls.count("get_firing_samples"), 0)
         programs = self._programs()
         self.assertEqual(len(programs), 2)
-        self.assertEqual(
-            sorted(programs.mapped("program_number")), [3, 4])
+        self.assertEqual(sorted(programs.mapped("program_number")), [3, 4])
         # The newest on each slot, not whichever came back first.
         bisque = programs.filtered(lambda p: p.program_number == 3)
         self.assertEqual(bisque.peak_temperature, 1000.0)
@@ -356,8 +400,7 @@ class TestProgramImport(TransactionCase):
             def list_kilns(self_inner):
                 raise MykilnError("/api/v1/kilns/ timed out twice")
 
-        with patch.object(type(self.connection), "_client",
-                          return_value=FailingClient()):
+        with patch.object(type(self.connection), "_client", return_value=FailingClient()):
             action = self.connection.action_refresh_programs()
         self.assertEqual(action["params"]["type"], "danger")
         self.assertEqual(self.connection.state, "error")
@@ -370,12 +413,14 @@ class TestBackfill(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.connection = cls.env["mb.kiln.connection"].create({
-            "name": "myKiln backfill",
-            "username": "someone",
-            "password": "not-a-real-password",
-            "backfill_page_size": 2,
-        })
+        cls.connection = cls.env["mb.kiln.connection"].create(
+            {
+                "name": "myKiln backfill",
+                "username": "someone",
+                "password": "not-a-real-password",
+                "backfill_page_size": 2,
+            }
+        )
 
     def test_backfill_pages_until_exhausted(self):
         firings = [dict(fixtures.FIRING_DETAIL, id=n) for n in range(5000, 5005)]
@@ -385,7 +430,7 @@ class TestBackfill(TransactionCase):
                 return len(firings)
 
             def list_firings(self_inner, limit=100, offset=0):
-                return [{"id": f["id"]} for f in firings[offset:offset + limit]]
+                return [{"id": f["id"]} for f in firings[offset : offset + limit]]
 
             def get_firing(self_inner, firing_id):
                 return next(f for f in firings if f["id"] == firing_id)
@@ -398,8 +443,12 @@ class TestBackfill(TransactionCase):
 
         self.assertEqual(self.connection.backfill_state, "done")
         self.assertEqual(self.connection.backfill_offset, 5)
-        self.assertEqual(self.env["mb.firing"].search_count(
-            [("external_id", "in", [str(n) for n in range(5000, 5005)])]), 5)
+        self.assertEqual(
+            self.env["mb.firing"].search_count(
+                [("external_id", "in", [str(n) for n in range(5000, 5005)])]
+            ),
+            5,
+        )
 
     def test_manager_can_arm_backfill_without_scheduled_action_access(self):
         class CountClient(FakeClient):
@@ -414,9 +463,7 @@ class TestBackfill(TransactionCase):
         cron = self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_backfill")
         cron.sudo().write({"active": False})
 
-        with patch.object(
-            type(self.connection), "_client", return_value=CountClient()
-        ):
+        with patch.object(type(self.connection), "_client", return_value=CountClient()):
             self.connection.with_user(manager).action_start_backfill()
 
         self.assertTrue(cron.active)
@@ -426,23 +473,20 @@ class TestBackfill(TransactionCase):
 
         class OnePageClient(FakeClient):
             def list_firings(self_inner, limit=100, offset=0):
-                return [
-                    {"id": firing["id"]}
-                    for firing in firings[offset:offset + limit]
-                ]
+                return [{"id": firing["id"]} for firing in firings[offset : offset + limit]]
 
             def get_firing(self_inner, firing_id):
                 return firings[0]
 
-        self.connection.write({
-            "backfill_state": "running",
-            "backfill_total": 1,
-            "backfill_offset": 0,
-        })
+        self.connection.write(
+            {
+                "backfill_state": "running",
+                "backfill_total": 1,
+                "backfill_offset": 0,
+            }
+        )
         with (
-            patch.object(
-                type(self.connection), "_client", return_value=OnePageClient()
-            ),
+            patch.object(type(self.connection), "_client", return_value=OnePageClient()),
             patch.object(
                 type(self.env["ir.cron"]),
                 "_commit_progress",
@@ -461,7 +505,7 @@ class TestBackfill(TransactionCase):
                 return len(firings)
 
             def list_firings(self_inner, limit=100, offset=0):
-                return [{"id": f["id"]} for f in firings[offset:offset + limit]]
+                return [{"id": f["id"]} for f in firings[offset : offset + limit]]
 
             def get_firing(self_inner, firing_id):
                 return next(f for f in firings if f["id"] == firing_id)
@@ -472,8 +516,12 @@ class TestBackfill(TransactionCase):
                 self.connection.action_start_backfill()
                 self.connection._backfill_slice()
 
-        self.assertEqual(self.env["mb.firing"].search_count(
-            [("external_id", "in", [str(n) for n in range(6000, 6003)])]), 3)
+        self.assertEqual(
+            self.env["mb.firing"].search_count(
+                [("external_id", "in", [str(n) for n in range(6000, 6003)])]
+            ),
+            3,
+        )
 
     def test_provider_timeout_is_recorded_not_raised_raw(self):
         """The first live attempt surfaced a bare ReadTimeout and lost the
@@ -500,11 +548,13 @@ class TestTokenReuse(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.connection = cls.env["mb.kiln.connection"].create({
-            "name": "myKiln token",
-            "username": "someone",
-            "password": "not-a-real-password",
-        })
+        cls.connection = cls.env["mb.kiln.connection"].create(
+            {
+                "name": "myKiln token",
+                "username": "someone",
+                "password": "not-a-real-password",
+            }
+        )
 
     def test_first_sync_stores_the_token(self):
         from ..models.mykiln_client import MykilnClient
@@ -561,26 +611,34 @@ class TestProgramMapping(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.connection = cls.env["mb.kiln.connection"].create({
-            "name": "myKiln programmes",
-            "username": "someone",
-            "password": "not-a-real-password",
-        })
+        cls.connection = cls.env["mb.kiln.connection"].create(
+            {
+                "name": "myKiln programmes",
+                "username": "someone",
+                "password": "not-a-real-password",
+            }
+        )
 
     def _sync(self, client):
         with patch.object(type(self.connection), "_client", return_value=client):
             self.connection._sync_one()
 
     def _program(self):
-        return self.env["mb.kiln.program"].search([
-            ("kiln_id.provider_external_id", "=", "41")], limit=1)
+        return self.env["mb.kiln.program"].search(
+            [("kiln_id.provider_external_id", "=", "41")], limit=1
+        )
 
     def test_a_programme_the_provider_does_not_report_is_not_invented(self):
         """The invariant the old 'unmapped programme' test protected: with no
         programme there is nothing to say what a firing was for, and a peak
         temperature is not allowed to stand in for the potter."""
-        blank = dict(fixtures.FIRING_DETAIL, id=8888, program_number=None,
-                     library_program_name=None, program=None)
+        blank = dict(
+            fixtures.FIRING_DETAIL,
+            id=8888,
+            program_number=None,
+            library_program_name=None,
+            program=None,
+        )
         self._sync(FakeClient(detail=blank))
         firing = self.env["mb.firing"].search([("external_id", "=", "8888")])
         self.assertFalse(firing.program_id)
@@ -598,8 +656,7 @@ class TestProgramMapping(TransactionCase):
         self.assertEqual(firing.kind, "bisque")
         self.assertTrue(firing.cooling_end)
         # Ended 18:30, ten hours of cooling.
-        self.assertEqual(
-            firing.cooling_end.isoformat(sep=" "), "2026-08-05 04:30:00")
+        self.assertEqual(firing.cooling_end.isoformat(sep=" "), "2026-08-05 04:30:00")
 
     def test_cooling_runs_from_the_last_sample_when_still_open(self):
         """A firing the provider has not closed still gets a hold, measured
@@ -612,19 +669,18 @@ class TestProgramMapping(TransactionCase):
         firing = self.env["mb.firing"].search([("external_id", "=", "7777")])
         self.assertEqual(firing.kind, "glaze")
         # Started 06:30, last sample at +5400s = 08:00, plus six hours.
-        self.assertEqual(
-            firing.cooling_end.isoformat(sep=" "), "2026-08-04 14:00:00")
+        self.assertEqual(firing.cooling_end.isoformat(sep=" "), "2026-08-04 14:00:00")
 
     def test_a_programme_is_mapped_once_per_kiln(self):
         from psycopg2 import IntegrityError
 
         self._sync(FakeClient())
-        kiln = self.env["mb.kiln"].search(
-            [("provider_external_id", "=", "41")], limit=1)
+        kiln = self.env["mb.kiln"].search([("provider_external_id", "=", "41")], limit=1)
         self.assertEqual(self._program().name, "Bisque 1000")
         with self.assertRaises(IntegrityError):
-            self.env["mb.kiln.program"].create({
-                "kiln_id": kiln.id, "name": "Bisque 1000", "kind": "glaze"})
+            self.env["mb.kiln.program"].create(
+                {"kiln_id": kiln.id, "name": "Bisque 1000", "kind": "glaze"}
+            )
             self.env.flush_all()
 
 
@@ -635,11 +691,13 @@ class TestRawPayload(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.connection = cls.env["mb.kiln.connection"].create({
-            "name": "myKiln raw",
-            "username": "someone",
-            "password": "not-a-real-password",
-        })
+        cls.connection = cls.env["mb.kiln.connection"].create(
+            {
+                "name": "myKiln raw",
+                "username": "someone",
+                "password": "not-a-real-password",
+            }
+        )
 
     def _sync(self, client):
         with patch.object(type(self.connection), "_client", return_value=client):
@@ -661,8 +719,9 @@ class TestRawPayload(TransactionCase):
         self._sync(FakeClient())
         self._sync(FakeClient())
         firing = self._firing()
-        attachments = self.env["ir.attachment"].search([
-            ("res_model", "=", "mb.firing"), ("res_id", "=", firing.id)])
+        attachments = self.env["ir.attachment"].search(
+            [("res_model", "=", "mb.firing"), ("res_id", "=", firing.id)]
+        )
         # One curve and one raw payload, however many times it is polled.
         self.assertEqual(len(attachments), 2)
 

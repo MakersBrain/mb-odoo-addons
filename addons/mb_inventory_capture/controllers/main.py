@@ -13,7 +13,6 @@ from odoo.addons.mb_control_bridge.controllers.auth import (
     payload_digest,
 )
 
-
 _logger = logging.getLogger(__name__)
 
 
@@ -27,10 +26,17 @@ def _error(error):
 
 
 def _company_capture(capture_uuid):
-    capture = request.env["mb.inventory.capture"].sudo().search([
-        ("capture_uuid", "=", capture_uuid),
-        ("company_id", "=", request.env.company.id),
-    ], limit=1)
+    capture = (
+        request.env["mb.inventory.capture"]
+        .sudo()
+        .search(
+            [
+                ("capture_uuid", "=", capture_uuid),
+                ("company_id", "=", request.env.company.id),
+            ],
+            limit=1,
+        )
+    )
     if not capture:
         raise NotFound("capture not found")
     return capture
@@ -63,15 +69,18 @@ class InventoryCaptureController(http.Controller):
                 raise Conflict("stored sanitized asset is corrupt") from error
             if len(content) != asset.byte_length:
                 raise Conflict("stored asset length does not match its evidence record")
-            return request.make_response(content, headers=[
-                ("Content-Type", asset.mimetype),
-                ("Content-Length", str(asset.byte_length)),
-                ("Digest", f"sha-256={asset.sanitized_sha256}"),
-                ("X-Content-SHA256", asset.sanitized_sha256),
-                ("Cache-Control", "no-store"),
-                ("Content-Disposition", f'attachment; filename="{asset.asset_uuid}"'),
-                ("X-Content-Type-Options", "nosniff"),
-            ])
+            return request.make_response(
+                content,
+                headers=[
+                    ("Content-Type", asset.mimetype),
+                    ("Content-Length", str(asset.byte_length)),
+                    ("Digest", f"sha-256={asset.sanitized_sha256}"),
+                    ("X-Content-SHA256", asset.sanitized_sha256),
+                    ("Cache-Control", "no-store"),
+                    ("Content-Disposition", f'attachment; filename="{asset.asset_uuid}"'),
+                    ("X-Content-Type-Options", "nosniff"),
+                ],
+            )
         except Exception as error:
             return _error(error)
 
@@ -104,13 +113,10 @@ class InventoryCaptureController(http.Controller):
                 with request.env.cr.savepoint():
                     receipts.record(operation_key, "inventory.capture.result", digest, response)
             except Exception:
-                replay = receipts.for_replay(
-                    operation_key, "inventory.capture.result", digest
-                )
+                replay = receipts.for_replay(operation_key, "inventory.capture.result", digest)
                 if not replay:
                     raise
                 response = replay.response
             return request.make_json_response(response)
         except Exception as error:
             return _error(error)
-

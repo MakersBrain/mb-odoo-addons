@@ -10,10 +10,10 @@ from odoo.exceptions import UserError
 # group_product_pricelist comes out falsy. Implied groups are the surgical
 # equivalent with no side effects.
 REQUIRED_FEATURES = [
-    "stock.group_stock_multi_locations",     # locations inside the depot at all
-    "stock.group_stock_multi_warehouses",    # ...and the Warehouse field that picks one
-    "product.group_product_pricelist",       # the commission
-    "sale.group_discount_per_so_line",       # shown as a discount, not a lower price
+    "stock.group_stock_multi_locations",  # locations inside the depot at all
+    "stock.group_stock_multi_warehouses",  # ...and the Warehouse field that picks one
+    "product.group_product_pricelist",  # the commission
+    "sale.group_discount_per_so_line",  # shown as a discount, not a lower price
 ]
 
 
@@ -38,7 +38,7 @@ class MbDepotCreate(models.TransientModel):
         # after it.
         precompute=True,
         help="Prefixes the depot's transfer references. Five characters, Odoo's "
-             "limit, and unique across warehouses.",
+        "limit, and unique across warehouses.",
     )
     commission = fields.Float(
         string="Commission (%)",
@@ -80,7 +80,7 @@ class MbDepotCreate(models.TransientModel):
         candidate, suffix = letters, 0
         while Warehouse.search_count([("code", "=", candidate)]):
             suffix += 1
-            candidate = "%s%d" % (letters[:5 - len(str(suffix))], suffix)
+            candidate = "%s%d" % (letters[: 5 - len(str(suffix))], suffix)
         return candidate
 
     def _enable_features(self):
@@ -111,13 +111,14 @@ class MbDepotCreate(models.TransientModel):
         setting, and saving one archives every pricelist in the database when
         group_product_pricelist resolves falsy.
         """
-        self.env["ir.default"].sudo().set(
-            "product.template", "invoice_policy", "delivery")
-        self.env["product.template"].search([
-            ("is_storable", "=", True),
-            ("sale_ok", "=", True),
-            ("invoice_policy", "!=", "delivery"),
-        ]).write({"invoice_policy": "delivery"})
+        self.env["ir.default"].sudo().set("product.template", "invoice_policy", "delivery")
+        self.env["product.template"].search(
+            [
+                ("is_storable", "=", True),
+                ("sale_ok", "=", True),
+                ("invoice_policy", "!=", "delivery"),
+            ]
+        ).write({"invoice_policy": "delivery"})
 
     def _ensure_warehouse(self):
         """The depot's warehouse, adopting one that is already there.
@@ -127,14 +128,20 @@ class MbDepotCreate(models.TransientModel):
         to learn to ignore.
         """
         Warehouse = self.env["stock.warehouse"]
-        warehouse = Warehouse.search([
-            ("is_depot", "=", True), ("depot_partner_id", "=", self.partner_id.id),
-        ], limit=1)
+        warehouse = Warehouse.search(
+            [
+                ("is_depot", "=", True),
+                ("depot_partner_id", "=", self.partner_id.id),
+            ],
+            limit=1,
+        )
         if warehouse:
-            warehouse.write({
-                "depot_commission": self.commission,
-                "mb_depot_legal_structure": self.legal_structure,
-            })
+            warehouse.write(
+                {
+                    "depot_commission": self.commission,
+                    "mb_depot_legal_structure": self.legal_structure,
+                }
+            )
             return warehouse
         # partner_id is deliberately left at the company's own address rather
         # than set to the depositary. stock.warehouse._update_partner_data()
@@ -145,17 +152,19 @@ class MbDepotCreate(models.TransientModel):
         # sale to it fail with "no rule to replenish in Inter-warehouse
         # transit". The depositary is carried by depot_partner_id, which has no
         # such side effect.
-        return Warehouse.create({
-            "name": self.partner_id.name,
-            "code": self.code,
-            "company_id": self.env.company.id,
-            "reception_steps": "one_step",
-            "delivery_steps": "ship_only",
-            "is_depot": True,
-            "mb_depot_legal_structure": self.legal_structure,
-            "depot_partner_id": self.partner_id.id,
-            "depot_commission": self.commission,
-        })
+        return Warehouse.create(
+            {
+                "name": self.partner_id.name,
+                "code": self.code,
+                "company_id": self.env.company.id,
+                "reception_steps": "one_step",
+                "delivery_steps": "ship_only",
+                "is_depot": True,
+                "mb_depot_legal_structure": self.legal_structure,
+                "depot_partner_id": self.partner_id.id,
+                "depot_commission": self.commission,
+            }
+        )
 
     def _ensure_pricelist(self, warehouse):
         """compute_price must be 'percentage': under 'formula' the percentage is
@@ -163,8 +172,9 @@ class MbDepotCreate(models.TransientModel):
         instead of the commission. See _show_discount() in
         sale/models/product_pricelist_item.py.
         """
-        name = _("%(partner)s (-%(pct)s%%)",
-                 partner=self.partner_id.name, pct=("%g" % self.commission))
+        name = _(
+            "%(partner)s (-%(pct)s%%)", partner=self.partner_id.name, pct=("%g" % self.commission)
+        )
         item_values = {
             "applied_on": "3_global",
             "compute_price": "percentage",
@@ -175,20 +185,21 @@ class MbDepotCreate(models.TransientModel):
             # Re-running with a renegotiated percentage is the reason to run it
             # again at all, so the existing global item is moved rather than
             # left beside a new one that would not deterministically win.
-            item = pricelist.item_ids.filtered(
-                lambda i: i.applied_on == "3_global")[:1]
+            item = pricelist.item_ids.filtered(lambda i: i.applied_on == "3_global")[:1]
             if item:
                 item.write(item_values)
             else:
                 pricelist.write({"item_ids": [fields.Command.create(item_values)]})
             pricelist.name = name
         else:
-            pricelist = self.env["product.pricelist"].create({
-                "name": name,
-                "currency_id": self.env.company.currency_id.id,
-                "company_id": self.env.company.id,
-                "item_ids": [fields.Command.create(item_values)],
-            })
+            pricelist = self.env["product.pricelist"].create(
+                {
+                    "name": name,
+                    "currency_id": self.env.company.currency_id.id,
+                    "company_id": self.env.company.id,
+                    "item_ids": [fields.Command.create(item_values)],
+                }
+            )
         return pricelist
 
     def action_create(self):

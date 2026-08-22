@@ -9,9 +9,7 @@ class CapabilityPolicy(models.Model):
 
     workshop_id = fields.Char(required=True, readonly=True, index=True)
     module_key = fields.Char(required=True, readonly=True, index=True)
-    state = fields.Selection(
-        [("restricted", "Restricted")], required=True, readonly=True
-    )
+    state = fields.Selection([("restricted", "Restricted")], required=True, readonly=True)
     reason = fields.Char(required=True, readonly=True)
     modules = fields.Json(required=True, readonly=True)
     rule_ids = fields.Many2many("ir.rule", readonly=True)
@@ -38,9 +36,9 @@ class CapabilityPolicy(models.Model):
             raise ValidationError(_("a bounded restriction reason is required"))
 
         policies = company.env["mb.control.capability.policy"].sudo()
-        existing = policies.search([
-            ("workshop_id", "=", workshop_id), ("module_key", "=", module_key)
-        ], limit=1)
+        existing = policies.search(
+            [("workshop_id", "=", workshop_id), ("module_key", "=", module_key)], limit=1
+        )
         if existing:
             if existing.modules != modules or existing.reason != reason:
                 raise ValidationError(_("the capability is already restricted differently"))
@@ -52,36 +50,44 @@ class CapabilityPolicy(models.Model):
         # merely extended by an addon are intentionally excluded so unrelated
         # Odoo workflows remain available and historical records remain readable.
         use_owned_model_rules = self._requires_owned_model_rules(module_key)
-        model_data = company.env["ir.model.data"].sudo().search([
-            ("module", "in", modules), ("model", "=", "ir.model")
-        ]) if use_owned_model_rules else company.env["ir.model.data"]
+        model_data = (
+            company.env["ir.model.data"]
+            .sudo()
+            .search([("module", "in", modules), ("model", "=", "ir.model")])
+            if use_owned_model_rules
+            else company.env["ir.model.data"]
+        )
         models_owned = model_data.mapped("res_id")
         if not models_owned and use_owned_model_rules:
             raise ValidationError(_("the capability exposes no enforceable owned model"))
         rules = company.env["ir.rule"].sudo()
         created = rules.browse()
         for model_id in sorted(set(models_owned)):
-            created |= rules.create({
-                "name": f"MakersBrain restricted: {module_key}",
-                "model_id": model_id,
-                # Odoo 19's canonical match-nothing domain.
-                "domain_force": "[(0, '=', 1)]",
-                "global": True,
-                "perm_read": False,
-                "perm_write": True,
-                "perm_create": True,
-                "perm_unlink": True,
-            })
-        policy = policies.create({
-            "workshop_id": workshop_id,
-            "module_key": module_key,
-            "state": "restricted",
-            "reason": reason,
-            "modules": modules,
-            "rule_ids": [(6, 0, created.ids)],
-            "evidence": custom_evidence,
-            "enforced_at": fields.Datetime.now(),
-        })
+            created |= rules.create(
+                {
+                    "name": f"MakersBrain restricted: {module_key}",
+                    "model_id": model_id,
+                    # Odoo 19's canonical match-nothing domain.
+                    "domain_force": "[(0, '=', 1)]",
+                    "global": True,
+                    "perm_read": False,
+                    "perm_write": True,
+                    "perm_create": True,
+                    "perm_unlink": True,
+                }
+            )
+        policy = policies.create(
+            {
+                "workshop_id": workshop_id,
+                "module_key": module_key,
+                "state": "restricted",
+                "reason": reason,
+                "modules": modules,
+                "rule_ids": [(6, 0, created.ids)],
+                "evidence": custom_evidence,
+                "enforced_at": fields.Datetime.now(),
+            }
+        )
         return policy._evidence(applied=True)
 
     def _requires_owned_model_rules(self, module_key):

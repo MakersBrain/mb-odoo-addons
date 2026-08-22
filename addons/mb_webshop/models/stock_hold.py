@@ -14,9 +14,7 @@ class WebshopStockHold(models.Model):
     product_id = fields.Many2one(
         "product.product", required=True, index=True, ondelete="restrict", readonly=True
     )
-    move_id = fields.Many2one(
-        "stock.move", index=True, ondelete="set null", readonly=True
-    )
+    move_id = fields.Many2one("stock.move", index=True, ondelete="set null", readonly=True)
     quantity = fields.Float(required=True, readonly=True)
     expires_at = fields.Datetime(required=True, index=True, readonly=True)
     state = fields.Selection(
@@ -73,11 +71,13 @@ class WebshopStockHold(models.Model):
             return 0
         self._lock_products(due.product_id)
         # Re-read after waiting: a cart request may have refreshed the hold.
-        due = self.sudo().search([
-            ("id", "in", due.ids),
-            ("state", "=", "active"),
-            ("expires_at", "<=", fields.Datetime.now()),
-        ])
+        due = self.sudo().search(
+            [
+                ("id", "in", due.ids),
+                ("state", "=", "active"),
+                ("expires_at", "<=", fields.Datetime.now()),
+            ]
+        )
         due._release_reservation("expired")
         for order in due.order_id.filtered(lambda order: order.state in ("draft", "sent")):
             order.shop_warning = _(

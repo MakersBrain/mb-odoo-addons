@@ -13,11 +13,17 @@ class CarrierRequestLog(models.Model):
     picking_id = fields.Many2one("stock.picking", index=True, ondelete="set null")
     http_status = fields.Integer()
     duration_ms = fields.Integer()
-    outcome = fields.Selection([
-        ("success", "Success"), ("validation", "Validation error"),
-        ("auth", "Authentication error"), ("transient", "Transient error"),
-        ("unavailable", "Unavailable"), ("unknown", "Unknown outcome"),
-    ], required=True)
+    outcome = fields.Selection(
+        [
+            ("success", "Success"),
+            ("validation", "Validation error"),
+            ("auth", "Authentication error"),
+            ("transient", "Transient error"),
+            ("unavailable", "Unavailable"),
+            ("unknown", "Unknown outcome"),
+        ],
+        required=True,
+    )
     diagnostic = fields.Char(help="Bounded code/message without credentials or customer data.")
     correlation_id = fields.Char(index=True)
 

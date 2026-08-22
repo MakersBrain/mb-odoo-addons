@@ -18,7 +18,8 @@ class SaleOrder(models.Model):
         domain="[('operation_type', '=', 'market'), ('state', 'in', ('approved', 'scheduled', 'in_progress'))]",
     )
     mb_market_product_ids = fields.Many2many(
-        "product.product", compute="_compute_mb_market_product_ids",
+        "product.product",
+        compute="_compute_mb_market_product_ids",
     )
 
     @api.depends("mb_commercial_operation_id", "mb_commercial_operation_id.market_location_id")
@@ -32,7 +33,8 @@ class SaleOrder(models.Model):
                 product.id
                 for product, quantity, reserved in self.env["stock.quant"]._read_group(
                     [("location_id", "child_of", location.id)],
-                    ["product_id"], ["quantity:sum", "reserved_quantity:sum"],
+                    ["product_id"],
+                    ["quantity:sum", "reserved_quantity:sum"],
                 )
                 if quantity - reserved > 0
             ]
@@ -50,9 +52,16 @@ class SaleOrder(models.Model):
         for order in self.filtered("mb_commercial_operation_id"):
             operation = order.mb_commercial_operation_id
             if operation.company_id != order.company_id:
-                raise ValidationError(_("The sales order and market operation must share a company."))
-            if operation.source_warehouse_id and order.warehouse_id != operation.source_warehouse_id:
-                raise ValidationError(_("The sales order must use the market operation's source warehouse."))
+                raise ValidationError(
+                    _("The sales order and market operation must share a company.")
+                )
+            if (
+                operation.source_warehouse_id
+                and order.warehouse_id != operation.source_warehouse_id
+            ):
+                raise ValidationError(
+                    _("The sales order must use the market operation's source warehouse.")
+                )
 
     def _get_product_catalog_domain(self):
         domain = super()._get_product_catalog_domain()
@@ -64,51 +73,74 @@ class SaleOrder(models.Model):
     def _check_market_stock(self):
         for order in self.filtered("mb_commercial_operation_id"):
             operation = order.mb_commercial_operation_id
-            if not operation.market_location_id or not operation.preparation_picking_id \
-                    or operation.preparation_picking_id.state != "done":
-                raise ValidationError(_("Complete market stock preparation before recording market sales."))
+            if (
+                not operation.market_location_id
+                or not operation.preparation_picking_id
+                or operation.preparation_picking_id.state != "done"
+            ):
+                raise ValidationError(
+                    _("Complete market stock preparation before recording market sales.")
+                )
             picking_type = order.warehouse_id.out_type_id
             if not picking_type.analytic_costs:
-                raise ValidationError(_(
-                    "Enable Analytic Costs on operation type %(operation_type)s so product cost reaches market profitability exactly once.",
-                    operation_type=picking_type.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "Enable Analytic Costs on operation type %(operation_type)s so product cost reaches market profitability exactly once.",
+                        operation_type=picking_type.display_name,
+                    )
+                )
             required = defaultdict(float)
-            for line in order.order_line.filtered(lambda item: not item.display_type and item.product_id.is_storable):
+            for line in order.order_line.filtered(
+                lambda item: not item.display_type and item.product_id.is_storable
+            ):
                 required[line.product_id] += line.product_uom_id._compute_quantity(
                     line.product_uom_qty, line.product_id.uom_id
                 )
             quant_model = self.env["stock.quant"]
             for product, quantity in required.items():
                 available = quant_model._get_available_quantity(
-                    product, operation.market_location_id, strict=False,
+                    product,
+                    operation.market_location_id,
+                    strict=False,
                 )
-                if float_compare(available, quantity, precision_rounding=product.uom_id.rounding) < 0:
-                    raise ValidationError(_(
-                        "Only %(available)s %(uom)s of %(product)s is free at this market.",
-                        available=available, uom=product.uom_id.display_name,
-                        product=product.display_name,
-                    ))
+                if (
+                    float_compare(available, quantity, precision_rounding=product.uom_id.rounding)
+                    < 0
+                ):
+                    raise ValidationError(
+                        _(
+                            "Only %(available)s %(uom)s of %(product)s is free at this market.",
+                            available=available,
+                            uom=product.uom_id.display_name,
+                            product=product.display_name,
+                        )
+                    )
 
     def action_confirm(self):
         self._check_market_stock()
         result = super().action_confirm()
         for order in self.filtered("mb_commercial_operation_id"):
-            order.picking_ids.filtered(lambda picking: picking.state != "cancel").write({
-                "mb_commercial_operation_id": order.mb_commercial_operation_id.id,
-                "project_id": order.mb_commercial_operation_id.project_id.id,
-            })
+            order.picking_ids.filtered(lambda picking: picking.state != "cancel").write(
+                {
+                    "mb_commercial_operation_id": order.mb_commercial_operation_id.id,
+                    "project_id": order.mb_commercial_operation_id.project_id.id,
+                }
+            )
         return result
 
     def write(self, vals):
         if "mb_commercial_operation_id" in vals:
-            operations = self.mb_commercial_operation_id | self.env["mb.commercial.operation"].browse(
-                vals.get("mb_commercial_operation_id")
-            )
+            operations = self.mb_commercial_operation_id | self.env[
+                "mb.commercial.operation"
+            ].browse(vals.get("mb_commercial_operation_id"))
             if operations.filtered(lambda operation: operation.state == "financially_closed"):
-                raise UserError(_("Reopen the financially closed operation before changing sales links."))
+                raise UserError(
+                    _("Reopen the financially closed operation before changing sales links.")
+                )
             if self.filtered(lambda order: order.state not in ("draft", "sent")):
-                raise UserError(_("A confirmed sales order cannot be moved to another commercial operation."))
+                raise UserError(
+                    _("A confirmed sales order cannot be moved to another commercial operation.")
+                )
         return super().write(vals)
 
     def _prepare_invoice(self):
@@ -134,7 +166,8 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     mb_commercial_operation_id = fields.Many2one(
-        related="order_id.mb_commercial_operation_id", store=True,
+        related="order_id.mb_commercial_operation_id",
+        store=True,
     )
     mb_market_product_ids = fields.Many2many(related="order_id.mb_market_product_ids")
 

@@ -26,40 +26,57 @@ class MbCommercialContract(models.Model):
     )
     refill_review_date = fields.Date(default=fields.Date.context_today)
     assortment_rule_ids = fields.One2many(
-        "mb.depot.assortment.rule", "contract_id", string="Refill Policies",
+        "mb.depot.assortment.rule",
+        "contract_id",
+        string="Refill Policies",
     )
     forecast_ids = fields.One2many(
-        "mb.depot.refill.forecast", "contract_id", string="Forecasts",
+        "mb.depot.refill.forecast",
+        "contract_id",
+        string="Forecasts",
     )
     rent_period_to_prepare = fields.Date(default=fields.Date.context_today)
     rent_period_ids = fields.One2many(
-        "mb.commercial.rent.period", "contract_id", string="Rent Periods",
+        "mb.commercial.rent.period",
+        "contract_id",
+        string="Rent Periods",
     )
     rent_bill_ids = fields.Many2many(
-        "account.move", compute="_compute_rent_bill_ids", string="Rent Bills",
+        "account.move",
+        compute="_compute_rent_bill_ids",
+        string="Rent Bills",
     )
     depot_scenario_ids = fields.One2many(
-        "mb.depot.profitability.scenario", "contract_id", string="Profitability Scenarios",
+        "mb.depot.profitability.scenario",
+        "contract_id",
+        string="Profitability Scenarios",
     )
     primary_depot_scenario_id = fields.Many2one(
-        "mb.depot.profitability.scenario", check_company=True, copy=False,
-        domain="[('contract_id', '=', id)]", ondelete="set null",
+        "mb.depot.profitability.scenario",
+        check_company=True,
+        copy=False,
+        domain="[('contract_id', '=', id)]",
+        ondelete="set null",
     )
     depot_recommendation = fields.Selection(
-        related="primary_depot_scenario_id.recommendation", string="Profitability Verdict",
-        store=True, index=True,
+        related="primary_depot_scenario_id.recommendation",
+        string="Profitability Verdict",
+        store=True,
+        index=True,
     )
     depot_recommendation_note = fields.Char(
         related="primary_depot_scenario_id.recommendation_note",
         string="Verdict Explanation",
     )
     depot_term_margin = fields.Monetary(
-        related="primary_depot_scenario_id.term_margin", string="Margin Over Term",
+        related="primary_depot_scenario_id.term_margin",
+        string="Margin Over Term",
         store=True,
     )
     depot_margin_per_hour = fields.Monetary(
         related="primary_depot_scenario_id.margin_per_effort_hour",
-        string="Margin per Hour", store=True,
+        string="Margin per Hour",
+        store=True,
     )
     depot_break_even_monthly_sales = fields.Monetary(
         related="primary_depot_scenario_id.break_even_monthly_sales",
@@ -105,25 +122,37 @@ class MbCommercialContract(models.Model):
     @api.constrains("depot_warehouse_id", "active", "date_start", "date_end")
     def _check_single_active_depot_contract(self):
         for contract in self.filtered(lambda item: item.active and item.depot_warehouse_id):
-            others = self.search([
-                ("id", "!=", contract.id),
-                ("active", "=", True),
-                ("company_id", "=", contract.company_id.id),
-                ("depot_warehouse_id", "=", contract.depot_warehouse_id.id),
-                ("date_start", "<=", contract.date_end or fields.Date.to_date("9999-12-31")),
-                "|", ("date_end", "=", False), ("date_end", ">=", contract.date_start),
-            ], limit=1)
+            others = self.search(
+                [
+                    ("id", "!=", contract.id),
+                    ("active", "=", True),
+                    ("company_id", "=", contract.company_id.id),
+                    ("depot_warehouse_id", "=", contract.depot_warehouse_id.id),
+                    ("date_start", "<=", contract.date_end or fields.Date.to_date("9999-12-31")),
+                    "|",
+                    ("date_end", "=", False),
+                    ("date_end", ">=", contract.date_start),
+                ],
+                limit=1,
+            )
             if others:
-                raise ValidationError(_(
-                    "Depot %(depot)s already has an overlapping active commercial contract.",
-                    depot=contract.depot_warehouse_id.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "Depot %(depot)s already has an overlapping active commercial contract.",
+                        depot=contract.depot_warehouse_id.display_name,
+                    )
+                )
 
     @api.constrains("depot_warehouse_id", "partner_id")
     def _check_depot_partner(self):
         for contract in self.filtered("depot_warehouse_id"):
-            if contract.depot_warehouse_id.depot_partner_id.commercial_partner_id != contract.partner_id.commercial_partner_id:
-                raise ValidationError(_("The contract partner must be the selected depot's depositary."))
+            if (
+                contract.depot_warehouse_id.depot_partner_id.commercial_partner_id
+                != contract.partner_id.commercial_partner_id
+            ):
+                raise ValidationError(
+                    _("The contract partner must be the selected depot's depositary.")
+                )
 
     def action_refresh_depot_forecast(self):
         self.assortment_rule_ids._refresh_forecast()
@@ -143,27 +172,33 @@ class MbCommercialContract(models.Model):
             raise ValidationError(_("Configure the depot and its default refill source first."))
         self.assortment_rule_ids._refresh_forecast()
         forecasts = self.forecast_ids.filtered(
-            lambda forecast: forecast.snapshot_date == fields.Date.context_today(self)
-            and forecast.suggested_quantity > 0
+            lambda forecast: (
+                forecast.snapshot_date == fields.Date.context_today(self)
+                and forecast.suggested_quantity > 0
+            )
         )
         if not forecasts:
             raise UserError(_("No refill quantity is currently suggested."))
         planned_date = self.refill_review_date or fields.Date.context_today(self)
         start = fields.Datetime.to_datetime(planned_date)
-        operation = self.env["mb.commercial.operation"].create({
-            "name": _("Refill %(depot)s", depot=self.depot_warehouse_id.name),
-            "operation_type": "depot_refill",
-            "company_id": self.company_id.id,
-            "contract_id": self.id,
-            "project_id": self.project_id.id,
-            "partner_id": self.partner_id.id,
-            "planned_start": start,
-            "planned_end": fields.Datetime.add(start, hours=3),
-            "stock_preparation_deadline": start,
-            "source_warehouse_id": self.source_warehouse_id.id,
-            "depot_warehouse_id": self.depot_warehouse_id.id,
-            "stock_plan_line_ids": [fields.Command.create(forecast._stock_plan_values()) for forecast in forecasts],
-        })
+        operation = self.env["mb.commercial.operation"].create(
+            {
+                "name": _("Refill %(depot)s", depot=self.depot_warehouse_id.name),
+                "operation_type": "depot_refill",
+                "company_id": self.company_id.id,
+                "contract_id": self.id,
+                "project_id": self.project_id.id,
+                "partner_id": self.partner_id.id,
+                "planned_start": start,
+                "planned_end": fields.Datetime.add(start, hours=3),
+                "stock_preparation_deadline": start,
+                "source_warehouse_id": self.source_warehouse_id.id,
+                "depot_warehouse_id": self.depot_warehouse_id.id,
+                "stock_plan_line_ids": [
+                    fields.Command.create(forecast._stock_plan_values()) for forecast in forecasts
+                ],
+            }
+        )
         return {
             "type": "ir.actions.act_window",
             "name": operation.display_name,
@@ -182,13 +217,20 @@ class MbCommercialContract(models.Model):
             raise ValidationError(_("Choose the rent service product first."))
         period_date = self.rent_period_to_prepare or fields.Date.context_today(self)
         period_start = period_date.replace(day=1)
-        period = self.env["mb.commercial.rent.period"].search([
-            ("contract_id", "=", self.id), ("period_start", "=", period_start),
-        ], limit=1)
+        period = self.env["mb.commercial.rent.period"].search(
+            [
+                ("contract_id", "=", self.id),
+                ("period_start", "=", period_start),
+            ],
+            limit=1,
+        )
         if not period:
-            period = self.env["mb.commercial.rent.period"].create({
-                "contract_id": self.id, "period_start": period_start,
-            })
+            period = self.env["mb.commercial.rent.period"].create(
+                {
+                    "contract_id": self.id,
+                    "period_start": period_start,
+                }
+            )
         return period.action_prepare_bill()
 
 
@@ -199,8 +241,11 @@ class MbCommercialRentPeriod(models.Model):
     _check_company_auto = True
 
     contract_id = fields.Many2one(
-        "mb.commercial.contract", required=True, check_company=True,
-        ondelete="restrict", index=True,
+        "mb.commercial.contract",
+        required=True,
+        check_company=True,
+        ondelete="restrict",
+        index=True,
     )
     company_id = fields.Many2one(related="contract_id.company_id", store=True, index=True)
     currency_id = fields.Many2one(related="company_id.currency_id")
@@ -209,18 +254,32 @@ class MbCommercialRentPeriod(models.Model):
     active_days = fields.Integer(compute="_compute_amount", store=True)
     amount = fields.Monetary(compute="_compute_amount", store=True)
     bill_id = fields.Many2one(
-        "account.move", check_company=True, copy=False, ondelete="restrict",
+        "account.move",
+        check_company=True,
+        copy=False,
+        ondelete="restrict",
     )
     state = fields.Selection(
-        [("pending", "Pending"), ("draft_bill", "Draft Bill"), ("posted", "Posted"), ("cancelled", "Cancelled")],
+        [
+            ("pending", "Pending"),
+            ("draft_bill", "Draft Bill"),
+            ("posted", "Posted"),
+            ("cancelled", "Cancelled"),
+        ],
         compute="_compute_state",
     )
 
     _period_unique = models.Constraint(
-        "UNIQUE(contract_id, period_start)", "Rent has already been prepared for this contract period.",
+        "UNIQUE(contract_id, period_start)",
+        "Rent has already been prepared for this contract period.",
     )
 
-    @api.depends("contract_id.date_start", "contract_id.date_end", "contract_id.monthly_fixed_rent", "period_start")
+    @api.depends(
+        "contract_id.date_start",
+        "contract_id.date_end",
+        "contract_id.monthly_fixed_rent",
+        "period_start",
+    )
     def _compute_amount(self):
         for period in self:
             if not period.period_start:
@@ -264,18 +323,32 @@ class MbCommercialRentPeriod(models.Model):
             return self._bill_action()
         contract = self.contract_id
         analytic_distribution = {str(contract.analytic_account_id.id): 100.0}
-        bill = self.env["account.move"].with_company(self.company_id).create({
-            "move_type": "in_invoice",
-            "partner_id": contract.partner_id.id,
-            "invoice_date": fields.Date.context_today(self),
-            "ref": _("Rent %(contract)s %(period)s", contract=contract.name, period=self.period_start),
-            "invoice_line_ids": [fields.Command.create({
-                "product_id": contract.rent_product_id.id,
-                "quantity": 1,
-                "price_unit": self.amount,
-                "analytic_distribution": analytic_distribution,
-            })],
-        })
+        bill = (
+            self.env["account.move"]
+            .with_company(self.company_id)
+            .create(
+                {
+                    "move_type": "in_invoice",
+                    "partner_id": contract.partner_id.id,
+                    "invoice_date": fields.Date.context_today(self),
+                    "ref": _(
+                        "Rent %(contract)s %(period)s",
+                        contract=contract.name,
+                        period=self.period_start,
+                    ),
+                    "invoice_line_ids": [
+                        fields.Command.create(
+                            {
+                                "product_id": contract.rent_product_id.id,
+                                "quantity": 1,
+                                "price_unit": self.amount,
+                                "analytic_distribution": analytic_distribution,
+                            }
+                        )
+                    ],
+                }
+            )
+        )
         self.bill_id = bill
         return self._bill_action()
 

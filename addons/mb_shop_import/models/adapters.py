@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
-
 MAX_SOURCE_BYTES = 20 * 1024 * 1024
 MAX_DECOMPRESSED_BYTES = 100 * 1024 * 1024
 MAX_RECORDS = 10_000
@@ -167,9 +166,9 @@ def _normalize_csv(record: dict[str, Any], source_key: str) -> dict[str, Any]:
     variant_title = str(record.get("variant_title") or "").strip() or None
     exact = str(record.get("external_id") or "").strip()
     fallback_material = "\0".join((source_key, product_url, variant_title or ""))
-    external_id = exact or "fallback:" + hashlib.sha256(
-        fallback_material.encode("utf-8")
-    ).hexdigest()
+    external_id = (
+        exact or "fallback:" + hashlib.sha256(fallback_material.encode("utf-8")).hexdigest()
+    )
     stock_value = record.get("stock_quantity")
     return {
         "external_id": external_id,
@@ -215,7 +214,9 @@ def detect(data: bytes, filename: str = "") -> str:
     return claims[0]
 
 
-def parse(data: bytes, filename: str, source_key: str, adapter_key: str | None = None) -> ParsedArtifact:
+def parse(
+    data: bytes, filename: str, source_key: str, adapter_key: str | None = None
+) -> ParsedArtifact:
     data = _bounded_source(data)
     selected = adapter_key or detect(data, filename)
     decoded = _decompress(data) if data.startswith(b"\x1f\x8b") else data

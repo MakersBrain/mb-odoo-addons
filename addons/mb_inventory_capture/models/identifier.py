@@ -5,7 +5,6 @@ from psycopg2 import IntegrityError
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
-
 GTIN_SCHEMES = {"gtin_8": 8, "gtin_12": 12, "gtin_13": 13, "gtin_14": 14}
 PRIVATE_SCHEMES = {"manufacturer_sku", "supplier_code", "internal"}
 
@@ -16,12 +15,17 @@ def normalize_identifier(scheme, value):
         digits = re.sub(r"[\s-]", "", printed)
         expected = GTIN_SCHEMES[scheme]
         if not digits.isdigit() or len(digits) != expected:
-            raise ValidationError(_("%(scheme)s must contain %(length)s digits.",
-                                    scheme=scheme, length=expected))
-        expected_check = (10 - sum(
-            int(digit) * (3 if index % 2 == 0 else 1)
-            for index, digit in enumerate(reversed(digits[:-1]))
-        ) % 10) % 10
+            raise ValidationError(
+                _("%(scheme)s must contain %(length)s digits.", scheme=scheme, length=expected)
+            )
+        expected_check = (
+            10
+            - sum(
+                int(digit) * (3 if index % 2 == 0 else 1)
+                for index, digit in enumerate(reversed(digits[:-1]))
+            )
+            % 10
+        ) % 10
         if expected_check != int(digits[-1]):
             raise ValidationError(_("The GTIN check digit is invalid."))
         return digits.zfill(14)
@@ -76,8 +80,7 @@ def parse_gs1_element_string(value):
     warnings rather than guessed because variable field lengths are contextual.
     """
     raw = (value or "").strip()
-    result = {"gtin": None, "lot": None, "expiry": None, "quantity": None,
-              "warnings": []}
+    result = {"gtin": None, "lot": None, "expiry": None, "quantity": None, "warnings": []}
     if not raw:
         return result
     parenthesized = re.findall(r"\((01|10|17|30)\)(.*?)(?=\((?:01|10|17|30)\)|$)", raw)
@@ -137,11 +140,17 @@ class ProductIdentifier(models.Model):
     company_id = fields.Many2one("res.company", index=True)
     scope_key = fields.Integer(compute="_compute_scope_key", store=True, index=True)
     product_id = fields.Many2one(
-        "product.product", required=True, ondelete="restrict", check_company=True, index=True,
+        "product.product",
+        required=True,
+        ondelete="restrict",
+        check_company=True,
+        index=True,
     )
     scheme = fields.Selection(
-        [(key, key.replace("_", " ").upper())
-         for key in sorted(set(GTIN_SCHEMES) | PRIVATE_SCHEMES)],
+        [
+            (key, key.replace("_", " ").upper())
+            for key in sorted(set(GTIN_SCHEMES) | PRIVATE_SCHEMES)
+        ],
         required=True,
     )
     comparison_scheme = fields.Char(required=True, readonly=True, index=True)
@@ -174,57 +183,74 @@ class ProductIdentifier(models.Model):
             scheme = values.get("scheme")
             if scheme in GTIN_SCHEMES:
                 if values.get("company_id"):
-                    raise ValidationError(_("GS1 identifiers are global and cannot be company-scoped."))
+                    raise ValidationError(
+                        _("GS1 identifiers are global and cannot be company-scoped.")
+                    )
                 comparison_scheme = "gtin"
             else:
                 comparison_scheme = scheme
             values["comparison_scheme"] = comparison_scheme
-            values["normalized_value"] = normalize_identifier(
-                scheme, values.get("printed_value")
-            )
+            values["normalized_value"] = normalize_identifier(scheme, values.get("printed_value"))
             prepared.append(values)
         try:
             with self.env.cr.savepoint():
                 records = super().create(prepared)
         except IntegrityError as error:
             for values in prepared:
-                conflict = self.search([
-                    ("scope_key", "=", values.get("company_id") or 0),
-                    ("comparison_scheme", "=", values["comparison_scheme"]),
-                    ("normalized_value", "=", values["normalized_value"]),
-                ], limit=1)
+                conflict = self.search(
+                    [
+                        ("scope_key", "=", values.get("company_id") or 0),
+                        ("comparison_scheme", "=", values["comparison_scheme"]),
+                        ("normalized_value", "=", values["normalized_value"]),
+                    ],
+                    limit=1,
+                )
                 if conflict:
-                    raise ValidationError(_(
-                        "This identifier is already assigned to %(product)s.",
-                        product=conflict.product_id.display_name,
-                    )) from error
+                    raise ValidationError(
+                        _(
+                            "This identifier is already assigned to %(product)s.",
+                            product=conflict.product_id.display_name,
+                        )
+                    ) from error
             raise
         records._check_primary_barcode_conflict()
         return records
 
     def write(self, values):
-        protected = {"scheme", "printed_value", "normalized_value", "comparison_scheme",
-                     "company_id", "product_id"}
+        protected = {
+            "scheme",
+            "printed_value",
+            "normalized_value",
+            "comparison_scheme",
+            "company_id",
+            "product_id",
+        }
         if protected.intersection(values) and not self.env.context.get("mb_identifier_reassign"):
-            raise ValidationError(_(
-                "Identifier identity and ownership are immutable; use the audited reassign action."
-            ))
+            raise ValidationError(
+                _(
+                    "Identifier identity and ownership are immutable; use the audited reassign action."
+                )
+            )
         result = super().write(values)
         self._check_primary_barcode_conflict()
         return result
 
     def _check_primary_barcode_conflict(self):
         for identifier in self.filtered(lambda record: record.comparison_scheme == "gtin"):
-            products = self.env["product.product"].search([
-                ("barcode", "!=", False),
-                ("id", "!=", identifier.product_id.id),
-            ])
+            products = self.env["product.product"].search(
+                [
+                    ("barcode", "!=", False),
+                    ("id", "!=", identifier.product_id.id),
+                ]
+            )
             for product in products:
                 if normalize_any_gtin(product.barcode) == identifier.normalized_value:
-                    raise ValidationError(_(
-                        "This GTIN is already the primary barcode of %s.",
-                        product.display_name,
-                    ))
+                    raise ValidationError(
+                        _(
+                            "This GTIN is already the primary barcode of %s.",
+                            product.display_name,
+                        )
+                    )
 
     def action_reassign(self, product, reason):
         self.ensure_one()
@@ -234,12 +260,14 @@ class ProductIdentifier(models.Model):
             raise ValidationError(_("A new owner and reassignment reason are required."))
         old_product = self.product_id
         self.with_context(mb_identifier_reassign=True).write({"product_id": product.id})
-        self.message_post(body=_(
-            "Identifier reassigned from %(old)s to %(new)s. Reason: %(reason)s",
-            old=old_product.display_name,
-            new=product.display_name,
-            reason=reason.strip(),
-        ))
+        self.message_post(
+            body=_(
+                "Identifier reassigned from %(old)s to %(new)s. Reason: %(reason)s",
+                old=old_product.display_name,
+                new=product.display_name,
+                reason=reason.strip(),
+            )
+        )
 
 
 class ProductProduct(models.Model):
@@ -269,36 +297,49 @@ class ProductProduct(models.Model):
                 continue
             digits = re.sub(r"[\s-]", "", product.barcode)
             scheme = next(key for key, length in GTIN_SCHEMES.items() if len(digits) == length)
-            existing = registry.search([
-                ("comparison_scheme", "=", "gtin"),
-                ("normalized_value", "=", normalized),
-            ], limit=1)
+            existing = registry.search(
+                [
+                    ("comparison_scheme", "=", "gtin"),
+                    ("normalized_value", "=", normalized),
+                ],
+                limit=1,
+            )
             if existing:
                 if existing.product_id != product:
-                    raise ValidationError(_(
-                        "This GTIN is already assigned to %s.",
-                        existing.product_id.display_name,
-                    ))
+                    raise ValidationError(
+                        _(
+                            "This GTIN is already assigned to %s.",
+                            existing.product_id.display_name,
+                        )
+                    )
                 continue
-            registry.create({
-                "product_id": product.id,
-                "scheme": scheme,
-                "printed_value": product.barcode,
-                "source": "primary_barcode",
-                "verification_state": "verified",
-            })
+            registry.create(
+                {
+                    "product_id": product.id,
+                    "scheme": scheme,
+                    "printed_value": product.barcode,
+                    "source": "primary_barcode",
+                    "verification_state": "verified",
+                }
+            )
 
     def _check_mb_barcode_identifier_conflict(self):
         for product in self.filtered("barcode"):
             normalized = normalize_any_gtin(product.barcode)
             if not normalized:
                 continue
-            conflict = self.env["mb.product.identifier"].search([
-                ("comparison_scheme", "=", "gtin"),
-                ("normalized_value", "=", normalized),
-                ("product_id", "!=", product.id),
-            ], limit=1)
+            conflict = self.env["mb.product.identifier"].search(
+                [
+                    ("comparison_scheme", "=", "gtin"),
+                    ("normalized_value", "=", normalized),
+                    ("product_id", "!=", product.id),
+                ],
+                limit=1,
+            )
             if conflict:
-                raise ValidationError(_(
-                    "This GTIN is already assigned to %s.", conflict.product_id.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "This GTIN is already assigned to %s.",
+                        conflict.product_id.display_name,
+                    )
+                )

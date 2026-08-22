@@ -5,7 +5,6 @@ import requests
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 
-
 ALLOWED_TOLLQUOTE_HOSTS = {"api.stage.tollquote.com", "api.tollquote.com"}
 
 
@@ -18,8 +17,11 @@ class MbTollquoteConnector(models.Model):
     name = fields.Char(required=True)
     active = fields.Boolean(default=True)
     company_id = fields.Many2one(
-        "res.company", required=True, default=lambda self: self.env.company,
-        index=True, tracking=True,
+        "res.company",
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
+        tracking=True,
     )
     environment = fields.Selection(
         [("staging", "Staging"), ("production", "Production")],
@@ -28,10 +30,14 @@ class MbTollquoteConnector(models.Model):
         tracking=True,
     )
     base_url = fields.Char(
-        required=True, default="https://api.stage.tollquote.com", tracking=True,
+        required=True,
+        default="https://api.stage.tollquote.com",
+        tracking=True,
     )
     api_token = fields.Char(
-        string="Bearer token", copy=False, groups="base.group_system",
+        string="Bearer token",
+        copy=False,
+        groups="base.group_system",
         help="Odoo has no secret store. This field is restricted to Settings administrators and is never logged or copied.",
     )
     timeout_seconds = fields.Integer(required=True, default=15)
@@ -54,7 +60,9 @@ class MbTollquoteConnector(models.Model):
             if parsed.scheme != "https" or parsed.hostname not in ALLOWED_TOLLQUOTE_HOSTS:
                 raise ValidationError(_("Use an allow-listed TollQuote HTTPS host."))
             if parsed.hostname != expected[connector.environment]:
-                raise ValidationError(_("The TollQuote host does not match the selected environment."))
+                raise ValidationError(
+                    _("The TollQuote host does not match the selected environment.")
+                )
 
     def _headers(self):
         self.ensure_one()
@@ -77,7 +85,9 @@ class MbTollquoteConnector(models.Model):
             }
             if self.sudo().api_token:
                 response = requests.request(
-                    method, f"{self.base_url.rstrip('/')}{path}", **request_values,
+                    method,
+                    f"{self.base_url.rstrip('/')}{path}",
+                    **request_values,
                 )
             else:
                 with requests.Session() as session:
@@ -87,12 +97,16 @@ class MbTollquoteConnector(models.Model):
                     )
                     bootstrap.raise_for_status()
                     response = session.request(
-                        method, f"{self.base_url.rstrip('/')}{path}", **request_values,
+                        method,
+                        f"{self.base_url.rstrip('/')}{path}",
+                        **request_values,
                     )
             response.raise_for_status()
             return response.json()
         except requests.Timeout as exc:
-            raise UserError(_("TollQuote timed out. Try again later or enter a manual travel cost.")) from exc
+            raise UserError(
+                _("TollQuote timed out. Try again later or enter a manual travel cost.")
+            ) from exc
         except requests.HTTPError as exc:
             status = exc.response.status_code if exc.response is not None else "?"
             if status == 401:
@@ -106,14 +120,18 @@ class MbTollquoteConnector(models.Model):
             raise UserError(_("TollQuote is unavailable or returned an invalid response.")) from exc
 
     def action_check_health(self):
-        if not self.env.user.has_group("mb_commercial_operations.group_commercial_operations_manager"):
+        if not self.env.user.has_group(
+            "mb_commercial_operations.group_commercial_operations_manager"
+        ):
             raise AccessError(_("Only a Commercial Operations Manager can test connectors."))
         for connector in self:
             response = connector._request("GET", "/ready")
-            connector.write({
-                "last_health_at": fields.Datetime.now(),
-                "last_health_status": response.get("status", "unknown"),
-            })
+            connector.write(
+                {
+                    "last_health_at": fields.Datetime.now(),
+                    "last_health_status": response.get("status", "unknown"),
+                }
+            )
         return True
 
 
@@ -126,20 +144,29 @@ class MbTravelEstimate(models.Model):
 
     name = fields.Char(required=True, default=lambda self: _("Travel estimate"), tracking=True)
     company_id = fields.Many2one(
-        "res.company", required=True, default=lambda self: self.env.company,
-        index=True, tracking=True,
+        "res.company",
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
+        tracking=True,
     )
     currency_id = fields.Many2one(related="company_id.currency_id")
     connector_id = fields.Many2one(
-        "mb.tollquote.connector", required=True, check_company=True,
+        "mb.tollquote.connector",
+        required=True,
+        check_company=True,
         ondelete="restrict",
     )
     operation_id = fields.Many2one(
-        "mb.commercial.operation", check_company=True, copy=False,
-        ondelete="set null", index=True,
+        "mb.commercial.operation",
+        check_company=True,
+        copy=False,
+        ondelete="set null",
+        index=True,
     )
     project_id = fields.Many2one(
-        related="operation_id.project_id", store=True,
+        related="operation_id.project_id",
+        store=True,
     )
     task_id = fields.Many2one(related="operation_id.task_id", store=True)
     origin_partner_id = fields.Many2one("res.partner", check_company=True)
@@ -157,8 +184,11 @@ class MbTravelEstimate(models.Model):
     driver_cost_eur_per_hour = fields.Monetary(default=0.0)
     state = fields.Selection(
         [
-            ("draft", "Draft"), ("quoted", "Quoted"), ("accepted", "Accepted"),
-            ("superseded", "Superseded"), ("failed", "Failed"),
+            ("draft", "Draft"),
+            ("quoted", "Quoted"),
+            ("accepted", "Accepted"),
+            ("superseded", "Superseded"),
+            ("failed", "Failed"),
         ],
         required=True,
         default="draft",
@@ -282,18 +312,25 @@ class MbTravelEstimate(models.Model):
                 total_distance += distance
                 total_seconds += seconds
                 total_provider_toll += provider_amount
-                quote_currency = self.env["res.currency"].search([
-                    ("name", "=", quote_currency_name),
-                ], limit=1)
+                quote_currency = self.env["res.currency"].search(
+                    [
+                        ("name", "=", quote_currency_name),
+                    ],
+                    limit=1,
+                )
                 if not quote_currency:
                     incomplete = True
-                    warnings.append(_(
-                        "Unknown provider currency %(currency)s; enter the toll cost manually.",
-                        currency=quote_currency_name,
-                    ))
+                    warnings.append(
+                        _(
+                            "Unknown provider currency %(currency)s; enter the toll cost manually.",
+                            currency=quote_currency_name,
+                        )
+                    )
                 else:
                     converted = quote_currency._convert(
-                        provider_amount, self.currency_id, self.company_id,
+                        provider_amount,
+                        self.currency_id,
+                        self.company_id,
                         fields.Date.to_date(self.departure_at),
                     )
                     total_toll += converted
@@ -301,48 +338,62 @@ class MbTravelEstimate(models.Model):
                         conversion_rates.append(converted / provider_amount)
                 request_id = request_id or quote.get("request_id")
                 reporting_currency = quote_currency_name
-                provider_versions.add(str(quote.get("api_version") or quote.get("version") or "0.1.0"))
+                provider_versions.add(
+                    str(quote.get("api_version") or quote.get("version") or "0.1.0")
+                )
                 quote_warnings = quote.get("warnings") or []
                 warnings.extend(str(item) for item in quote_warnings)
                 if (
-                    quote.get("unpriced") or quote.get("unpriced_countries")
-                    or not payable or distance <= 0 or seconds <= 0
+                    quote.get("unpriced")
+                    or quote.get("unpriced_countries")
+                    or not payable
+                    or distance <= 0
+                    or seconds <= 0
                 ):
                     incomplete = True
                 requests_snapshot.append({"route": route_request, "quote": quote_request})
                 responses_snapshot.append({"route": route, "quote": quote})
-            fuel = total_distance / 100.0 * self.fuel_consumption_l_per_100km * self.fuel_price_eur_per_l
+            fuel = (
+                total_distance
+                / 100.0
+                * self.fuel_consumption_l_per_100km
+                * self.fuel_price_eur_per_l
+            )
             driver = total_seconds / 3600.0 * self.driver_cost_eur_per_hour
             total = total_toll + fuel + driver
             if provider_versions - {"0.1.0"}:
                 incomplete = True
-                warnings.append(_(
-                    "TollQuote API revision %(versions)s has not been validated.",
-                    versions=", ".join(sorted(provider_versions)),
-                ))
-            self.write({
-                "state": "quoted",
-                "request_id": request_id,
-                "provider_version": ", ".join(sorted(provider_versions)) or "0.1.0",
-                "calculated_at": fields.Datetime.now(),
-                "distance_km": total_distance,
-                "duration_hours": total_seconds / 3600.0,
-                "toll_cost": self.currency_id.round(total_toll),
-                "provider_toll_amount": total_provider_toll,
-                "conversion_rate": (
-                    sum(conversion_rates) / len(conversion_rates) if conversion_rates else 0.0
-                ),
-                "conversion_date": fields.Date.to_date(self.departure_at),
-                "fuel_cost": self.currency_id.round(fuel),
-                "driver_cost": self.currency_id.round(driver),
-                "total_operating_cost": self.currency_id.round(total),
-                "reporting_currency": reporting_currency,
-                "incomplete": incomplete,
-                "incomplete_acknowledged": False,
-                "warning_text": "\n".join(warnings),
-                "request_snapshot": requests_snapshot,
-                "response_snapshot": responses_snapshot,
-            })
+                warnings.append(
+                    _(
+                        "TollQuote API revision %(versions)s has not been validated.",
+                        versions=", ".join(sorted(provider_versions)),
+                    )
+                )
+            self.write(
+                {
+                    "state": "quoted",
+                    "request_id": request_id,
+                    "provider_version": ", ".join(sorted(provider_versions)) or "0.1.0",
+                    "calculated_at": fields.Datetime.now(),
+                    "distance_km": total_distance,
+                    "duration_hours": total_seconds / 3600.0,
+                    "toll_cost": self.currency_id.round(total_toll),
+                    "provider_toll_amount": total_provider_toll,
+                    "conversion_rate": (
+                        sum(conversion_rates) / len(conversion_rates) if conversion_rates else 0.0
+                    ),
+                    "conversion_date": fields.Date.to_date(self.departure_at),
+                    "fuel_cost": self.currency_id.round(fuel),
+                    "driver_cost": self.currency_id.round(driver),
+                    "total_operating_cost": self.currency_id.round(total),
+                    "reporting_currency": reporting_currency,
+                    "incomplete": incomplete,
+                    "incomplete_acknowledged": False,
+                    "warning_text": "\n".join(warnings),
+                    "request_snapshot": requests_snapshot,
+                    "response_snapshot": responses_snapshot,
+                }
+            )
         except UserError:
             self.state = "failed"
             raise
@@ -351,16 +402,18 @@ class MbTravelEstimate(models.Model):
     def action_calculate(self):
         self.ensure_one()
         if self.state == "accepted":
-            revision = self.copy({
-                "state": "draft",
-                "revision": self.revision + 1,
-                "previous_revision_id": self.id,
-                "request_id": False,
-                "calculated_at": False,
-                "request_snapshot": False,
-                "response_snapshot": False,
-                "incomplete_acknowledged": False,
-            })
+            revision = self.copy(
+                {
+                    "state": "draft",
+                    "revision": self.revision + 1,
+                    "previous_revision_id": self.id,
+                    "request_id": False,
+                    "calculated_at": False,
+                    "request_snapshot": False,
+                    "response_snapshot": False,
+                    "incomplete_acknowledged": False,
+                }
+            )
             revision._calculate_current_revision()
             return {
                 "type": "ir.actions.act_window",
@@ -377,10 +430,14 @@ class MbTravelEstimate(models.Model):
             if estimate.state != "quoted":
                 raise UserError(_("Only a quoted estimate can be accepted."))
             if estimate.incomplete and not estimate.incomplete_acknowledged:
-                raise ValidationError(_(
-                    "TollQuote reported incomplete pricing. Acknowledge it or use manual travel cost."
-                ))
-            estimate.previous_revision_id.filtered(lambda old: old.state == "accepted").state = "superseded"
+                raise ValidationError(
+                    _(
+                        "TollQuote reported incomplete pricing. Acknowledge it or use manual travel cost."
+                    )
+                )
+            estimate.previous_revision_id.filtered(
+                lambda old: old.state == "accepted"
+            ).state = "superseded"
             estimate.state = "accepted"
             if estimate.operation_id:
                 estimate.operation_id.travel_estimate_id = estimate
@@ -388,13 +445,24 @@ class MbTravelEstimate(models.Model):
 
     def write(self, vals):
         input_fields = {
-            "connector_id", "origin_partner_id", "destination_partner_id",
-            "origin_latitude", "origin_longitude", "destination_latitude",
-            "destination_longitude", "round_trip", "departure_at", "vehicle_class",
-            "payment_option", "fuel_consumption_l_per_100km", "fuel_price_eur_per_l",
+            "connector_id",
+            "origin_partner_id",
+            "destination_partner_id",
+            "origin_latitude",
+            "origin_longitude",
+            "destination_latitude",
+            "destination_longitude",
+            "round_trip",
+            "departure_at",
+            "vehicle_class",
+            "payment_option",
+            "fuel_consumption_l_per_100km",
+            "fuel_price_eur_per_l",
             "driver_cost_eur_per_hour",
         }
-        if input_fields.intersection(vals) and self.filtered(lambda estimate: estimate.state in ("accepted", "superseded")):
+        if input_fields.intersection(vals) and self.filtered(
+            lambda estimate: estimate.state in ("accepted", "superseded")
+        ):
             raise UserError(_("Accepted travel estimates are immutable; calculate a new revision."))
         return super().write(vals)
 

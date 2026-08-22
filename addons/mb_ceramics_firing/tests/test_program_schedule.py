@@ -1,7 +1,10 @@
 from odoo.tests.common import TransactionCase, tagged
 
 from ..models.program_schedule import (
-    peak_temperature, ramp_minutes, schedule, total_minutes,
+    peak_temperature,
+    ramp_minutes,
+    schedule,
+    total_minutes,
 )
 
 
@@ -28,10 +31,12 @@ class TestProgramSchedule(TransactionCase):
         self.assertAlmostEqual(ramp_minutes(60.0, 1000.0, 700.0), 300.0)
 
     def test_each_segment_starts_where_the_last_one_ended(self):
-        rows = schedule([
-            {"ramp_rate": 100.0, "target_temperature": 600.0, "soak_time": 0},
-            {"ramp_rate": 60.0, "target_temperature": 1000.0, "soak_time": 30},
-        ])
+        rows = schedule(
+            [
+                {"ramp_rate": 100.0, "target_temperature": 600.0, "soak_time": 0},
+                {"ramp_rate": 60.0, "target_temperature": 1000.0, "soak_time": 30},
+            ]
+        )
         self.assertAlmostEqual(rows[0]["start_temperature"], 20.0)
         self.assertAlmostEqual(rows[0]["end_minutes"], 348.0)
         self.assertAlmostEqual(rows[1]["start_temperature"], 600.0)
@@ -41,10 +46,12 @@ class TestProgramSchedule(TransactionCase):
     def test_a_hold_at_full_power_is_the_hold_alone(self):
         """The live shape: a second segment carrying a rate of 1000 and the
         temperature the first one already reached. It is a hold."""
-        total = total_minutes([
-            {"ramp_rate": 100.0, "target_temperature": 1000.0, "soak_time": 0},
-            {"ramp_rate": 1000.0, "target_temperature": 1000.0, "soak_time": 90},
-        ])
+        total = total_minutes(
+            [
+                {"ramp_rate": 100.0, "target_temperature": 1000.0, "soak_time": 0},
+                {"ramp_rate": 1000.0, "target_temperature": 1000.0, "soak_time": 90},
+            ]
+        )
         self.assertAlmostEqual(total, 678.0)
 
     def test_a_programme_with_no_segments_says_nothing(self):
@@ -52,11 +59,16 @@ class TestProgramSchedule(TransactionCase):
         self.assertIsNone(peak_temperature([]))
 
     def test_the_peak_is_the_highest_target_asked_for(self):
-        self.assertEqual(peak_temperature([
-            {"target_temperature": 900.0},
-            {"target_temperature": 1230.0},
-            {"target_temperature": 700.0},
-        ]), 1230.0)
+        self.assertEqual(
+            peak_temperature(
+                [
+                    {"target_temperature": 900.0},
+                    {"target_temperature": 1230.0},
+                    {"target_temperature": 700.0},
+                ]
+            ),
+            1230.0,
+        )
 
 
 @tagged("post_install", "-at_install")
@@ -67,17 +79,35 @@ class TestProgramSegments(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.kiln = cls.env["mb.kiln"].create({"name": "Test kiln"})
-        cls.program = cls.env["mb.kiln.program"].create({
-            "kiln_id": cls.kiln.id,
-            "name": "Programme 2",
-            "kind": "bisque",
-            "segment_ids": [
-                (0, 0, {"number": 1, "ramp_rate": 100.0,
-                        "target_temperature": 600.0, "soak_time": 0.0}),
-                (0, 0, {"number": 2, "ramp_rate": 60.0,
-                        "target_temperature": 1000.0, "soak_time": 30.0}),
-            ],
-        })
+        cls.program = cls.env["mb.kiln.program"].create(
+            {
+                "kiln_id": cls.kiln.id,
+                "name": "Programme 2",
+                "kind": "bisque",
+                "segment_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "number": 1,
+                            "ramp_rate": 100.0,
+                            "target_temperature": 600.0,
+                            "soak_time": 0.0,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "number": 2,
+                            "ramp_rate": 60.0,
+                            "target_temperature": 1000.0,
+                            "soak_time": 30.0,
+                        },
+                    ),
+                ],
+            }
+        )
 
     def test_scheduled_hours_come_from_the_segments(self):
         self.assertAlmostEqual(self.program.scheduled_hours, 778.0 / 60.0)
@@ -101,11 +131,15 @@ class TestProgramSegments(TransactionCase):
         self.assertAlmostEqual(self.program.firing_hours, 868.0 / 60.0)
 
     def test_a_full_power_segment_is_flagged(self):
-        segment = self.env["mb.kiln.program.segment"].create({
-            "program_id": self.program.id, "number": 3,
-            "ramp_rate": 1000.0, "target_temperature": 1000.0,
-            "soak_time": 60.0,
-        })
+        segment = self.env["mb.kiln.program.segment"].create(
+            {
+                "program_id": self.program.id,
+                "number": 3,
+                "ramp_rate": 1000.0,
+                "target_temperature": 1000.0,
+                "soak_time": 60.0,
+            }
+        )
         self.assertTrue(segment.full_power)
         self.assertEqual(segment.ramp_minutes, 0.0)
         self.assertEqual(segment.duration_minutes, 60.0)
@@ -114,8 +148,12 @@ class TestProgramSegments(TransactionCase):
         from odoo.exceptions import ValidationError
 
         with self.assertRaises(ValidationError):
-            self.env["mb.kiln.program.segment"].create({
-                "program_id": self.program.id, "number": 9,
-                "ramp_rate": 60.0, "target_temperature": 900.0,
-                "soak_time": -10.0,
-            })
+            self.env["mb.kiln.program.segment"].create(
+                {
+                    "program_id": self.program.id,
+                    "number": 9,
+                    "ramp_rate": 60.0,
+                    "target_temperature": 900.0,
+                    "soak_time": -10.0,
+                }
+            )

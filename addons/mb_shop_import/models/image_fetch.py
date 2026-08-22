@@ -18,7 +18,6 @@ from urllib.parse import urljoin, urlsplit
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-
 MAX_IMAGE_BYTES = 15 * 1024 * 1024
 MAX_IMAGE_PIXELS = 50_000_000
 MAX_REDIRECTS = 3
@@ -80,7 +79,8 @@ def _request(url: str, allowed_hosts: set[str]) -> tuple[bytes, str, str | None]
     connection = _PinnedHTTPSConnection(host, address, timeout=TIMEOUT_SECONDS)
     try:
         connection.request(
-            "GET", target,
+            "GET",
+            target,
             headers={"Host": host, "User-Agent": "mb-shop-import/1"},
         )
         response = connection.getresponse()

@@ -17,17 +17,23 @@ class MbDepotAssortmentRule(models.Model):
     active = fields.Boolean(default=True)
     priority = fields.Integer(default=10)
     contract_id = fields.Many2one(
-        "mb.commercial.contract", required=True, check_company=True,
-        ondelete="cascade", index=True,
+        "mb.commercial.contract",
+        required=True,
+        check_company=True,
+        ondelete="cascade",
+        index=True,
     )
     company_id = fields.Many2one(related="contract_id.company_id", store=True, index=True)
     currency_id = fields.Many2one(related="company_id.currency_id")
     depot_warehouse_id = fields.Many2one(
-        related="contract_id.depot_warehouse_id", store=True, index=True,
+        related="contract_id.depot_warehouse_id",
+        store=True,
+        index=True,
     )
     target_type = fields.Selection(
         [("product", "Exact Product"), ("bucket", "Assortment Bucket")],
-        required=True, default="product",
+        required=True,
+        default="product",
     )
     product_id = fields.Many2one("product.product", check_company=True)
     category_id = fields.Many2one("product.category")
@@ -90,21 +96,29 @@ class MbDepotAssortmentRule(models.Model):
         depot_location = self.depot_warehouse_id.lot_stock_id
         quant_rows = self.env["stock.quant"]._read_group(
             [("product_id", "in", products.ids), ("location_id", "child_of", depot_location.id)],
-            [], ["quantity:sum", "reserved_quantity:sum"],
+            [],
+            ["quantity:sum", "reserved_quantity:sum"],
         )
         current_quantity = sum(row[0] for row in quant_rows)
         reserved_quantity = sum(row[1] for row in quant_rows)
         available_now = current_quantity - reserved_quantity
 
         timezone = pytz.timezone(self.company_id.partner_id.tz or "UTC")
-        start_utc = timezone.localize(datetime.combine(window_start, time.min)).astimezone(pytz.UTC).replace(tzinfo=None)
-        move_lines = self.env["stock.move.line"].search([
-            ("product_id", "in", products.ids),
-            ("state", "=", "done"),
-            ("date", ">=", start_utc),
-            "|", ("location_id", "child_of", depot_location.id),
-                 ("location_dest_id", "child_of", depot_location.id),
-        ])
+        start_utc = (
+            timezone.localize(datetime.combine(window_start, time.min))
+            .astimezone(pytz.UTC)
+            .replace(tzinfo=None)
+        )
+        move_lines = self.env["stock.move.line"].search(
+            [
+                ("product_id", "in", products.ids),
+                ("state", "=", "done"),
+                ("date", ">=", start_utc),
+                "|",
+                ("location_id", "child_of", depot_location.id),
+                ("location_dest_id", "child_of", depot_location.id),
+            ]
+        )
         net_by_day = defaultdict(float)
         for line in move_lines:
             source_inside = line.location_id._child_of(depot_location)
@@ -112,7 +126,9 @@ class MbDepotAssortmentRule(models.Model):
             if source_inside == destination_inside:
                 continue
             quantity = line.quantity_product_uom
-            net_by_day[self._company_local_day(line.date)] += quantity if destination_inside else -quantity
+            net_by_day[self._company_local_day(line.date)] += (
+                quantity if destination_inside else -quantity
+            )
 
         opening = current_quantity - sum(net_by_day.values())
         balance = opening
@@ -125,22 +141,32 @@ class MbDepotAssortmentRule(models.Model):
             balance = closing
             cursor += timedelta(days=1)
 
-        report_lines = self.env["mb.depot.sale.report.line"].search([
-            ("report_id.depot_warehouse_id", "=", self.depot_warehouse_id.id),
-            ("report_id.state", "in", ("processed", "reversal_required")),
-            ("product_id", "in", products.ids),
-            ("sold_at", ">=", start_utc),
-        ])
+        report_lines = self.env["mb.depot.sale.report.line"].search(
+            [
+                ("report_id.depot_warehouse_id", "=", self.depot_warehouse_id.id),
+                ("report_id.state", "in", ("processed", "reversal_required")),
+                ("product_id", "in", products.ids),
+                ("sold_at", ">=", start_utc),
+            ]
+        )
         sold_quantity = sum(report_lines.mapped("quantity"))
-        original_moves = self.env["stock.move"].search([
-            ("move_line_ids.mb_depot_sale_report_line_id", "in", report_lines.ids),
-            ("state", "=", "done"),
-        ])
-        returned_moves = self.env["stock.move"].search([
-            ("origin_returned_move_id", "in", original_moves.ids),
-            ("state", "=", "done"),
-            ("date", ">=", start_utc),
-        ]) if original_moves else self.env["stock.move"]
+        original_moves = self.env["stock.move"].search(
+            [
+                ("move_line_ids.mb_depot_sale_report_line_id", "in", report_lines.ids),
+                ("state", "=", "done"),
+            ]
+        )
+        returned_moves = (
+            self.env["stock.move"].search(
+                [
+                    ("origin_returned_move_id", "in", original_moves.ids),
+                    ("state", "=", "done"),
+                    ("date", ">=", start_utc),
+                ]
+            )
+            if original_moves
+            else self.env["stock.move"]
+        )
         returned_quantity = sum(returned_moves.mapped("quantity"))
         net_sold = max(0.0, sold_quantity - returned_quantity)
         average_daily_sales = net_sold / exposed_days if exposed_days else 0.0
@@ -151,8 +177,12 @@ class MbDepotAssortmentRule(models.Model):
         suggested = max(0.0, self.target_quantity - projected)
         days_of_cover = available_now / average_daily_sales if average_daily_sales else 0.0
         due_date = (
-            today + timedelta(days=max(0, int((available_now - self.minimum_quantity) / average_daily_sales)))
-            if average_daily_sales else False
+            today
+            + timedelta(
+                days=max(0, int((available_now - self.minimum_quantity) / average_daily_sales))
+            )
+            if average_daily_sales
+            else False
         )
         if not net_sold:
             confidence = "policy"
@@ -187,10 +217,13 @@ class MbDepotAssortmentRule(models.Model):
         forecast_model = self.env["mb.depot.refill.forecast"]
         for rule in self.filtered(lambda item: item.active and item.depot_warehouse_id):
             values = rule._forecast_values()
-            forecast = forecast_model.search([
-                ("rule_id", "=", rule.id),
-                ("snapshot_date", "=", values["snapshot_date"]),
-            ], limit=1)
+            forecast = forecast_model.search(
+                [
+                    ("rule_id", "=", rule.id),
+                    ("snapshot_date", "=", values["snapshot_date"]),
+                ],
+                limit=1,
+            )
             if forecast:
                 forecast.write(values)
             else:
@@ -217,12 +250,18 @@ class MbDepotRefillForecast(models.Model):
     _check_company_auto = True
 
     rule_id = fields.Many2one(
-        "mb.depot.assortment.rule", required=True, check_company=True,
-        ondelete="cascade", index=True,
+        "mb.depot.assortment.rule",
+        required=True,
+        check_company=True,
+        ondelete="cascade",
+        index=True,
     )
     contract_id = fields.Many2one(
-        "mb.commercial.contract", required=True, check_company=True,
-        ondelete="cascade", index=True,
+        "mb.commercial.contract",
+        required=True,
+        check_company=True,
+        ondelete="cascade",
+        index=True,
     )
     company_id = fields.Many2one(related="contract_id.company_id", store=True, index=True)
     depot_warehouse_id = fields.Many2one(related="contract_id.depot_warehouse_id", store=True)
@@ -250,7 +289,8 @@ class MbDepotRefillForecast(models.Model):
     stockout_biased = fields.Boolean()
 
     _snapshot_unique = models.Constraint(
-        "UNIQUE(rule_id, snapshot_date)", "A rule already has a forecast snapshot for this date.",
+        "UNIQUE(rule_id, snapshot_date)",
+        "A rule already has a forecast snapshot for this date.",
     )
 
     def _stock_plan_values(self):
@@ -266,9 +306,11 @@ class MbDepotRefillForecast(models.Model):
         if rule.target_type == "product":
             values["product_id"] = rule.product_id.id
         else:
-            values.update({
-                "category_id": rule.category_id.id,
-                "price_min": rule.price_min,
-                "price_max": rule.price_max,
-            })
+            values.update(
+                {
+                    "category_id": rule.category_id.id,
+                    "price_min": rule.price_min,
+                    "price_max": rule.price_max,
+                }
+            )
         return values

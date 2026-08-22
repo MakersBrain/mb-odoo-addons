@@ -40,7 +40,7 @@ ODOO_CONTAINER = "mb-odoo-web"
 # pattern: everything else in this database is real stock.
 FIXTURE_PRODUCTS = ["Bisque Template"]
 
-CLEANUP_TEMPLATE = '''
+CLEANUP_TEMPLATE = """
 import json
 import collections
 
@@ -139,15 +139,29 @@ print("DONE dangling xmlids now", still)
 print("DONE storage categories:", Category.search([]).mapped("name"))
 print("DONE uncategorised products:",
       Template.search_count([("categ_id", "=", False)]))
-'''
+"""
 
 
 def run_in_odoo(script, database, prefixes):
     """Pipe a script into `odoo shell` and echo the lines it meant to report."""
     result = subprocess.run(
-        ["docker", "exec", "-i", ODOO_CONTAINER, "odoo", "shell",
-         "-d", database, "--log-level=error", "--http-port=8199", "--no-http"],
-        input=script, capture_output=True, text=True)
+        [
+            "docker",
+            "exec",
+            "-i",
+            ODOO_CONTAINER,
+            "odoo",
+            "shell",
+            "-d",
+            database,
+            "--log-level=error",
+            "--http-port=8199",
+            "--no-http",
+        ],
+        input=script,
+        capture_output=True,
+        text=True,
+    )
     for line in result.stdout.splitlines():
         if line.startswith(prefixes):
             print("  " + line)
@@ -157,19 +171,21 @@ def run_in_odoo(script, database, prefixes):
 
 def main():
     parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--database", default="odoo")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="report what would change, write nothing")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="report what would change, write nothing"
+    )
     options = parser.parse_args()
 
     script = CLEANUP_TEMPLATE.format(
-        config=json.dumps({"fixture_products": FIXTURE_PRODUCTS}),
-        dry_run=options.dry_run)
-    print(f"{'checking' if options.dry_run else 'cleaning'} demo residue "
-          f"in '{options.database}' ...")
-    run_in_odoo(script, options.database,
-                prefixes=("XMLID", "PRODUCT", "CATEGORY", "DONE"))
+        config=json.dumps({"fixture_products": FIXTURE_PRODUCTS}), dry_run=options.dry_run
+    )
+    print(
+        f"{'checking' if options.dry_run else 'cleaning'} demo residue in '{options.database}' ..."
+    )
+    run_in_odoo(script, options.database, prefixes=("XMLID", "PRODUCT", "CATEGORY", "DONE"))
 
 
 if __name__ == "__main__":

@@ -6,32 +6,42 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     mb_depot_sale_report_id = fields.Many2one(
-        "mb.depot.sale.report", string="Depot sale report", copy=False,
-        index=True, readonly=True,
+        "mb.depot.sale.report",
+        string="Depot sale report",
+        copy=False,
+        index=True,
+        readonly=True,
     )
     mb_depot_effective_date = fields.Datetime(
-        string="Effective depot sale date", copy=False, readonly=True,
+        string="Effective depot sale date",
+        copy=False,
+        readonly=True,
     )
     mb_depot_reported_public_total = fields.Monetary(
-        string="Reported public total", copy=False, readonly=True,
+        string="Reported public total",
+        copy=False,
+        readonly=True,
     )
     mb_depot_reported_net_total = fields.Monetary(
-        string="Reported net total", copy=False, readonly=True,
+        string="Reported net total",
+        copy=False,
+        readonly=True,
     )
 
     mb_depot_product_ids = fields.Many2many(
         comodel_name="product.product",
         string="Pieces at the depot",
         compute="_compute_mb_depot_product_ids",
-        help="On hand and unreserved at the depot. What the line's product "
-             "domain is built from.",
+        help="On hand and unreserved at the depot. What the line's product domain is built from.",
     )
 
     def _mb_depots_by_company_and_partner(self):
-        depots = self.env["stock.warehouse"].search([
-            ("is_depot", "=", True),
-            ("company_id", "in", self.company_id.ids),
-        ])
+        depots = self.env["stock.warehouse"].search(
+            [
+                ("is_depot", "=", True),
+                ("company_id", "in", self.company_id.ids),
+            ]
+        )
         return {
             (depot.company_id.id, depot.depot_partner_id.commercial_partner_id.id): depot
             for depot in depots
@@ -56,10 +66,12 @@ class SaleOrder(models.Model):
         super()._compute_warehouse_id()
         by_partner = self._mb_depots_by_company_and_partner()
         for order in self:
-            depot = by_partner.get((
-                order.company_id.id,
-                order.partner_id.commercial_partner_id.id,
-            ))
+            depot = by_partner.get(
+                (
+                    order.company_id.id,
+                    order.partner_id.commercial_partner_id.id,
+                )
+            )
             if depot:
                 order.warehouse_id = depot
 
@@ -89,23 +101,29 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         by_partner = self._mb_depots_by_company_and_partner()
         for order in self:
-            depot = by_partner.get((
-                order.company_id.id,
-                order.partner_id.commercial_partner_id.id,
-            ))
+            depot = by_partner.get(
+                (
+                    order.company_id.id,
+                    order.partner_id.commercial_partner_id.id,
+                )
+            )
             if depot and order.warehouse_id != depot:
                 order.warehouse_id = depot
 
         mandate = self.filtered(
-            lambda order: order.warehouse_id.is_depot
-            and order.warehouse_id.mb_depot_legal_structure == "mandate"
+            lambda order: (
+                order.warehouse_id.is_depot
+                and order.warehouse_id.mb_depot_legal_structure == "mandate"
+            )
         )
         if mandate:
-            raise UserError(_(
-                "The selected depot is a mandate. The purchase-resale sales "
-                "workflow cannot be used; invoice final customers at retail and "
-                "book the gallery commission as a vendor bill."
-            ))
+            raise UserError(
+                _(
+                    "The selected depot is a mandate. The purchase-resale sales "
+                    "workflow cannot be used; invoice final customers at retail and "
+                    "book the gallery commission as a vendor bill."
+                )
+            )
 
         depot_lines = self.filtered("warehouse_id.is_depot").order_line.filtered(
             lambda line: not line.display_type
@@ -117,17 +135,21 @@ class SaleOrder(models.Model):
         depot_lines.route_ids = False
 
         invalid_lines = depot_lines.filtered(
-            lambda line: not line.display_type
-            and line.product_id.is_storable
-            and line.product_id.invoice_policy != "delivery"
+            lambda line: (
+                not line.display_type
+                and line.product_id.is_storable
+                and line.product_id.invoice_policy != "delivery"
+            )
         )
         if invalid_lines:
             products = ", ".join(sorted(set(invalid_lines.product_id.mapped("display_name"))))
-            raise UserError(_(
-                "Depot sales must invoice delivered quantities. Change the "
-                "invoicing policy to Delivered quantities for: %(products)s",
-                products=products,
-            ))
+            raise UserError(
+                _(
+                    "Depot sales must invoice delivered quantities. Change the "
+                    "invoicing policy to Delivered quantities for: %(products)s",
+                    products=products,
+                )
+            )
         return super().action_confirm()
 
     def _prepare_confirmation_values(self):
@@ -148,18 +170,18 @@ class SaleOrder(models.Model):
             if not reports:
                 continue
             delivery_dates = [
-                order.mb_depot_sale_report_id._company_local_date(
-                    order.mb_depot_effective_date
-                )
+                order.mb_depot_sale_report_id._company_local_date(order.mb_depot_effective_date)
                 for order in orders
                 if order.mb_depot_effective_date
             ]
-            invoice.write({
-                "mb_depot_sale_report_ids": [fields.Command.set(reports.ids)],
-                "mb_depot_sale_report_id": reports.id if len(reports) == 1 else False,
-                "mb_depot_delivery_date_from": min(delivery_dates),
-                "mb_depot_delivery_date_to": max(delivery_dates),
-            })
+            invoice.write(
+                {
+                    "mb_depot_sale_report_ids": [fields.Command.set(reports.ids)],
+                    "mb_depot_sale_report_id": reports.id if len(reports) == 1 else False,
+                    "mb_depot_delivery_date_from": min(delivery_dates),
+                    "mb_depot_delivery_date_to": max(delivery_dates),
+                }
+            )
         return invoices
 
 
@@ -167,14 +189,19 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     mb_depot_sale_report_line_id = fields.Many2one(
-        "mb.depot.sale.report.line", string="Depot report line",
-        copy=False, readonly=True, index=True,
+        "mb.depot.sale.report.line",
+        string="Depot report line",
+        copy=False,
+        readonly=True,
+        index=True,
     )
 
     # Related rather than reached through `parent.` in the line's domain: the
     # domain is evaluated per row, and a field on the row itself is the form the
     # web client evaluates without ambiguity.
     mb_is_depot_order = fields.Boolean(
-        related="order_id.warehouse_id.is_depot", string="Sold from a depot")
+        related="order_id.warehouse_id.is_depot", string="Sold from a depot"
+    )
     mb_depot_product_ids = fields.Many2many(
-        related="order_id.mb_depot_product_ids", string="Pieces at the depot")
+        related="order_id.mb_depot_product_ids", string="Pieces at the depot"
+    )

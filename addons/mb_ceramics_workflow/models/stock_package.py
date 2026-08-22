@@ -4,8 +4,7 @@ from odoo import fields, models
 class StockPackage(models.Model):
     _inherit = "stock.package"
 
-    mb_board_content_ids = fields.One2many(
-        "mb.board.content", "board_id", string="WIP history")
+    mb_board_content_ids = fields.One2many("mb.board.content", "board_id", string="WIP history")
     mb_current_board_content_ids = fields.One2many(
         "mb.board.content",
         "board_id",

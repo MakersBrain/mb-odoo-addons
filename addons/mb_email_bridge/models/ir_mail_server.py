@@ -5,7 +5,6 @@ from contextvars import ContextVar
 from odoo import _, fields, models
 from odoo.exceptions import ValidationError
 
-
 _SMTP_PIN = ContextVar("mb_webshop_smtp_pin", default=None)
 _ORIGINAL_CREATE_CONNECTION = getattr(
     socket, "_mb_webshop_original_create_connection", socket.create_connection
@@ -96,7 +95,7 @@ class IrMailServer(models.Model):
             peer = connection.sock.getpeername()[0]
             if peer != pinned_address or not ipaddress.ip_address(peer).is_global:
                 connection.close()
-                raise ValidationError(_(
-                    "The SMTP connection did not use an approved public address."
-                ))
+                raise ValidationError(
+                    _("The SMTP connection did not use an approved public address.")
+                )
         return connection

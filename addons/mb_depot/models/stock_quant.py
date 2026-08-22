@@ -13,7 +13,7 @@ class StockQuant(models.Model):
         string="Days held",
         compute="_compute_depot_days",
         help="Days since this piece arrived at its current location. A piece that "
-             "has sat unsold for months is the thing worth chasing.",
+        "has sat unsold for months is the thing worth chasing.",
     )
     company_currency_id = fields.Many2one(
         related="company_id.currency_id",
@@ -33,7 +33,7 @@ class StockQuant(models.Model):
         compute="_compute_depot_commercial_values",
         store=True,
         help="On-hand quantity valued at the public sales price, independently "
-             "from Odoo's accounting inventory valuation.",
+        "from Odoo's accounting inventory valuation.",
     )
     depot_expected_net_value = fields.Monetary(
         string="Expected net",
@@ -41,7 +41,7 @@ class StockQuant(models.Model):
         compute="_compute_depot_commercial_values",
         store=True,
         help="Expected proceeds if the on-hand quantity sells at the public "
-             "price, after the depot's recorded commission.",
+        "price, after the depot's recorded commission.",
     )
 
     @api.depends(

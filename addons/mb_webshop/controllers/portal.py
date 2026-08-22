@@ -12,13 +12,19 @@ class WebshopCustomerPortal(sale_portal.CustomerPortal):
         values = super()._sale_order_get_page_view_values(
             order_sudo, access_token, values, history_session_key, **kwargs
         )
-        values.update({
-            "mb_returns": request.env["mb.webshop.return"].sudo().search([
-                ("order_id", "=", order_sudo.id),
-            ]),
-            "mb_can_request_return": bool(order_sudo._mb_returnable_lines()),
-            "mb_return_submitted": kwargs.get("return_submitted"),
-        })
+        values.update(
+            {
+                "mb_returns": request.env["mb.webshop.return"]
+                .sudo()
+                .search(
+                    [
+                        ("order_id", "=", order_sudo.id),
+                    ]
+                ),
+                "mb_can_request_return": bool(order_sudo._mb_returnable_lines()),
+                "mb_return_submitted": kwargs.get("return_submitted"),
+            }
+        )
         return values
 
     @http.route(
@@ -30,9 +36,7 @@ class WebshopCustomerPortal(sale_portal.CustomerPortal):
     )
     def portal_order_return(self, order_id, access_token=None, **post):
         try:
-            order = self._document_check_access(
-                "sale.order", order_id, access_token=access_token
-            )
+            order = self._document_check_access("sale.order", order_id, access_token=access_token)
         except (AccessError, MissingError):
             return request.redirect("/my")
 
@@ -55,9 +59,7 @@ class WebshopCustomerPortal(sale_portal.CustomerPortal):
             except ValidationError as exc:
                 error = exc.args[0]
             else:
-                return request.redirect(
-                    order.get_portal_url(query_string="&return_submitted=1")
-                )
+                return request.redirect(order.get_portal_url(query_string="&return_submitted=1"))
 
         values = {
             "sale_order": order,

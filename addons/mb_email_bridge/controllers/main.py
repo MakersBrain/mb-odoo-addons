@@ -5,12 +5,12 @@ from werkzeug.exceptions import HTTPException
 from odoo import http
 from odoo.exceptions import ValidationError
 from odoo.http import request
+
 from odoo.addons.mb_control_bridge.controllers.auth import (
     authenticate_control_request,
     json_body,
     payload_digest,
 )
-
 
 _logger = logging.getLogger(__name__)
 
@@ -49,14 +49,41 @@ class WebshopSmtpBridge(http.Controller):
                 _logger.exception("webshop SMTP bridge failed")
             return _error(error)
 
-    @http.route("/mb_control/v1/webshop/smtp/status", type="http", auth="public", methods=["POST"], csrf=False, save_session=False)
+    @http.route(
+        "/mb_control/v1/webshop/smtp/status",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
     def status(self):
-        return self._handle("webshop.smtp.status", lambda company, body: company.mb_webshop_smtp_status(body))
+        return self._handle(
+            "webshop.smtp.status", lambda company, body: company.mb_webshop_smtp_status(body)
+        )
 
-    @http.route("/mb_control/v1/webshop/smtp/configure", type="http", auth="public", methods=["POST"], csrf=False, save_session=False)
+    @http.route(
+        "/mb_control/v1/webshop/smtp/configure",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
     def configure(self):
-        return self._handle("webshop.smtp.configure", lambda company, body: company.mb_configure_webshop_smtp(body))
+        return self._handle(
+            "webshop.smtp.configure", lambda company, body: company.mb_configure_webshop_smtp(body)
+        )
 
-    @http.route("/mb_control/v1/webshop/smtp/reset", type="http", auth="public", methods=["POST"], csrf=False, save_session=False)
+    @http.route(
+        "/mb_control/v1/webshop/smtp/reset",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        save_session=False,
+    )
     def reset(self):
-        return self._handle("webshop.smtp.reset", lambda company, body: company.mb_reset_webshop_smtp(body))
+        return self._handle(
+            "webshop.smtp.reset", lambda company, body: company.mb_reset_webshop_smtp(body)
+        )

@@ -159,7 +159,7 @@ def openai_call(
         {"Authorization": f"Bearer {key}"},
         body,
     )
-    message = ((envelope.get("choices") or [{}])[0].get("message") or {})
+    message = (envelope.get("choices") or [{}])[0].get("message") or {}
     content = message.get("content")
     if not isinstance(content, str):
         raise RuntimeError("OpenAI returned no structured content")
@@ -172,9 +172,7 @@ def gemini_schema(value):
     if not isinstance(value, dict):
         return value
     converted = {
-        key: gemini_schema(item)
-        for key, item in value.items()
-        if key != "additionalProperties"
+        key: gemini_schema(item) for key, item in value.items() if key != "additionalProperties"
     }
     if "properties" in converted:
         converted["propertyOrdering"] = list(converted["properties"])
@@ -212,9 +210,7 @@ def gemini_call(
             },
         },
     )
-    parts = (
-        ((((envelope.get("candidates") or [{}])[0].get("content") or {}).get("parts")) or [])
-    )
+    parts = (((envelope.get("candidates") or [{}])[0].get("content") or {}).get("parts")) or []
     content = "".join(part.get("text", "") for part in parts if isinstance(part, dict))
     if not content:
         raise RuntimeError("Gemini returned no structured content")
@@ -307,9 +303,7 @@ def main() -> int:
             print(f"tested {filename} with {args.provider}/{args.model}", file=sys.stderr)
     report["summary"] = {
         field: {
-            "matched": sum(
-                image["matches"][field] is True for image in report["images"].values()
-            ),
+            "matched": sum(image["matches"][field] is True for image in report["images"].values()),
             "expected": sum(
                 image["matches"][field] is not None for image in report["images"].values()
             ),

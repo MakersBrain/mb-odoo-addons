@@ -68,8 +68,12 @@ class AccountMove(models.Model):
         if not self.mb_sumup_checkout_url:
             return ""
         barcode = self.env["ir.actions.report"].barcode(
-            "QR", self.mb_sumup_checkout_url, width=128, height=128,
-            quiet=False, barLevel="M",
+            "QR",
+            self.mb_sumup_checkout_url,
+            width=128,
+            height=128,
+            quiet=False,
+            barLevel="M",
         )
         return image_data_uri(base64.b64encode(barcode))
 
@@ -87,15 +91,18 @@ class AccountMove(models.Model):
         provider_model = self.env["payment.provider"].sudo()
         # One provider record per company, which is the point: the money has to
         # land in the account belonging to the company invoicing.
-        provider = provider_model.search([
-            ("code", "=", "sumup"),
-            ("state", "in", ("enabled", "test")),
-            *provider_model._check_company_domain(self.company_id),
-        ], limit=1)
+        provider = provider_model.search(
+            [
+                ("code", "=", "sumup"),
+                ("state", "in", ("enabled", "test")),
+                *provider_model._check_company_domain(self.company_id),
+            ],
+            limit=1,
+        )
         if not provider:
-            raise UserError(_(
-                "No SumUp payment provider is enabled for %s.", self.company_id.display_name
-            ))
+            raise UserError(
+                _("No SumUp payment provider is enabled for %s.", self.company_id.display_name)
+            )
         return provider
 
     def _mb_sumup_get_or_create_transaction(self, amount):
@@ -130,10 +137,12 @@ class AccountMove(models.Model):
         if residual <= 0:
             raise UserError(_("This invoice has nothing left to pay."))
         if amount <= 0 or self.currency_id.compare_amounts(amount, residual) > 0:
-            raise UserError(_(
-                "The SumUp checkout amount cannot exceed the amount still due (%s).",
-                self.currency_id.format(residual),
-            ))
+            raise UserError(
+                _(
+                    "The SumUp checkout amount cannot exceed the amount still due (%s).",
+                    self.currency_id.format(residual),
+                )
+            )
 
         existing = self.mb_sumup_transaction_id
         if (
@@ -151,27 +160,32 @@ class AccountMove(models.Model):
             existing.sudo()._sumup_deactivate_checkout()
 
         provider = self._mb_sumup_provider()
-        payment_method = provider.payment_method_ids.filtered(
-            lambda pm: pm.code == "card"
-        )[:1] or provider.payment_method_ids[:1]
+        payment_method = (
+            provider.payment_method_ids.filtered(lambda pm: pm.code == "card")[:1]
+            or provider.payment_method_ids[:1]
+        )
         if not self.partner_id:
             raise UserError(_("Set a customer on the invoice before asking them to pay."))
 
-        tx_sudo = self.env["payment.transaction"].sudo().create({
-            "provider_id": provider.id,
-            "payment_method_id": payment_method.id,
-            "partner_id": self.partner_id.id,
-            "amount": amount,
-            "currency_id": self.currency_id.id,
-            # The customer follows a link to a hosted page, which is a redirect
-            # flow whether the link was clicked or scanned off a sheet of paper.
-            "operation": "online_redirect",
-            "invoice_ids": [Command.set(self.ids)],
-        })
-        if not tx_sudo._sumup_create_checkout():
-            raise UserError(
-                tx_sudo.state_message or _("SumUp did not return a payment link.")
+        tx_sudo = (
+            self.env["payment.transaction"]
+            .sudo()
+            .create(
+                {
+                    "provider_id": provider.id,
+                    "payment_method_id": payment_method.id,
+                    "partner_id": self.partner_id.id,
+                    "amount": amount,
+                    "currency_id": self.currency_id.id,
+                    # The customer follows a link to a hosted page, which is a redirect
+                    # flow whether the link was clicked or scanned off a sheet of paper.
+                    "operation": "online_redirect",
+                    "invoice_ids": [Command.set(self.ids)],
+                }
             )
+        )
+        if not tx_sudo._sumup_create_checkout():
+            raise UserError(tx_sudo.state_message or _("SumUp did not return a payment link."))
 
         self.sudo().mb_sumup_transaction_id = tx_sudo
         return tx_sudo

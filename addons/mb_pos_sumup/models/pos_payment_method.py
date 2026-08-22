@@ -28,18 +28,18 @@ class PosPaymentMethod(models.Model):
     sumup_affiliate_key = fields.Char(
         string="SumUp Affiliate Key",
         help="From Developer settings in the SumUp dashboard. The key allows "
-             "a list of application identifiers, and the POS runs in a "
-             "browser rather than in an application of yours, so that list "
-             "has to include the browser: on iOS the SumUp app reports the "
-             "caller as com.sumup.appswitch, whatever the URL says. Add it to "
-             "the key beside your own identifier.",
+        "a list of application identifiers, and the POS runs in a "
+        "browser rather than in an application of yours, so that list "
+        "has to include the browser: on iOS the SumUp app reports the "
+        "caller as com.sumup.appswitch, whatever the URL says. Add it to "
+        "the key beside your own identifier.",
         copy=False,
     )
     sumup_app_id = fields.Char(
         string="SumUp App ID",
         help="Sent as the app-id parameter, which only Android reads. iOS "
-             "takes no such parameter and derives the caller itself - see the "
-             "affiliate key above. Use an identifier registered on the key.",
+        "takes no such parameter and derives the caller itself - see the "
+        "affiliate key above. Use an identifier registered on the key.",
         copy=False,
     )
     sumup_payment_provider_id = fields.Many2one(
@@ -48,14 +48,14 @@ class PosPaymentMethod(models.Model):
         domain=[("code", "=", "sumup"), ("state", "in", ("enabled", "test"))],
         check_company=True,
         help="The SumUp account used to verify a payment against SumUp's own "
-             "records and to refund it. It is mandatory: callback URL "
-             "parameters are never accepted as payment evidence.",
+        "records and to refund it. It is mandatory: callback URL "
+        "parameters are never accepted as payment evidence.",
     )
     sumup_skip_success_screen = fields.Boolean(
         string="Skip SumUp Success Screen",
         default=True,
         help="Return to the POS as soon as the card is approved instead of "
-             "waiting for the cashier to dismiss SumUp's own screen.",
+        "waiting for the cashier to dismiss SumUp's own screen.",
     )
 
     # === HELPERS === #
@@ -78,10 +78,12 @@ class PosPaymentMethod(models.Model):
             or provider_sudo.company_id != self.company_id
             or not provider_sudo.sudo().sumup_api_key
         ):
-            raise UserError(_(
-                "Set an enabled SumUp account for the same company on payment method %s.",
-                self.display_name,
-            ))
+            raise UserError(
+                _(
+                    "Set an enabled SumUp account for the same company on payment method %s.",
+                    self.display_name,
+                )
+            )
         provider_sudo._sumup_get_merchant_code()
         return provider_sudo
 
@@ -108,9 +110,7 @@ class PosPaymentMethod(models.Model):
             # A payment SumUp has no record of is not a payment. The caller
             # reports it as unconfirmed rather than as an error, because the
             # cashier's next move is the same either way: take the money again.
-            _logger.warning(
-                "SumUp has no transaction matching %s.", query
-            )
+            _logger.warning("SumUp has no transaction matching %s.", query)
             return {}
 
     # === POS METHODS === #
@@ -135,10 +135,13 @@ class PosPaymentMethod(models.Model):
 
         self._sumup_provider_sudo()
         if not self.sumup_affiliate_key:
-            raise UserError(_(
-                "Set the SumUp affiliate key on the payment method %s before "
-                "taking a payment with it.", self.display_name
-            ))
+            raise UserError(
+                _(
+                    "Set the SumUp affiliate key on the payment method %s before "
+                    "taking a payment with it.",
+                    self.display_name,
+                )
+            )
         if len(payment_uuid) > FOREIGN_TX_ID_MAX_LENGTH:
             raise UserError(_("The payment identifier is too long for SumUp."))
 
@@ -217,9 +220,13 @@ class PosPaymentMethod(models.Model):
                     "currency, or merchant account."
                 ),
             }
-        if successful and currency.compare_amounts(
-            float(transaction.get("amount") or 0.0), currency.round(amount)
-        ) != 0:
+        if (
+            successful
+            and currency.compare_amounts(
+                float(transaction.get("amount") or 0.0), currency.round(amount)
+            )
+            != 0
+        ):
             return {
                 "successful": False,
                 "verified": True,
@@ -239,9 +246,9 @@ class PosPaymentMethod(models.Model):
             "card_no": card.get("last_4_digits") or "",
             "card_brand": card.get("type") or "",
             "card_type": transaction.get("entry_mode") or "",
-            "message": "" if successful else _(
-                "SumUp reported this payment as %s.", transaction.get("status")
-            ),
+            "message": ""
+            if successful
+            else _("SumUp reported this payment as %s.", transaction.get("status")),
         }
 
     def sumup_refund_payment(self, transaction_code, amount):

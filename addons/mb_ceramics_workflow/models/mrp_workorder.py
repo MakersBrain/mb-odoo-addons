@@ -27,30 +27,38 @@ class MrpWorkorder(models.Model):
                 minimum = product.mb_firing_min_temperature
                 maximum = product.mb_firing_max_temperature
                 if minimum and peak < minimum:
-                    raise ValidationError(_(
-                        "%(program)s peaks below %(product)s's minimum firing "
-                        "temperature of %(minimum)s C.",
-                        program=load.program_id.display_name,
-                        product=product.display_name,
-                        minimum=minimum,
-                    ))
+                    raise ValidationError(
+                        _(
+                            "%(program)s peaks below %(product)s's minimum firing "
+                            "temperature of %(minimum)s C.",
+                            program=load.program_id.display_name,
+                            product=product.display_name,
+                            minimum=minimum,
+                        )
+                    )
                 if maximum and peak > maximum:
-                    raise ValidationError(_(
-                        "%(program)s peaks above %(product)s's maximum firing "
-                        "temperature of %(maximum)s C.",
-                        program=load.program_id.display_name,
-                        product=product.display_name,
-                        maximum=maximum,
-                    ))
+                    raise ValidationError(
+                        _(
+                            "%(program)s peaks above %(product)s's maximum firing "
+                            "temperature of %(maximum)s C.",
+                            program=load.program_id.display_name,
+                            product=product.display_name,
+                            maximum=maximum,
+                        )
+                    )
         return result
 
     def button_finish(self):
         result = super().button_finish()
         for production in self.production_id:
             next_order = production.workorder_ids.filtered(
-                lambda workorder: workorder.state not in ("done", "cancel"))[:1]
+                lambda workorder: workorder.state not in ("done", "cancel")
+            )[:1]
             production.mb_board_content_ids.filtered(
-                lambda content: content.state == "current").write({
+                lambda content: content.state == "current"
+            ).write(
+                {
                     "current_workorder_id": next_order.id or False,
-                })
+                }
+            )
         return result

@@ -7,8 +7,8 @@ class ResCompany(models.Model):
     mb_market_target_margin_per_hour = fields.Monetary(
         string="Target Market Margin per Hour",
         help="Minimum planned margin per hour of effort (work plus travel) below which a "
-             "market is only worth attending for reasons other than money. Leave at zero "
-             "to judge markets on break-even headroom alone.",
+        "market is only worth attending for reasons other than money. Leave at zero "
+        "to judge markets on break-even headroom alone.",
     )
 
     _mb_market_target_margin_nonnegative = models.Constraint(

@@ -51,7 +51,9 @@ def request(
         headers["Content-Type"] = mimetype
     call = urllib.request.Request(url, data=body, headers=headers, method=method)
     try:
-        with urllib.request.urlopen(call, timeout=90, context=ssl.create_default_context()) as response:
+        with urllib.request.urlopen(
+            call, timeout=90, context=ssl.create_default_context()
+        ) as response:
             payload = response.read(MAX_RESPONSE_BYTES + 1)
             if len(payload) > MAX_RESPONSE_BYTES:
                 raise RuntimeError("Azure response exceeded the 8 MB bound")
@@ -63,15 +65,9 @@ def request(
 
 def analyze(endpoint: str, key: str, image: bytes, mimetype: str) -> tuple[dict, bool]:
     base = endpoint.rstrip("/")
-    query = urllib.parse.urlencode(
-        {"_overload": "analyzeDocument", "api-version": API_VERSION}
-    )
-    submit_url = (
-        f"{base}/documentintelligence/documentModels/prebuilt-read:analyze?{query}"
-    )
-    status, headers, _ = request(
-        submit_url, key, method="POST", body=image, mimetype=mimetype
-    )
+    query = urllib.parse.urlencode({"_overload": "analyzeDocument", "api-version": API_VERSION})
+    submit_url = f"{base}/documentintelligence/documentModels/prebuilt-read:analyze?{query}"
+    status, headers, _ = request(submit_url, key, method="POST", body=image, mimetype=mimetype)
     if status not in {200, 202}:
         raise RuntimeError(f"unexpected Azure submit status {status}")
     operation_url = headers.get("Operation-Location") or headers.get("operation-location")
@@ -136,8 +132,7 @@ def evaluate(content: str, expected: dict) -> dict:
         None if product is None else all(term and term in haystack for term in product_terms)
     )
     decisions["alternates"] = {
-        alternate: compact(alternate) in haystack
-        for alternate in expected.get("alternates", [])
+        alternate: compact(alternate) in haystack for alternate in expected.get("alternates", [])
     }
     return decisions
 
@@ -151,10 +146,14 @@ def main() -> int:
     endpoint = os.environ.get("AZURE_DOCUMENT_ENDPOINT", "").strip()
     key = os.environ.get("AZURE_DOCUMENT_KEY", "").strip()
     parsed = urllib.parse.urlsplit(endpoint)
-    if parsed.scheme != "https" or not parsed.hostname or not parsed.hostname.endswith(
-        ".cognitiveservices.azure.com"
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or not parsed.hostname.endswith(".cognitiveservices.azure.com")
     ):
-        raise SystemExit("AZURE_DOCUMENT_ENDPOINT must be an Azure Cognitive Services HTTPS endpoint")
+        raise SystemExit(
+            "AZURE_DOCUMENT_ENDPOINT must be an Azure Cognitive Services HTTPS endpoint"
+        )
     if not key:
         raise SystemExit("AZURE_DOCUMENT_KEY is required")
 
@@ -194,9 +193,7 @@ def main() -> int:
     fields = ("barcode", "lot", "product")
     report["summary"] = {
         field: {
-            "matched": sum(
-                image["matches"][field] is True for image in report["images"].values()
-            ),
+            "matched": sum(image["matches"][field] is True for image in report["images"].values()),
             "expected": sum(
                 image["matches"][field] is not None for image in report["images"].values()
             ),

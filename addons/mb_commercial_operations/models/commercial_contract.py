@@ -18,25 +18,39 @@ class MbCommercialContract(models.Model):
     name = fields.Char(required=True, default=lambda self: _("New"), copy=False, tracking=True)
     active = fields.Boolean(default=True, tracking=True)
     company_id = fields.Many2one(
-        "res.company", required=True, default=lambda self: self.env.company,
-        index=True, tracking=True,
+        "res.company",
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
+        tracking=True,
     )
     currency_id = fields.Many2one(related="company_id.currency_id")
     partner_id = fields.Many2one(
-        "res.partner", string="Venue / Contract Partner", required=True,
-        tracking=True, check_company=True,
+        "res.partner",
+        string="Venue / Contract Partner",
+        required=True,
+        tracking=True,
+        check_company=True,
     )
     project_id = fields.Many2one(
-        "project.project", required=True, check_company=True, ondelete="restrict",
-        tracking=True, index=True,
+        "project.project",
+        required=True,
+        check_company=True,
+        ondelete="restrict",
+        tracking=True,
+        index=True,
     )
     analytic_account_id = fields.Many2one(
-        related="project_id.account_id", string="Analytic Account", store=True,
+        related="project_id.account_id",
+        string="Analytic Account",
+        store=True,
     )
     date_start = fields.Date(required=True, default=fields.Date.context_today, tracking=True)
     date_end = fields.Date(tracking=True)
     origin_partner_id = fields.Many2one(
-        "res.partner", string="Default Travel Origin", check_company=True,
+        "res.partner",
+        string="Default Travel Origin",
+        check_company=True,
     )
     monthly_fixed_rent = fields.Monetary(tracking=True)
     rent_billing_method = fields.Selection(
@@ -50,20 +64,29 @@ class MbCommercialContract(models.Model):
         tracking=True,
     )
     rent_product_id = fields.Many2one(
-        "product.product", string="Rent Service", check_company=True,
+        "product.product",
+        string="Rent Service",
+        check_company=True,
         domain="[('type', '=', 'service')]",
     )
     notice_days = fields.Integer(default=30)
     review_date = fields.Date()
     attachment_ids = fields.Many2many(
-        "ir.attachment", "mb_commercial_contract_attachment_rel",
-        "contract_id", "attachment_id", string="Contract Documents",
+        "ir.attachment",
+        "mb_commercial_contract_attachment_rel",
+        "contract_id",
+        "attachment_id",
+        string="Contract Documents",
     )
     obligation_ids = fields.One2many(
-        "mb.commercial.obligation", "contract_id", string="Obligations",
+        "mb.commercial.obligation",
+        "contract_id",
+        string="Obligations",
     )
     operation_ids = fields.One2many(
-        "mb.commercial.operation", "contract_id", string="Operations",
+        "mb.commercial.operation",
+        "contract_id",
+        string="Operations",
     )
 
     _date_order = models.Constraint(
@@ -83,23 +106,31 @@ class MbCommercialContract(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get("name", _("New")) == _("New"):
-                vals["name"] = self.env["ir.sequence"].next_by_code(
-                    "mb.commercial.contract"
-                ) or _("New")
+                vals["name"] = self.env["ir.sequence"].next_by_code("mb.commercial.contract") or _(
+                    "New"
+                )
             if not vals.get("project_id"):
                 company = self.env["res.company"].browse(
                     vals.get("company_id") or self.env.company.id
                 )
                 partner = self.env["res.partner"].browse(vals.get("partner_id"))
-                project = self.env["project.project"].with_company(company).create({
-                    "name": vals.get("name") or partner.display_name or _("Commercial Contract"),
-                    "company_id": company.id,
-                    "partner_id": partner.id,
-                    "allow_timesheets": True,
-                    "mb_commercial_kind": "contract",
-                    "date_start": vals.get("date_start"),
-                    "date": vals.get("date_end"),
-                })
+                project = (
+                    self.env["project.project"]
+                    .with_company(company)
+                    .create(
+                        {
+                            "name": vals.get("name")
+                            or partner.display_name
+                            or _("Commercial Contract"),
+                            "company_id": company.id,
+                            "partner_id": partner.id,
+                            "allow_timesheets": True,
+                            "mb_commercial_kind": "contract",
+                            "date_start": vals.get("date_start"),
+                            "date": vals.get("date_end"),
+                        }
+                    )
+                )
                 if not project.account_id:
                     project._create_analytic_account()
                 vals["project_id"] = project.id
@@ -108,11 +139,14 @@ class MbCommercialContract(models.Model):
     @api.constrains("rent_billing_method", "monthly_fixed_rent", "rent_product_id")
     def _check_rent_configuration(self):
         for contract in self:
-            if contract.rent_billing_method == "vendor_bill" \
-                    and contract.monthly_fixed_rent and not contract.rent_product_id:
-                raise ValidationError(_(
-                    "Choose a rent service product before preparing vendor bills."
-                ))
+            if (
+                contract.rent_billing_method == "vendor_bill"
+                and contract.monthly_fixed_rent
+                and not contract.rent_product_id
+            ):
+                raise ValidationError(
+                    _("Choose a rent service product before preparing vendor bills.")
+                )
 
     def action_generate_occurrences(self):
         self.obligation_ids._generate_occurrences()
@@ -138,11 +172,16 @@ class MbCommercialObligation(models.Model):
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
     company_id = fields.Many2one(
-        related="contract_id.company_id", store=True, index=True,
+        related="contract_id.company_id",
+        store=True,
+        index=True,
     )
     contract_id = fields.Many2one(
-        "mb.commercial.contract", required=True, check_company=True,
-        ondelete="cascade", index=True,
+        "mb.commercial.contract",
+        required=True,
+        check_company=True,
+        ondelete="cascade",
+        index=True,
     )
     obligation_type = fields.Selection(
         [("attendance", "Venue attendance"), ("visit", "Site visit")],
@@ -158,8 +197,12 @@ class MbCommercialObligation(models.Model):
     required_hours = fields.Float(default=0.0)
     duration_hours = fields.Float(required=True, default=7.0)
     preferred_weekday = fields.Selection(
-        [(str(day), label) for day, label in enumerate(
-            ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))],
+        [
+            (str(day), label)
+            for day, label in enumerate(
+                ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+            )
+        ],
         required=True,
         default="0",
     )
@@ -168,11 +211,15 @@ class MbCommercialObligation(models.Model):
     date_end = fields.Date()
     horizon_months = fields.Integer(required=True, default=6)
     user_ids = fields.Many2many(
-        "res.users", "mb_commercial_obligation_user_rel", "obligation_id", "user_id",
+        "res.users",
+        "mb_commercial_obligation_user_rel",
+        "obligation_id",
+        "user_id",
         string="Default Assignees",
     )
     occurrence_ids = fields.One2many(
-        "mb.commercial.obligation.occurrence", "obligation_id",
+        "mb.commercial.obligation.occurrence",
+        "obligation_id",
     )
 
     _date_order = models.Constraint(
@@ -184,7 +231,8 @@ class MbCommercialObligation(models.Model):
         "Occurrences, duration, and planning horizon must be positive.",
     )
     _hours_nonnegative = models.Constraint(
-        "CHECK(required_hours >= 0)", "Required hours cannot be negative.",
+        "CHECK(required_hours >= 0)",
+        "Required hours cannot be negative.",
     )
     _start_hour_range = models.Constraint(
         "CHECK(start_hour >= 0 AND start_hour < 24)",
@@ -195,18 +243,24 @@ class MbCommercialObligation(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get("contract_id") and not vals.get("date_start"):
-                vals["date_start"] = self.env["mb.commercial.contract"].browse(
-                    vals["contract_id"]
-                ).date_start
+                vals["date_start"] = (
+                    self.env["mb.commercial.contract"].browse(vals["contract_id"]).date_start
+                )
         records = super().create(vals_list)
         records._generate_occurrences()
         return records
 
     def write(self, vals):
         generation_fields = {
-            "period_unit", "required_occurrences", "duration_hours",
-            "preferred_weekday", "start_hour", "date_start", "date_end",
-            "horizon_months", "active",
+            "period_unit",
+            "required_occurrences",
+            "duration_hours",
+            "preferred_weekday",
+            "start_hour",
+            "date_start",
+            "date_end",
+            "horizon_months",
+            "active",
         }
         result = super().write(vals)
         if generation_fields.intersection(vals):
@@ -268,20 +322,26 @@ class MbCommercialObligation(models.Model):
                     if obligation.date_end and occurrence_date > obligation.date_end:
                         continue
                     planned_start = obligation._local_datetime_to_utc(occurrence_date)
-                    values.append({
-                        "obligation_id": obligation.id,
-                        "period_start": period_start,
-                        "sequence": sequence,
-                        "planned_start": planned_start,
-                        "planned_end": planned_start + timedelta(hours=obligation.duration_hours),
-                    })
+                    values.append(
+                        {
+                            "obligation_id": obligation.id,
+                            "period_start": period_start,
+                            "sequence": sequence,
+                            "planned_start": planned_start,
+                            "planned_end": planned_start
+                            + timedelta(hours=obligation.duration_hours),
+                        }
+                    )
         if values:
             for vals in values:
-                existing = occurrence_model.search([
-                    ("obligation_id", "=", vals["obligation_id"]),
-                    ("period_start", "=", vals["period_start"]),
-                    ("sequence", "=", vals["sequence"]),
-                ], limit=1)
+                existing = occurrence_model.search(
+                    [
+                        ("obligation_id", "=", vals["obligation_id"]),
+                        ("period_start", "=", vals["period_start"]),
+                        ("sequence", "=", vals["sequence"]),
+                    ],
+                    limit=1,
+                )
                 if not existing:
                     occurrence_model.create(vals)
         return True
@@ -308,14 +368,21 @@ class MbCommercialObligationOccurrence(models.Model):
 
     name = fields.Char(compute="_compute_name", store=True)
     company_id = fields.Many2one(
-        related="obligation_id.company_id", store=True, index=True,
+        related="obligation_id.company_id",
+        store=True,
+        index=True,
     )
     obligation_id = fields.Many2one(
-        "mb.commercial.obligation", required=True, check_company=True,
-        ondelete="cascade", index=True,
+        "mb.commercial.obligation",
+        required=True,
+        check_company=True,
+        ondelete="cascade",
+        index=True,
     )
     contract_id = fields.Many2one(
-        related="obligation_id.contract_id", store=True, index=True,
+        related="obligation_id.contract_id",
+        store=True,
+        index=True,
     )
     period_start = fields.Date(required=True, index=True)
     sequence = fields.Integer(required=True)
@@ -335,7 +402,9 @@ class MbCommercialObligationOccurrence(models.Model):
         index=True,
     )
     operation_id = fields.Many2one(
-        "mb.commercial.operation", check_company=True, copy=False,
+        "mb.commercial.operation",
+        check_company=True,
+        copy=False,
         ondelete="restrict",
     )
     task_id = fields.Many2one(related="operation_id.task_id", store=True)
@@ -353,7 +422,8 @@ class MbCommercialObligationOccurrence(models.Model):
     @api.depends("obligation_id.name", "period_start", "sequence")
     def _compute_name(self):
         for occurrence in self:
-            occurrence.name = _("%(name)s — %(period)s #%(sequence)s",
+            occurrence.name = _(
+                "%(name)s — %(period)s #%(sequence)s",
                 name=occurrence.obligation_id.name or _("Obligation"),
                 period=occurrence.period_start or "",
                 sequence=occurrence.sequence,
@@ -380,7 +450,9 @@ class MbCommercialObligationOccurrence(models.Model):
         return {
             "name": self.name,
             "company_id": self.company_id.id,
-            "operation_type": "attendance" if self.obligation_id.obligation_type == "attendance" else "visit",
+            "operation_type": "attendance"
+            if self.obligation_id.obligation_type == "attendance"
+            else "visit",
             "contract_id": self.contract_id.id,
             "project_id": self.contract_id.project_id.id,
             "partner_id": self.contract_id.partner_id.id,
@@ -401,15 +473,23 @@ class MbCommercialObligationOccurrence(models.Model):
         for occurrence in self:
             if occurrence.state == "done":
                 raise UserError(_("A completed occurrence cannot be cancelled."))
-            if occurrence.operation_id and occurrence.operation_id.state not in ("cancelled", "done", "financially_closed"):
+            if occurrence.operation_id and occurrence.operation_id.state not in (
+                "cancelled",
+                "done",
+                "financially_closed",
+            ):
                 occurrence.operation_id.action_cancel()
             occurrence.state = "cancelled"
         return True
 
     def write(self, vals):
         protected = {"obligation_id", "period_start", "sequence", "planned_start", "planned_end"}
-        if protected.intersection(vals) and self.filtered(lambda record: record.state != "proposed"):
-            raise UserError(_("Approved or completed contractual occurrences cannot be rescheduled."))
+        if protected.intersection(vals) and self.filtered(
+            lambda record: record.state != "proposed"
+        ):
+            raise UserError(
+                _("Approved or completed contractual occurrences cannot be rescheduled.")
+            )
         return super().write(vals)
 
     @api.ondelete(at_uninstall=False)

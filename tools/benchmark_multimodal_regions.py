@@ -141,7 +141,7 @@ def call_gemini(key: str, model: str, crops: list[bytes]) -> tuple[dict, dict]:
     if len(payload) > MAX_RESPONSE_BYTES:
         raise RuntimeError("provider response exceeded the 256 KB bound")
     envelope = json.loads(payload)
-    parts = (((envelope.get("candidates") or [{}])[0].get("content") or {}).get("parts") or [])
+    parts = ((envelope.get("candidates") or [{}])[0].get("content") or {}).get("parts") or []
     content = "".join(part.get("text", "") for part in parts if isinstance(part, dict))
     if not content:
         raise RuntimeError("Gemini returned no structured content")

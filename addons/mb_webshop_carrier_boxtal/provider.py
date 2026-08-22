@@ -24,7 +24,6 @@ from odoo.addons.mb_webshop_carrier_base.provider import (
     register_provider,
 )
 
-
 PRODUCTION_BASE = "https://api.boxtal.com"
 SANDBOX_BASE = "https://api.boxtal.build"
 JSON_LIMIT = 1024 * 1024
@@ -43,6 +42,7 @@ class BoxtalProvider:
     supports_return_label = False
     supports_tracking_lookup = False
     supports_contextual_options = False
+
     # The current OpenAPI has neither an idempotency header nor lookup by
     # Shipment.externalId. An ambiguous POST must therefore remain unknown.
     @staticmethod
@@ -152,11 +152,15 @@ class BoxtalProvider:
             raise ProviderValidationError("invalid_pickup_point")
         try:
             latitude = float(position["latitude"]) if position.get("latitude") is not None else None
-            longitude = float(position["longitude"]) if position.get("longitude") is not None else None
+            longitude = (
+                float(position["longitude"]) if position.get("longitude") is not None else None
+            )
         except (TypeError, ValueError) as error:
             raise ProviderValidationError("invalid_pickup_coordinates") from error
         number = str(location.get("number") or "").strip()
-        street = " ".join(part for part in (number, str(location.get("street") or "").strip()) if part)
+        street = " ".join(
+            part for part in (number, str(location.get("street") or "").strip()) if part
+        )
         return PickupPoint(
             code=code,
             name=str(point.get("name") or code)[:255],
@@ -167,7 +171,9 @@ class BoxtalProvider:
             latitude=latitude,
             longitude=longitude,
             distance_m=int(item.get("distanceFromSearchLocation") or 0),
-            opening_hours=point.get("openingDays") if isinstance(point.get("openingDays"), dict) else {},
+            opening_hours=point.get("openingDays")
+            if isinstance(point.get("openingDays"), dict)
+            else {},
         )
 
     def search_pickup_points(self, query):
@@ -222,10 +228,15 @@ class BoxtalProvider:
 
     @staticmethod
     def _address(address, address_type):
-        street = " ".join(filter(None, (
-            str(address.get("street") or "").strip(),
-            str(address.get("street2") or "").strip(),
-        )))
+        street = " ".join(
+            filter(
+                None,
+                (
+                    str(address.get("street") or "").strip(),
+                    str(address.get("street2") or "").strip(),
+                ),
+            )
+        )
         country = str(address.get("country_code") or "").upper()
         if not street or not address.get("city") or not country:
             raise ProviderValidationError("complete_address_required")
@@ -249,7 +260,9 @@ class BoxtalProvider:
             parcel.width_cm or float(getattr(self.carrier, "mb_boxtal_width_cm", 0)),
             parcel.height_cm or float(getattr(self.carrier, "mb_boxtal_height_cm", 0)),
         )
-        if parcel.weight_kg <= 0 or any(value <= 0 or not math.isfinite(value) for value in dimensions):
+        if parcel.weight_kg <= 0 or any(
+            value <= 0 or not math.isfinite(value) for value in dimensions
+        ):
             raise ProviderValidationError("positive_weight_and_dimensions_required")
         content_id = str(getattr(self.carrier, "mb_boxtal_content_category", "") or "")
         description = str(getattr(self.carrier, "mb_boxtal_content_description", "") or "")
@@ -423,7 +436,10 @@ class BoxtalProvider:
         documents = payload.get("content")
         if not isinstance(documents, list):
             raise ProviderUnavailableError("invalid_document_response")
-        label = next((item for item in documents if isinstance(item, dict) and item.get("type") == "LABEL"), None)
+        label = next(
+            (item for item in documents if isinstance(item, dict) and item.get("type") == "LABEL"),
+            None,
+        )
         if not label or not isinstance(label.get("url"), str):
             raise ProviderTransientError("label_not_ready")
         return self._download_document(label["url"])
@@ -488,7 +504,10 @@ class BoxtalProvider:
         if not isinstance(subscriptions, list):
             raise ProviderUnavailableError("invalid_subscription_response")
         for subscription in subscriptions:
-            if not isinstance(subscription, dict) or subscription.get("callbackUrl") != callback_url:
+            if (
+                not isinstance(subscription, dict)
+                or subscription.get("callbackUrl") != callback_url
+            ):
                 continue
             subscription_id = str(subscription.get("id") or "")
             if not subscription_id or len(subscription_id) > 128:

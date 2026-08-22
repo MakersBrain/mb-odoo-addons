@@ -10,10 +10,16 @@ class PosConfig(models.Model):
         # POS cashiers intentionally do not receive Label Studio access. Read
         # only the active templates needed for the computed POS projection,
         # with an explicit company boundary before elevating privileges.
-        templates = self.env["mb.label.template"].sudo().search([
-            ("active", "=", True),
-            ("company_id", "in", self.mapped("company_id").ids),
-        ])
+        templates = (
+            self.env["mb.label.template"]
+            .sudo()
+            .search(
+                [
+                    ("active", "=", True),
+                    ("company_id", "in", self.mapped("company_id").ids),
+                ]
+            )
+        )
         by_company = {}
         for template in templates:
             prefix = template.current_version_id.qr_url_prefix or template.qr_url_prefix

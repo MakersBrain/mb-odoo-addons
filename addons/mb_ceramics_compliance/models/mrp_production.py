@@ -31,8 +31,10 @@ class MrpProduction(models.Model):
         if not categories:
             return self.env["stock.lot"].browse()
         return lots.filtered(
-            lambda lot: lot.product_id.categ_id.id in categories.ids
-            or lot.product_id.categ_id.parent_id.id in categories.ids
+            lambda lot: (
+                lot.product_id.categ_id.id in categories.ids
+                or lot.product_id.categ_id.parent_id.id in categories.ids
+            )
         )
 
     def _mb_check_food_contact(self):
@@ -40,20 +42,25 @@ class MrpProduction(models.Model):
             if not production.product_id.mb_food_contact:
                 continue
             if production.qty_producing and not production.lot_producing_ids:
-                raise UserError(_(
-                    "%s produces a food-contact article and needs a lot number "
-                    "before it can be marked done.",
-                    production.name,
-                ))
+                raise UserError(
+                    _(
+                        "%s produces a food-contact article and needs a lot number "
+                        "before it can be marked done.",
+                        production.name,
+                    )
+                )
             untested = production._mb_consumed_glaze_lots().filtered(
-                lambda lot: not lot.mb_migration_passed)
+                lambda lot: not lot.mb_migration_passed
+            )
             if untested:
-                raise UserError(_(
-                    "These glaze lots have no passing migration test, so %(order)s "
-                    "cannot be released as food contact: %(lots)s",
-                    order=production.name,
-                    lots=", ".join(untested.mapped("name")),
-                ))
+                raise UserError(
+                    _(
+                        "These glaze lots have no passing migration test, so %(order)s "
+                        "cannot be released as food contact: %(lots)s",
+                        order=production.name,
+                        lots=", ".join(untested.mapped("name")),
+                    )
+                )
 
     def button_mark_done(self):
         self._mb_check_food_contact()

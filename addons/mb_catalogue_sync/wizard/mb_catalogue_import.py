@@ -23,12 +23,16 @@ class MbCatalogueImport(models.TransientModel):
     _description = "Import materials from the master catalogue"
 
     service_id = fields.Many2one(
-        "mb.catalogue.service", string="Catalogue", required=True,
-        default=lambda self: self.env["mb.catalogue.service"].search([], limit=1))
+        "mb.catalogue.service",
+        string="Catalogue",
+        required=True,
+        default=lambda self: self.env["mb.catalogue.service"].search([], limit=1),
+    )
     query = fields.Char(
         string="Search",
         help="A manufacturer code or a product name: PC-20, SC74, hot tamale. "
-             "Punctuation in a code does not matter.")
+        "Punctuation in a code does not matter.",
+    )
     manufacturer = fields.Char(help="Restrict to one manufacturer id, e.g. mayco.")
     line_ids = fields.One2many("mb.catalogue.import.line", "wizard_id")
     result_count = fields.Integer(string="Results", compute="_compute_result_count")
@@ -51,7 +55,8 @@ class MbCatalogueImport(models.TransientModel):
             params["manufacturer"] = self.manufacturer
 
         payload = self.env["mb.catalogue.client"]._get(
-            self.service_id, "/v1/canonical-products", params)
+            self.service_id, "/v1/canonical-products", params
+        )
         products = payload.get("products") or []
 
         # Which of these the workshop already has, so the list says so rather
@@ -60,25 +65,35 @@ class MbCatalogueImport(models.TransientModel):
         existing = {
             product.mb_canonical_id: product
             for product in template.search(
-                [("mb_canonical_id", "in", [p["canonical_product_id"] for p in products])])
+                [("mb_canonical_id", "in", [p["canonical_product_id"] for p in products])]
+            )
         }
 
         self.line_ids.unlink()
-        self.line_ids = [(0, 0, {
-            "canonical_id": product["canonical_product_id"],
-            "brand": product.get("brand"),
-            "manufacturer_sku": product.get("manufacturer_sku"),
-            "name": product.get("canonical_name"),
-            "family": product.get("family"),
-            "firing_range": product.get("firing_range"),
-            "source_count": product.get("source_count") or 0,
-            "unit_price_low": product.get("min_price_per_litre")
-                              or product.get("min_price_per_kg") or 0.0,
-            "unit_price_high": product.get("max_price_per_litre")
-                               or product.get("max_price_per_kg") or 0.0,
-            "unit_price_per": "l" if product.get("min_price_per_litre") else "kg",
-            "product_tmpl_id": existing.get(product["canonical_product_id"], template).id,
-        }) for product in products]
+        self.line_ids = [
+            (
+                0,
+                0,
+                {
+                    "canonical_id": product["canonical_product_id"],
+                    "brand": product.get("brand"),
+                    "manufacturer_sku": product.get("manufacturer_sku"),
+                    "name": product.get("canonical_name"),
+                    "family": product.get("family"),
+                    "firing_range": product.get("firing_range"),
+                    "source_count": product.get("source_count") or 0,
+                    "unit_price_low": product.get("min_price_per_litre")
+                    or product.get("min_price_per_kg")
+                    or 0.0,
+                    "unit_price_high": product.get("max_price_per_litre")
+                    or product.get("max_price_per_kg")
+                    or 0.0,
+                    "unit_price_per": "l" if product.get("min_price_per_litre") else "kg",
+                    "product_tmpl_id": existing.get(product["canonical_product_id"], template).id,
+                },
+            )
+            for product in products
+        ]
 
         return self._reopen()
 
@@ -91,18 +106,22 @@ class MbCatalogueImport(models.TransientModel):
 
         summary = self.service_id.action_import(chosen.mapped("canonical_id"))
         templates = self.env["product.template"].search(
-            [("mb_canonical_id", "in", chosen.mapped("canonical_id"))])
+            [("mb_canonical_id", "in", chosen.mapped("canonical_id"))]
+        )
 
-        message = _("%(created)s created, %(updated)s updated, "
-                    "%(offers)s supplier prices.",
-                    created=summary["imported"], updated=summary["updated"],
-                    offers=summary["offers"])
+        message = _(
+            "%(created)s created, %(updated)s updated, %(offers)s supplier prices.",
+            created=summary["imported"],
+            updated=summary["updated"],
+            offers=summary["offers"],
+        )
         if summary["refused"]:
             # Said out loud. An import that quietly dropped every price looks
             # exactly like a supplier that has none.
             message += "\n" + "\n".join(
                 _("Refused %(reason)s: %(count)s", reason=reason, count=count)
-                for reason, count in sorted(summary["refused"].items()))
+                for reason, count in sorted(summary["refused"].items())
+            )
         _logger.info("catalogue import: %s", message.replace("\n", " | "))
 
         return {
@@ -148,7 +167,7 @@ class MbCatalogueImportLine(models.TransientModel):
     unit_price_low = fields.Float(string="From", readonly=True, digits=(12, 2))
     unit_price_high = fields.Float(string="To", readonly=True, digits=(12, 2))
     unit_price_per = fields.Selection(
-        [("l", "per litre"), ("kg", "per kg")], string="Price per", readonly=True)
+        [("l", "per litre"), ("kg", "per kg")], string="Price per", readonly=True
+    )
     # Set when the workshop already has it, which is why the row is not tickable.
-    product_tmpl_id = fields.Many2one(
-        "product.template", string="Already imported", readonly=True)
+    product_tmpl_id = fields.Many2one("product.template", string="Already imported", readonly=True)

@@ -15,12 +15,14 @@ class MrpProduction(models.Model):
         """
         self.ensure_one()
         if lot.product_id != self.product_id:
-            raise UserError(_(
-                "Lot %(lot)s belongs to %(other)s, not to %(wanted)s.",
-                lot=lot.name,
-                other=lot.product_id.display_name,
-                wanted=self.product_id.display_name,
-            ))
+            raise UserError(
+                _(
+                    "Lot %(lot)s belongs to %(other)s, not to %(wanted)s.",
+                    lot=lot.name,
+                    other=lot.product_id.display_name,
+                    wanted=self.product_id.display_name,
+                )
+            )
         if lot not in self.lot_producing_ids:
             self.lot_producing_ids = [(4, lot.id)]
         return lot

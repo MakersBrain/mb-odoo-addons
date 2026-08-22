@@ -10,16 +10,18 @@ import requests
 import werkzeug.urls
 
 from odoo import SUPERUSER_ID, http
-from odoo.addons.auth_oauth.controllers.main import (
-    OAuthController as OAuthControllerBase,
-    OAuthLogin as OAuthLoginBase,
-)
-from odoo.addons.web.controllers.utils import _get_login_redirect_url, ensure_db
 from odoo.exceptions import AccessDenied
 from odoo.http import request
 
-from .auth import bootstrap_credential
+from odoo.addons.auth_oauth.controllers.main import (
+    OAuthController as OAuthControllerBase,
+)
+from odoo.addons.auth_oauth.controllers.main import (
+    OAuthLogin as OAuthLoginBase,
+)
+from odoo.addons.web.controllers.utils import _get_login_redirect_url, ensure_db
 
+from .auth import bootstrap_credential
 
 ATTEMPT_SESSION_KEY = "mb_oidc_login_attempt"
 ATTEMPT_LIFETIME_SECONDS = 300
@@ -113,7 +115,11 @@ class MBLogin(OAuthLoginBase):
                 or 0
             )
             provider = next(
-                (candidate for candidate in self.list_providers() if candidate["id"] == provider_id),
+                (
+                    candidate
+                    for candidate in self.list_providers()
+                    if candidate["id"] == provider_id
+                ),
                 None,
             )
             if provider:
@@ -161,9 +167,7 @@ class MBCodeFlowController(OAuthControllerBase):
         company = request.env.company.sudo()
         workshop_id = company.mb_control_workshop_id or ""
         control_api = os.environ.get("MB_CONTROL_API_URL", "").rstrip("/")
-        if not workshop_id or not control_api.startswith(
-            ("https://", "http://control.localhost:")
-        ):
+        if not workshop_id or not control_api.startswith(("https://", "http://control.localhost:")):
             raise AccessDenied()
         endpoint = f"{control_api}/internal/v1/workshops/{workshop_id}/oidc/verify"
         try:
@@ -191,21 +195,25 @@ class MBCodeFlowController(OAuthControllerBase):
         return subject
 
     def _login_existing_user(self, provider, subject, return_target):
-        user = request.env["res.users"].with_user(SUPERUSER_ID).search([
-            ("active", "=", True),
-            ("mb_rauthy_subject", "=", subject),
-            ("oauth_provider_id", "=", provider.id),
-            ("oauth_uid", "=", subject),
-        ])
+        user = (
+            request.env["res.users"]
+            .with_user(SUPERUSER_ID)
+            .search(
+                [
+                    ("active", "=", True),
+                    ("mb_rauthy_subject", "=", subject),
+                    ("oauth_provider_id", "=", provider.id),
+                    ("oauth_uid", "=", subject),
+                ]
+            )
+        )
         if len(user) != 1:
             raise AccessDenied()
         request.session.uid = None
         request.session["pre_login"] = user.login
         request.session["pre_uid"] = user.id
         request.session.finalize(request.env)
-        response = request.redirect(
-            _get_login_redirect_url(user.id, return_target), 303
-        )
+        response = request.redirect(_get_login_redirect_url(user.id, return_target), 303)
         response.autocorrect_location_header = False
         return response
 
@@ -236,16 +244,17 @@ class MBCodeFlowController(OAuthControllerBase):
             attempt = self._consume_attempt(params.get("state"))
             if params.get("error") or not isinstance(params.get("code"), str):
                 raise AccessDenied()
-            provider = request.env["auth.oauth.provider"].sudo().browse(
-                int(attempt["provider_id"])
-            ).exists()
+            provider = (
+                request.env["auth.oauth.provider"]
+                .sudo()
+                .browse(int(attempt["provider_id"]))
+                .exists()
+            )
             if not provider or not provider.enabled or not provider.mb_code_flow:
                 raise AccessDenied()
             tokens = self._redeem_code(provider, attempt, params["code"])
             subject = self._validate_tokens(attempt, tokens)
-            return self._login_existing_user(
-                provider, subject, attempt["return_target"]
-            )
+            return self._login_existing_user(provider, subject, attempt["return_target"])
         except (AccessDenied, KeyError, TypeError, ValueError, requests.RequestException):
             response = request.redirect("/web/login?oauth_error=2", 303)
             response.autocorrect_location_header = False

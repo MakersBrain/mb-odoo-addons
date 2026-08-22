@@ -12,39 +12,81 @@ found in the field rather than in this file.
 """
 
 KILNS = [
-    {"id": 41, "name": "Ecotop 80", "zones": 1, "control_method": "TC304",
-     "controller": {"id": 77},
-     "manufacturer": "Rohde", "model_number": "TE 80 S",
-     "volume": 80, "power": 6.0, "max_temperature": 1320.0,
-     "heating_method": "electric", "serial_number": "80275",
-     "purchase_date": "2025-04-24"},
+    {
+        "id": 41,
+        "name": "Ecotop 80",
+        "zones": 1,
+        "control_method": "TC304",
+        "controller": {"id": 77},
+        "manufacturer": "Rohde",
+        "model_number": "TE 80 S",
+        "volume": 80,
+        "power": 6.0,
+        "max_temperature": 1320.0,
+        "heating_method": "electric",
+        "serial_number": "80275",
+        "purchase_date": "2025-04-24",
+    },
     {"id": 42, "name": "", "zones": 3, "controller": 78},
 ]
 
 # ROHDE's model catalogue. The live one holds 315 rows and lists a model once
 # per sales region, identical but for `location` - so the duplicate is here too.
 KILN_TYPES = [
-    {"id": 468, "manufacturer": "Rohde", "series": "TE-S",
-     "model_number": "TE 80 S", "configuration": "top_loader",
-     "heating_method": "electric", "location": "location_1_europe",
-     "voltage": 400, "phases": 1},
-    {"id": 611, "manufacturer": "Rohde", "series": "TE-S",
-     "model_number": "TE 80 S", "configuration": "top_loader",
-     "heating_method": "electric", "location": "location_3_other",
-     "voltage": 400, "phases": 1},
-    {"id": 486, "manufacturer": "Rohde", "series": "ELS-N",
-     "model_number": "ELS 150 N", "configuration": "front_loader",
-     "heating_method": "electric", "location": "location_1_europe",
-     "voltage": 230, "phases": 1},
+    {
+        "id": 468,
+        "manufacturer": "Rohde",
+        "series": "TE-S",
+        "model_number": "TE 80 S",
+        "configuration": "top_loader",
+        "heating_method": "electric",
+        "location": "location_1_europe",
+        "voltage": 400,
+        "phases": 1,
+    },
+    {
+        "id": 611,
+        "manufacturer": "Rohde",
+        "series": "TE-S",
+        "model_number": "TE 80 S",
+        "configuration": "top_loader",
+        "heating_method": "electric",
+        "location": "location_3_other",
+        "voltage": 400,
+        "phases": 1,
+    },
+    {
+        "id": 486,
+        "manufacturer": "Rohde",
+        "series": "ELS-N",
+        "model_number": "ELS 150 N",
+        "configuration": "front_loader",
+        "heating_method": "electric",
+        "location": "location_1_europe",
+        "voltage": 230,
+        "phases": 1,
+    },
 ]
 
 CONTROLLERS = [
-    {"id": 77, "is_communicating": True, "controller_state": "firing",
-     "temperature_1": 1043.5, "temperature_set_point": 1240,
-     "temperature_units": "Celsius", "current_segment_number": 3},
-    {"id": 78, "is_communicating": False, "controller_state": "idle",
-     "temperature_1": 68, "temperature_set_point": None,
-     "temperature_units": "Fahrenheit", "current_segment_number": None},
+    {
+        "id": 77,
+        "is_communicating": True,
+        "controller_state": "firing",
+        "temperature_1": 1043.5,
+        "temperature_set_point": 1240,
+        "temperature_units": "Celsius",
+        "current_segment_number": 3,
+    },
+    {
+        "id": 78,
+        "is_communicating": False,
+        "controller_state": "idle",
+        "temperature_1": 68,
+        "temperature_set_point": None,
+        "temperature_units": "Fahrenheit",
+        "current_segment_number": None,
+    },
 ]
 
 # 100 deg/h from ambient to 1000, then a 90 minute hold. The second segment
@@ -56,10 +98,22 @@ BISQUE_PROGRAM = {
     "event_relay_1_function": "unused",
     "event_relay_2_function": "unused",
     "segments": [
-        {"id": 488992, "program_id": 289506, "number": 1, "ramp_rate": 100.0,
-         "target_temperature": 1000.0, "soak_time": 0},
-        {"id": 488993, "program_id": 289506, "number": 2, "ramp_rate": 1000.0,
-         "target_temperature": 1000.0, "soak_time": 90},
+        {
+            "id": 488992,
+            "program_id": 289506,
+            "number": 1,
+            "ramp_rate": 100.0,
+            "target_temperature": 1000.0,
+            "soak_time": 0,
+        },
+        {
+            "id": 488993,
+            "program_id": 289506,
+            "number": 2,
+            "ramp_rate": 1000.0,
+            "target_temperature": 1000.0,
+            "soak_time": 90,
+        },
     ],
 }
 
@@ -69,10 +123,22 @@ BISQUE_PROGRAM_REVISED = {
     "event_relay_1_function": "unused",
     "event_relay_2_function": "unused",
     "segments": [
-        {"id": 498147, "program_id": 293771, "number": 1, "ramp_rate": 150.0,
-         "target_temperature": 1040.0, "soak_time": 30},
-        {"id": 498148, "program_id": 293771, "number": 2, "ramp_rate": 1000.0,
-         "target_temperature": 1040.0, "soak_time": 120},
+        {
+            "id": 498147,
+            "program_id": 293771,
+            "number": 1,
+            "ramp_rate": 150.0,
+            "target_temperature": 1040.0,
+            "soak_time": 30,
+        },
+        {
+            "id": 498148,
+            "program_id": 293771,
+            "number": 2,
+            "ramp_rate": 1000.0,
+            "target_temperature": 1040.0,
+            "soak_time": 120,
+        },
     ],
 }
 
@@ -82,18 +148,33 @@ GLAZE_PROGRAM = {
     "event_relay_1_function": "unused",
     "event_relay_2_function": "unused",
     "segments": [
-        {"id": 1087713, "program_id": 564200, "number": 1, "ramp_rate": 150.0,
-         "target_temperature": 900.0, "soak_time": 0},
-        {"id": 1087714, "program_id": 564200, "number": 2, "ramp_rate": 60.0,
-         "target_temperature": 1230.0, "soak_time": 0},
+        {
+            "id": 1087713,
+            "program_id": 564200,
+            "number": 1,
+            "ramp_rate": 150.0,
+            "target_temperature": 900.0,
+            "soak_time": 0,
+        },
+        {
+            "id": 1087714,
+            "program_id": 564200,
+            "number": 2,
+            "ramp_rate": 60.0,
+            "target_temperature": 1230.0,
+            "soak_time": 0,
+        },
     ],
 }
 
 FIRING_DETAIL = {
-    "id": 4417, "kiln": {"id": 41}, "name": "Biscuit 12/04",
+    "id": 4417,
+    "kiln": {"id": 41},
+    "name": "Biscuit 12/04",
     "start_date_time": "2026-08-04T06:30:00Z",
     "end_date_time": "2026-08-04T18:30:00Z",
-    "library_program_name": "Bisque 1000", "program_number": 3,
+    "library_program_name": "Bisque 1000",
+    "program_number": 3,
     "program": BISQUE_PROGRAM,
 }
 
@@ -101,18 +182,24 @@ FIRING_DETAIL = {
 # Live myKiln never names a programme - `library_program_name` is null on every
 # firing, because the library the name would come from is empty.
 FIRING_DETAIL_OLDER = {
-    "id": 4416, "kiln": {"id": 41}, "name": None,
+    "id": 4416,
+    "kiln": {"id": 41},
+    "name": None,
     "start_date_time": "2026-07-30T06:00:00Z",
     "end_date_time": "2026-07-30T19:00:00Z",
-    "library_program_name": None, "program_number": 3,
+    "library_program_name": None,
+    "program_number": 3,
     "program": BISQUE_PROGRAM_REVISED,
 }
 
 FIRING_DETAIL_GLAZE = {
-    "id": 4419, "kiln": {"id": 41}, "name": None,
+    "id": 4419,
+    "kiln": {"id": 41},
+    "name": None,
     "start_date_time": "2026-08-06T05:00:00Z",
     "end_date_time": "2026-08-06T20:00:00Z",
-    "library_program_name": None, "program_number": 4,
+    "library_program_name": None,
+    "program_number": 4,
     "program": GLAZE_PROGRAM,
 }
 

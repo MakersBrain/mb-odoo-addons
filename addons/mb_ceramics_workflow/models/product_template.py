@@ -40,12 +40,18 @@ class ProductTemplate(models.Model):
             if product.mb_second_product_tmpl_id == product:
                 raise ValidationError(_("A product cannot be its own seconds product."))
             if product.mb_second_product_tmpl_id.tracking != product.tracking:
-                raise ValidationError(_("The first-quality and seconds products must use the same tracking policy."))
+                raise ValidationError(
+                    _("The first-quality and seconds products must use the same tracking policy.")
+                )
 
     @api.constrains("mb_firing_min_temperature", "mb_firing_max_temperature")
     def _check_firing_range(self):
         for product in self:
-            if (product.mb_firing_min_temperature and product.mb_firing_max_temperature
-                    and product.mb_firing_min_temperature
-                    > product.mb_firing_max_temperature):
-                raise ValidationError(_("The minimum firing temperature cannot exceed the maximum."))
+            if (
+                product.mb_firing_min_temperature
+                and product.mb_firing_max_temperature
+                and product.mb_firing_min_temperature > product.mb_firing_max_temperature
+            ):
+                raise ValidationError(
+                    _("The minimum firing temperature cannot exceed the maximum.")
+                )

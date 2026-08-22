@@ -25,8 +25,7 @@ class TestKilnWorkcenter(TransactionCase):
         """
         kiln = self.env["mb.kiln"].create({"name": "Nabertherm Top 60"})
         self.assertEqual(kiln.workcenter_id.resource_calendar_id, self.continuous)
-        self.assertEqual(
-            sum(self.continuous.attendance_ids.mapped("duration_hours")), 168.0)
+        self.assertEqual(sum(self.continuous.attendance_ids.mapped("duration_hours")), 168.0)
 
     def test_kiln_workcenter_is_tagged_firing(self):
         kiln = self.env["mb.kiln"].create({"name": "Skutt KM1027"})
@@ -36,10 +35,12 @@ class TestKilnWorkcenter(TransactionCase):
     def test_existing_records_are_left_alone(self):
         """A workshop already running MRP keeps the work centre it has."""
         workcenter = self.env["mrp.workcenter"].create({"name": "Old kiln bay"})
-        kiln = self.env["mb.kiln"].create({
-            "name": "Rohde KE 100",
-            "workcenter_id": workcenter.id,
-        })
+        kiln = self.env["mb.kiln"].create(
+            {
+                "name": "Rohde KE 100",
+                "workcenter_id": workcenter.id,
+            }
+        )
         self.assertEqual(kiln.workcenter_id, workcenter)
 
     def test_renaming_the_kiln_renames_both_halves(self):
@@ -64,14 +65,16 @@ class TestKilnWorkcenter(TransactionCase):
         capacity is what says a firing of eight and a firing of forty cost the
         same fourteen hours.
         """
-        kiln = self.env["mb.kiln"].create({
-            "name": "Rohde Ecotop 80",
-            "pieces_per_load": 40,
-        })
-        product = self.env["product.product"].create({
-            "name": "Mug", "is_storable": True})
+        kiln = self.env["mb.kiln"].create(
+            {
+                "name": "Rohde Ecotop 80",
+                "pieces_per_load": 40,
+            }
+        )
+        product = self.env["product.product"].create({"name": "Mug", "is_storable": True})
         capacity, _setup, _cleanup = kiln.workcenter_id._get_capacity(
-            product, self.unit, default_capacity=1)
+            product, self.unit, default_capacity=1
+        )
         self.assertEqual(capacity, 40)
 
     def test_pieces_per_load_follows_the_kiln(self):
@@ -84,17 +87,19 @@ class TestKilnWorkcenter(TransactionCase):
     def test_per_product_capacity_still_wins(self):
         """A workshop that has measured its own load is not overruled."""
         kiln = self.env["mb.kiln"].create({"name": "Kiln", "pieces_per_load": 40})
-        tile = self.env["product.product"].create({
-            "name": "Test tile", "is_storable": True})
-        self.env["mrp.workcenter.capacity"].create({
-            "workcenter_id": kiln.workcenter_id.id,
-            "product_id": tile.id,
-            "product_uom_id": self.unit.id,
-            "capacity": 120,
-        })
+        tile = self.env["product.product"].create({"name": "Test tile", "is_storable": True})
+        self.env["mrp.workcenter.capacity"].create(
+            {
+                "workcenter_id": kiln.workcenter_id.id,
+                "product_id": tile.id,
+                "product_uom_id": self.unit.id,
+                "capacity": 120,
+            }
+        )
         kiln.pieces_per_load = 30
         capacity, _setup, _cleanup = kiln.workcenter_id._get_capacity(
-            tile, self.unit, default_capacity=1)
+            tile, self.unit, default_capacity=1
+        )
         self.assertEqual(capacity, 120)
 
 
@@ -119,8 +124,8 @@ class TestSeededWorkcenters(TransactionCase):
             drying.resource_calendar_id,
             self.env.ref("mb_workshop_base.mb_calendar_continuous"),
         )
-        product = self.env["product.product"].create({
-            "name": "Bowl", "is_storable": True})
+        product = self.env["product.product"].create({"name": "Bowl", "is_storable": True})
         capacity, _setup, _cleanup = drying._get_capacity(
-            product, self.env.ref("uom.product_uom_unit"), default_capacity=1)
+            product, self.env.ref("uom.product_uom_unit"), default_capacity=1
+        )
         self.assertGreaterEqual(capacity, 1000)

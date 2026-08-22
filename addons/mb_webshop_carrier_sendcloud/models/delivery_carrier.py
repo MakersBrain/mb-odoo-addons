@@ -22,9 +22,7 @@ class DeliveryCarrier(models.Model):
     mb_sendcloud_carrier_code = fields.Char(
         string="Sendcloud carrier filter", groups="base.group_system"
     )
-    mb_sendcloud_brand_id = fields.Integer(
-        string="Sendcloud brand ID", groups="base.group_system"
-    )
+    mb_sendcloud_brand_id = fields.Integer(string="Sendcloud brand ID", groups="base.group_system")
     mb_sendcloud_use_locations = fields.Boolean(
         string="Offer uses service points",
         help="Require a compatible Sendcloud service point at webshop checkout.",
@@ -36,20 +34,28 @@ class DeliveryCarrier(models.Model):
         string="Parcel content description", default="Handmade goods"
     )
     mb_sendcloud_webhook_ready = fields.Boolean(
-        string="Signed webhook verified", copy=False, readonly=True,
+        string="Signed webhook verified",
+        copy=False,
+        readonly=True,
         groups="base.group_system",
     )
     mb_sendcloud_last_webhook_at = fields.Datetime(
-        string="Last Sendcloud webhook", copy=False, readonly=True,
+        string="Last Sendcloud webhook",
+        copy=False,
+        readonly=True,
         groups="base.group_system",
     )
 
     def _mb_restricted_configuration_fields(self):
         return super()._mb_restricted_configuration_fields() | {
-            "mb_sendcloud_sender_address_id", "mb_sendcloud_contract_id",
-            "mb_sendcloud_carrier_code", "mb_sendcloud_brand_id",
-            "mb_sendcloud_use_locations", "mb_sendcloud_length_cm",
-            "mb_sendcloud_width_cm", "mb_sendcloud_height_cm",
+            "mb_sendcloud_sender_address_id",
+            "mb_sendcloud_contract_id",
+            "mb_sendcloud_carrier_code",
+            "mb_sendcloud_brand_id",
+            "mb_sendcloud_use_locations",
+            "mb_sendcloud_length_cm",
+            "mb_sendcloud_width_cm",
+            "mb_sendcloud_height_cm",
             "mb_sendcloud_content_description",
         }
 
@@ -72,16 +78,23 @@ class DeliveryCarrier(models.Model):
         return super().write(values)
 
     @api.constrains(
-        "delivery_type", "mb_sendcloud_length_cm", "mb_sendcloud_width_cm",
-        "mb_sendcloud_height_cm", "mb_label_format", "mb_sendcloud_sender_address_id",
+        "delivery_type",
+        "mb_sendcloud_length_cm",
+        "mb_sendcloud_width_cm",
+        "mb_sendcloud_height_cm",
+        "mb_label_format",
+        "mb_sendcloud_sender_address_id",
     )
     def _check_sendcloud_configuration(self):
         for carrier in self.filtered(lambda record: record.delivery_type == "mb_sendcloud"):
-            if min(
-                carrier.mb_sendcloud_length_cm,
-                carrier.mb_sendcloud_width_cm,
-                carrier.mb_sendcloud_height_cm,
-            ) <= 0:
+            if (
+                min(
+                    carrier.mb_sendcloud_length_cm,
+                    carrier.mb_sendcloud_width_cm,
+                    carrier.mb_sendcloud_height_cm,
+                )
+                <= 0
+            ):
                 raise ValidationError(_("Sendcloud parcel dimensions must be greater than zero."))
             if carrier.mb_label_format not in ("A4", "A5", "10x15", "ZPL"):
                 raise ValidationError(_("The Sendcloud label format is unsupported."))
@@ -100,9 +113,9 @@ class DeliveryCarrier(models.Model):
     def mb_sendcloud_send_shipping(self, pickings):
         self.ensure_one()
         if self.prod_environment and not self.mb_sendcloud_webhook_ready:
-            raise UserError(_(
-                "Verify a signed Sendcloud test webhook before buying production labels."
-            ))
+            raise UserError(
+                _("Verify a signed Sendcloud test webhook before buying production labels.")
+            )
         return self._mb_send_shipping(pickings)
 
     def mb_sendcloud_cancel_shipment(self, pickings):
@@ -114,9 +127,9 @@ class DeliveryCarrier(models.Model):
     def mb_sendcloud_get_return_label(self, pickings, tracking_number=None, origin_date=None):
         self.ensure_one()
         if self.prod_environment and not self.mb_sendcloud_webhook_ready:
-            raise UserError(_(
-                "Verify a signed Sendcloud test webhook before buying production return labels."
-            ))
+            raise UserError(
+                _("Verify a signed Sendcloud test webhook before buying production return labels.")
+            )
         return self._mb_get_return_label(pickings, tracking_number, origin_date)
 
     def _mb_sendcloud_get_close_locations(self, partner_address, **kwargs):
@@ -131,10 +144,13 @@ class DeliveryCarrier(models.Model):
                 raise UserError(_("Configure a Sendcloud outbound option before testing."))
             if not carrier.mb_sendcloud_sender_address_id:
                 raise UserError(_("Select a Sendcloud sender address before testing."))
-            if not carrier.prod_environment and carrier.mb_provider_service_code != "sendcloud:letter":
-                raise UserError(_(
-                    "Test policy permits only the Sendcloud unstamped-letter option."
-                ))
+            if (
+                not carrier.prod_environment
+                and carrier.mb_provider_service_code != "sendcloud:letter"
+            ):
+                raise UserError(
+                    _("Test policy permits only the Sendcloud unstamped-letter option.")
+                )
         return super().action_mb_test_connection()
 
     def action_mb_copy_sendcloud_webhook_url(self):
@@ -166,8 +182,10 @@ class DeliveryCarrier(models.Model):
             or not {"public_key", "private_key"}.issubset(credentials)
         ):
             raise UserError(_("The carrier rotation material is invalid."))
-        self.sudo().write({
-            "mb_sendcloud_webhook_ready": False,
-            "mb_sendcloud_last_webhook_at": False,
-        })
+        self.sudo().write(
+            {
+                "mb_sendcloud_webhook_ready": False,
+                "mb_sendcloud_last_webhook_at": False,
+            }
+        )
         return secrets.token_urlsafe(24)

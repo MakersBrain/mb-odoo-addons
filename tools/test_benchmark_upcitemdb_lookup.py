@@ -1,5 +1,4 @@
 import pytest
-
 from benchmark_upcitemdb_lookup import (
     LookupCache,
     candidate_matches,

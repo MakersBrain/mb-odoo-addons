@@ -29,9 +29,11 @@ class MbCommercialOperation(models.Model):
                 operation.urssaf_source_ids = False
                 operation.urssaf_recognition_status = "not_applicable"
                 continue
-            candidates = source_model.search([
-                ("company_id", "=", operation.company_id.id),
-            ])
+            candidates = source_model.search(
+                [
+                    ("company_id", "=", operation.company_id.id),
+                ]
+            )
             sources = candidates.filtered(
                 lambda source, current_operation=operation: (
                     source.pos_order_id.mb_commercial_operation_id == current_operation
@@ -41,7 +43,8 @@ class MbCommercialOperation(models.Model):
             operation.urssaf_source_ids = sources
             if sources:
                 operation.urssaf_recognition_status = (
-                    "filed" if all(source.declaration_state == "filed" for source in sources)
+                    "filed"
+                    if all(source.declaration_state == "filed" for source in sources)
                     else "computed"
                 )
                 continue
@@ -49,9 +52,7 @@ class MbCommercialOperation(models.Model):
                 item["component"] == "revenue"
                 for item in operation._get_operation_profitability_items()
             )
-            operation.urssaf_recognition_status = (
-                "pending" if has_revenue else "not_applicable"
-            )
+            operation.urssaf_recognition_status = "pending" if has_revenue else "not_applicable"
 
     def action_view_urssaf_sources(self):
         self.ensure_one()

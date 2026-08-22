@@ -5,7 +5,12 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 from .mykiln_client import (
-    MykilnAuthError, MykilnClient, MykilnError, as_number, as_str, nested_id,
+    MykilnAuthError,
+    MykilnClient,
+    MykilnError,
+    as_number,
+    as_str,
+    nested_id,
     parse_instant,
 )
 from .mykiln_normalize import normalize_firing, normalize_kilns, normalize_program
@@ -39,8 +44,7 @@ def _newest_programs(observations):
         if held is None:
             newest[key] = payload
             continue
-        if payload["fired_at"] and (
-                not held["fired_at"] or payload["fired_at"] > held["fired_at"]):
+        if payload["fired_at"] and (not held["fired_at"] or payload["fired_at"] > held["fired_at"]):
             newest[key] = payload
     return newest
 
@@ -55,8 +59,8 @@ class MbKilnConnection(models.Model):
 
     name = fields.Char(required=True, default="myKiln")
     provider = fields.Selection(
-        selection=[("rohde_mykiln", "ROHDE myKiln")],
-        required=True, default="rohde_mykiln")
+        selection=[("rohde_mykiln", "ROHDE myKiln")], required=True, default="rohde_mykiln"
+    )
     base_url = fields.Char(required=True, default="https://mykiln.eu")
     username = fields.Char(required=True)
     password = fields.Char(
@@ -74,50 +78,61 @@ class MbKilnConnection(models.Model):
         # the token instead of logging in on every wake. It has the same group
         # restriction as the password, is never logged, and is cleared whenever
         # the provider refuses it.
-        groups="mrp.group_mrp_manager", copy=False, readonly=True)
+        groups="mrp.group_mrp_manager",
+        copy=False,
+        readonly=True,
+    )
     provider_token_at = fields.Datetime(readonly=True, copy=False)
 
     active = fields.Boolean(default=True)
     company_id = fields.Many2one(
-        comodel_name="res.company", required=True, index=True,
-        default=lambda self: self.env.company)
+        comodel_name="res.company", required=True, index=True, default=lambda self: self.env.company
+    )
 
     state = fields.Selection(
-        selection=[("draft", "Never connected"), ("ok", "Connected"),
-                   ("error", "Failing")],
-        default="draft", readonly=True)
+        selection=[("draft", "Never connected"), ("ok", "Connected"), ("error", "Failing")],
+        default="draft",
+        readonly=True,
+    )
     last_sync = fields.Datetime(readonly=True)
     last_error = fields.Text(readonly=True)
     firing_limit = fields.Integer(
-        default=5, required=True,
+        default=5,
+        required=True,
         help="How many recent firings the routine poll pulls. Small on "
-             "purpose: history is the backfill's job, not the cron's.")
+        "purpose: history is the backfill's job, not the cron's.",
+    )
     timeout = fields.Integer(
-        default=120, required=True,
+        default=120,
+        required=True,
         help="Seconds to wait on one provider call. Measured against myKiln, "
-             "a listing of fifty firings took twenty-two seconds and was "
-             "slower than one of two hundred, so this is generous by design.")
+        "a listing of fifty firings took twenty-two seconds and was "
+        "slower than one of two hundred, so this is generous by design.",
+    )
 
     backfill_state = fields.Selection(
-        selection=[("idle", "Not started"), ("running", "Running"),
-                   ("done", "Complete")],
-        default="idle", required=True, readonly=True)
+        selection=[("idle", "Not started"), ("running", "Running"), ("done", "Complete")],
+        default="idle",
+        required=True,
+        readonly=True,
+    )
     backfill_offset = fields.Integer(readonly=True)
     backfill_total = fields.Integer(readonly=True)
     sync_programs = fields.Boolean(
         string="Refresh programmes",
         default=True,
         help="Keep each kiln's programmes in step with the controller as "
-             "firings come in. The provider has no programme library to read, "
-             "so a programme is learned from the firings that ran it - which "
-             "means this costs nothing beyond the firings already imported.",
+        "firings come in. The provider has no programme library to read, "
+        "so a programme is learned from the firings that ran it - which "
+        "means this costs nothing beyond the firings already imported.",
     )
     program_scan_limit = fields.Integer(
-        default=50, required=True,
+        default=50,
+        required=True,
         help="How many recent firings the Refresh programmes button looks "
-             "through to find each controller slot. Only the newest firing per "
-             "slot is fetched in full, so this is one listing call plus one "
-             "call per programme found.",
+        "through to find each controller slot. Only the newest firing per "
+        "slot is fetched in full, so this is one listing call plus one "
+        "call per programme found.",
     )
     program_count = fields.Integer(compute="_compute_counts")
 
@@ -125,19 +140,20 @@ class MbKilnConnection(models.Model):
         string="Keep provider payload",
         default=True,
         help="Attach the provider's own JSON to each firing. Roughly 82 KB "
-             "each, so about 6 MB for a full myKiln history. Worth it while "
-             "the integration is young; switch it off once the normalized "
-             "fields are trusted.")
+        "each, so about 6 MB for a full myKiln history. Worth it while "
+        "the integration is young; switch it off once the normalized "
+        "fields are trusted.",
+    )
     backfill_page_size = fields.Integer(
-        default=10, required=True,
+        default=10,
+        required=True,
         help="Firings listed per provider call during backfill. Kept small "
-             "because the listing endpoint degrades badly with page size, "
-             "while fetching each firing's detail and samples is cheap.")
-    backfill_progress = fields.Float(
-        compute="_compute_backfill_progress", string="Backfill %")
+        "because the listing endpoint degrades badly with page size, "
+        "while fetching each firing's detail and samples is cheap.",
+    )
+    backfill_progress = fields.Float(compute="_compute_backfill_progress", string="Backfill %")
 
-    kiln_ids = fields.One2many(
-        comodel_name="mb.kiln", inverse_name="connection_id", readonly=True)
+    kiln_ids = fields.One2many(comodel_name="mb.kiln", inverse_name="connection_id", readonly=True)
     kiln_count = fields.Integer(compute="_compute_counts")
     firing_count = fields.Integer(compute="_compute_counts")
 
@@ -146,16 +162,19 @@ class MbKilnConnection(models.Model):
         for connection in self:
             total = connection.backfill_total
             connection.backfill_progress = (
-                100.0 * connection.backfill_offset / total) if total else 0.0
+                (100.0 * connection.backfill_offset / total) if total else 0.0
+            )
 
     def _compute_counts(self):
         for connection in self:
             kilns = connection.kiln_ids
             connection.kiln_count = len(kilns)
             connection.firing_count = self.env["mb.firing"].search_count(
-                [("kiln_id", "in", kilns.ids)])
+                [("kiln_id", "in", kilns.ids)]
+            )
             connection.program_count = self.env["mb.kiln.program"].search_count(
-                [("kiln_id", "in", kilns.ids)])
+                [("kiln_id", "in", kilns.ids)]
+            )
 
     # -- provider access ---------------------------------------------------
 
@@ -164,18 +183,24 @@ class MbKilnConnection(models.Model):
         record = self.sudo()
         if not record.password:
             raise UserError(_("%s has no password set.", self.display_name))
-        return MykilnClient(record.username, record.password, record.base_url,
-                            timeout=record.timeout or 120,
-                            token=record.provider_token or None)
+        return MykilnClient(
+            record.username,
+            record.password,
+            record.base_url,
+            timeout=record.timeout or 120,
+            token=record.provider_token or None,
+        )
 
     def _remember_token(self, client):
         """Persist a token the client had to fetch. A no-op when it reused one."""
         self.ensure_one()
         if client.token_changed and client.token:
-            self.sudo().write({
-                "provider_token": client.token,
-                "provider_token_at": fields.Datetime.now(),
-            })
+            self.sudo().write(
+                {
+                    "provider_token": client.token,
+                    "provider_token_at": fields.Datetime.now(),
+                }
+            )
 
     def _forget_token(self):
         """Drop a token the provider no longer accepts, so the next run logs in."""
@@ -272,16 +297,13 @@ class MbKilnConnection(models.Model):
             # The stored token goes: it is the most likely thing to be stale.
             self._forget_token()
             self.write({"state": "error", "last_error": str(error)})
-            _logger.warning(
-                "kiln connection %s: authentication failed", self.id)
+            _logger.warning("kiln connection %s: authentication failed", self.id)
             raise
         except MykilnError as error:
             self.write({"state": "error", "last_error": str(error)})
-            _logger.warning(
-                "kiln connection %s: %s", self.id, error)
+            _logger.warning("kiln connection %s: %s", self.id, error)
             raise
-        self.write({
-            "state": "ok", "last_error": False, "last_sync": fields.Datetime.now()})
+        self.write({"state": "ok", "last_error": False, "last_sync": fields.Datetime.now()})
 
     def _import_firings(self, client, summaries, kiln_payloads, applied_kilns):
         """Fetch and apply each listed firing. Returns how many were written.
@@ -309,15 +331,16 @@ class MbKilnConnection(models.Model):
         if self.sync_programs:
             self._apply_programs(
                 _newest_programs(
-                    (kiln_external, detail)
-                    for kiln_external, detail, _samples in fetched),
-                applied_kilns)
+                    (kiln_external, detail) for kiln_external, detail, _samples in fetched
+                ),
+                applied_kilns,
+            )
 
         written = 0
         for kiln_external, detail, samples in fetched:
             payload = normalize_firing(
-                detail, samples, units.get(kiln_external, "Celsius"),
-                states.get(kiln_external))
+                detail, samples, units.get(kiln_external, "Celsius"), states.get(kiln_external)
+            )
             if payload and self._apply_firing(payload, applied_kilns):
                 written += 1
         return written
@@ -335,8 +358,11 @@ class MbKilnConnection(models.Model):
         for (kiln_external, _number), payload in sorted(programs.items()):
             kiln = kilns.get(kiln_external)
             if not kiln:
-                _logger.info("skipping programme %s: kiln %s not imported",
-                             payload.get("name"), kiln_external)
+                _logger.info(
+                    "skipping programme %s: kiln %s not imported",
+                    payload.get("name"),
+                    kiln_external,
+                )
                 continue
             applied |= Program._apply_provider(kiln, payload)
         return applied
@@ -361,22 +387,27 @@ class MbKilnConnection(models.Model):
         found = {}
         for payload in payloads:
             external_id = payload["external_id"]
-            kiln = Kiln.search([
-                ("provider", "=", self.provider),
-                ("provider_external_id", "=", external_id),
-                ("company_id", "=", self.company_id.id),
-            ], limit=1)
+            kiln = Kiln.search(
+                [
+                    ("provider", "=", self.provider),
+                    ("provider_external_id", "=", external_id),
+                    ("company_id", "=", self.company_id.id),
+                ],
+                limit=1,
+            )
             values = {
                 "provider": self.provider,
                 "provider_external_id": external_id,
                 "connection_id": self.id,
                 "company_id": self.company_id.id,
             }
-            values.update({
-                key: value
-                for key, value in (payload.get("specification") or {}).items()
-                if value is not None
-            })
+            values.update(
+                {
+                    key: value
+                    for key, value in (payload.get("specification") or {}).items()
+                    if value is not None
+                }
+            )
             if kiln:
                 # The name is set once. An artisan renames a kiln to what they
                 # call it in the workshop, and a poll that renamed it back
@@ -398,18 +429,25 @@ class MbKilnConnection(models.Model):
         self.ensure_one()
         kiln = kilns.get(payload["kiln_external_id"])
         if not kiln:
-            _logger.info("skipping firing %s: kiln %s not imported",
-                         payload["external_id"], payload["kiln_external_id"])
+            _logger.info(
+                "skipping firing %s: kiln %s not imported",
+                payload["external_id"],
+                payload["kiln_external_id"],
+            )
             return self.env["mb.firing"]
 
         Firing = self.env["mb.firing"]
-        firing = Firing.search([
-            ("provider", "=", self.provider),
-            ("external_id", "=", payload["external_id"]),
-            ("company_id", "=", self.company_id.id),
-        ], limit=1)
+        firing = Firing.search(
+            [
+                ("provider", "=", self.provider),
+                ("external_id", "=", payload["external_id"]),
+                ("company_id", "=", self.company_id.id),
+            ],
+            limit=1,
+        )
         program = self.env["mb.kiln.program"]._match(
-            kiln, payload["program"], payload.get("program_number"))
+            kiln, payload["program"], payload.get("program_number")
+        )
         values = {
             "kiln_id": kiln.id,
             "provider": self.provider,
@@ -433,8 +471,7 @@ class MbKilnConnection(models.Model):
             values["kind"] = program.kind
             reference = payload["ended_at"] or payload["last_sample_at"]
             if reference and program.cooling_hours:
-                values["cooling_end"] = reference + timedelta(
-                    hours=program.cooling_hours)
+                values["cooling_end"] = reference + timedelta(hours=program.cooling_hours)
         if firing:
             firing._mb_apply_provider_values(values)
         else:
@@ -469,9 +506,12 @@ class MbKilnConnection(models.Model):
                 return {
                     "type": "ir.actions.client",
                     "tag": "display_notification",
-                    "params": {"type": "danger",
-                               "title": _("myKiln did not answer"),
-                               "message": str(error), "sticky": True},
+                    "params": {
+                        "type": "danger",
+                        "title": _("myKiln did not answer"),
+                        "message": str(error),
+                        "sticky": True,
+                    },
                 }
         return {
             "type": "ir.actions.client",
@@ -489,8 +529,7 @@ class MbKilnConnection(models.Model):
         kilns = self._describe_kilns(client)
         applied_kilns = self._apply_kilns(kilns)
 
-        summaries = client.list_firings(
-            limit=self.program_scan_limit or 50, offset=0)
+        summaries = client.list_firings(limit=self.program_scan_limit or 50, offset=0)
         candidates = {}
         for summary in summaries:
             number = as_number(summary.get("program_number"))
@@ -507,8 +546,7 @@ class MbKilnConnection(models.Model):
         for kiln_external, _number in sorted(candidates):
             firing_id = candidates[(kiln_external, _number)][0]
             observations.append((kiln_external, client.get_firing(firing_id)))
-        applied = self._apply_programs(
-            _newest_programs(observations), applied_kilns)
+        applied = self._apply_programs(_newest_programs(observations), applied_kilns)
         self._remember_token(client)
         return len(applied)
 
@@ -526,14 +564,18 @@ class MbKilnConnection(models.Model):
         """
         for connection in self:
             client = connection._client()
-            connection.write({
-                "backfill_state": "running",
-                "backfill_offset": 0,
-                "backfill_total": client.count_firings(),
-            })
-        self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_backfill").sudo().write({
-            "active": True,
-        })
+            connection.write(
+                {
+                    "backfill_state": "running",
+                    "backfill_offset": 0,
+                    "backfill_total": client.count_firings(),
+                }
+            )
+        self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_backfill").sudo().write(
+            {
+                "active": True,
+            }
+        )
         return True
 
     def action_stop_backfill(self):
@@ -551,21 +593,20 @@ class MbKilnConnection(models.Model):
         while True:
             with self.env.cr.savepoint():
                 summaries = client.list_firings(
-                    limit=self.backfill_page_size, offset=self.backfill_offset)
+                    limit=self.backfill_page_size, offset=self.backfill_offset
+                )
                 if not summaries:
                     self.backfill_state = "done"
                 else:
                     self._import_firings(client, summaries, kilns, applied_kilns)
                     self.backfill_offset += len(summaries)
-                    if (
-                        self.backfill_total
-                        and self.backfill_offset >= self.backfill_total
-                    ):
+                    if self.backfill_total and self.backfill_offset >= self.backfill_total:
                         self.backfill_state = "done"
             if self.env.context.get("cron_id"):
                 remaining = max(self.backfill_total - self.backfill_offset, 0)
                 time_left = self.env["ir.cron"]._commit_progress(
-                    processed=len(summaries), remaining=remaining)
+                    processed=len(summaries), remaining=remaining
+                )
                 if not time_left:
                     break
             if self.backfill_state == "done":
@@ -576,24 +617,23 @@ class MbKilnConnection(models.Model):
 
     @api.model
     def _cron_backfill(self):
-        running = self.search([("backfill_state", "=", "running"),
-                               ("active", "=", True)])
+        running = self.search([("backfill_state", "=", "running"), ("active", "=", True)])
         for connection in running:
             try:
                 connection._backfill_slice()
             except Exception:
-                _logger.exception("kiln backfill failed for connection %s",
-                                  connection.id)
-                connection.write({"backfill_state": "idle",
-                                  "state": "error",
-                                  "last_error": "Backfill interrupted; see the log."})
+                _logger.exception("kiln backfill failed for connection %s", connection.id)
+                connection.write(
+                    {
+                        "backfill_state": "idle",
+                        "state": "error",
+                        "last_error": "Backfill interrupted; see the log.",
+                    }
+                )
                 self.env["ir.cron"]._commit_progress(processed=1)
         if not self.search_count([("backfill_state", "=", "running")]):
-            self.env.ref(
-                "mb_kiln_bridge.ir_cron_mb_kiln_backfill"
-            ).sudo().write({"active": False})
-            self.env["ir.cron"]._commit_progress(
-                remaining=0, deactivate=True)
+            self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_backfill").sudo().write({"active": False})
+            self.env["ir.cron"]._commit_progress(remaining=0, deactivate=True)
         return True
 
     # -- cron --------------------------------------------------------------

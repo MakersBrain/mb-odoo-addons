@@ -76,14 +76,31 @@ PRINTF = re.compile(
 # `{}`, `{0}`, `{name}`, `{name!r:>10}` and QWeb/OWL `{{ expr }}`.
 BRACE = re.compile(r"\{\{[^{}]*\}\}|\{[^{}]*\}")
 TAG = re.compile(r"</?\s*([A-Za-z][-\w]*)((?:\s+[^<>]*?)?)/?>")
-UNSAFE_URL = re.compile(r"""(?:href|src|action|xlink:href)\s*=\s*["']?\s*(javascript|data|vbscript):""", re.I)
+UNSAFE_URL = re.compile(
+    r"""(?:href|src|action|xlink:href)\s*=\s*["']?\s*(javascript|data|vbscript):""", re.I
+)
 EVENT_ATTR = re.compile(r"\son[a-z]+\s*=", re.I)
 SCRIPT_TAG = re.compile(r"<\s*(script|iframe|object|embed)\b", re.I)
 # Void elements never carry a closing tag, so they must not count when the
 # opening and closing multisets are compared.
 VOID_TAGS = {
-    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
-    "param", "source", "track", "wbr", "t-esc", "t-out", "t-raw",
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+    "t-esc",
+    "t-out",
+    "t-raw",
 }
 HAS_LETTER = re.compile(r"[^\W\d_]", re.UNICODE)
 
@@ -192,13 +209,19 @@ def check_pair(where: str, msgid: str, msgstr: str, report: Report, allow_identi
         )
     else:
         # Positional `%s` cannot be reordered; named ones can.
-        positional = [m.group(0) for m in PRINTF.finditer(msgid) if not m.group("key") and m.group(0) != "%%"]
+        positional = [
+            m.group(0) for m in PRINTF.finditer(msgid) if not m.group("key") and m.group(0) != "%%"
+        ]
         if len(positional) > 1:
             translated = [
-                m.group(0) for m in PRINTF.finditer(msgstr) if not m.group("key") and m.group(0) != "%%"
+                m.group(0)
+                for m in PRINTF.finditer(msgstr)
+                if not m.group("key") and m.group(0) != "%%"
             ]
             if positional != translated:
-                report.fail(where, "positional placeholders reordered; use named placeholders instead")
+                report.fail(
+                    where, "positional placeholders reordered; use named placeholders instead"
+                )
 
     source_brace = placeholder_counts(msgid, BRACE)
     target_brace = placeholder_counts(msgstr, BRACE)
@@ -211,7 +234,9 @@ def check_pair(where: str, msgid: str, msgstr: str, report: Report, allow_identi
 
     if msgid.count("\n") != msgstr.count("\n"):
         report.fail(where, "newline structure changed")
-    if msgid.startswith("\n") != msgstr.startswith("\n") or msgid.endswith("\n") != msgstr.endswith("\n"):
+    if msgid.startswith("\n") != msgstr.startswith("\n") or msgid.endswith("\n") != msgstr.endswith(
+        "\n"
+    ):
         report.fail(where, "leading/trailing newline changed")
 
     check_markup(where, msgid, msgstr, report)
@@ -326,11 +351,15 @@ PY_USER_FACING = re.compile(
 # The receiver in front of such a call, when it is a logger.
 LOGGER_RECEIVER = re.compile(r"(?:^|[^\w.])(?:_?logger|logging|_log)\s*\.\s*$")
 # Odoo notification helper, whose message and title are both user-facing.
-PY_NOTIFY = re.compile(r"['\"](?:message|title)['\"]\s*:\s*(?P<quote>['\"])(?P<text>[^'\"]{4,})(?P=quote)")
+PY_NOTIFY = re.compile(
+    r"['\"](?:message|title)['\"]\s*:\s*(?P<quote>['\"])(?P<text>[^'\"]{4,})(?P=quote)"
+)
 JS_USER_FACING = re.compile(
     r"\b(?:notification\.add|this\.notification\.add|dialog\.add|alert|confirm)\s*\(\s*(?P<quote>[`'\"])"
 )
-JS_LABEL = re.compile(r"\b(?:title|label|body|message|confirmLabel|cancelLabel)\s*:\s*(?P<quote>[`'\"])(?P<text>[^`'\"]{4,})(?P=quote)")
+JS_LABEL = re.compile(
+    r"\b(?:title|label|body|message|confirmLabel|cancelLabel)\s*:\s*(?P<quote>[`'\"])(?P<text>[^`'\"]{4,})(?P=quote)"
+)
 PROSE = re.compile(r"^[A-ZÀ-ÖØ-Þ][\w'’,.\- ]{6,}$")
 # Words that make a literal a technical token rather than prose.
 TECHNICAL_HINT = re.compile(r"[_/\\{}<>$#@|]|^[a-z0-9.]+$|^\d|https?:|^[A-Z0-9_]+$")
@@ -382,10 +411,16 @@ def scan_python(path: Path, report: Report, exempt: SourceExemptions) -> None:
             continue
         match = PY_USER_FACING.search(line)
         if match and not LOGGER_RECEIVER.search(line[: match.start()]):
-            report.fail(f"{path.relative_to(REPO)}:{number}", "user-facing message not wrapped in _()")
+            report.fail(
+                f"{path.relative_to(REPO)}:{number}", "user-facing message not wrapped in _()"
+            )
             continue
         notify = PY_NOTIFY.search(line)
-        if notify and looks_like_prose(notify.group("text")) and not exempt.allows(notify.group("text")):
+        if (
+            notify
+            and looks_like_prose(notify.group("text"))
+            and not exempt.allows(notify.group("text"))
+        ):
             report.fail(
                 f"{path.relative_to(REPO)}:{number}",
                 f"notification text not wrapped in _(): {short(notify.group('text'))}",
@@ -401,10 +436,16 @@ def scan_javascript(path: Path, report: Report, exempt: SourceExemptions) -> Non
         if "_t(" in line:
             continue
         if JS_USER_FACING.search(line):
-            report.fail(f"{path.relative_to(REPO)}:{number}", "user-facing call not wrapped in _t()")
+            report.fail(
+                f"{path.relative_to(REPO)}:{number}", "user-facing call not wrapped in _t()"
+            )
             continue
         label = JS_LABEL.search(line)
-        if label and looks_like_prose(label.group("text")) and not exempt.allows(label.group("text")):
+        if (
+            label
+            and looks_like_prose(label.group("text"))
+            and not exempt.allows(label.group("text"))
+        ):
             report.fail(
                 f"{path.relative_to(REPO)}:{number}",
                 f"UI label not wrapped in _t(): {short(label.group('text'))}",
@@ -422,7 +463,13 @@ def scan_french_source(path: Path, report: Report) -> None:
     """French prose in source is a bug: source is English, French lives in fr.po."""
     text = path.read_text(encoding="utf-8", errors="replace")
     for number, line in enumerate(text.splitlines(), start=1):
-        if "é" not in line and "è" not in line and "à" not in line and "ç" not in line and "ê" not in line:
+        if (
+            "é" not in line
+            and "è" not in line
+            and "à" not in line
+            and "ç" not in line
+            and "ê" not in line
+        ):
             continue
         stripped = line.strip()
         if stripped.startswith(("#", "//", "*")):
@@ -459,11 +506,23 @@ def scan_module_source(module: Path, allowlist: dict, report: Report) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--module", action="append", default=[], help="restrict to these addon names")
-    parser.add_argument("--source", action="store_true", help="run the source scanner instead of the catalogue checks")
-    parser.add_argument("--all", action="store_true", help="run both the catalogue checks and the source scanner")
-    parser.add_argument("--summary", action="store_true", help="print per-addon translated/total counts")
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--module", action="append", default=[], help="restrict to these addon names"
+    )
+    parser.add_argument(
+        "--source",
+        action="store_true",
+        help="run the source scanner instead of the catalogue checks",
+    )
+    parser.add_argument(
+        "--all", action="store_true", help="run both the catalogue checks and the source scanner"
+    )
+    parser.add_argument(
+        "--summary", action="store_true", help="print per-addon translated/total counts"
+    )
     args = parser.parse_args()
 
     modules = installable_addons()

@@ -10,6 +10,6 @@ class MbKiln(models.Model):
         ondelete="set null",
         check_company=True,
         help="The connection this kiln was imported through. Clearing it "
-             "leaves the kiln and its firings in place; they are ours, not "
-             "the provider's.",
+        "leaves the kiln and its firings in place; they are ours, not "
+        "the provider's.",
     )

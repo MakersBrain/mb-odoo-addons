@@ -8,9 +8,9 @@ from urllib.parse import urlparse
 import requests
 
 from odoo import _, models, modules, tools
-from odoo.addons.base.models.ir_mail_server import MailDeliveryException
 from odoo.exceptions import UserError
 
+from odoo.addons.base.models.ir_mail_server import MailDeliveryException
 
 APPROVED_MODELS = {
     "account.move",
@@ -18,9 +18,7 @@ APPROVED_MODELS = {
     "sale.order",
     "stock.picking",
 }
-UUID_RE = re.compile(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-)
+UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024
 
 
@@ -37,16 +35,24 @@ class MailMail(models.Model):
             return self.env["res.company"]
         if company.mb_webshop_mail_transport != "platform":
             return self.env["res.company"]
-        enabled = self.env["website"].sudo().search_count([
-            ("company_id", "in", [company.id, False]),
-            ("mb_webshop_enabled", "=", True),
-        ])
-        return company if enabled and tools.email_normalize(company.email or "") else self.env["res.company"]
+        enabled = (
+            self.env["website"]
+            .sudo()
+            .search_count(
+                [
+                    ("company_id", "in", [company.id, False]),
+                    ("mb_webshop_enabled", "=", True),
+                ]
+            )
+        )
+        return (
+            company
+            if enabled and tools.email_normalize(company.email or "")
+            else self.env["res.company"]
+        )
 
     def _mb_control_token(self, company):
-        root = os.environ.get(
-            "MB_ODOO_CLIENT_TOKEN_ROOT", "/run/mb-odoo-client-secrets"
-        )
+        root = os.environ.get("MB_ODOO_CLIENT_TOKEN_ROOT", "/run/mb-odoo-client-secrets")
         try:
             token_file = (Path(root) / company.mb_control_workshop_id).resolve(strict=True)
             root_path = Path(root).resolve(strict=True)
@@ -105,35 +111,43 @@ class MailMail(models.Model):
                 total += len(raw)
                 if total > MAX_ATTACHMENT_BYTES:
                     raise UserError(_("Transactional email attachments exceed 8 MiB."))
-                attachments.append({
-                    "name": name,
-                    "content_type": mimetype or "application/octet-stream",
-                    "content_base64": base64.b64encode(raw).decode("ascii"),
-                })
+                attachments.append(
+                    {
+                        "name": name,
+                        "content_type": mimetype or "application/octet-stream",
+                        "content_base64": base64.b64encode(raw).decode("ascii"),
+                    }
+                )
             for recipient in recipients:
                 recipient_hash = hashlib.sha256(recipient.encode("utf-8")).hexdigest()[:16]
                 source_key = f"odoo:{self.id}:{index}:{recipient_hash}"
-                self._mb_submit(company, source_key, {
-                    "source_key": source_key,
-                    "recipient": recipient,
-                    "subject": email.get("subject") or "",
-                    "text": email.get("body_alternative") or "",
-                    "html": email.get("body") or "",
-                    "sender_name": f"{company.name} via MakersBrain",
-                    "reply_to": tools.email_normalize(email.get("reply_to") or company.email),
-                    "model": self.model,
-                    "attachments": attachments,
-                })
+                self._mb_submit(
+                    company,
+                    source_key,
+                    {
+                        "source_key": source_key,
+                        "recipient": recipient,
+                        "subject": email.get("subject") or "",
+                        "text": email.get("body_alternative") or "",
+                        "html": email.get("body") or "",
+                        "sender_name": f"{company.name} via MakersBrain",
+                        "reply_to": tools.email_normalize(email.get("reply_to") or company.email),
+                        "model": self.model,
+                        "attachments": attachments,
+                    },
+                )
             partner = email.get("partner_id")
             if partner:
                 success_pids.append(partner.id)
             else:
                 success_emails.extend(recipients)
-        self.write({
-            "state": "sent",
-            "failure_type": False,
-            "failure_reason": False,
-        })
+        self.write(
+            {
+                "state": "sent",
+                "failure_type": False,
+                "failure_reason": False,
+            }
+        )
         self._postprocess_sent_message(
             success_pids=success_pids,
             success_emails=success_emails,
@@ -162,11 +176,13 @@ class MailMail(models.Model):
                 if auto_commit:
                     self.env.cr.commit()
             except Exception as error:
-                mail.write({
-                    "state": "exception",
-                    "failure_type": "unknown",
-                    "failure_reason": _("MakersBrain transactional email submission failed."),
-                })
+                mail.write(
+                    {
+                        "state": "exception",
+                        "failure_type": "unknown",
+                        "failure_reason": _("MakersBrain transactional email submission failed."),
+                    }
+                )
                 mail._postprocess_sent_message(
                     success_pids=[],
                     success_emails=[],

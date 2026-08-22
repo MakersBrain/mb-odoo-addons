@@ -4,11 +4,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 from PIL import Image
+
 from odoo.tests import TransactionCase, tagged
 
 from ..models.adapters import AdapterError, detect, parse
 from ..models.image_fetch import ImageFetchError, _sanitize, _validated_address
-
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -49,16 +49,23 @@ class TestShopImportAdapters(TransactionCase):
     def test_missing_source_and_non_finite_price_are_rejected(self):
         row = (FIXTURES / "emily-sample.ndjson").read_text().splitlines()[0]
         with self.assertRaisesRegex(AdapterError, "no scraper source"):
-            parse(row.replace('"source":"emily-alarcon"', '"source":""').encode(),
-                  "missing-source.ndjson", "emily-alarcon")
+            parse(
+                row.replace('"source":"emily-alarcon"', '"source":""').encode(),
+                "missing-source.ndjson",
+                "emily-alarcon",
+            )
         with self.assertRaisesRegex(AdapterError, "finite number"):
-            parse(row.replace('"price":28.0', '"price":"NaN"').encode(),
-                  "nan.ndjson", "emily-alarcon")
+            parse(
+                row.replace('"price":28.0', '"price":"NaN"').encode(), "nan.ndjson", "emily-alarcon"
+            )
 
     def test_image_address_validation_rejects_internal_destinations(self):
-        with patch("socket.getaddrinfo", return_value=[
-            (2, 1, 6, "", ("127.0.0.1", 443)),
-        ]):
+        with patch(
+            "socket.getaddrinfo",
+            return_value=[
+                (2, 1, 6, "", ("127.0.0.1", 443)),
+            ],
+        ):
             with self.assertRaisesRegex(ImageFetchError, "non-public"):
                 _validated_address("images.example")
 

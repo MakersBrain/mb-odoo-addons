@@ -4,18 +4,15 @@ from odoo.exceptions import UserError
 from odoo.tests import tagged
 from odoo.tools import mute_logger
 
-from odoo.addons.payment.tests.http_common import PaymentHttpCommon
 from odoo.addons.mb_payment_sumup.controllers.main import SumUpController
 from odoo.addons.mb_payment_sumup.tests.common import SumUpCommon
+from odoo.addons.payment.tests.http_common import PaymentHttpCommon
 
-_SEND_REQUEST = (
-    "odoo.addons.payment.models.payment_provider.PaymentProvider._send_api_request"
-)
+_SEND_REQUEST = "odoo.addons.payment.models.payment_provider.PaymentProvider._send_api_request"
 
 
 @tagged("post_install", "-at_install")
 class TestSumUp(SumUpCommon, PaymentHttpCommon):
-
     # === The request === #
 
     def test_request_url_keeps_the_version_of_the_endpoint(self):
@@ -83,9 +80,9 @@ class TestSumUp(SumUpCommon, PaymentHttpCommon):
         with patch(_SEND_REQUEST, return_value=dict(self.checkout_data, status="EXPIRED")) as req:
             tx._sumup_deactivate_checkout()
 
-        self.assertEqual(req.call_args[0][:2], (
-            "DELETE", f"/v0.1/checkouts/{self.checkout_data['id']}"
-        ))
+        self.assertEqual(
+            req.call_args[0][:2], ("DELETE", f"/v0.1/checkouts/{self.checkout_data['id']}")
+        )
         self.assertFalse(tx.sumup_checkout_url)
         self.assertEqual(tx.state, "cancel")
 
@@ -147,10 +144,15 @@ class TestSumUp(SumUpCommon, PaymentHttpCommon):
         self.assertEqual(send_request.call_count, 2)
         self.assertEqual(send_request.call_args[0][0], "GET")
         self.assertEqual(tx.state, "done")
-        self.assertEqual(self.env["payment.transaction"].search_count([
-            ("reference", "=", tx.reference),
-            ("provider_id", "=", self.provider.id),
-        ]), 1)
+        self.assertEqual(
+            self.env["payment.transaction"].search_count(
+                [
+                    ("reference", "=", tx.reference),
+                    ("provider_id", "=", self.provider.id),
+                ]
+            ),
+            1,
+        )
 
     @mute_logger(
         "odoo.addons.mb_payment_sumup.controllers.main",
@@ -189,9 +191,7 @@ class TestSumUp(SumUpCommon, PaymentHttpCommon):
 
         method, endpoint = send_request.call_args[0][:2]
         self.assertEqual(method, "POST")
-        self.assertEqual(
-            endpoint, "/v1.0/merchants/MCTEST01/payments/tx_0001/refunds"
-        )
+        self.assertEqual(endpoint, "/v1.0/merchants/MCTEST01/payments/tx_0001/refunds")
         # Odoo holds refunds as negative amounts; SumUp only knows positive ones.
         self.assertEqual(send_request.call_args[1]["json"], {"amount": 100.0})
         self.assertEqual(refund_tx.state, "pending")
@@ -203,10 +203,13 @@ class TestSumUp(SumUpCommon, PaymentHttpCommon):
         with patch(_SEND_REQUEST, return_value={}):
             refund_tx = tx._refund(amount_to_refund=100.0)
 
-        with patch(_SEND_REQUEST, return_value={
-            "id": "tx_0001",
-            "events": [{"type": "REFUND", "status": "REFUNDED", "amount": 100.0}],
-        }):
+        with patch(
+            _SEND_REQUEST,
+            return_value={
+                "id": "tx_0001",
+                "events": [{"type": "REFUND", "status": "REFUNDED", "amount": 100.0}],
+            },
+        ):
             refund_tx._sumup_poll_refund()
 
         self.assertEqual(refund_tx.state, "done")

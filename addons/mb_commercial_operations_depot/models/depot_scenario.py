@@ -30,17 +30,25 @@ class MbDepotProfitabilityScenario(models.Model):
 
     sequence = fields.Integer(default=10)
     name = fields.Char(
-        required=True, default=lambda self: _("Base scenario"), tracking=True,
+        required=True,
+        default=lambda self: _("Base scenario"),
+        tracking=True,
     )
     contract_id = fields.Many2one(
-        "mb.commercial.contract", required=True, ondelete="cascade",
-        check_company=True, index=True,
+        "mb.commercial.contract",
+        required=True,
+        ondelete="cascade",
+        check_company=True,
+        index=True,
     )
     company_id = fields.Many2one(related="contract_id.company_id", store=True, index=True)
     currency_id = fields.Many2one(related="company_id.currency_id")
     state = fields.Selection(
         [("draft", "Draft"), ("approved", "Approved"), ("superseded", "Superseded")],
-        required=True, default="draft", copy=False, tracking=True,
+        required=True,
+        default="draft",
+        copy=False,
+        tracking=True,
     )
 
     # --- Term and permanences -------------------------------------------------
@@ -50,8 +58,8 @@ class MbDepotProfitabilityScenario(models.Model):
     # computed fields are written by _write(), which no immutability guard sees.
     term_months = fields.Integer(
         help="Months this scenario judges. Taken from the contract dates when the "
-             "scenario is created, or the six-month planning horizon when the "
-             "contract is open-ended.",
+        "scenario is created, or the six-month planning horizon when the "
+        "contract is open-ended.",
     )
     permanences_per_month = fields.Float(
         help="Permanence days owed each month, summed from the contract's obligations.",
@@ -63,9 +71,11 @@ class MbDepotProfitabilityScenario(models.Model):
 
     # --- Travel ---------------------------------------------------------------
     travel_estimate_id = fields.Many2one(
-        "mb.travel.estimate", check_company=True, ondelete="restrict",
+        "mb.travel.estimate",
+        check_company=True,
+        ondelete="restrict",
         help="Accepted round trip to the depot. Its cost and duration are multiplied "
-             "by the number of permanences over the term.",
+        "by the number of permanences over the term.",
     )
     travel_cost_per_permanence = fields.Monetary()
     travel_hours_per_permanence = fields.Float()
@@ -74,7 +84,7 @@ class MbDepotProfitabilityScenario(models.Model):
     expected_monthly_sales = fields.Monetary(
         string="Expected Monthly Sales (Public Price)",
         help="What customers are expected to pay the depot each month, before the "
-             "depot takes its commission.",
+        "depot takes its commission.",
     )
     vat_rate = fields.Float(digits=(16, 4), help="Percentage included in the public price.")
     commission_rate = fields.Float(
@@ -83,7 +93,8 @@ class MbDepotProfitabilityScenario(models.Model):
     )
     commission_basis = fields.Selection(
         [("public", "Public price including VAT"), ("net_of_vat", "Price excluding VAT")],
-        required=True, default="public",
+        required=True,
+        default="public",
         help="Which figure the contract applies the commission to.",
     )
     product_cost_ratio = fields.Float(
@@ -99,7 +110,7 @@ class MbDepotProfitabilityScenario(models.Model):
     other_monthly_fixed_cost = fields.Monetary()
     target_margin_per_hour = fields.Monetary(
         help="Hourly margin floor this depot is judged against. Defaults to the "
-             "company policy; zero judges it on break-even headroom alone.",
+        "company policy; zero judges it on break-even headroom alone.",
     )
 
     # --- Results --------------------------------------------------------------
@@ -107,12 +118,16 @@ class MbDepotProfitabilityScenario(models.Model):
     work_hours = fields.Float(compute="_compute_results", store=True)
     travel_hours = fields.Float(compute="_compute_results", store=True)
     effort_hours = fields.Float(
-        compute="_compute_results", store=True, string="Work + Travel Hours",
+        compute="_compute_results",
+        store=True,
+        string="Work + Travel Hours",
     )
     monthly_sales_excl_vat = fields.Monetary(compute="_compute_results", store=True)
     monthly_commission = fields.Monetary(compute="_compute_results", store=True)
     monthly_receipts = fields.Monetary(
-        compute="_compute_results", store=True, string="Monthly Receipts After Commission",
+        compute="_compute_results",
+        store=True,
+        string="Monthly Receipts After Commission",
     )
     monthly_product_cost = fields.Monetary(compute="_compute_results", store=True)
     monthly_contribution = fields.Monetary(compute="_compute_results", store=True)
@@ -126,13 +141,18 @@ class MbDepotProfitabilityScenario(models.Model):
     break_even_monthly_sales = fields.Monetary(compute="_compute_results", store=True)
     break_even_headroom_ratio = fields.Float(compute="_compute_results", store=True)
     margin_per_effort_hour = fields.Monetary(
-        compute="_compute_results", store=True, string="Margin per Hour (Work + Travel)",
+        compute="_compute_results",
+        store=True,
+        string="Margin per Hour (Work + Travel)",
     )
     margin_per_work_hour = fields.Monetary(compute="_compute_results", store=True)
     calculation_blocked = fields.Boolean(compute="_compute_results", store=True)
     calculation_note = fields.Char(compute="_compute_results", store=True)
     recommendation = fields.Selection(
-        VERDICT_SELECTION, compute="_compute_results", store=True, string="Verdict",
+        VERDICT_SELECTION,
+        compute="_compute_results",
+        store=True,
+        string="Verdict",
     )
     recommendation_note = fields.Char(compute="_compute_results", store=True)
 
@@ -175,12 +195,23 @@ class MbDepotProfitabilityScenario(models.Model):
             self.travel_hours_per_permanence = estimate.duration_hours
 
     @api.depends(
-        "term_months", "permanences_per_month", "hours_per_permanence",
-        "work_hourly_cost", "travel_cost_per_permanence", "travel_hours_per_permanence",
-        "expected_monthly_sales", "vat_rate", "commission_rate", "commission_basis",
-        "product_cost_ratio", "other_monthly_variable_cost", "monthly_fixed_rent",
-        "other_monthly_fixed_cost", "target_margin_per_hour",
-        "travel_estimate_id", "travel_estimate_id.state",
+        "term_months",
+        "permanences_per_month",
+        "hours_per_permanence",
+        "work_hourly_cost",
+        "travel_cost_per_permanence",
+        "travel_hours_per_permanence",
+        "expected_monthly_sales",
+        "vat_rate",
+        "commission_rate",
+        "commission_basis",
+        "product_cost_ratio",
+        "other_monthly_variable_cost",
+        "monthly_fixed_rent",
+        "other_monthly_fixed_cost",
+        "target_margin_per_hour",
+        "travel_estimate_id",
+        "travel_estimate_id.state",
     )
     def _compute_results(self):
         for scenario in self:
@@ -206,8 +237,10 @@ class MbDepotProfitabilityScenario(models.Model):
             monthly_labour = per_month * scenario.hours_per_permanence * scenario.work_hourly_cost
             monthly_travel = per_month * scenario.travel_cost_per_permanence
             monthly_fixed = (
-                scenario.monthly_fixed_rent + scenario.other_monthly_fixed_cost
-                + monthly_labour + monthly_travel
+                scenario.monthly_fixed_rent
+                + scenario.other_monthly_fixed_cost
+                + monthly_labour
+                + monthly_travel
             )
             monthly_margin = contribution - monthly_fixed
 
@@ -238,12 +271,12 @@ class MbDepotProfitabilityScenario(models.Model):
             else:
                 # Nothing standing to cover, so the first sale is already ahead.
                 scenario.break_even_headroom_ratio = 1.0
-            scenario.margin_per_effort_hour = currency.round(
-                scenario.term_margin / effort_hours
-            ) if effort_hours > 0 else 0.0
-            scenario.margin_per_work_hour = currency.round(
-                scenario.term_margin / work_hours
-            ) if work_hours > 0 else 0.0
+            scenario.margin_per_effort_hour = (
+                currency.round(scenario.term_margin / effort_hours) if effort_hours > 0 else 0.0
+            )
+            scenario.margin_per_work_hour = (
+                currency.round(scenario.term_margin / work_hours) if work_hours > 0 else 0.0
+            )
             scenario.calculation_blocked = blocked
             scenario.calculation_note = note
             scenario.recommendation, scenario.recommendation_note = (
@@ -339,8 +372,7 @@ class MbDepotProfitabilityScenario(models.Model):
             if scenario.calculation_blocked:
                 raise ValidationError(scenario.calculation_note)
             scenario.contract_id.depot_scenario_ids.filtered(
-                lambda other, current=scenario:
-                other != current and other.state == "approved"
+                lambda other, current=scenario: other != current and other.state == "approved"
             ).write({"state": "superseded"})
             scenario.write({"state": "approved"})
             scenario.contract_id.primary_depot_scenario_id = scenario
@@ -348,7 +380,9 @@ class MbDepotProfitabilityScenario(models.Model):
 
     def write(self, vals):
         protected = set(self._fields) - {
-            "state", "message_follower_ids", "message_partner_ids",
+            "state",
+            "message_follower_ids",
+            "message_partner_ids",
         }
         if protected.intersection(vals) and self.filtered(
             lambda scenario: scenario.state != "draft"

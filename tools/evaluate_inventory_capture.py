@@ -75,10 +75,7 @@ def score(expected: dict, actual: dict) -> dict:
             totals[field] += 1
             if str(found.get(field, "")).casefold() == str(wanted[field]).casefold():
                 correct[field] += 1
-    return {
-        field: {"correct": correct[field], "total": totals[field]}
-        for field in fields
-    }
+    return {field: {"correct": correct[field], "total": totals[field]} for field in fields}
 
 
 def main() -> int:
@@ -92,7 +89,8 @@ def main() -> int:
         members = {
             PurePosixPath(info.filename).name: info
             for info in archive.infolist()
-            if not info.is_dir() and PurePosixPath(info.filename).suffix.lower() in {".jpg", ".jpeg", ".png"}
+            if not info.is_dir()
+            and PurePosixPath(info.filename).suffix.lower() in {".jpg", ".jpeg", ".png"}
         }
         report["missing"] = sorted(set(expected) - set(members))
         report["unexpected"] = sorted(set(members) - set(expected))

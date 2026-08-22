@@ -6,23 +6,29 @@ from odoo.tools.float_utils import float_round
 class StockLot(models.Model):
     _inherit = "stock.lot"
 
-    mb_ceramics_stage = fields.Selection(
-        related="product_id.product_tmpl_id.mb_ceramics_stage"
-    )
+    mb_ceramics_stage = fields.Selection(related="product_id.product_tmpl_id.mb_ceramics_stage")
     mb_bom_revision_id = fields.Many2one(
-        "mrp.bom", string="Recipe revision", copy=False, readonly=True,
-        ondelete="restrict", check_company=True,
+        "mrp.bom",
+        string="Recipe revision",
+        copy=False,
+        readonly=True,
+        ondelete="restrict",
+        check_company=True,
     )
 
     mb_production_ids = fields.Many2many(
-        "mrp.production", compute="_compute_mb_ceramics_trace", string="Productions")
+        "mrp.production", compute="_compute_mb_ceramics_trace", string="Productions"
+    )
     mb_firing_ids = fields.Many2many(
-        "mb.firing", compute="_compute_mb_ceramics_trace", string="Firings")
+        "mb.firing", compute="_compute_mb_ceramics_trace", string="Firings"
+    )
     mb_firing_count = fields.Integer(compute="_compute_mb_ceramics_trace")
     mb_board_ids = fields.Many2many(
-        "stock.package", compute="_compute_mb_ceramics_trace", string="Boards")
+        "stock.package", compute="_compute_mb_ceramics_trace", string="Boards"
+    )
     mb_loss_ids = fields.Many2many(
-        "mb.production.loss", compute="_compute_mb_ceramics_trace", string="Losses")
+        "mb.production.loss", compute="_compute_mb_ceramics_trace", string="Losses"
+    )
     mb_related_lot_ids = fields.Many2many(
         "stock.lot",
         compute="_compute_mb_ceramics_trace",
@@ -36,20 +42,26 @@ class StockLot(models.Model):
         productions = self.env["mrp.production"]
         frontier = self
         while frontier:
-            output_lines = self.env["stock.move.line"].search([
-                ("lot_id", "in", frontier.ids),
-                ("move_id.production_id", "!=", False),
-            ])
-            input_lines = self.env["stock.move.line"].search([
-                ("lot_id", "in", frontier.ids),
-                ("move_id.raw_material_production_id", "!=", False),
-            ])
+            output_lines = self.env["stock.move.line"].search(
+                [
+                    ("lot_id", "in", frontier.ids),
+                    ("move_id.production_id", "!=", False),
+                ]
+            )
+            input_lines = self.env["stock.move.line"].search(
+                [
+                    ("lot_id", "in", frontier.ids),
+                    ("move_id.raw_material_production_id", "!=", False),
+                ]
+            )
             connected_productions = (
                 output_lines.move_id.production_id
                 | input_lines.move_id.raw_material_production_id
-                | self.env["mrp.production"].search([
-                    ("lot_producing_ids", "in", frontier.ids),
-                ])
+                | self.env["mrp.production"].search(
+                    [
+                        ("lot_producing_ids", "in", frontier.ids),
+                    ]
+                )
             )
             new_productions = connected_productions - productions
             if not new_productions:
@@ -92,9 +104,11 @@ class StockLot(models.Model):
             raise UserError(_("WIP labels are available only for green or bisque ware."))
         quantity = self.env.context.get("mb_wip_quantity")
         if quantity is None:
-            quantity = sum(self.quant_ids.filtered(
-                lambda quant: quant.location_id.usage == "internal"
-            ).mapped("quantity"))
+            quantity = sum(
+                self.quant_ids.filtered(lambda quant: quant.location_id.usage == "internal").mapped(
+                    "quantity"
+                )
+            )
         return {
             "type": "ir.actions.act_window",
             "name": _("Print WIP label"),
@@ -104,15 +118,15 @@ class StockLot(models.Model):
             "context": {
                 "default_product_id": self.product_id.id,
                 "default_lot_id": self.id,
-                "default_template_id": self.env.ref(
-                    "mb_label.template_wip_lot_30x20"
-                ).id,
+                "default_template_id": self.env.ref("mb_label.template_wip_lot_30x20").id,
                 "default_manual_values_json": {
                     "stage": stage.upper(),
-                    "quantity": str(float_round(
-                        quantity,
-                        precision_rounding=self.product_id.uom_id.rounding,
-                    )),
+                    "quantity": str(
+                        float_round(
+                            quantity,
+                            precision_rounding=self.product_id.uom_id.rounding,
+                        )
+                    ),
                 },
             },
         }

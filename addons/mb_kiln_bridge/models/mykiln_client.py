@@ -115,8 +115,9 @@ def results(payload):
 
 
 class MykilnClient:
-    def __init__(self, username, password, base_url=None, timeout=DEFAULT_TIMEOUT,
-                 session=None, token=None):
+    def __init__(
+        self, username, password, base_url=None, timeout=DEFAULT_TIMEOUT, session=None, token=None
+    ):
         self._base_url = (base_url or MYKILN_BASE_URL).rstrip("/")
         self._username = username
         self._password = password
@@ -147,13 +148,17 @@ class MykilnClient:
                 self.login()
             headers["Authorization"] = "Token %s" % self._token
         return self._session.request(
-            method, "%s%s" % (self._base_url, path),
-            headers=headers, json=json_body, timeout=self._timeout,
+            method,
+            "%s%s" % (self._base_url, path),
+            headers=headers,
+            json=json_body,
+            timeout=self._timeout,
         )
 
     def login(self):
         response = self._session.request(
-            "POST", "%s/api/v1/authenticate/" % self._base_url,
+            "POST",
+            "%s/api/v1/authenticate/" % self._base_url,
             headers={"Accept": "application/json"},
             json={"username": self._username, "password": self._password},
             timeout=self._timeout,
@@ -167,8 +172,7 @@ class MykilnClient:
         if response.status_code >= 400 or not token:
             detail = as_str(body.get("detail"))
             # The password is never included, here or anywhere else.
-            raise MykilnAuthError(
-                detail or "login failed with status %s" % response.status_code)
+            raise MykilnAuthError(detail or "login failed with status %s" % response.status_code)
         self._token = token
         self._token_changed = True
 
@@ -227,12 +231,10 @@ class MykilnClient:
         not in here; they are on the kiln itself, which is the authority since
         a model can be built to more than one specification.
         """
-        return results(self._get_json(
-            "/api/v1/kiln_types/?limit=%s" % KILN_TYPE_PAGE_SIZE))
+        return results(self._get_json("/api/v1/kiln_types/?limit=%s" % KILN_TYPE_PAGE_SIZE))
 
     def list_firings(self, limit=FIRING_PAGE_SIZE, offset=0):
-        return results(self._get_json(
-            "/api/v1/firings/?limit=%s&offset=%s" % (limit, offset)))
+        return results(self._get_json("/api/v1/firings/?limit=%s&offset=%s" % (limit, offset)))
 
     def get_firing(self, firing_id):
         payload = self._get_json("/api/v1/firings/%s" % firing_id)

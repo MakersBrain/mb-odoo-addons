@@ -6,7 +6,6 @@ import unittest
 from tools.extension_manifest import tree_inventory
 from tools.release_metadata import canonical_digest, checked_ref, selected_runtime
 
-
 D1 = "sha256:" + "1" * 64
 D2 = "sha256:" + "2" * 64
 D3 = "sha256:" + "3" * 64
@@ -40,11 +39,13 @@ class TestExtensionRelease(unittest.TestCase):
             "deployment_ref": qualified["official_source_ref"],
             "subject_digest": D1,
             "subject_kind": "image_index",
-            "platforms": [{
-                "platform": qualified["platform"],
-                "manifest_digest": D2,
-                "config_digest": D3,
-            }],
+            "platforms": [
+                {
+                    "platform": qualified["platform"],
+                    "manifest_digest": D2,
+                    "config_digest": D3,
+                }
+            ],
         }
         self.assertEqual(selected_runtime(runtime, qualified), runtime["platforms"][0])
         wrong = json.loads(json.dumps(qualified))

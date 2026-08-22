@@ -5,45 +5,53 @@ from odoo.tests import tagged
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
-_SEND_REQUEST = (
-    "odoo.addons.payment.models.payment_provider.PaymentProvider._send_api_request"
-)
+_SEND_REQUEST = "odoo.addons.payment.models.payment_provider.PaymentProvider._send_api_request"
 
 
 @tagged("post_install", "-at_install")
 class TestInvoiceSumUpLink(AccountTestInvoicingCommon):
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.provider = cls.env["payment.provider"].search([
-            ("code", "=", "sumup"), ("company_id", "=", cls.env.company.id),
-        ], limit=1)
-        cls.provider.write({
-            "state": "test",
-            "sumup_api_key": "sup_sk_dummy",
-            "sumup_merchant_code": "MCTEST01",
-        })
+        cls.provider = cls.env["payment.provider"].search(
+            [
+                ("code", "=", "sumup"),
+                ("company_id", "=", cls.env.company.id),
+            ],
+            limit=1,
+        )
+        cls.provider.write(
+            {
+                "state": "test",
+                "sumup_api_key": "sup_sk_dummy",
+                "sumup_merchant_code": "MCTEST01",
+            }
+        )
         cls.invoice = cls.init_invoice(
             "out_invoice", partner=cls.partner_a, amounts=[100.0], post=True
         )
 
     def _checkout_response(self, **overrides):
-        return dict({
-            "id": "cd0d6c1a-0000-4000-8000-000000000001",
-            "checkout_reference": "ref",
-            "amount": self.invoice.amount_total,
-            "currency": self.invoice.currency_id.name,
-            "status": "PENDING",
-            "hosted_checkout_url": "https://pay.sumup.com/b2c/QWERTY",
-            "transactions": [],
-        }, **overrides)
+        return dict(
+            {
+                "id": "cd0d6c1a-0000-4000-8000-000000000001",
+                "checkout_reference": "ref",
+                "amount": self.invoice.amount_total,
+                "currency": self.invoice.currency_id.name,
+                "status": "PENDING",
+                "hosted_checkout_url": "https://pay.sumup.com/b2c/QWERTY",
+                "transactions": [],
+            },
+            **overrides,
+        )
 
     def _open_wizard(self):
-        return self.env["mb.sumup.link.wizard"].with_context(
-            default_move_id=self.invoice.id
-        ).create({})
+        return (
+            self.env["mb.sumup.link.wizard"]
+            .with_context(default_move_id=self.invoice.id)
+            .create({})
+        )
 
     # === The wizard === #
 
@@ -81,24 +89,28 @@ class TestInvoiceSumUpLink(AccountTestInvoicingCommon):
     def test_a_different_amount_gets_its_own_checkout(self):
         wizard = self._open_wizard()
 
-        with patch(_SEND_REQUEST, side_effect=[
-            self._checkout_response(),
-            self._checkout_response(status="EXPIRED"),
-            self._checkout_response(
-                id="cd0d6c1a-0000-4000-8000-000000000002",
-                hosted_checkout_url="https://pay.sumup.com/b2c/ASDFGH",
-                amount=40.0,
-            ),
-        ]) as send_request:
+        with patch(
+            _SEND_REQUEST,
+            side_effect=[
+                self._checkout_response(),
+                self._checkout_response(status="EXPIRED"),
+                self._checkout_response(
+                    id="cd0d6c1a-0000-4000-8000-000000000002",
+                    hosted_checkout_url="https://pay.sumup.com/b2c/ASDFGH",
+                    amount=40.0,
+                ),
+            ],
+        ) as send_request:
             wizard.action_generate()
             partial = self._open_wizard()
             partial.amount = 40.0
             partial.action_generate()
 
         self.assertEqual(send_request.call_count, 3)
-        self.assertEqual(send_request.call_args_list[1].args[:2], (
-            "DELETE", f"/v0.1/checkouts/{self._checkout_response()['id']}"
-        ))
+        self.assertEqual(
+            send_request.call_args_list[1].args[:2],
+            ("DELETE", f"/v0.1/checkouts/{self._checkout_response()['id']}"),
+        )
         self.assertEqual(self.invoice.mb_sumup_transaction_id.amount, 40.0)
 
     def test_amount_over_current_residual_is_refused(self):
@@ -153,9 +165,12 @@ class TestInvoiceSumUpLink(AccountTestInvoicingCommon):
             self._open_wizard().action_generate()
         tx = self.invoice.mb_sumup_transaction_id
 
-        tx._process("sumup", self._checkout_response(
-            status="PAID", transactions=[{"id": "tx_0001", "status": "SUCCESSFUL"}]
-        ))
+        tx._process(
+            "sumup",
+            self._checkout_response(
+                status="PAID", transactions=[{"id": "tx_0001", "status": "SUCCESSFUL"}]
+            ),
+        )
         tx._post_process()
 
         self.assertEqual(tx.state, "done")

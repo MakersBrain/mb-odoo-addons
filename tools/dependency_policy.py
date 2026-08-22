@@ -66,7 +66,9 @@ def check(runtime=False):
     if collisions:
         raise ValueError(f"extension top-level namespace collision: {sorted(collisions)}")
     locked = locked_packages()
-    declared_extension = sorted(item["distribution"].lower().replace("_", "-") for item in extension)
+    declared_extension = sorted(
+        item["distribution"].lower().replace("_", "-") for item in extension
+    )
     if locked != declared_extension:
         raise ValueError("extension package inventory does not exactly match the lock")
 
@@ -79,7 +81,9 @@ def check(runtime=False):
     providers.update(item["import"] for item in extension)
     missing_declarations = declared_manifest_imports - providers
     if missing_declarations:
-        raise ValueError(f"manifest dependencies absent from inventory: {sorted(missing_declarations)}")
+        raise ValueError(
+            f"manifest dependencies absent from inventory: {sorted(missing_declarations)}"
+        )
 
     local = {path.name for path in ADDONS.iterdir() if path.is_dir()}
     allowed = set(sys.stdlib_module_names) | local | {"odoo"}
@@ -145,15 +149,14 @@ def build(target):
     if scripts.exists() and any(scripts.iterdir()):
         raise ValueError("extension dependencies must not install console scripts")
     for library in target.rglob("*.so"):
-        result = subprocess.run(
-            ["ldd", str(library)], capture_output=True, check=False, text=True
-        )
+        result = subprocess.run(["ldd", str(library)], capture_output=True, check=False, text=True)
         if result.returncode or "not found" in result.stdout + result.stderr:
             raise ValueError(f"native dependency closure failed: {library.relative_to(target)}")
-    expected = {item["distribution"].lower().replace("_", "-") for item in inventory["extension_packages"]}
+    expected = {
+        item["distribution"].lower().replace("_", "-") for item in inventory["extension_packages"]
+    }
     installed = {
-        path.name.rsplit("-", 1)[0].lower().replace("_", "-")
-        for path in target.glob("*.dist-info")
+        path.name.rsplit("-", 1)[0].lower().replace("_", "-") for path in target.glob("*.dist-info")
     }
     if installed != expected:
         raise ValueError(f"installed dependency inventory mismatch: {sorted(installed)}")

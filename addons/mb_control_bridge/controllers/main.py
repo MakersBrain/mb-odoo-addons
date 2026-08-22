@@ -9,7 +9,6 @@ from odoo.http import request
 
 from .auth import authenticate_control_request, json_body, payload_digest
 
-
 _logger = logging.getLogger(__name__)
 PROVIDER_BY_DELIVERY_TYPE = {
     "mb_boxtal": "boxtal",
@@ -89,23 +88,31 @@ class ControlPlaneBridge(http.Controller):
     def carrier_targets(self):
         try:
             authenticate_control_request()
-            carriers = request.env["delivery.carrier"].sudo().search([
-                ("delivery_type", "in", tuple(PROVIDER_BY_DELIVERY_TYPE)),
-                ("company_id", "!=", False),
-            ])
-            return request.make_json_response([
-                {
-                    "company_id": carrier.company_id.id,
-                    "company_name": carrier.company_id.display_name,
-                    "carrier_id": carrier.id,
-                    "carrier_name": carrier.display_name,
-                    "provider": PROVIDER_BY_DELIVERY_TYPE[carrier.delivery_type],
-                    "environment": "production" if carrier.prod_environment else "test",
-                    "service_code": carrier.mb_provider_service_code or "",
-                    "configured": bool(carrier.mb_secret_ref),
-                }
-                for carrier in carriers
-            ])
+            carriers = (
+                request.env["delivery.carrier"]
+                .sudo()
+                .search(
+                    [
+                        ("delivery_type", "in", tuple(PROVIDER_BY_DELIVERY_TYPE)),
+                        ("company_id", "!=", False),
+                    ]
+                )
+            )
+            return request.make_json_response(
+                [
+                    {
+                        "company_id": carrier.company_id.id,
+                        "company_name": carrier.company_id.display_name,
+                        "carrier_id": carrier.id,
+                        "carrier_name": carrier.display_name,
+                        "provider": PROVIDER_BY_DELIVERY_TYPE[carrier.delivery_type],
+                        "environment": "production" if carrier.prod_environment else "test",
+                        "service_code": carrier.mb_provider_service_code or "",
+                        "configured": bool(carrier.mb_secret_ref),
+                    }
+                    for carrier in carriers
+                ]
+            )
         except Exception as error:
             if not isinstance(error, (HTTPException, ValidationError)):
                 _logger.exception("carrier target listing failed")
@@ -124,8 +131,15 @@ class ControlPlaneBridge(http.Controller):
             authenticate_control_request()
             body = json_body()
             workshop_id = str(body.get("workshop_id") or "")
-            company = request.env["res.company"].sudo().browse(int(body.get("company_id") or 0)).exists()
-            carrier = request.env["delivery.carrier"].sudo().browse(int(body.get("carrier_id") or 0)).exists()
+            company = (
+                request.env["res.company"].sudo().browse(int(body.get("company_id") or 0)).exists()
+            )
+            carrier = (
+                request.env["delivery.carrier"]
+                .sudo()
+                .browse(int(body.get("carrier_id") or 0))
+                .exists()
+            )
             environment = body.get("environment")
             secret_ref = str(body.get("secret_ref") or "")
             expected_prefix = f"docker/{workshop_id}/carrier/"
@@ -180,8 +194,15 @@ class ControlPlaneBridge(http.Controller):
             authenticate_control_request()
             body = json_body()
             workshop_id = str(body.get("workshop_id") or "")
-            company = request.env["res.company"].sudo().browse(int(body.get("company_id") or 0)).exists()
-            carrier = request.env["delivery.carrier"].sudo().browse(int(body.get("carrier_id") or 0)).exists()
+            company = (
+                request.env["res.company"].sudo().browse(int(body.get("company_id") or 0)).exists()
+            )
+            carrier = (
+                request.env["delivery.carrier"]
+                .sudo()
+                .browse(int(body.get("carrier_id") or 0))
+                .exists()
+            )
             if (
                 not company
                 or company.mb_control_workshop_id != workshop_id
@@ -193,11 +214,13 @@ class ControlPlaneBridge(http.Controller):
                 or carrier.mb_secret_ref != body.get("secret_ref")
             ):
                 raise BadRequest("carrier secret scope is invalid")
-            carrier.with_context(mb_carrier_lifecycle_write=True).write({
-                "mb_secret_ref": False,
-                "mb_credential_state": "unconfigured",
-                "mb_last_error": False,
-            })
+            carrier.with_context(mb_carrier_lifecycle_write=True).write(
+                {
+                    "mb_secret_ref": False,
+                    "mb_credential_state": "unconfigured",
+                    "mb_last_error": False,
+                }
+            )
             return request.make_json_response({"unbound": True, "carrier_id": carrier.id})
         except Exception as error:
             if not isinstance(error, (HTTPException, ValidationError)):
@@ -244,12 +267,14 @@ class ControlPlaneBridge(http.Controller):
         try:
             authenticate_control_request()
             company = request.env.company.sudo()
-            return request.make_json_response({
-                "status": "ready",
-                "database": request.db,
-                "workshop_id": company.mb_control_workshop_id or None,
-                "entitlement_version": company.mb_entitlement_version,
-            })
+            return request.make_json_response(
+                {
+                    "status": "ready",
+                    "database": request.db,
+                    "workshop_id": company.mb_control_workshop_id or None,
+                    "entitlement_version": company.mb_entitlement_version,
+                }
+            )
         except Exception as error:
             return _json_error(error)
 
@@ -275,9 +300,7 @@ class ControlPlaneBridge(http.Controller):
             if existing:
                 return request.make_json_response(existing.response)
             result = request.env["res.users"].sudo().mb_reconcile_membership(body)
-            receipts.record(
-                operation_key, "membership.reconcile", payload_digest(body), result
-            )
+            receipts.record(operation_key, "membership.reconcile", payload_digest(body), result)
             return request.make_json_response(result)
         except Exception as error:
             if not isinstance(error, (HTTPException, ValidationError)):
@@ -329,9 +352,7 @@ class ControlPlaneBridge(http.Controller):
                 raise BadRequest("operation_key is required")
             digest = payload_digest(body)
             receipts = request.env["mb.control.operation.receipt"].sudo()
-            existing = receipts.for_replay(
-                operation_key, "entitlement.apply", digest
-            )
+            existing = receipts.for_replay(operation_key, "entitlement.apply", digest)
             if existing:
                 return request.make_json_response(existing.response)
             result = request.env.company.sudo().mb_apply_entitlement(body)

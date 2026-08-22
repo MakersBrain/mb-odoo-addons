@@ -30,16 +30,21 @@ class StockPicking(models.Model):
         compute="_compute_mb_depot_sale_date",
         inverse="_inverse_mb_depot_sale_date",
         help="Reported sale date for the whole transfer. The date itself lives on "
-             "the move lines, so a sheet of reported sales can date each piece "
-             "separately; this is the shortcut for the ordinary case where one "
-             "transfer stands for one reported sale.",
+        "the move lines, so a sheet of reported sales can date each piece "
+        "separately; this is the shortcut for the ordinary case where one "
+        "transfer stands for one reported sale.",
     )
     mb_depot_sale_report_id = fields.Many2one(
-        "mb.depot.sale.report", string="Depot sale report", copy=False,
-        index=True, readonly=True,
+        "mb.depot.sale.report",
+        string="Depot sale report",
+        copy=False,
+        index=True,
+        readonly=True,
     )
     mb_depot_effective_date = fields.Datetime(
-        string="Effective depot sale date", copy=False, readonly=True,
+        string="Effective depot sale date",
+        copy=False,
+        readonly=True,
     )
 
     @api.depends("move_line_ids.mb_depot_sale_date")
@@ -54,8 +59,7 @@ class StockPicking(models.Model):
         for picking in self:
             picking.move_line_ids.mb_depot_sale_date = picking.mb_depot_sale_date
 
-    @api.depends("location_id.warehouse_id.is_depot",
-                 "location_dest_id.warehouse_id.is_depot")
+    @api.depends("location_id.warehouse_id.is_depot", "location_dest_id.warehouse_id.is_depot")
     def _compute_depot_warehouse_id(self):
         for picking in self:
             destination = picking.location_dest_id.warehouse_id
@@ -115,7 +119,8 @@ class StockPicking(models.Model):
 
     def _get_product_catalog_record_lines(self, product_ids, *, child_field=False, **kwargs):
         lines = self[child_field or CATALOG_LINES].filtered(
-            lambda move: move.product_id.id in product_ids)
+            lambda move: move.product_id.id in product_ids
+        )
         return lines.grouped(lambda move: move.product_id)
 
     def _get_product_catalog_domain(self):
@@ -132,8 +137,15 @@ class StockPicking(models.Model):
             else:
                 move.unlink()
         elif quantity > 0:
-            self.write({field: [Command.create(
-                self._get_new_catalog_line_values(product_id, quantity, **kwargs))]})
+            self.write(
+                {
+                    field: [
+                        Command.create(
+                            self._get_new_catalog_line_values(product_id, quantity, **kwargs)
+                        )
+                    ]
+                }
+            )
         return self.env["product.product"].browse(product_id).list_price
 
     def _get_new_catalog_line_values(self, product_id, quantity, **kwargs):

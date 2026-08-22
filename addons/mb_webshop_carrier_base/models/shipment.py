@@ -10,8 +10,8 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 from ..provider import (
-    Parcel,
     CancellationResult,
+    Parcel,
     ProviderAuthError,
     ProviderError,
     ProviderTransientError,
@@ -22,7 +22,6 @@ from ..provider import (
     TrackingSnapshot,
     provider_class,
 )
-
 
 SHIPMENT_STATES = [
     ("draft", "Queued"),
@@ -51,7 +50,9 @@ class CarrierShipment(models.Model):
     )
     parcel_index = fields.Integer(required=True, default=0)
     idempotency_key = fields.Char(required=True, index=True, copy=False)
-    state = fields.Selection(SHIPMENT_STATES, required=True, default="draft", index=True, copy=False)
+    state = fields.Selection(
+        SHIPMENT_STATES, required=True, default="draft", index=True, copy=False
+    )
     operation = fields.Selection(
         [("create", "Create"), ("cancel", "Cancel")], required=True, default="create", copy=False
     )
@@ -60,8 +61,12 @@ class CarrierShipment(models.Model):
     tracking_url = fields.Char(copy=False)
     exact_price = fields.Float(copy=False)
     document_ids = fields.Many2many(
-        "ir.attachment", "mb_carrier_shipment_attachment_rel",
-        "shipment_id", "attachment_id", string="Documents", copy=False,
+        "ir.attachment",
+        "mb_carrier_shipment_attachment_rel",
+        "shipment_id",
+        "attachment_id",
+        string="Documents",
+        copy=False,
     )
     last_error = fields.Char(copy=False)
     submitted_at = fields.Datetime(copy=False)
@@ -95,29 +100,33 @@ class CarrierShipment(models.Model):
 
     @api.model
     def create_or_get(self, values):
-        existing = self.search([
-            ("carrier_id", "=", values["carrier_id"]),
-            ("idempotency_key", "=", values["idempotency_key"]),
-        ], limit=1)
+        existing = self.search(
+            [
+                ("carrier_id", "=", values["carrier_id"]),
+                ("idempotency_key", "=", values["idempotency_key"]),
+            ],
+            limit=1,
+        )
         if existing:
             return existing
         try:
             with self.env.cr.savepoint():
                 return self.create(values)
         except IntegrityError:
-            return self.search([
-                ("carrier_id", "=", values["carrier_id"]),
-                ("idempotency_key", "=", values["idempotency_key"]),
-            ], limit=1)
+            return self.search(
+                [
+                    ("carrier_id", "=", values["carrier_id"]),
+                    ("idempotency_key", "=", values["idempotency_key"]),
+                ],
+                limit=1,
+            )
 
     @staticmethod
     def _partner_payload(partner):
         street = (partner.street or "").strip()
         street_name = (getattr(partner, "mb_street_name", "") or "").strip()
         house_number = (getattr(partner, "mb_house_number", "") or "").strip()
-        house_number_addition = (
-            getattr(partner, "mb_house_number_addition", "") or ""
-        ).strip()
+        house_number_addition = (getattr(partner, "mb_house_number_addition", "") or "").strip()
         if not street_name or not house_number:
             leading = re.fullmatch(r"\s*(\d+[A-Za-z]?)\s*[, -]?\s*(.+?)\s*", street)
             trailing = re.fullmatch(r"\s*(.+?)\s*[, ]\s*(\d+[A-Za-z]?)\s*", street)
@@ -149,8 +158,18 @@ class CarrierShipment(models.Model):
         if not isinstance(snapshot, dict):
             return None
         allowed = {
-            "name", "company", "street", "street2", "street_name", "house_number",
-            "house_number_addition", "zip", "city", "country_code", "phone", "email",
+            "name",
+            "company",
+            "street",
+            "street2",
+            "street_name",
+            "house_number",
+            "house_number_addition",
+            "zip",
+            "city",
+            "country_code",
+            "phone",
+            "email",
         }
         payload = {key: snapshot.get(key, "") for key in allowed}
         return payload if payload.get("country_code") else None
@@ -246,18 +265,20 @@ class CarrierShipment(models.Model):
         # Provider exception text is bounded but may still contain echoed input;
         # keep only a stable class/code, never a response body.
         safe_diagnostic = diagnostic if diagnostic.replace("_", "").isalnum() else ""
-        self.env["mb.carrier.request.log"].sudo().create({
-            "company_id": self.company_id.id,
-            "provider_code": self.carrier_id.mb_provider_code,
-            "operation": operation or self.operation,
-            "shipment_id": self.id,
-            "picking_id": self.picking_id.id,
-            "http_status": status,
-            "duration_ms": max(0, int((time.monotonic() - started) * 1000)),
-            "outcome": outcome,
-            "diagnostic": safe_diagnostic[:128],
-            "correlation_id": hashlib.sha256(self.idempotency_key.encode()).hexdigest()[:24],
-        })
+        self.env["mb.carrier.request.log"].sudo().create(
+            {
+                "company_id": self.company_id.id,
+                "provider_code": self.carrier_id.mb_provider_code,
+                "operation": operation or self.operation,
+                "shipment_id": self.id,
+                "picking_id": self.picking_id.id,
+                "http_status": status,
+                "duration_ms": max(0, int((time.monotonic() - started) * 1000)),
+                "outcome": outcome,
+                "diagnostic": safe_diagnostic[:128],
+                "correlation_id": hashlib.sha256(self.idempotency_key.encode()).hexdigest()[:24],
+            }
+        )
 
     def _post_operation_failure(self, ambiguous=False):
         """Post a fixed, translated message; provider response text is never chatter-safe."""
@@ -268,9 +289,7 @@ class CarrierShipment(models.Model):
                 "provider before retrying."
             )
         else:
-            body = _(
-                "The carrier operation failed. Review the shipment journal before retrying."
-            )
+            body = _("The carrier operation failed. Review the shipment journal before retrying.")
         self.picking_id.message_post(body=body)
 
     def _store_document(self, document: ShipmentDocument):
@@ -283,20 +302,27 @@ class CarrierShipment(models.Model):
         else:
             prefix = carrier._get_delivery_label_prefix()
         extension = {"ZPL": "zpl", "PNG": "png"}.get(document.format, "pdf")
-        attachment = self.env["ir.attachment"].sudo().create({
-            "name": f"{prefix}-{self.provider_ref or self.id}.{extension}",
-            "raw": document.content,
-            "mimetype": {
-                "zpl": "text/plain", "png": "image/png", "pdf": "application/pdf",
-            }[extension],
-            "res_model": "stock.picking",
-            "res_id": self.picking_id.id,
-        })
+        attachment = (
+            self.env["ir.attachment"]
+            .sudo()
+            .create(
+                {
+                    "name": f"{prefix}-{self.provider_ref or self.id}.{extension}",
+                    "raw": document.content,
+                    "mimetype": {
+                        "zpl": "text/plain",
+                        "png": "image/png",
+                        "pdf": "application/pdf",
+                    }[extension],
+                    "res_model": "stock.picking",
+                    "res_id": self.picking_id.id,
+                }
+            )
+        )
         self.document_ids = [(4, attachment.id)]
         if (
-            (document.kind == "return_label" or self.direction == "return")
-            and carrier.get_return_label_from_portal
-        ):
+            document.kind == "return_label" or self.direction == "return"
+        ) and carrier.get_return_label_from_portal:
             attachment.generate_access_token()
         return attachment
 
@@ -332,7 +358,8 @@ class CarrierShipment(models.Model):
         if not self.tracking_number:
             return
         refs = [
-            part for part in (self.picking_id.carrier_tracking_ref or "").split(",")
+            part
+            for part in (self.picking_id.carrier_tracking_ref or "").split(",")
             if part and part != self.tracking_number
         ]
         self.picking_id.sudo().carrier_tracking_ref = ",".join(refs) or False
@@ -398,9 +425,7 @@ class CarrierShipment(models.Model):
                     if reconciled is not None:
                         self._apply_submission(reconciled)
                         self._log(started, "success", operation="reconcile")
-                        self.picking_id.message_post(
-                            body=_("Carrier label purchase accepted.")
-                        )
+                        self.picking_id.message_post(body=_("Carrier label purchase accepted."))
                         return
                 self._log(
                     started,
@@ -408,10 +433,12 @@ class CarrierShipment(models.Model):
                     "ambiguous_provider_outcome" if final_attempt else "safe_retry_scheduled",
                 )
                 if final_attempt:
-                    self.write({
-                        "state": "unknown",
-                        "last_error": "ambiguous_provider_outcome",
-                    })
+                    self.write(
+                        {
+                            "state": "unknown",
+                            "last_error": "ambiguous_provider_outcome",
+                        }
+                    )
                     self._post_operation_failure(ambiguous=True)
                     return
             except ProviderError:
@@ -444,13 +471,15 @@ class CarrierShipment(models.Model):
                 else:
                     result = provider.cancel_shipment(self.provider_ref)
                 if isinstance(result, CancellationResult) and result.state == "pending":
-                    self.write({
-                        "state": "cancelling",
-                        "last_error": False,
-                        "tracking_next_check_at": fields.Datetime.add(
-                            fields.Datetime.now(), minutes=5
-                        ),
-                    })
+                    self.write(
+                        {
+                            "state": "cancelling",
+                            "last_error": False,
+                            "tracking_next_check_at": fields.Datetime.add(
+                                fields.Datetime.now(), minutes=5
+                            ),
+                        }
+                    )
                     self._log(started, "pending")
                     self.picking_id.message_post(
                         body=_("Provider cancellation was requested and is pending confirmation.")
@@ -461,10 +490,13 @@ class CarrierShipment(models.Model):
                     self._log(started, "validation", "cancellation_rejected")
                     self._post_operation_failure()
                     return
-                self.write({
-                    "state": "cancelled", "completed_at": fields.Datetime.now(),
-                    "last_error": False,
-                })
+                self.write(
+                    {
+                        "state": "cancelled",
+                        "completed_at": fields.Datetime.now(),
+                        "last_error": False,
+                    }
+                )
                 self._remove_tracking_from_picking()
                 self._log(started, "success")
                 self.picking_id.message_post(body=_("Provider cancellation confirmed."))
@@ -506,10 +538,12 @@ class CarrierShipment(models.Model):
         for shipment in self:
             if shipment.state != "failed":
                 raise UserError(_("Only a definitely failed operation can be retried."))
-            shipment.write({
-                "state": "cancel_pending" if shipment.operation == "cancel" else "draft",
-                "last_error": False,
-            })
+            shipment.write(
+                {
+                    "state": "cancel_pending" if shipment.operation == "cancel" else "draft",
+                    "last_error": False,
+                }
+            )
         return True
 
     def action_reconcile(self):
@@ -517,11 +551,11 @@ class CarrierShipment(models.Model):
             if shipment.state != "unknown" or shipment.operation != "create":
                 raise UserError(_("Only an unknown creation outcome can be reconciled."))
             provider = shipment.carrier_id._mb_provider(purpose="reconciliation")
-            mutation = (
-                "create_return" if shipment.direction == "return" else "create_shipment"
-            )
+            mutation = "create_return" if shipment.direction == "return" else "create_shipment"
             if not provider.operation_safety(mutation).reconciliation_lookup:
-                raise UserError(_("This provider cannot reconcile an ambiguous purchase automatically."))
+                raise UserError(
+                    _("This provider cannot reconcile an ambiguous purchase automatically.")
+                )
             started = time.monotonic()
             try:
                 submission = provider.reconcile_shipment(shipment._shipment_request())
@@ -531,7 +565,9 @@ class CarrierShipment(models.Model):
                     shipment._apply_submission(submission)
                 shipment._log(started, "success", operation="reconcile")
             except ProviderError:
-                shipment._log(started, "unavailable", "reconciliation_failed", operation="reconcile")
+                shipment._log(
+                    started, "unavailable", "reconciliation_failed", operation="reconcile"
+                )
                 raise
         return True
 
@@ -541,17 +577,19 @@ class CarrierShipment(models.Model):
             if shipment.state != "unknown" or shipment.operation != "create":
                 raise UserError(_("Only an unknown creation outcome can be resolved this way."))
             provider_type = provider_class(shipment.carrier_id.mb_provider_code or "")
-            mutation = (
-                "create_return" if shipment.direction == "return" else "create_shipment"
-            )
+            mutation = "create_return" if shipment.direction == "return" else "create_shipment"
             if provider_type.operation_safety(mutation).reconciliation_lookup:
                 raise UserError(_("Use provider reconciliation for this shipment."))
-            shipment.write({
-                "state": "failed",
-                "last_error": "merchant_confirmed_provider_absent",
-            })
+            shipment.write(
+                {
+                    "state": "failed",
+                    "last_error": "merchant_confirmed_provider_absent",
+                }
+            )
             shipment.picking_id.message_post(
-                body=_("Merchant confirmed that no provider shipment exists; retry is now available.")
+                body=_(
+                    "Merchant confirmed that no provider shipment exists; retry is now available."
+                )
             )
         return True
 
@@ -559,11 +597,13 @@ class CarrierShipment(models.Model):
         for shipment in self:
             if shipment.state != "unknown" or shipment.operation != "cancel":
                 raise UserError(_("Only an unknown cancellation can be resolved this way."))
-            shipment.write({
-                "state": "cancelled",
-                "completed_at": fields.Datetime.now(),
-                "last_error": "merchant_confirmed_provider_cancelled",
-            })
+            shipment.write(
+                {
+                    "state": "cancelled",
+                    "completed_at": fields.Datetime.now(),
+                    "last_error": "merchant_confirmed_provider_cancelled",
+                }
+            )
             shipment._remove_tracking_from_picking()
             shipment.picking_id.message_post(
                 body=_("Merchant verified the cancellation in the provider portal.")
@@ -574,10 +614,12 @@ class CarrierShipment(models.Model):
         for shipment in self:
             if shipment.state != "unknown" or shipment.operation != "cancel":
                 raise UserError(_("Only an unknown cancellation can be resolved this way."))
-            shipment.write({
-                "state": "failed",
-                "last_error": "merchant_confirmed_provider_not_cancelled",
-            })
+            shipment.write(
+                {
+                    "state": "failed",
+                    "last_error": "merchant_confirmed_provider_not_cancelled",
+                }
+            )
         return True
 
     def _apply_tracking_snapshot(self, snapshot: TrackingSnapshot):
@@ -605,9 +647,7 @@ class CarrierShipment(models.Model):
         if snapshot.category in terminal:
             values["tracking_next_check_at"] = False
         else:
-            values["tracking_next_check_at"] = fields.Datetime.add(
-                fields.Datetime.now(), hours=2
-            )
+            values["tracking_next_check_at"] = fields.Datetime.add(fields.Datetime.now(), hours=2)
         self.write(values)
         self._sync_tracking_to_picking()
         return True
@@ -627,30 +667,30 @@ class CarrierShipment(models.Model):
             self._log(started, "success", operation="tracking_lookup")
             return snapshot
         except (ProviderTransientError, ProviderUnavailableError):
-            self.write({
-                "tracking_last_checked_at": fields.Datetime.now(),
-                "tracking_last_error": "tracking_temporarily_unavailable",
-                "tracking_next_check_at": fields.Datetime.add(
-                    fields.Datetime.now(), hours=4
-                ),
-            })
+            self.write(
+                {
+                    "tracking_last_checked_at": fields.Datetime.now(),
+                    "tracking_last_error": "tracking_temporarily_unavailable",
+                    "tracking_next_check_at": fields.Datetime.add(fields.Datetime.now(), hours=4),
+                }
+            )
             self._log(
-                started, "unavailable", "tracking_temporarily_unavailable",
+                started,
+                "unavailable",
+                "tracking_temporarily_unavailable",
                 operation="tracking_lookup",
             )
             return None
 
     def action_refresh_tracking(self):
         for shipment in self:
-            last_checked = fields.Datetime.to_datetime(
-                shipment.tracking_last_checked_at
-            )
+            last_checked = fields.Datetime.to_datetime(shipment.tracking_last_checked_at)
             if last_checked and last_checked > fields.Datetime.subtract(
                 fields.Datetime.now(), minutes=1
             ):
-                raise UserError(_(
-                    "Tracking was refreshed recently. Wait one minute before trying again."
-                ))
+                raise UserError(
+                    _("Tracking was refreshed recently. Wait one minute before trying again.")
+                )
             shipment._refresh_tracking()
         return True
 
@@ -662,86 +702,97 @@ class CarrierShipment(models.Model):
             return False
         result = reconcile(self.provider_ref, direction=self.direction)
         if result.state == "confirmed":
-            self.write({
-                "state": "cancelled",
-                "completed_at": fields.Datetime.now(),
-                "tracking_next_check_at": False,
-                "last_error": False,
-            })
+            self.write(
+                {
+                    "state": "cancelled",
+                    "completed_at": fields.Datetime.now(),
+                    "tracking_next_check_at": False,
+                    "last_error": False,
+                }
+            )
             self._remove_tracking_from_picking()
         elif result.state == "rejected":
-            self.write({
-                "state": "failed",
-                "last_error": "cancellation_rejected",
-                "tracking_next_check_at": False,
-            })
-        else:
-            self.tracking_next_check_at = fields.Datetime.add(
-                fields.Datetime.now(), hours=1
+            self.write(
+                {
+                    "state": "failed",
+                    "last_error": "cancellation_rejected",
+                    "tracking_next_check_at": False,
+                }
             )
+        else:
+            self.tracking_next_check_at = fields.Datetime.add(fields.Datetime.now(), hours=1)
         return True
 
     @api.model
     def _cron_reconcile_provider_state(self, limit=50):
         now = fields.Datetime.now()
-        shipments = self.sudo().search([
-            ("provider_ref", "!=", False),
-            ("state", "in", ("awaiting_document", "label_ready", "cancelling")),
-            "|", ("tracking_next_check_at", "=", False),
-            ("tracking_next_check_at", "<=", now),
-        ], order="tracking_next_check_at, id", limit=limit)
+        shipments = self.sudo().search(
+            [
+                ("provider_ref", "!=", False),
+                ("state", "in", ("awaiting_document", "label_ready", "cancelling")),
+                "|",
+                ("tracking_next_check_at", "=", False),
+                ("tracking_next_check_at", "<=", now),
+            ],
+            order="tracking_next_check_at, id",
+            limit=limit,
+        )
         for shipment in shipments:
             try:
                 if shipment.state == "cancelling":
                     shipment._reconcile_pending_cancellation()
                 elif shipment.state == "awaiting_document":
-                    provider = shipment.carrier_id._mb_provider(
-                        purpose="document_recovery"
-                    )
+                    provider = shipment.carrier_id._mb_provider(purpose="document_recovery")
                     retrieve = getattr(provider, "retrieve_document_submission", None)
                     if retrieve:
-                        shipment._apply_submission(retrieve(
-                            shipment.provider_ref, direction=shipment.direction
-                        ))
+                        shipment._apply_submission(
+                            retrieve(shipment.provider_ref, direction=shipment.direction)
+                        )
                 elif getattr(
                     provider_class(shipment.carrier_id.mb_provider_code or ""),
-                    "supports_tracking_lookup", False,
+                    "supports_tracking_lookup",
+                    False,
                 ):
                     shipment._refresh_tracking()
             except (ProviderError, UserError):
-                shipment.write({
-                    "tracking_last_error": "provider_state_reconciliation_failed",
-                    "tracking_next_check_at": fields.Datetime.add(now, hours=4),
-                })
+                shipment.write(
+                    {
+                        "tracking_last_error": "provider_state_reconciliation_failed",
+                        "tracking_next_check_at": fields.Datetime.add(now, hours=4),
+                    }
+                )
         return len(shipments)
 
     @api.model
     def _recover_stale_submissions(self, stale_minutes=15):
         """Never replay a mutation whose worker died after its durable claim."""
         cutoff = fields.Datetime.subtract(fields.Datetime.now(), minutes=stale_minutes)
-        stale = self.sudo().search([
-            ("state", "=", "submitting"),
-            "|", ("submitted_at", "=", False), ("submitted_at", "<", cutoff),
-        ])
+        stale = self.sudo().search(
+            [
+                ("state", "=", "submitting"),
+                "|",
+                ("submitted_at", "=", False),
+                ("submitted_at", "<", cutoff),
+            ]
+        )
         for shipment in stale:
-            shipment.write({
-                "state": "unknown",
-                "last_error": (
-                    "worker_interrupted_cancel"
-                    if shipment.operation == "cancel"
-                    else "worker_interrupted_create"
-                ),
-            })
+            shipment.write(
+                {
+                    "state": "unknown",
+                    "last_error": (
+                        "worker_interrupted_cancel"
+                        if shipment.operation == "cancel"
+                        else "worker_interrupted_create"
+                    ),
+                }
+            )
             shipment._post_operation_failure(ambiguous=True)
         return len(stale)
 
     @api.model
     def _cron_progress_active(self):
         context = self.env.context
-        return bool(
-            context.get("ir_cron_progress_id")
-            or context.get("cron_id")
-        )
+        return bool(context.get("ir_cron_progress_id") or context.get("cron_id"))
 
     @api.model
     def _cron_process(self, limit=20):

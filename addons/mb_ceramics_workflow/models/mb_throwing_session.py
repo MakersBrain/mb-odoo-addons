@@ -12,17 +12,20 @@ class MbThrowingSession(models.Model):
     name = fields.Char(required=True, copy=False, default=lambda self: _("New"))
     date = fields.Date(required=True, default=fields.Date.context_today)
     clay_product_id = fields.Many2one(
-        "product.product", required=True, domain=[("is_storable", "=", True)],
-        check_company=True)
+        "product.product", required=True, domain=[("is_storable", "=", True)], check_company=True
+    )
     clay_lot_id = fields.Many2one(
-        "stock.lot", required=True, domain="[('product_id', '=', clay_product_id)]",
-        check_company=True)
+        "stock.lot",
+        required=True,
+        domain="[('product_id', '=', clay_product_id)]",
+        check_company=True,
+    )
     source_location_id = fields.Many2one(
-        "stock.location", required=True, domain=[("usage", "=", "internal")],
-        check_company=True)
+        "stock.location", required=True, domain=[("usage", "=", "internal")], check_company=True
+    )
     damp_location_id = fields.Many2one(
-        "stock.location", required=True, domain=[("usage", "=", "internal")],
-        check_company=True)
+        "stock.location", required=True, domain=[("usage", "=", "internal")], check_company=True
+    )
     board_id = fields.Many2one(
         "stock.package",
         domain="[('package_type_id.package_use', '=', 'reusable')]",
@@ -30,24 +33,27 @@ class MbThrowingSession(models.Model):
     )
     note = fields.Text()
     line_ids = fields.One2many(
-        "mb.throwing.session.line", "session_id", string="Outputs", copy=True)
+        "mb.throwing.session.line", "session_id", string="Outputs", copy=True
+    )
     production_ids = fields.One2many(
-        "mrp.production", "mb_throwing_session_id", string="Manufacturing orders")
+        "mrp.production", "mb_throwing_session_id", string="Manufacturing orders"
+    )
     state = fields.Selection(
         [("draft", "Draft"), ("done", "Recorded"), ("cancel", "Cancelled")],
         required=True,
         default="draft",
     )
     company_id = fields.Many2one(
-        "res.company", required=True, index=True,
-        default=lambda self: self.env.company)
+        "res.company", required=True, index=True, default=lambda self: self.env.company
+    )
 
     @api.model_create_multi
     def create(self, vals_list):
         for values in vals_list:
             if values.get("name", _("New")) == _("New"):
-                values["name"] = self.env["ir.sequence"].next_by_code(
-                    "mb.throwing.session") or _("New")
+                values["name"] = self.env["ir.sequence"].next_by_code("mb.throwing.session") or _(
+                    "New"
+                )
         return super().create(vals_list)
 
     @api.constrains("clay_product_id", "clay_lot_id")
@@ -64,22 +70,29 @@ class MbThrowingSession(models.Model):
             return
         if self.clay_lot_id.product_id == self.clay_product_id:
             return
-        quants = self.env["stock.quant"].search([
-            ("product_id", "=", self.clay_product_id.id),
-            ("location_id", "=", self.source_location_id.id),
-            ("lot_id", "!=", False),
-            ("quantity", ">", 0),
-        ])
+        quants = self.env["stock.quant"].search(
+            [
+                ("product_id", "=", self.clay_product_id.id),
+                ("location_id", "=", self.source_location_id.id),
+                ("lot_id", "!=", False),
+                ("quantity", ">", 0),
+            ]
+        )
         lots = quants.lot_id.sorted(key=lambda lot: (lot.create_date, lot.id))
-        self.clay_lot_id = next((
-            lot for lot in lots
-            if self.env["stock.quant"]._get_available_quantity(
-                self.clay_product_id,
-                self.source_location_id,
-                lot_id=lot,
-                strict=True,
-            ) > 0
-        ), False)
+        self.clay_lot_id = next(
+            (
+                lot
+                for lot in lots
+                if self.env["stock.quant"]._get_available_quantity(
+                    self.clay_product_id,
+                    self.source_location_id,
+                    lot_id=lot,
+                    strict=True,
+                )
+                > 0
+            ),
+            False,
+        )
 
     def action_confirm(self):
         for session in self:
@@ -101,21 +114,19 @@ class MbThrowingSessionLine(models.Model):
     _check_company_auto = True
 
     session_id = fields.Many2one(
-        "mb.throwing.session", required=True, ondelete="cascade",
-        check_company=True)
+        "mb.throwing.session", required=True, ondelete="cascade", check_company=True
+    )
     blank_product_id = fields.Many2one(
-        "product.product", required=True, domain=[("is_storable", "=", True)],
-        check_company=True)
+        "product.product", required=True, domain=[("is_storable", "=", True)], check_company=True
+    )
     quantity = fields.Float(required=True, digits="Product Unit", default=1.0)
     clay_quantity = fields.Float(required=True, digits="Product Unit", default=1.0)
     bom_id = fields.Many2one("mrp.bom", required=True, check_company=True)
-    production_id = fields.Many2one(
-        "mrp.production", readonly=True, copy=False, check_company=True)
-    blank_lot_id = fields.Many2one(
-        "stock.lot", readonly=True, copy=False, check_company=True)
+    production_id = fields.Many2one("mrp.production", readonly=True, copy=False, check_company=True)
+    blank_lot_id = fields.Many2one("stock.lot", readonly=True, copy=False, check_company=True)
     company_id = fields.Many2one(
-        related="session_id.company_id", store=True, required=True, index=True,
-        precompute=True)
+        related="session_id.company_id", store=True, required=True, index=True, precompute=True
+    )
 
     _positive_quantity = models.Constraint(
         "CHECK(quantity > 0 AND clay_quantity > 0)",
@@ -126,7 +137,8 @@ class MbThrowingSessionLine(models.Model):
     def _check_bom_product(self):
         for line in self:
             if line.blank_product_id not in (
-                    line.bom_id.product_id | line.bom_id.product_tmpl_id.product_variant_ids):
+                line.bom_id.product_id | line.bom_id.product_tmpl_id.product_variant_ids
+            ):
                 raise ValidationError(_("The bill of materials does not produce this blank."))
             if line.blank_product_id.tracking != "lot":
                 raise ValidationError(_("Reusable blank products must be tracked by lot."))
@@ -142,52 +154,59 @@ class MbThrowingSessionLine(models.Model):
     def _produce_blank(self):
         self.ensure_one()
         session = self.session_id
-        production = self.env["mrp.production"].create({
-            "product_id": self.blank_product_id.id,
-            "product_qty": self.quantity,
-            "product_uom_id": self.blank_product_id.uom_id.id,
-            "bom_id": self.bom_id.id,
-            "location_src_id": session.source_location_id.id,
-            "location_dest_id": session.damp_location_id.id,
-            "origin": session.name,
-            "company_id": session.company_id.id,
-            "mb_workflow_kind": "throwing",
-            "mb_throwing_session_id": session.id,
-        })
+        production = self.env["mrp.production"].create(
+            {
+                "product_id": self.blank_product_id.id,
+                "product_qty": self.quantity,
+                "product_uom_id": self.blank_product_id.uom_id.id,
+                "bom_id": self.bom_id.id,
+                "location_src_id": session.source_location_id.id,
+                "location_dest_id": session.damp_location_id.id,
+                "origin": session.name,
+                "company_id": session.company_id.id,
+                "mb_workflow_kind": "throwing",
+                "mb_throwing_session_id": session.id,
+            }
+        )
         production.action_confirm()
         clay_move = production.move_raw_ids.filtered(
-            lambda move: move.product_id == session.clay_product_id)[:1]
+            lambda move: move.product_id == session.clay_product_id
+        )[:1]
         if not clay_move:
-            raise UserError(_(
-                "The bill of materials of %(product)s does not consume the "
-                "selected clay.",
-                product=self.blank_product_id.display_name,
-            ))
+            raise UserError(
+                _(
+                    "The bill of materials of %(product)s does not consume the selected clay.",
+                    product=self.blank_product_id.display_name,
+                )
+            )
         available = self.env["stock.quant"]._get_available_quantity(
             session.clay_product_id,
             session.source_location_id,
             lot_id=session.clay_lot_id,
             strict=True,
         )
-        reserved_from_lot = sum(clay_move.move_line_ids.filtered(
-            lambda move_line: move_line.lot_id == session.clay_lot_id
-        ).mapped("quantity"))
+        reserved_from_lot = sum(
+            clay_move.move_line_ids.filtered(
+                lambda move_line: move_line.lot_id == session.clay_lot_id
+            ).mapped("quantity")
+        )
         if available + reserved_from_lot < self.clay_quantity:
             raise UserError(_("The selected clay lot does not have enough available stock."))
         production.action_assign()
         clay_move.lot_ids = session.clay_lot_id
         clay_move.quantity = self.clay_quantity
         clay_move.picked = True
-        lot = self.env["stock.lot"].create({
-            "name": self.env["ir.sequence"].next_by_code("mb.blank.lot"),
-            "product_id": self.blank_product_id.id,
-            "company_id": session.company_id.id,
-        })
+        lot = self.env["stock.lot"].create(
+            {
+                "name": self.env["ir.sequence"].next_by_code("mb.blank.lot"),
+                "product_id": self.blank_product_id.id,
+                "company_id": session.company_id.id,
+            }
+        )
         production.lot_producing_ids = [fields.Command.set(lot.ids)]
         production.qty_producing = self.quantity
         production._set_qty_producing()
-        production.with_context(
-            skip_backorder=True, skip_redirection=True).button_mark_done()
+        production.with_context(skip_backorder=True, skip_redirection=True).button_mark_done()
         if production.state != "done":
             raise UserError(_("The throwing order needs manual manufacturing review."))
         self.write({"production_id": production.id, "blank_lot_id": lot.id})

@@ -6,14 +6,12 @@ from odoo.http import request
 
 from ..provider import ProviderError, ProviderValidationError, provider_class
 
-
 IDENTIFIER = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
 SUBSCRIPTION = re.compile(r"^[A-Za-z0-9_-]{16,128}$")
 MAX_BODY = 256 * 1024
 
 
 class CarrierWebhookController(http.Controller):
-
     @http.route(
         "/mb_carrier/webhook/<string:provider_code>/<string:subscription_id>",
         type="http",
@@ -32,11 +30,18 @@ class CarrierWebhookController(http.Controller):
         if not raw_body or len(raw_body) > MAX_BODY:
             return request.make_json_response({"error": "invalid payload"}, status=400)
 
-        carrier = request.env["delivery.carrier"].sudo().search([
-            ("mb_provider_code", "=", provider_code),
-            ("mb_subscription_id", "=", subscription_id),
-            ("mb_provider_enabled", "=", True),
-        ], limit=1)
+        carrier = (
+            request.env["delivery.carrier"]
+            .sudo()
+            .search(
+                [
+                    ("mb_provider_code", "=", provider_code),
+                    ("mb_subscription_id", "=", subscription_id),
+                    ("mb_provider_enabled", "=", True),
+                ],
+                limit=1,
+            )
+        )
         if not carrier:
             return request.make_json_response({"error": "not found"}, status=404)
         try:
@@ -56,9 +61,7 @@ class CarrierWebhookController(http.Controller):
                 production=bool(carrier.prod_environment),
                 carrier=carrier,
             )
-            if not provider.verify_webhook(
-                raw_body, request.httprequest.headers, webhook_secret
-            ):
+            if not provider.verify_webhook(raw_body, request.httprequest.headers, webhook_secret):
                 return request.make_json_response({"error": "invalid signature"}, status=401)
             event = provider.parse_webhook(raw_body)
             if not event.provider_ref or event.kind not in ("document", "tracking"):
@@ -77,8 +80,10 @@ class CarrierWebhookController(http.Controller):
             event_key = hashlib.sha256(event_key.encode()).hexdigest()
         request.env["mb.carrier.webhook.event"].sudo().receive(carrier, event, event_key)
         if provider_code == "sendcloud" and "mb_sendcloud_webhook_ready" in carrier._fields:
-            carrier.sudo().write({
-                "mb_sendcloud_webhook_ready": True,
-                "mb_sendcloud_last_webhook_at": fields.Datetime.now(),
-            })
+            carrier.sudo().write(
+                {
+                    "mb_sendcloud_webhook_ready": True,
+                    "mb_sendcloud_last_webhook_at": fields.Datetime.now(),
+                }
+            )
         return request.make_json_response({"accepted": True}, status=202)

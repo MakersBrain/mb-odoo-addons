@@ -1,11 +1,11 @@
 import base64
-from datetime import datetime
-from decimal import Decimal, InvalidOperation
 import io
 import re
+from datetime import datetime
+from decimal import Decimal, InvalidOperation
 
-from PIL import Image, ImageChops, ImageDraw, ImageFont, ImageOps
 import qrcode
+from PIL import Image, ImageChops, ImageDraw, ImageFont, ImageOps
 from qrcode.constants import ERROR_CORRECT_M
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as pdf_canvas
@@ -15,7 +15,6 @@ from odoo.exceptions import ValidationError
 from odoo.tools.misc import format_amount
 
 from .label_template import TOKEN_RE, build_qr_value, parse_filters, qr_identity_path
-
 
 MM_TO_PT = 72.0 / 25.4
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
@@ -37,8 +36,18 @@ FONT_PATHS = {
 DATA_URL_RE = re.compile(r"^data:image/[^;]+;base64,(.+)$", re.DOTALL)
 EXPRESSION_RE = re.compile(r"\[\[([a-z]+)(?:\|([^\]]*))?\]\]", re.IGNORECASE)
 MONTHS = (
-    "janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août",
-    "septembre", "octobre", "novembre", "décembre",
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre",
 )
 
 
@@ -95,7 +104,9 @@ class MbLabelRenderService(models.AbstractModel):
         try:
             return Decimal(str(value).strip())
         except (InvalidOperation, ValueError):
-            raise ValidationError(_("A numeric label filter received a non-numeric value.")) from None
+            raise ValidationError(
+                _("A numeric label filter received a non-numeric value.")
+            ) from None
 
     def _format_decimal(self, value, minimum, maximum):
         language = (self.env.lang or "en_US").replace("-", "_")
@@ -104,6 +115,7 @@ class MbLabelRenderService(models.AbstractModel):
             pattern += "." + ("0" * minimum) + ("#" * (maximum - minimum))
         try:
             from babel.numbers import format_decimal
+
             return format_decimal(value, format=pattern, locale=language)
         except (ValueError, ArithmeticError):
             return format(value, ".%sf" % minimum)
@@ -134,12 +146,14 @@ class MbLabelRenderService(models.AbstractModel):
                 except ValidationError:
                     continue
                 value = format_amount(
-                    self.env, float(numeric), self.env.company.currency_id).strip()
+                    self.env, float(numeric), self.env.company.currency_id
+                ).strip()
             elif name == "money_trim":
                 try:
                     numeric = self._decimal_value(value)
                     value = format_amount(
-                        self.env, float(numeric), self.env.company.currency_id).strip()
+                        self.env, float(numeric), self.env.company.currency_id
+                    ).strip()
                 except ValidationError:
                     value = str(value or "")
                 value = self._trim_money_zeros(value)
@@ -155,17 +169,23 @@ class MbLabelRenderService(models.AbstractModel):
 
         def formatted(pattern):
             tokens = {
-                "YYYY": "%04d" % now.year, "YY": "%02d" % (now.year % 100),
-                "MM": "%02d" % now.month, "DD": "%02d" % now.day,
-                "HH": "%02d" % now.hour, "mm": "%02d" % now.minute,
+                "YYYY": "%04d" % now.year,
+                "YY": "%02d" % (now.year % 100),
+                "MM": "%02d" % now.month,
+                "DD": "%02d" % now.day,
+                "HH": "%02d" % now.hour,
+                "mm": "%02d" % now.minute,
                 "ss": "%02d" % now.second,
             }
             return re.sub(r"YYYY|YY|MM|DD|HH|mm|ss", lambda match: tokens[match.group(0)], pattern)
 
         builtins = {
-            "date": formatted("DD/MM/YYYY"), "time": formatted("HH:mm"),
-            "datetime": formatted("DD/MM/YYYY HH:mm"), "iso": formatted("YYYY-MM-DD"),
-            "year": formatted("YYYY"), "month": MONTHS[now.month - 1],
+            "date": formatted("DD/MM/YYYY"),
+            "time": formatted("HH:mm"),
+            "datetime": formatted("DD/MM/YYYY HH:mm"),
+            "iso": formatted("YYYY-MM-DD"),
+            "year": formatted("YYYY"),
+            "month": MONTHS[now.month - 1],
             "monthyear": "%s %s" % (MONTHS[now.month - 1], now.year),
         }
 
@@ -186,8 +206,14 @@ class MbLabelRenderService(models.AbstractModel):
 
     def _barcode_image(self, kind, value, width, height, humanreadable=False):
         raw = self.env["ir.actions.report"].barcode(
-            kind or "auto", value, width=max(40, width), height=max(40, height),
-            quiet=True, humanreadable=humanreadable, barLevel="M")
+            kind or "auto",
+            value,
+            width=max(40, width),
+            height=max(40, height),
+            quiet=True,
+            humanreadable=humanreadable,
+            barLevel="M",
+        )
         return Image.open(io.BytesIO(raw)).convert("1")
 
     def _qr_image(self, value, width, height, quiet_zone=4):
@@ -202,8 +228,11 @@ class MbLabelRenderService(models.AbstractModel):
         modules = code.make_image(fill_color="black", back_color="white").convert("1")
         side = min(width, height)
         if side < modules.width:
-            raise ValidationError(_(
-                "The QR element is too small for its encoded value. Enlarge it or shorten the URL."))
+            raise ValidationError(
+                _(
+                    "The QR element is too small for its encoded value. Enlarge it or shorten the URL."
+                )
+            )
         modules = modules.resize((side, side), Image.Resampling.NEAREST)
         result = Image.new("1", (width, height), 1)
         result.paste(modules, ((width - side) // 2, (height - side) // 2))
@@ -234,13 +263,75 @@ class MbLabelRenderService(models.AbstractModel):
             return result
         if mode == "ordered":
             bayer = (
-                0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26,
-                12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22,
-                3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25,
-                15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21,
+                0,
+                32,
+                8,
+                40,
+                2,
+                34,
+                10,
+                42,
+                48,
+                16,
+                56,
+                24,
+                50,
+                18,
+                58,
+                26,
+                12,
+                44,
+                4,
+                36,
+                14,
+                46,
+                6,
+                38,
+                60,
+                28,
+                52,
+                20,
+                62,
+                30,
+                54,
+                22,
+                3,
+                35,
+                11,
+                43,
+                1,
+                33,
+                9,
+                41,
+                51,
+                19,
+                59,
+                27,
+                49,
+                17,
+                57,
+                25,
+                15,
+                47,
+                7,
+                39,
+                13,
+                45,
+                5,
+                37,
+                63,
+                31,
+                55,
+                23,
+                61,
+                29,
+                53,
+                21,
             )
             output = [
-                0 if value < bayer[(index // width % 8) * 8 + (index % width % 8)] * 255 / 64 else 255
+                0
+                if value < bayer[(index // width % 8) * 8 + (index % width % 8)] * 255 / 64
+                else 255
                 for index, value in enumerate(pixels)
             ]
             result = Image.new("L", image.size)
@@ -256,7 +347,9 @@ class MbLabelRenderService(models.AbstractModel):
         height = max(1, round(version.height_mm * px_per_mm))
         image = Image.new("L", (width, height), 255)
         elements = sorted(
-            version.document_json.get("elements", []), key=lambda item: item.get("z", 0))
+            version.document_json.get("elements", []), key=lambda item: item.get("z", 0)
+        )
+
         def mm(value):
             return round(float(value or 0) * px_per_mm)
 
@@ -266,15 +359,22 @@ class MbLabelRenderService(models.AbstractModel):
             x, y, w, h = box
             bounds = (x, y, x + w, y + h)
             if kind == "rect":
-                shape.rectangle(bounds, fill=255 if filled else None,
-                                outline=None if filled else 255, width=stroke)
+                shape.rectangle(
+                    bounds,
+                    fill=255 if filled else None,
+                    outline=None if filled else 255,
+                    width=stroke,
+                )
             elif kind == "ellipse":
-                shape.ellipse(bounds, fill=255 if filled else None,
-                              outline=None if filled else 255, width=stroke)
+                shape.ellipse(
+                    bounds,
+                    fill=255 if filled else None,
+                    outline=None if filled else 255,
+                    width=stroke,
+                )
             elif kind == "triangle":
                 points = ((x + w // 2, y), (x + w, y + h), (x, y + h))
-                shape.polygon(points, fill=255 if filled else None,
-                              outline=None if filled else 255)
+                shape.polygon(points, fill=255 if filled else None, outline=None if filled else 255)
                 if not filled and stroke > 1:
                     shape.line(points + (points[0],), fill=255, width=stroke, joint="curve")
             else:
@@ -305,13 +405,17 @@ class MbLabelRenderService(models.AbstractModel):
             resolved_content = None
             if kind == "text":
                 resolved_content = self.resolve(
-                    element.get("text", ""), values, required=element.get("required", True))
+                    element.get("text", ""), values, required=element.get("required", True)
+                )
             elif kind in ("qr", "barcode"):
                 resolved_content = self.resolve(
-                    element.get("data", "{{qr}}"), values,
-                    required=element.get("required", True))
-            if kind in ("text", "qr", "barcode") and not element.get("required", True) \
-                    and not resolved_content:
+                    element.get("data", "{{qr}}"), values, required=element.get("required", True)
+                )
+            if (
+                kind in ("text", "qr", "barcode")
+                and not element.get("required", True)
+                and not resolved_content
+            ):
                 continue
             layer = Image.new("L", (width, height), 255)
             mask = Image.new("L", (width, height), 0)
@@ -333,8 +437,11 @@ class MbLabelRenderService(models.AbstractModel):
             elif kind == "text":
                 text = resolved_content
                 font = self._font(
-                    mm(element.get("font_size", 3)), element.get("bold", False),
-                    element.get("italic", False), element.get("font", "sans"))
+                    mm(element.get("font_size", 3)),
+                    element.get("bold", False),
+                    element.get("italic", False),
+                    element.get("font", "sans"),
+                )
                 lines = []
                 for paragraph in text.splitlines() or [""]:
                     if element.get("no_wrap"):
@@ -350,29 +457,47 @@ class MbLabelRenderService(models.AbstractModel):
                             current = word
                     lines.append(current)
                 line_height = max(1, font.getbbox("Ag")[3] - font.getbbox("Ag")[1])
-                visible = lines[:max(1, h // line_height)]
+                visible = lines[: max(1, h // line_height)]
                 block_height = len(visible) * line_height
                 valign = element.get("valign", "middle")
-                first_y = y if valign == "top" else y + h - block_height if valign == "bottom" else y + (h - block_height) // 2
+                first_y = (
+                    y
+                    if valign == "top"
+                    else y + h - block_height
+                    if valign == "bottom"
+                    else y + (h - block_height) // 2
+                )
                 for index, line in enumerate(visible):
                     line_width = layer_draw.textbbox((0, 0), line, font=font)[2]
                     align = element.get("align", "left")
-                    line_x = x if align == "left" else (x + w - line_width if align == "right" else x + (w - line_width) // 2)
+                    line_x = (
+                        x
+                        if align == "left"
+                        else (x + w - line_width if align == "right" else x + (w - line_width) // 2)
+                    )
                     line_y = first_y + index * line_height
                     layer_draw.text((line_x, line_y), line, font=font, fill=ink)
                     mask_draw.text((line_x, line_y), line, font=font, fill=255)
                     if element.get("underline"):
                         underline_y = min(y + h - 1, line_y + line_height - 1)
                         thickness = max(1, round(font.size / 12))
-                        line_box = (line_x, underline_y, line_x + line_width, underline_y + thickness)
+                        line_box = (
+                            line_x,
+                            underline_y,
+                            line_x + line_width,
+                            underline_y + thickness,
+                        )
                         layer_draw.rectangle(line_box, fill=ink)
                         mask_draw.rectangle(line_box, fill=255)
             elif kind in ("qr", "barcode"):
                 value = resolved_content
-                code = self._qr_image(
-                    value, w, h, element.get("quiet_zone", 4)) if kind == "qr" else self._barcode_image(
-                    element.get("format", "auto"), value, w, h,
-                    element.get("show_value", False)).resize((w, h), Image.Resampling.NEAREST)
+                code = (
+                    self._qr_image(value, w, h, element.get("quiet_zone", 4))
+                    if kind == "qr"
+                    else self._barcode_image(
+                        element.get("format", "auto"), value, w, h, element.get("show_value", False)
+                    ).resize((w, h), Image.Resampling.NEAREST)
+                )
                 layer.paste(code, (x, y))
                 mask_draw.rectangle((x, y, x + w, y + h), fill=255)
             elif kind == "image":
@@ -381,28 +506,37 @@ class MbLabelRenderService(models.AbstractModel):
                     try:
                         logo = Image.open(io.BytesIO(base64.b64decode(match.group(1)))).convert("L")
                         logo.thumbnail(
-                            (w, h), Image.Resampling.NEAREST if element.get("pre_binarised")
-                            else Image.Resampling.LANCZOS)
+                            (w, h),
+                            Image.Resampling.NEAREST
+                            if element.get("pre_binarised")
+                            else Image.Resampling.LANCZOS,
+                        )
                         if element.get("pre_binarised"):
                             logo = logo.point(lambda pixel: 255 if pixel >= 128 else 0)
                         else:
                             logo = self._dither_image(
-                                logo, element.get("dither", "threshold"),
-                                element.get("dither_threshold", 160))
+                                logo,
+                                element.get("dither", "threshold"),
+                                element.get("dither_threshold", 160),
+                            )
                         logo_x, logo_y = x + (w - logo.width) // 2, y + (h - logo.height) // 2
                         layer_draw.rectangle((x, y, x + w, y + h), fill=255)
                         layer.paste(logo, (logo_x, logo_y))
                         mask_draw.rectangle((x, y, x + w, y + h), fill=255)
                     except Exception as error:
-                        raise ValidationError(_("The label contains an unreadable image.")) from error
+                        raise ValidationError(
+                            _("The label contains an unreadable image.")
+                        ) from error
 
             rotation = int(element.get("rotation", 0)) % 360
             if rotation:
                 center = (x + w / 2, y + h / 2)
-                layer = layer.rotate(-rotation, resample=Image.Resampling.BICUBIC,
-                                     center=center, fillcolor=255)
-                mask = mask.rotate(-rotation, resample=Image.Resampling.NEAREST,
-                                   center=center, fillcolor=0)
+                layer = layer.rotate(
+                    -rotation, resample=Image.Resampling.BICUBIC, center=center, fillcolor=255
+                )
+                mask = mask.rotate(
+                    -rotation, resample=Image.Resampling.NEAREST, center=center, fillcolor=0
+                )
             image = Image.composite(layer, image, mask)
 
         if version.round_media:
@@ -420,8 +554,14 @@ class MbLabelRenderService(models.AbstractModel):
         document = pdf_canvas.Canvas(output, pagesize=(width_pt, height_pt), pageCompression=1)
         for _copy in range(max(1, int(copies))):
             document.drawImage(
-                ImageReader(io.BytesIO(png)), 0, 0, width=width_pt, height=height_pt,
-                preserveAspectRatio=False, mask="auto")
+                ImageReader(io.BytesIO(png)),
+                0,
+                0,
+                width=width_pt,
+                height=height_pt,
+                preserveAspectRatio=False,
+                mask="auto",
+            )
             document.showPage()
         document.save()
         return output.getvalue()

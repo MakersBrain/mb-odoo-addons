@@ -123,7 +123,9 @@ def generate() -> int:
                 break
         sentinels.extend(chosen.values())
 
-    MANIFEST.write_text(json.dumps(sentinels, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    MANIFEST.write_text(
+        json.dumps(sentinels, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
+    )
     modules = len({s["module"] for s in sentinels})
     print(f"{len(sentinels)} sentinels across {modules} addon(s) -> {MANIFEST.relative_to(REPO)}")
     return 0
@@ -131,7 +133,7 @@ def generate() -> int:
 
 # Runs inside `odoo shell`, where `env` is injected. Kept as a string because
 # that is the only interface `odoo shell` offers.
-CHECK_SCRIPT = r'''
+CHECK_SCRIPT = r"""
 import json, sys
 from odoo.tools.translate import code_translations
 
@@ -170,7 +172,7 @@ for item in sentinels:
 for failure in failures:
     print("SENTINEL FAIL " + failure)
 print(f"SENTINEL SUMMARY {len(sentinels) - len(failures)}/{len(sentinels)} passed")
-'''
+"""
 
 
 def check(database: str, container: str) -> int:
@@ -178,13 +180,24 @@ def check(database: str, container: str) -> int:
         print(f"{MANIFEST.relative_to(REPO)} does not exist; run --generate first", file=sys.stderr)
         return 1
     sentinels = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    script = f"SENTINELS_JSON = {json.dumps(json.dumps(sentinels, ensure_ascii=False))}\n" + CHECK_SCRIPT
+    script = (
+        f"SENTINELS_JSON = {json.dumps(json.dumps(sentinels, ensure_ascii=False))}\n" + CHECK_SCRIPT
+    )
 
     result = subprocess.run(
         [
-            "docker", "exec", "-i", container,
-            "odoo", "shell", "-c", "/etc/odoo/odoo.conf", "-d", database,
-            "--no-http", "--log-level=warn",
+            "docker",
+            "exec",
+            "-i",
+            container,
+            "odoo",
+            "shell",
+            "-c",
+            "/etc/odoo/odoo.conf",
+            "-d",
+            database,
+            "--no-http",
+            "--log-level=warn",
         ],
         input=script,
         capture_output=True,
@@ -206,8 +219,12 @@ def check(database: str, container: str) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--generate", action="store_true", help="rebuild the manifest from the catalogues")
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--generate", action="store_true", help="rebuild the manifest from the catalogues"
+    )
     parser.add_argument("--check", metavar="DB", help="assert the manifest against a database")
     parser.add_argument("--container", default=CONTAINER_DEFAULT, help="Odoo container name")
     args = parser.parse_args()

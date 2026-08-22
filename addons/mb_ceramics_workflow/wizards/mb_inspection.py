@@ -13,21 +13,21 @@ class MbInspection(models.TransientModel):
         domain=[("mb_workflow_kind", "=", "glazing")],
     )
     selected_quantity = fields.Float(
-        related="production_id.product_qty", string="Selected blanks", readonly=True)
+        related="production_id.product_qty", string="Selected blanks", readonly=True
+    )
     accepted_quantity = fields.Float(digits="Product Unit")
     second_quantity = fields.Float(digits="Product Unit")
     loss_quantity = fields.Float(digits="Product Unit")
     loss_reason = fields.Text()
     second_product_id = fields.Many2one(
-        "product.product", compute="_compute_second_product", readonly=True)
-    seconds_location_id = fields.Many2one(
-        "stock.location", domain=[("usage", "=", "internal")])
+        "product.product", compute="_compute_second_product", readonly=True
+    )
+    seconds_location_id = fields.Many2one("stock.location", domain=[("usage", "=", "internal")])
     loss_operation_id = fields.Many2one(
-        "mrp.workorder", domain="[('production_id', '=', production_id)]")
-    board_id = fields.Many2one(
-        "stock.package", compute="_compute_context_links", readonly=True)
-    firing_id = fields.Many2one(
-        "mb.firing", compute="_compute_context_links", readonly=True)
+        "mrp.workorder", domain="[('production_id', '=', production_id)]"
+    )
+    board_id = fields.Many2one("stock.package", compute="_compute_context_links", readonly=True)
+    firing_id = fields.Many2one("mb.firing", compute="_compute_context_links", readonly=True)
 
     @api.model
     def default_get(self, field_list):
@@ -36,7 +36,8 @@ class MbInspection(models.TransientModel):
         if production:
             values["accepted_quantity"] = production.product_qty
             final_order = production.workorder_ids.filtered(
-                lambda workorder: workorder.state not in ("done", "cancel"))[-1:]
+                lambda workorder: workorder.state not in ("done", "cancel")
+            )[-1:]
             values["loss_operation_id"] = final_order.id or False
         return values
 
@@ -50,7 +51,8 @@ class MbInspection(models.TransientModel):
     def _compute_context_links(self):
         for wizard in self:
             current = wizard.production_id.mb_board_content_ids.filtered(
-                lambda line: line.state == "current")[:1]
+                lambda line: line.state == "current"
+            )[:1]
             wizard.board_id = current.board_id
             wizard.firing_id = wizard.loss_operation_id.mb_firing_id
 
@@ -66,11 +68,16 @@ class MbInspection(models.TransientModel):
         count = 1 if product.tracking == "lot" else int(quantity)
         if product.tracking == "serial" and quantity != count:
             raise UserError(_("A serial-tracked inspection quantity must be a whole number."))
-        return self.env["stock.lot"].create([{
-            "name": self.env["ir.sequence"].next_by_code("mb.finished.identity"),
-            "product_id": product.id,
-            "company_id": self.production_id.company_id.id,
-        } for _index in range(count)])
+        return self.env["stock.lot"].create(
+            [
+                {
+                    "name": self.env["ir.sequence"].next_by_code("mb.finished.identity"),
+                    "product_id": product.id,
+                    "company_id": self.production_id.company_id.id,
+                }
+                for _index in range(count)
+            ]
+        )
 
     def _create_second_move(self):
         if not self.second_quantity:
@@ -85,10 +92,12 @@ class MbInspection(models.TransientModel):
             self.second_quantity,
             self.second_product_id.uom_id.id,
         )
-        values.update({
-            "location_dest_id": self.seconds_location_id.id,
-            "additional": True,
-        })
+        values.update(
+            {
+                "location_dest_id": self.seconds_location_id.id,
+                "additional": True,
+            }
+        )
         move = self.env["stock.move"].create(values)
         move._action_confirm()
         lots = self._create_lots(self.second_product_id, self.second_quantity)
@@ -104,24 +113,27 @@ class MbInspection(models.TransientModel):
         for move in production.move_raw_ids:
             lines = move.move_line_ids.filtered("quantity")
             quantity = sum(lines.mapped("quantity"))
-            if float_compare(
-                quantity,
-                move.product_uom_qty,
-                precision_rounding=move.product_uom.rounding,
-            ) != 0:
-                raise UserError(_(
-                    "%(product)s must be reserved in the exact "
-                    "bill-of-material quantity.",
-                    product=move.product_id.display_name,
-                ))
-            if move.product_id.tracking != "none" and any(
-                not line.lot_id for line in lines
+            if (
+                float_compare(
+                    quantity,
+                    move.product_uom_qty,
+                    precision_rounding=move.product_uom.rounding,
+                )
+                != 0
             ):
-                raise UserError(_(
-                    "%(product)s requires a lot or serial number before "
-                    "inspection.",
-                    product=move.product_id.display_name,
-                ))
+                raise UserError(
+                    _(
+                        "%(product)s must be reserved in the exact bill-of-material quantity.",
+                        product=move.product_id.display_name,
+                    )
+                )
+            if move.product_id.tracking != "none" and any(not line.lot_id for line in lines):
+                raise UserError(
+                    _(
+                        "%(product)s requires a lot or serial number before inspection.",
+                        product=move.product_id.display_name,
+                    )
+                )
             if move.state != "done":
                 move.picked = True
 
@@ -133,7 +145,9 @@ class MbInspection(models.TransientModel):
         rounding = production.product_uom_id.rounding
         total = self.accepted_quantity + self.second_quantity + self.loss_quantity
         if float_compare(total, production.product_qty, precision_rounding=rounding) != 0:
-            raise UserError(_("First-quality, second and process-loss quantities must equal selected blanks."))
+            raise UserError(
+                _("First-quality, second and process-loss quantities must equal selected blanks.")
+            )
         firing_orders = production.workorder_ids.filtered(
             lambda workorder: workorder.operation_id.mb_kiln_program_id
         )
@@ -154,14 +168,16 @@ class MbInspection(models.TransientModel):
         production._set_qty_producing()
         self._create_second_move()
         if self.loss_quantity:
-            self.env["mb.production.loss"].create({
-                "production_id": production.id,
-                "quantity": self.loss_quantity,
-                "operation_id": self.loss_operation_id.id,
-                "reason": self.loss_reason,
-                "board_id": self.board_id.id,
-                "firing_id": self.firing_id.id,
-            })
+            self.env["mb.production.loss"].create(
+                {
+                    "production_id": production.id,
+                    "quantity": self.loss_quantity,
+                    "operation_id": self.loss_operation_id.id,
+                    "reason": self.loss_reason,
+                    "board_id": self.board_id.id,
+                    "firing_id": self.firing_id.id,
+                }
+            )
         production.workorder_ids.filtered(
             lambda workorder: workorder.state not in ("done", "cancel")
         ).button_finish()
@@ -174,7 +190,8 @@ class MbInspection(models.TransientModel):
             raise UserError(_("The manufacturing order needs manual review before completion."))
         production.write({"mb_inspected": True})
         production.mb_board_content_ids.filtered(
-            lambda content: content.state == "current").action_remove()
+            lambda content: content.state == "current"
+        ).action_remove()
         glazing_session = production.mb_glazing_session_id
         if glazing_session and all(
             order.state == "done" for order in glazing_session.production_ids

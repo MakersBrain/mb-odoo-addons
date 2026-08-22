@@ -13,26 +13,34 @@ class TestDepotStatement(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.warehouse = cls.env["stock.warehouse"].search(
-            [("company_id", "=", cls.env.company.id)], limit=1)
-        cls.gallery = cls.env["res.partner"].create({
-            "name": "Galerie Test", "is_company": True})
+            [("company_id", "=", cls.env.company.id)], limit=1
+        )
+        cls.gallery = cls.env["res.partner"].create({"name": "Galerie Test", "is_company": True})
 
-        wizard = cls.env["mb.depot.create"].create({
-            "partner_id": cls.gallery.id,
-            "commission": 40.0,
-            "legal_structure": "resale",
-        })
+        wizard = cls.env["mb.depot.create"].create(
+            {
+                "partner_id": cls.gallery.id,
+                "commission": 40.0,
+                "legal_structure": "resale",
+            }
+        )
         wizard.action_create()
-        cls.depot_warehouse = cls.env["stock.warehouse"].search([
-            ("depot_partner_id", "=", cls.gallery.id), ("is_depot", "=", True)])
+        cls.depot_warehouse = cls.env["stock.warehouse"].search(
+            [("depot_partner_id", "=", cls.gallery.id), ("is_depot", "=", True)]
+        )
         # The statement is warehouse-scoped; the moves below still need the one
         # location the pieces actually stand in.
         cls.depot = cls.depot_warehouse.lot_stock_id
 
-        cls.product = cls.env["product.product"].create({
-            "name": "Test bowl", "type": "consu", "is_storable": True,
-            "list_price": 100.0, "standard_price": 25.0,
-        })
+        cls.product = cls.env["product.product"].create(
+            {
+                "name": "Test bowl",
+                "type": "consu",
+                "is_storable": True,
+                "list_price": 100.0,
+                "standard_price": 25.0,
+            }
+        )
         cls.customers = cls.env.ref("stock.stock_location_customers")
 
     def _move(self, source, destination, qty, date=None, sale_date=None):
@@ -44,19 +52,25 @@ class TestDepotStatement(TransactionCase):
         depositary reports. They differ whenever a gallery reports after the
         fact, which is the ordinary case.
         """
-        move = self.env["stock.move"].create({
-            "product_id": self.product.id,
-            "product_uom_qty": qty,
-            "location_id": source.id,
-            "location_dest_id": destination.id,
-        })
+        move = self.env["stock.move"].create(
+            {
+                "product_id": self.product.id,
+                "product_uom_qty": qty,
+                "location_id": source.id,
+                "location_dest_id": destination.id,
+            }
+        )
         move._action_confirm()
-        move.move_line_ids = [fields.Command.create({
-            "product_id": self.product.id,
-            "location_id": source.id,
-            "location_dest_id": destination.id,
-            "quantity": qty,
-        })]
+        move.move_line_ids = [
+            fields.Command.create(
+                {
+                    "product_id": self.product.id,
+                    "location_id": source.id,
+                    "location_dest_id": destination.id,
+                    "quantity": qty,
+                }
+            )
+        ]
         move.picked = True
         move._action_done()
         if date:
@@ -66,11 +80,13 @@ class TestDepotStatement(TransactionCase):
         return move
 
     def _statement(self, date_from, date_to):
-        statement = self.env["mb.depot.statement"].create({
-            "depot_id": self.depot_warehouse.id,
-            "date_from": date_from,
-            "date_to": date_to,
-        })
+        statement = self.env["mb.depot.statement"].create(
+            {
+                "depot_id": self.depot_warehouse.id,
+                "date_from": date_from,
+                "date_to": date_to,
+            }
+        )
         action = statement.action_compute()
         self.assertEqual(action["target"], "current")
         return statement
@@ -78,19 +94,26 @@ class TestDepotStatement(TransactionCase):
     def test_depot_is_created_consistently(self):
         depot = self.depot_warehouse
         self.assertTrue(depot.is_depot)
-        self.assertEqual(self.depot.usage, "internal",
-                         "a depot must stay internal or the stock leaves our books")
-        self.assertEqual(self.depot.warehouse_id, depot,
-                         "the pieces stand in the depot's own warehouse, which is "
-                         "what keeps an ordinary delivery from reserving them")
+        self.assertEqual(
+            self.depot.usage, "internal", "a depot must stay internal or the stock leaves our books"
+        )
+        self.assertEqual(
+            self.depot.warehouse_id,
+            depot,
+            "the pieces stand in the depot's own warehouse, which is "
+            "what keeps an ordinary delivery from reserving them",
+        )
         self.assertEqual(depot.reception_steps, "one_step")
-        self.assertEqual(depot.delivery_steps, "ship_only",
-                         "multi-step would split one sale into two moves")
+        self.assertEqual(
+            depot.delivery_steps, "ship_only", "multi-step would split one sale into two moves"
+        )
         item = depot.depot_pricelist_id.item_ids
         self.assertEqual(
-            item.compute_price, "percentage",
+            item.compute_price,
+            "percentage",
             "under 'formula' the commission is folded into the unit price and "
-            "never appears on the invoice")
+            "never appears on the invoice",
+        )
         self.assertEqual(item.percent_price, 40.0)
 
     def test_placed_sold_returned_and_closing(self):
@@ -114,8 +137,11 @@ class TestDepotStatement(TransactionCase):
         self._move(self.depot, self.customers, 3, date="2026-08-12 09:00:00")
 
         line = self._statement("2026-08-01", "2026-08-31").line_ids
-        on_hand = sum(self.env["stock.quant"].search(
-            [("location_id", "child_of", self.depot.id)]).mapped("quantity"))
+        on_hand = sum(
+            self.env["stock.quant"]
+            .search([("location_id", "child_of", self.depot.id)])
+            .mapped("quantity")
+        )
         self.assertEqual(line.qty_closing, on_hand)
 
     def test_earlier_movements_become_the_opening_balance(self):
@@ -149,16 +175,19 @@ class TestDepotStatement(TransactionCase):
 
     def test_internal_shuffling_is_not_a_movement(self):
         stock = self.warehouse.lot_stock_id
-        shelf = self.env["stock.location"].create({
-            "name": "Vitrine", "usage": "internal", "location_id": self.depot.id})
+        shelf = self.env["stock.location"].create(
+            {"name": "Vitrine", "usage": "internal", "location_id": self.depot.id}
+        )
         self._move(stock, self.depot, 4, date="2026-08-05 09:00:00")
         self._move(self.depot, shelf, 4, date="2026-08-06 09:00:00")
 
         line = self._statement("2026-08-01", "2026-08-31").line_ids
         self.assertEqual(line.qty_placed, 4)
-        self.assertEqual(line.qty_returned, 0,
-                         "moving a piece between two shelves of the same gallery "
-                         "is not a return")
+        self.assertEqual(
+            line.qty_returned,
+            0,
+            "moving a piece between two shelves of the same gallery is not a return",
+        )
         self.assertEqual(line.qty_closing, 4)
 
     def test_value_falls_back_to_list_price_and_commission(self):
@@ -180,18 +209,17 @@ class TestDepotStatement(TransactionCase):
         """
         stock = self.warehouse.lot_stock_id
         self._move(stock, self.depot, 5, date="2026-08-05 09:00:00")
-        self._move(self.depot, self.customers, 2,
-                   date="2026-09-04 11:00:00", sale_date="2026-08-20")
+        self._move(
+            self.depot, self.customers, 2, date="2026-09-04 11:00:00", sale_date="2026-08-20"
+        )
 
         august = self._statement("2026-08-01", "2026-08-31").line_ids
-        self.assertEqual(august.qty_sold, 2, "a sale reported late is still an "
-                                             "August sale")
+        self.assertEqual(august.qty_sold, 2, "a sale reported late is still an August sale")
         self.assertEqual(august.qty_closing, 3)
 
         september = self._statement("2026-09-01", "2026-09-30").line_ids
         self.assertEqual(september.qty_sold, 0)
-        self.assertEqual(september.qty_opening, 3,
-                         "August's closing has to be September's opening")
+        self.assertEqual(september.qty_opening, 3, "August's closing has to be September's opening")
 
     def test_a_reported_date_also_moves_a_placement(self):
         """The date is applied to every crossing move, not only to sales. A
@@ -199,8 +227,7 @@ class TestDepotStatement(TransactionCase):
         and take the opening balance with it.
         """
         stock = self.warehouse.lot_stock_id
-        self._move(stock, self.depot, 4,
-                   date="2026-08-03 09:00:00", sale_date="2026-07-28")
+        self._move(stock, self.depot, 4, date="2026-08-03 09:00:00", sale_date="2026-07-28")
 
         line = self._statement("2026-08-01", "2026-08-31").line_ids
         self.assertEqual(line.qty_placed, 0)
@@ -210,8 +237,9 @@ class TestDepotStatement(TransactionCase):
     def test_the_statement_reports_the_day_a_piece_sold(self):
         stock = self.warehouse.lot_stock_id
         self._move(stock, self.depot, 3, date="2026-08-01 09:00:00")
-        self._move(self.depot, self.customers, 1,
-                   date="2026-09-04 11:00:00", sale_date="2026-08-14")
+        self._move(
+            self.depot, self.customers, 1, date="2026-09-04 11:00:00", sale_date="2026-08-14"
+        )
 
         line = self._statement("2026-08-01", "2026-08-31").line_ids
         self.assertEqual(line.date_sold, fields.Date.to_date("2026-08-14"))
@@ -222,10 +250,12 @@ class TestDepotStatement(TransactionCase):
         """
         stock = self.warehouse.lot_stock_id
         self._move(stock, self.depot, 5, date="2026-08-01 09:00:00")
-        self._move(self.depot, self.customers, 1, sale_date="2026-08-14",
-                   date="2026-09-04 11:00:00")
-        self._move(self.depot, self.customers, 1, sale_date="2026-08-19",
-                   date="2026-09-04 11:00:00")
+        self._move(
+            self.depot, self.customers, 1, sale_date="2026-08-14", date="2026-09-04 11:00:00"
+        )
+        self._move(
+            self.depot, self.customers, 1, sale_date="2026-08-19", date="2026-09-04 11:00:00"
+        )
 
         line = self._statement("2026-08-01", "2026-08-31").line_ids
         self.assertEqual(line.qty_sold, 2)
@@ -247,27 +277,35 @@ class TestDepotStatement(TransactionCase):
         back on the transfer when the lines agree.
         """
         stock = self.warehouse.lot_stock_id
-        other = self.env["product.product"].create({
-            "name": "Test mug", "type": "consu", "is_storable": True,
-            "list_price": 40.0,
-        })
+        other = self.env["product.product"].create(
+            {
+                "name": "Test mug",
+                "type": "consu",
+                "is_storable": True,
+                "list_price": 40.0,
+            }
+        )
         self._move(stock, self.depot, 5, date="2026-08-01 09:00:00")
         self.env["stock.quant"]._update_available_quantity(other, self.depot, 5)
 
-        picking = self.env["stock.picking"].create({
-            "picking_type_id": self.warehouse.out_type_id.id,
-            "location_id": self.depot.id,
-            "location_dest_id": self.customers.id,
-            "move_ids": [
-                fields.Command.create({
-                    "product_id": product.id,
-                    "product_uom_qty": 1,
-                    "location_id": self.depot.id,
-                    "location_dest_id": self.customers.id,
-                })
-                for product in (self.product, other)
-            ],
-        })
+        picking = self.env["stock.picking"].create(
+            {
+                "picking_type_id": self.warehouse.out_type_id.id,
+                "location_id": self.depot.id,
+                "location_dest_id": self.customers.id,
+                "move_ids": [
+                    fields.Command.create(
+                        {
+                            "product_id": product.id,
+                            "product_uom_qty": 1,
+                            "location_id": self.depot.id,
+                            "location_dest_id": self.customers.id,
+                        }
+                    )
+                    for product in (self.product, other)
+                ],
+            }
+        )
         picking.action_confirm()
         picking.action_assign()
         picking.move_ids.picked = True
@@ -277,14 +315,15 @@ class TestDepotStatement(TransactionCase):
         picking.mb_depot_sale_date = "2026-08-15"
         self.assertEqual(
             set(picking.move_line_ids.mapped("mb_depot_sale_date")),
-            {fields.Date.to_date("2026-08-15")})
-        self.assertEqual(picking.mb_depot_sale_date,
-                         fields.Date.to_date("2026-08-15"))
+            {fields.Date.to_date("2026-08-15")},
+        )
+        self.assertEqual(picking.mb_depot_sale_date, fields.Date.to_date("2026-08-15"))
 
         picking.move_line_ids[0].mb_depot_sale_date = "2026-08-16"
         self.assertFalse(
             picking.mb_depot_sale_date,
-            "lines that disagree leave the transfer with no single date to show")
+            "lines that disagree leave the transfer with no single date to show",
+        )
 
     def test_a_depot_receives_and_delivers_in_one_step(self):
         """Multi-step would put a receiving bay and a packing table inside the
@@ -292,5 +331,6 @@ class TestDepotStatement(TransactionCase):
         first leg leaves the depot for a sibling location.
         """
         from odoo.exceptions import ValidationError
+
         with self.assertRaises(ValidationError):
             self.depot_warehouse.delivery_steps = "pick_ship"

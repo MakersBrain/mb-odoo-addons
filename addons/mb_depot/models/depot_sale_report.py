@@ -17,19 +17,30 @@ class MbDepotSaleReport(models.Model):
 
     name = fields.Char(compute="_compute_name", store=True)
     company_id = fields.Many2one(
-        "res.company", required=True, default=lambda self: self.env.company,
-        index=True, tracking=True,
+        "res.company",
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
+        tracking=True,
     )
     currency_id = fields.Many2one(related="company_id.currency_id")
     depot_warehouse_id = fields.Many2one(
-        "stock.warehouse", string="Depot", required=True, tracking=True,
+        "stock.warehouse",
+        string="Depot",
+        required=True,
+        tracking=True,
         domain="[('is_depot', '=', True), ('company_id', '=', company_id)]",
     )
     external_reference = fields.Char(
-        string="Depot report reference", required=True, index=True, tracking=True,
+        string="Depot report reference",
+        required=True,
+        index=True,
+        tracking=True,
     )
     report_received_on = fields.Date(
-        required=True, default=fields.Date.context_today, tracking=True,
+        required=True,
+        default=fields.Date.context_today,
+        tracking=True,
     )
     note = fields.Text()
     create_draft_invoice = fields.Boolean(tracking=True)
@@ -40,10 +51,17 @@ class MbDepotSaleReport(models.Model):
             ("reversal_required", "Reversal required"),
             ("reversed", "Reversed"),
         ],
-        required=True, default="draft", copy=False, index=True, tracking=True,
+        required=True,
+        default="draft",
+        copy=False,
+        index=True,
+        tracking=True,
     )
     line_ids = fields.One2many(
-        "mb.depot.sale.report.line", "report_id", string="Reported sales", copy=True,
+        "mb.depot.sale.report.line",
+        "report_id",
+        string="Reported sales",
+        copy=True,
     )
     available_product_ids = fields.Many2many(
         "product.product",
@@ -61,10 +79,12 @@ class MbDepotSaleReport(models.Model):
         string="Invoices",
     )
     return_picking_ids = fields.Many2many(
-        "stock.picking", compute="_compute_correction_documents",
+        "stock.picking",
+        compute="_compute_correction_documents",
     )
     credit_note_ids = fields.Many2many(
-        "account.move", compute="_compute_correction_documents",
+        "account.move",
+        compute="_compute_correction_documents",
     )
     sale_order_count = fields.Integer(compute="_compute_document_counts")
     picking_count = fields.Integer(compute="_compute_document_counts")
@@ -76,10 +96,14 @@ class MbDepotSaleReport(models.Model):
     processed_at = fields.Datetime(readonly=True, copy=False)
     processed_by_id = fields.Many2one("res.users", readonly=True, copy=False)
     reversal_reason = fields.Text(
-        string="Correction/reversal reason", copy=False, tracking=True,
+        string="Correction/reversal reason",
+        copy=False,
+        tracking=True,
     )
     allow_partial_reversal = fields.Boolean(
-        string="Reason documents a partial correction", copy=False, tracking=True,
+        string="Reason documents a partial correction",
+        copy=False,
+        tracking=True,
     )
 
     _reference_unique = models.Constraint(
@@ -90,10 +114,15 @@ class MbDepotSaleReport(models.Model):
     @api.depends("depot_warehouse_id", "external_reference")
     def _compute_name(self):
         for report in self:
-            report.name = " / ".join(filter(None, (
-                report.depot_warehouse_id.name,
-                report.external_reference,
-            ))) or _("New depot sale report")
+            report.name = " / ".join(
+                filter(
+                    None,
+                    (
+                        report.depot_warehouse_id.name,
+                        report.external_reference,
+                    ),
+                )
+            ) or _("New depot sale report")
 
     @api.depends("depot_warehouse_id")
     def _compute_available_product_ids(self):
@@ -150,7 +179,7 @@ class MbDepotSaleReport(models.Model):
             if value:
                 barriers[label] = value
         if company.mb_depot_stock_closed_through:
-            barriers[_('depot inventory closing')] = company.mb_depot_stock_closed_through
+            barriers[_("depot inventory closing")] = company.mb_depot_stock_closed_through
         return barriers
 
     @api.depends("company_id")
@@ -187,15 +216,19 @@ class MbDepotSaleReport(models.Model):
         if depot.company_id != self.company_id:
             raise ValidationError(_("The depot must belong to the report company."))
         if depot.mb_depot_legal_structure != "resale":
-            raise ValidationError(_(
-                "Depot %(depot)s is not configured as Purchase-resale on sale.",
-                depot=depot.display_name,
-            ))
+            raise ValidationError(
+                _(
+                    "Depot %(depot)s is not configured as Purchase-resale on sale.",
+                    depot=depot.display_name,
+                )
+            )
         if not depot.depot_partner_id or not depot.depot_pricelist_id:
-            raise ValidationError(_(
-                "Configure the depositary and commission pricelist on %(depot)s.",
-                depot=depot.display_name,
-            ))
+            raise ValidationError(
+                _(
+                    "Configure the depositary and commission pricelist on %(depot)s.",
+                    depot=depot.display_name,
+                )
+            )
         if not self.line_ids:
             raise ValidationError(_("Add at least one reported sale line."))
         self._validate_closed_period_configuration()
@@ -209,22 +242,30 @@ class MbDepotSaleReport(models.Model):
         self.ensure_one()
         today = fields.Date.context_today(self.with_company(self.company_id))
         barriers = self._get_closed_period_barriers()
-        barrier_label, barrier = (max(barriers.items(), key=lambda item: item[1])
-                                  if barriers else (False, False))
+        barrier_label, barrier = (
+            max(barriers.items(), key=lambda item: item[1]) if barriers else (False, False)
+        )
         for line in self.line_ids:
             local_date = self._company_local_date(line.sold_at)
             if local_date > today:
-                raise ValidationError(_(
-                    "%(product)s is dated %(date)s, which is in the future.",
-                    product=line.product_id.display_name, date=local_date,
-                ))
+                raise ValidationError(
+                    _(
+                        "%(product)s is dated %(date)s, which is in the future.",
+                        product=line.product_id.display_name,
+                        date=local_date,
+                    )
+                )
             if barrier and local_date <= barrier:
-                raise ValidationError(_(
-                    "%(product)s is dated %(date)s. Depot sales are permanently "
-                    "closed through %(barrier)s (%(source)s).",
-                    product=line.product_id.display_name, date=local_date,
-                    barrier=barrier, source=barrier_label,
-                ))
+                raise ValidationError(
+                    _(
+                        "%(product)s is dated %(date)s. Depot sales are permanently "
+                        "closed through %(barrier)s (%(source)s).",
+                        product=line.product_id.display_name,
+                        date=local_date,
+                        barrier=barrier,
+                        source=barrier_label,
+                    )
+                )
 
     def _lock_report_and_quants(self):
         self.ensure_one()
@@ -240,9 +281,15 @@ class MbDepotSaleReport(models.Model):
         self.env.cr.execute(
             "SELECT id FROM mb_depot_sale_report WHERE id = %s FOR UPDATE", [self.id]
         )
-        location_ids = self.env["stock.location"].search([
-            ("id", "child_of", self.depot_warehouse_id.lot_stock_id.id),
-        ]).ids
+        location_ids = (
+            self.env["stock.location"]
+            .search(
+                [
+                    ("id", "child_of", self.depot_warehouse_id.lot_stock_id.id),
+                ]
+            )
+            .ids
+        )
         self.env.cr.execute(
             """
                 SELECT id FROM stock_quant
@@ -283,40 +330,44 @@ class MbDepotSaleReport(models.Model):
         boundaries.append(fields.Datetime.now())
         for boundary in boundaries:
             later_net_movement = 0.0
-            for move_line in move_lines.filtered(
-                lambda item, at=boundary: item.date > at
-            ):
+            for move_line in move_lines.filtered(lambda item, at=boundary: item.date > at):
                 incoming = move_line.location_dest_id._child_of(depot_location)
                 outgoing = move_line.location_id._child_of(depot_location)
                 later_net_movement += (move_line.quantity if incoming else 0.0) - (
                     move_line.quantity if outgoing else 0.0
                 )
             reported_outgoing = sum(
-                requested_lines.filtered(
-                    lambda item, at=boundary: item.sold_at <= at
-                ).mapped("quantity")
+                requested_lines.filtered(lambda item, at=boundary: item.sold_at <= at).mapped(
+                    "quantity"
+                )
             )
             balance = current - later_net_movement - reported_outgoing
             if float_compare(balance, 0.0, precision_rounding=product.uom_id.rounding) < 0:
                 detail = lot.name if lot else product.display_name
-                raise ValidationError(_(
-                    "%(item)s was not available at stock boundary %(date)s after "
-                    "applying every sale in this report.",
-                    item=detail, date=boundary,
-                ))
+                raise ValidationError(
+                    _(
+                        "%(item)s was not available at stock boundary %(date)s after "
+                        "applying every sale in this report.",
+                        item=detail,
+                        date=boundary,
+                    )
+                )
 
     def _validate_serial_crossing_history(self, line):
         """Require one uninterrupted entry of the exact serial before its sale."""
         depot_location = self.depot_warehouse_id.lot_stock_id
-        movements = self.env["stock.move.line"].search([
-            ("move_id.state", "=", "done"),
-            ("product_id", "=", line.product_id.id),
-            ("lot_id", "=", line.lot_id.id),
-            ("date", "<=", line.sold_at),
-            "|",
-            ("location_id", "child_of", depot_location.id),
-            ("location_dest_id", "child_of", depot_location.id),
-        ], order="date, id")
+        movements = self.env["stock.move.line"].search(
+            [
+                ("move_id.state", "=", "done"),
+                ("product_id", "=", line.product_id.id),
+                ("lot_id", "=", line.lot_id.id),
+                ("date", "<=", line.sold_at),
+                "|",
+                ("location_id", "child_of", depot_location.id),
+                ("location_dest_id", "child_of", depot_location.id),
+            ],
+            order="date, id",
+        )
         entered = False
         balance = 0.0
         for movement in movements:
@@ -326,23 +377,33 @@ class MbDepotSaleReport(models.Model):
                 entered = True
                 balance += movement.quantity
             elif outgoing and not incoming:
-                raise ValidationError(_(
-                    "Serial number %(serial)s left %(depot)s before its reported "
-                    "sale at %(date)s.",
+                raise ValidationError(
+                    _(
+                        "Serial number %(serial)s left %(depot)s before its reported "
+                        "sale at %(date)s.",
+                        serial=line.lot_id.name,
+                        depot=self.depot_warehouse_id.display_name,
+                        date=line.sold_at,
+                    )
+                )
+        if (
+            not entered
+            or float_compare(
+                balance,
+                1.0,
+                precision_rounding=line.product_uom_id.rounding,
+            )
+            < 0
+        ):
+            raise ValidationError(
+                _(
+                    "Serial number %(serial)s had not entered %(depot)s by its "
+                    "reported sale at %(date)s.",
                     serial=line.lot_id.name,
                     depot=self.depot_warehouse_id.display_name,
                     date=line.sold_at,
-                ))
-        if not entered or float_compare(
-            balance, 1.0, precision_rounding=line.product_uom_id.rounding,
-        ) < 0:
-            raise ValidationError(_(
-                "Serial number %(serial)s had not entered %(depot)s by its "
-                "reported sale at %(date)s.",
-                serial=line.lot_id.name,
-                depot=self.depot_warehouse_id.display_name,
-                date=line.sold_at,
-            ))
+                )
+            )
 
     def _validate_stock(self):
         self.ensure_one()
@@ -352,26 +413,42 @@ class MbDepotSaleReport(models.Model):
         for line in self.line_ids:
             product = line.product_id
             if not product.is_storable or not product.sale_ok:
-                raise ValidationError(_(
-                    "%(product)s must be a saleable storable product.",
-                    product=product.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "%(product)s must be a saleable storable product.",
+                        product=product.display_name,
+                    )
+                )
             if product.invoice_policy != "delivery":
-                raise ValidationError(_(
-                    "%(product)s must invoice Delivered quantities.",
-                    product=product.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "%(product)s must invoice Delivered quantities.",
+                        product=product.display_name,
+                    )
+                )
             if product.tracking != "none" and not line.lot_id:
-                raise ValidationError(_("Select a lot or serial number for %s.", product.display_name))
+                raise ValidationError(
+                    _("Select a lot or serial number for %s.", product.display_name)
+                )
             if product.tracking == "none" and line.lot_id:
-                raise ValidationError(_("Do not select a lot for untracked product %s.", product.display_name))
+                raise ValidationError(
+                    _("Do not select a lot for untracked product %s.", product.display_name)
+                )
             if line.lot_id and line.lot_id.product_id != product:
-                raise ValidationError(_("The selected lot does not belong to %s.", product.display_name))
+                raise ValidationError(
+                    _("The selected lot does not belong to %s.", product.display_name)
+                )
             if product.tracking == "serial":
-                if float_compare(line.quantity, 1.0, precision_rounding=line.product_uom_id.rounding):
-                    raise ValidationError(_("Serial-tracked product %s must have quantity one.", product.display_name))
+                if float_compare(
+                    line.quantity, 1.0, precision_rounding=line.product_uom_id.rounding
+                ):
+                    raise ValidationError(
+                        _("Serial-tracked product %s must have quantity one.", product.display_name)
+                    )
                 if line.lot_id.id in serial_ids:
-                    raise ValidationError(_("Serial number %s appears more than once.", line.lot_id.name))
+                    raise ValidationError(
+                        _("Serial number %s appears more than once.", line.lot_id.name)
+                    )
                 serial_ids.add(line.lot_id.id)
                 self._validate_serial_crossing_history(line)
             key = (product, line.lot_id if product.tracking != "none" else False)
@@ -379,15 +456,22 @@ class MbDepotSaleReport(models.Model):
 
         for (product, lot), quantity in requested.items():
             available = self.env["stock.quant"]._get_available_quantity(
-                product, depot_location, lot_id=lot, strict=False,
+                product,
+                depot_location,
+                lot_id=lot,
+                strict=False,
                 allow_negative=True,
             )
             if float_compare(available, quantity, precision_rounding=product.uom_id.rounding) < 0:
                 detail = lot.name if lot else product.display_name
-                raise ValidationError(_(
-                    "Only %(available)s of %(item)s is currently unreserved at this depot; %(requested)s was reported.",
-                    available=available, item=detail, requested=quantity,
-                ))
+                raise ValidationError(
+                    _(
+                        "Only %(available)s of %(item)s is currently unreserved at this depot; %(requested)s was reported.",
+                        available=available,
+                        item=detail,
+                        requested=quantity,
+                    )
+                )
         historical_groups = defaultdict(lambda: self.env["mb.depot.sale.report.line"])
         for line in self.line_ids:
             key = (
@@ -418,25 +502,34 @@ class MbDepotSaleReport(models.Model):
                 line.reported_public_unit_price * line.quantity for line in lines
             ),
             "mb_depot_reported_net_total": sum(lines.mapped("net_line_amount")),
-            "order_line": [fields.Command.create({
-                "product_id": line.product_id.id,
-                "product_uom_qty": line.quantity,
-                "product_uom_id": line.product_uom_id.id,
-                "price_unit": line.reported_public_unit_price,
-                "discount": line.reported_commission_percentage,
-                "mb_depot_sale_report_line_id": line.id,
-            }) for line in lines],
+            "order_line": [
+                fields.Command.create(
+                    {
+                        "product_id": line.product_id.id,
+                        "product_uom_qty": line.quantity,
+                        "product_uom_id": line.product_uom_id.id,
+                        "price_unit": line.reported_public_unit_price,
+                        "discount": line.reported_commission_percentage,
+                        "mb_depot_sale_report_line_id": line.id,
+                    }
+                )
+                for line in lines
+            ],
         }
 
     def _assign_exact_report_lines(self, order, report_lines):
         picking = order.picking_ids.filtered(lambda record: record.state != "cancel")
         if len(picking) != 1:
-            raise UserError(_("Depot sale %(order)s did not produce exactly one delivery.", order=order.name))
+            raise UserError(
+                _("Depot sale %(order)s did not produce exactly one delivery.", order=order.name)
+            )
         picking.mb_depot_sale_report_id = self
         picking.mb_depot_effective_date = order.mb_depot_effective_date
-        if picking.picking_type_id.warehouse_id != self.depot_warehouse_id \
-                or picking.location_id != self.depot_warehouse_id.lot_stock_id \
-                or picking.location_dest_id.usage != "customer":
+        if (
+            picking.picking_type_id.warehouse_id != self.depot_warehouse_id
+            or picking.location_id != self.depot_warehouse_id.lot_stock_id
+            or picking.location_dest_id.usage != "customer"
+        ):
             raise UserError(_("Delivery %s was not sourced from the selected depot.", picking.name))
 
         picking.action_assign()
@@ -445,7 +538,9 @@ class MbDepotSaleReport(models.Model):
             report_line = by_report_line[sale_line.mb_depot_sale_report_line_id.id]
             moves = sale_line.move_ids.filtered(lambda move: move.state != "cancel")
             if not moves:
-                raise UserError(_("No stock move was created for %s.", report_line.product_id.display_name))
+                raise UserError(
+                    _("No stock move was created for %s.", report_line.product_id.display_name)
+                )
             moves._do_unreserve()
             moves.move_line_ids.unlink()
             remaining = report_line.quantity
@@ -461,23 +556,35 @@ class MbDepotSaleReport(models.Model):
                     strict=False,
                 )
                 if float_compare(
-                    reserved, quantity,
+                    reserved,
+                    quantity,
                     precision_rounding=report_line.product_uom_id.rounding,
                 ):
-                    raise ValidationError(_(
-                        "The exact available stock for %(product)s changed while "
-                        "the depot report was being processed.",
-                        product=report_line.product_id.display_name,
-                    ))
+                    raise ValidationError(
+                        _(
+                            "The exact available stock for %(product)s changed while "
+                            "the depot report was being processed.",
+                            product=report_line.product_id.display_name,
+                        )
+                    )
                 assigned_lines = move.move_line_ids - previous_lines
-                assigned_lines.write({
-                    "picked": True,
-                    "mb_depot_sale_date": self._company_local_date(report_line.sold_at),
-                    "mb_depot_sale_report_line_id": report_line.id,
-                })
+                assigned_lines.write(
+                    {
+                        "picked": True,
+                        "mb_depot_sale_date": self._company_local_date(report_line.sold_at),
+                        "mb_depot_sale_report_line_id": report_line.id,
+                    }
+                )
                 remaining -= quantity
-            if float_compare(remaining, 0.0, precision_rounding=report_line.product_uom_id.rounding):
-                raise UserError(_("Could not assign the full reported quantity of %s.", report_line.product_id.display_name))
+            if float_compare(
+                remaining, 0.0, precision_rounding=report_line.product_uom_id.rounding
+            ):
+                raise UserError(
+                    _(
+                        "Could not assign the full reported quantity of %s.",
+                        report_line.product_id.display_name,
+                    )
+                )
 
         self._validate_dates()
         for report_line in report_lines:
@@ -486,13 +593,16 @@ class MbDepotSaleReport(models.Model):
             )
             assigned_quantity = sum(assigned.mapped("quantity"))
             if float_compare(
-                assigned_quantity, report_line.quantity,
+                assigned_quantity,
+                report_line.quantity,
                 precision_rounding=report_line.product_uom_id.rounding,
             ) or any(item.lot_id != report_line.lot_id for item in assigned):
-                raise UserError(_(
-                    "The reserved quantity or lot for %(product)s changed before validation.",
-                    product=report_line.product_id.display_name,
-                ))
+                raise UserError(
+                    _(
+                        "The reserved quantity or lot for %(product)s changed before validation.",
+                        product=report_line.product_id.display_name,
+                    )
+                )
         sold_on = self._company_local_date(order.mb_depot_effective_date)
         result = picking.with_context(
             skip_backorder=True,
@@ -503,7 +613,9 @@ class MbDepotSaleReport(models.Model):
             force_period_date=sold_on,
         ).button_validate()
         if isinstance(result, dict):
-            raise UserError(_("Delivery %s still requires an interactive validation choice.", picking.name))
+            raise UserError(
+                _("Delivery %s still requires an interactive validation choice.", picking.name)
+            )
         if picking.state != "done":
             raise UserError(_("Delivery %s was not completed.", picking.name))
         # Odoo 19 propagates date_done to done moves and their move lines. Keep
@@ -512,10 +624,12 @@ class MbDepotSaleReport(models.Model):
         picking.write({"date_done": order.mb_depot_effective_date})
         for move_line in picking.move_line_ids:
             report_line = move_line.mb_depot_sale_report_line_id
-            move_line.write({
-                "date": report_line.sold_at,
-                "mb_depot_sale_date": self._company_local_date(report_line.sold_at),
-            })
+            move_line.write(
+                {
+                    "date": report_line.sold_at,
+                    "mb_depot_sale_date": self._company_local_date(report_line.sold_at),
+                }
+            )
         return picking
 
     def action_process(self):
@@ -540,42 +654,54 @@ class MbDepotSaleReport(models.Model):
             picking = self._assign_exact_report_lines(order, lines)
             orders |= order
             pickings |= picking
-            order.message_post(body=_(
-                "Created from depot report %(reference)s for %(depot)s, effective %(date)s.",
-                reference=self.external_reference, depot=self.depot_warehouse_id.display_name,
-                date=sold_at,
-            ))
-            picking.message_post(body=_(
-                "Completed from depot report %(reference)s, effective %(date)s.",
-                reference=self.external_reference, date=sold_at,
-            ))
+            order.message_post(
+                body=_(
+                    "Created from depot report %(reference)s for %(depot)s, effective %(date)s.",
+                    reference=self.external_reference,
+                    depot=self.depot_warehouse_id.display_name,
+                    date=sold_at,
+                )
+            )
+            picking.message_post(
+                body=_(
+                    "Completed from depot report %(reference)s, effective %(date)s.",
+                    reference=self.external_reference,
+                    date=sold_at,
+                )
+            )
 
         invoice = self.env["account.move"]
         if self.create_draft_invoice:
             invoice = orders._create_invoices(grouped=False)
             if len(invoice) != 1:
-                raise UserError(_("The generated depot orders could not be consolidated into one invoice."))
+                raise UserError(
+                    _("The generated depot orders could not be consolidated into one invoice.")
+                )
             today = fields.Date.context_today(self.with_company(self.company_id))
             barriers = self._get_closed_period_barriers()
             if barriers and today <= max(barriers.values()):
                 raise UserError(_("Today's invoice date is in a closed period."))
-            invoice.write({
-                "invoice_date": today,
-                "mb_depot_sale_report_id": self.id,
-                "mb_depot_delivery_date_from": min(
-                    self._company_local_date(line.sold_at) for line in self.line_ids
-                ),
-                "mb_depot_delivery_date_to": max(
-                    self._company_local_date(line.sold_at) for line in self.line_ids
-                ),
-                "ref": self.external_reference,
-            })
+            invoice.write(
+                {
+                    "invoice_date": today,
+                    "mb_depot_sale_report_id": self.id,
+                    "mb_depot_delivery_date_from": min(
+                        self._company_local_date(line.sold_at) for line in self.line_ids
+                    ),
+                    "mb_depot_delivery_date_to": max(
+                        self._company_local_date(line.sold_at) for line in self.line_ids
+                    ),
+                    "ref": self.external_reference,
+                }
+            )
 
-        self.with_context(**internal_context()).write({
-            "state": "processed",
-            "processed_at": fields.Datetime.now(),
-            "processed_by_id": self.env.user.id,
-        })
+        self.with_context(**internal_context()).write(
+            {
+                "state": "processed",
+                "processed_at": fields.Datetime.now(),
+                "processed_by_id": self.env.user.id,
+            }
+        )
         return self.action_view_sale_orders()
 
     def action_start_reversal(self):
@@ -605,15 +731,22 @@ class MbDepotSaleReport(models.Model):
         for invoice in self.invoice_ids.filtered(lambda move: move.state == "posted"):
             posted_credits = invoice.reversal_move_ids.filtered(lambda move: move.state == "posted")
             credited = sum(abs(posted_credits.mapped("amount_total_signed")))
-            if not posted_credits or (not self.allow_partial_reversal and float_compare(
-                credited, abs(invoice.amount_total_signed),
-                precision_rounding=invoice.currency_id.rounding,
-            ) < 0):
+            if not posted_credits or (
+                not self.allow_partial_reversal
+                and float_compare(
+                    credited,
+                    abs(invoice.amount_total_signed),
+                    precision_rounding=invoice.currency_id.rounding,
+                )
+                < 0
+            ):
                 raise UserError(_("Post a complete linked credit note for %s first.", invoice.name))
-        returned_moves = self.env["stock.move"].search([
-            ("origin_returned_move_id", "in", self.picking_ids.move_ids.ids),
-            ("state", "=", "done"),
-        ])
+        returned_moves = self.env["stock.move"].search(
+            [
+                ("origin_returned_move_id", "in", self.picking_ids.move_ids.ids),
+                ("state", "=", "done"),
+            ]
+        )
         total_returned = sum(returned_moves.mapped("quantity"))
         if not total_returned:
             raise UserError(_("Complete at least one linked stock return first."))
@@ -622,11 +755,25 @@ class MbDepotSaleReport(models.Model):
                 lambda item, original=move: item.origin_returned_move_id == original
             )
             returned = sum(move_returns.mapped("quantity"))
-            if float_compare(returned, move.quantity, precision_rounding=move.product_uom.rounding) > 0:
-                raise UserError(_("Returned quantity exceeds the original sale of %s.", move.product_id.display_name))
-            if not self.allow_partial_reversal and float_compare(
-                returned, move.quantity, precision_rounding=move.product_uom.rounding,
-            ) < 0:
+            if (
+                float_compare(returned, move.quantity, precision_rounding=move.product_uom.rounding)
+                > 0
+            ):
+                raise UserError(
+                    _(
+                        "Returned quantity exceeds the original sale of %s.",
+                        move.product_id.display_name,
+                    )
+                )
+            if (
+                not self.allow_partial_reversal
+                and float_compare(
+                    returned,
+                    move.quantity,
+                    precision_rounding=move.product_uom.rounding,
+                )
+                < 0
+            ):
                 raise UserError(_("Complete the return of %s first.", move.product_id.display_name))
             original_by_lot = defaultdict(float)
             returned_by_lot = defaultdict(float)
@@ -635,56 +782,77 @@ class MbDepotSaleReport(models.Model):
             for move_line in move_returns.move_line_ids:
                 returned_by_lot[move_line.lot_id.id] += move_line.quantity
             for lot_id, quantity in returned_by_lot.items():
-                if lot_id not in original_by_lot or float_compare(
-                    quantity,
-                    original_by_lot[lot_id],
-                    precision_rounding=move.product_uom.rounding,
-                ) > 0:
+                if (
+                    lot_id not in original_by_lot
+                    or float_compare(
+                        quantity,
+                        original_by_lot[lot_id],
+                        precision_rounding=move.product_uom.rounding,
+                    )
+                    > 0
+                ):
                     lot = self.env["stock.lot"].browse(lot_id)
-                    raise UserError(_(
-                        "Return the original lot or serial for %(product)s; "
-                        "%(lot)s was not sold by this report.",
-                        product=move.product_id.display_name,
-                        lot=lot.display_name if lot else _("untracked stock"),
-                    ))
+                    raise UserError(
+                        _(
+                            "Return the original lot or serial for %(product)s; "
+                            "%(lot)s was not sold by this report.",
+                            product=move.product_id.display_name,
+                            lot=lot.display_name if lot else _("untracked stock"),
+                        )
+                    )
             if not self.allow_partial_reversal:
                 for lot_id, quantity in original_by_lot.items():
-                    if float_compare(
-                        returned_by_lot[lot_id],
-                        quantity,
-                        precision_rounding=move.product_uom.rounding,
-                    ) < 0:
+                    if (
+                        float_compare(
+                            returned_by_lot[lot_id],
+                            quantity,
+                            precision_rounding=move.product_uom.rounding,
+                        )
+                        < 0
+                    ):
                         lot = self.env["stock.lot"].browse(lot_id)
-                        raise UserError(_(
-                            "Complete the return of lot or serial %(lot)s for %(product)s.",
-                            lot=lot.display_name if lot else _("untracked stock"),
-                            product=move.product_id.display_name,
-                        ))
+                        raise UserError(
+                            _(
+                                "Complete the return of lot or serial %(lot)s for %(product)s.",
+                                lot=lot.display_name if lot else _("untracked stock"),
+                                product=move.product_id.display_name,
+                            )
+                        )
         barriers = self._get_closed_period_barriers()
         if barriers:
             source, barrier = max(barriers.items(), key=lambda item: item[1])
             for picking in returned_moves.picking_id:
                 if self._company_local_date(picking.date_done) <= barrier:
-                    raise UserError(_(
-                        "Return %(picking)s is inside the permanent closing horizon "
-                        "through %(date)s (%(source)s).",
-                        picking=picking.name, date=barrier, source=source,
-                    ))
+                    raise UserError(
+                        _(
+                            "Return %(picking)s is inside the permanent closing horizon "
+                            "through %(date)s (%(source)s).",
+                            picking=picking.name,
+                            date=barrier,
+                            source=source,
+                        )
+                    )
             for credit in self.credit_note_ids.filtered(lambda move: move.state == "posted"):
                 if credit.date <= barrier:
-                    raise UserError(_(
-                        "Credit note %(credit)s is inside the permanent closing horizon "
-                        "through %(date)s (%(source)s).",
-                        credit=credit.name, date=barrier, source=source,
-                    ))
+                    raise UserError(
+                        _(
+                            "Credit note %(credit)s is inside the permanent closing horizon "
+                            "through %(date)s (%(source)s).",
+                            credit=credit.name,
+                            date=barrier,
+                            source=source,
+                        )
+                    )
         self.with_context(**internal_context()).state = "reversed"
         return True
 
     def _document_action(self, model, records, name):
         self.ensure_one()
         action = {
-            "type": "ir.actions.act_window", "name": name,
-            "res_model": model, "view_mode": "list,form",
+            "type": "ir.actions.act_window",
+            "name": name,
+            "res_model": model,
+            "view_mode": "list,form",
             "domain": [("id", "in", records.ids)],
         }
         if len(records) == 1:
@@ -710,9 +878,7 @@ class MbDepotSaleReport(models.Model):
 
     def _check_accounting_document_access(self):
         if not self.env.user.has_group("account.group_account_invoice"):
-            raise AccessError(_(
-                "Invoicing access is required to open invoices and credit notes."
-            ))
+            raise AccessError(_("Invoicing access is required to open invoices and credit notes."))
 
     @api.model_create_multi
     def create(self, values_list):
@@ -722,22 +888,27 @@ class MbDepotSaleReport(models.Model):
             if values.get("create_draft_invoice") and not self.env.user.has_group(
                 "account.group_account_invoice"
             ):
-                raise AccessError(_(
-                    "Invoicing access is required to enable draft invoice creation."
-                ))
+                raise AccessError(
+                    _("Invoicing access is required to enable draft invoice creation.")
+                )
             if values.get("external_reference"):
                 values["external_reference"] = values["external_reference"].strip()
-                existing = self.search([
-                    ("company_id", "=", values.get("company_id") or self.env.company.id),
-                    ("depot_warehouse_id", "=", values.get("depot_warehouse_id")),
-                    ("external_reference", "=", values["external_reference"]),
-                ], limit=1)
+                existing = self.search(
+                    [
+                        ("company_id", "=", values.get("company_id") or self.env.company.id),
+                        ("depot_warehouse_id", "=", values.get("depot_warehouse_id")),
+                        ("external_reference", "=", values["external_reference"]),
+                    ],
+                    limit=1,
+                )
                 if existing:
-                    raise UserError(_(
-                        "Depot report reference %(reference)s already belongs to %(report)s.",
-                        reference=values["external_reference"],
-                        report=existing._get_html_link(),
-                    ))
+                    raise UserError(
+                        _(
+                            "Depot report reference %(reference)s already belongs to %(report)s.",
+                            reference=values["external_reference"],
+                            report=existing._get_html_link(),
+                        )
+                    )
         return super().create(values_list)
 
     def write(self, values):
@@ -750,12 +921,17 @@ class MbDepotSaleReport(models.Model):
         forbidden = set(values) - correction_fields
         if forbidden and self.filtered(lambda report: report.state != "draft") and not internal:
             raise UserError(_("Processed depot reports are immutable; use the reversal workflow."))
-        if set(values).intersection(correction_fields) and self.filtered(
-            lambda report: report.state == "reversed"
-        ) and not internal:
+        if (
+            set(values).intersection(correction_fields)
+            and self.filtered(lambda report: report.state == "reversed")
+            and not internal
+        ):
             raise UserError(_("Reversed depot reports are immutable."))
-        if "create_draft_invoice" in values and values["create_draft_invoice"] \
-                and not self.env.user.has_group("account.group_account_invoice"):
+        if (
+            "create_draft_invoice" in values
+            and values["create_draft_invoice"]
+            and not self.env.user.has_group("account.group_account_invoice")
+        ):
             raise AccessError(_("Invoicing access is required to enable draft invoice creation."))
         return super().write(values)
 
@@ -771,14 +947,18 @@ class MbDepotSaleReportLine(models.Model):
     _order = "sold_at, id"
 
     report_id = fields.Many2one(
-        "mb.depot.sale.report", required=True, ondelete="cascade", index=True,
+        "mb.depot.sale.report",
+        required=True,
+        ondelete="cascade",
+        index=True,
     )
     depot_warehouse_id = fields.Many2one(related="report_id.depot_warehouse_id")
     company_id = fields.Many2one(related="report_id.company_id", store=True, index=True)
     currency_id = fields.Many2one(related="report_id.currency_id")
     sold_at = fields.Datetime(required=True, index=True)
     product_id = fields.Many2one(
-        "product.product", required=True,
+        "product.product",
+        required=True,
         domain="[('id', 'in', available_product_ids), ('sale_ok', '=', True), ('is_storable', '=', True)]",
     )
     available_product_ids = fields.Many2many(
@@ -786,10 +966,14 @@ class MbDepotSaleReportLine(models.Model):
         string="Available Products at the Depot",
     )
     product_uom_id = fields.Many2one(
-        "uom.uom", related="product_id.uom_id", store=True, readonly=True,
+        "uom.uom",
+        related="product_id.uom_id",
+        store=True,
+        readonly=True,
     )
     lot_id = fields.Many2one(
-        "stock.lot", string="Lot/Serial number",
+        "stock.lot",
+        string="Lot/Serial number",
         domain="[('id', 'in', available_lot_ids)]",
     )
     available_lot_ids = fields.Many2many(
@@ -810,9 +994,7 @@ class MbDepotSaleReportLine(models.Model):
             if not line.product_id:
                 continue
             line.reported_public_unit_price = line.product_id.list_price
-            line.reported_commission_percentage = (
-                line.report_id.depot_warehouse_id.depot_commission
-            )
+            line.reported_commission_percentage = line.report_id.depot_warehouse_id.depot_commission
 
     @api.depends("report_id.depot_warehouse_id", "product_id")
     def _compute_available_lot_ids(self):
@@ -821,18 +1003,22 @@ class MbDepotSaleReportLine(models.Model):
             if not depot or not line.product_id:
                 line.available_lot_ids = False
                 continue
-            quants = self.env["stock.quant"].search([
-                ("location_id", "child_of", depot.lot_stock_id.id),
-                ("product_id", "=", line.product_id.id),
-                ("lot_id", "!=", False),
-                ("quantity", ">", 0),
-            ])
+            quants = self.env["stock.quant"].search(
+                [
+                    ("location_id", "child_of", depot.lot_stock_id.id),
+                    ("product_id", "=", line.product_id.id),
+                    ("lot_id", "!=", False),
+                    ("quantity", ">", 0),
+                ]
+            )
             line.available_lot_ids = quants.filtered(
                 lambda quant: quant.quantity - quant.reserved_quantity > 0
             ).lot_id
 
     @api.depends(
-        "quantity", "reported_public_unit_price", "reported_commission_percentage",
+        "quantity",
+        "reported_public_unit_price",
+        "reported_commission_percentage",
     )
     def _compute_net_amount(self):
         for line in self:
@@ -842,7 +1028,9 @@ class MbDepotSaleReportLine(models.Model):
             line.net_line_amount = line.net_unit_price * line.quantity
 
     @api.constrains(
-        "quantity", "reported_public_unit_price", "reported_commission_percentage",
+        "quantity",
+        "reported_public_unit_price",
+        "reported_commission_percentage",
     )
     def _validate_commercial_evidence(self):
         for line in self:
@@ -865,9 +1053,9 @@ class MbDepotSaleReportLine(models.Model):
                     "reported_commission_percentage",
                     report.depot_warehouse_id.depot_commission,
                 )
-        reports = self.env["mb.depot.sale.report"].browse([
-            values.get("report_id") for values in values_list if values.get("report_id")
-        ])
+        reports = self.env["mb.depot.sale.report"].browse(
+            [values.get("report_id") for values in values_list if values.get("report_id")]
+        )
         if reports.filtered(lambda report: report.state != "draft"):
             raise UserError(_("Lines can only be added to a draft depot report."))
         return super().create(values_list)

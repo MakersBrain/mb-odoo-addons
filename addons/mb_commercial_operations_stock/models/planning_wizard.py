@@ -13,26 +13,32 @@ class MbCommercialOperationPlanWizard(models.TransientModel):
         values = super().default_get(field_list)
         operation = self.env["mb.commercial.operation"].browse(values.get("operation_id"))
         if operation:
-            values.update({
-                "source_warehouse_id": operation.source_warehouse_id.id,
-                "source_location_id": operation.source_location_id.id,
-                "stock_preparation_deadline": operation.stock_preparation_deadline,
-            })
+            values.update(
+                {
+                    "source_warehouse_id": operation.source_warehouse_id.id,
+                    "source_location_id": operation.source_location_id.id,
+                    "stock_preparation_deadline": operation.stock_preparation_deadline,
+                }
+            )
         return values
 
     def _operation_values(self):
         values = super()._operation_values()
-        values.update({
-            "source_warehouse_id": self.source_warehouse_id.id,
-            "source_location_id": self.source_location_id.id,
-            "stock_preparation_deadline": self.stock_preparation_deadline,
-        })
+        values.update(
+            {
+                "source_warehouse_id": self.source_warehouse_id.id,
+                "source_location_id": self.source_location_id.id,
+                "stock_preparation_deadline": self.stock_preparation_deadline,
+            }
+        )
         return values
 
     def _after_operation_saved(self, operation, scenario):
         result = super()._after_operation_saved(operation, scenario)
         self._sync_deadline_activity(
-            operation, _("Prepare commercial stock"), self.stock_preparation_deadline,
+            operation,
+            _("Prepare commercial stock"),
+            self.stock_preparation_deadline,
         )
         return result
 
@@ -53,7 +59,8 @@ class MbCommercialOperationPlanWizard(models.TransientModel):
                 continue
             groups = self.env["stock.quant"]._read_group(
                 [("product_id", "=", line.product_id.id), ("location_id", "child_of", location.id)],
-                [], ["quantity:sum", "reserved_quantity:sum"],
+                [],
+                ["quantity:sum", "reserved_quantity:sum"],
             )
             quantity, reserved = groups[0] if groups else (0.0, 0.0)
             available = quantity - reserved
@@ -63,8 +70,12 @@ class MbCommercialOperationPlanWizard(models.TransientModel):
             line.shortage_qty = max(0.0, line.desired_opening_qty + line.safety_qty - available)
             line.readiness = "shortage" if line.shortage_qty else "planned"
         return {
-            "type": "ir.actions.act_window", "name": _("Complete Planning"),
-            "res_model": self._name, "res_id": self.id, "view_mode": "form", "target": "new",
+            "type": "ir.actions.act_window",
+            "name": _("Complete Planning"),
+            "res_model": self._name,
+            "res_id": self.id,
+            "view_mode": "form",
+            "target": "new",
         }
 
 

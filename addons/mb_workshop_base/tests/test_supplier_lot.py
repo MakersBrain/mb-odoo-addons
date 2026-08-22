@@ -13,21 +13,25 @@ class TestSupplierLot(TransactionCase):
     """
 
     def test_supplier_lot_requirement_requires_tracking(self):
-        material = self.env["product.template"].create({
-            "name": "Supplier material",
-            "is_storable": True,
-            "tracking": "lot",
-            "mb_supplier_lot_required": True,
-        })
+        material = self.env["product.template"].create(
+            {
+                "name": "Supplier material",
+                "is_storable": True,
+                "tracking": "lot",
+                "mb_supplier_lot_required": True,
+            }
+        )
         with self.assertRaises(ValidationError):
             material.tracking = "none"
 
     def test_untracked_material_may_leave_the_flag_off(self):
-        material = self.env["product.template"].create({
-            "name": "Bulk sand",
-            "is_storable": True,
-            "tracking": "none",
-        })
+        material = self.env["product.template"].create(
+            {
+                "name": "Bulk sand",
+                "is_storable": True,
+                "tracking": "none",
+            }
+        )
         self.assertFalse(material.mb_supplier_lot_required)
 
     def test_the_continuous_calendar_is_here_and_is_continuous(self):

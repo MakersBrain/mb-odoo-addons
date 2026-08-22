@@ -35,8 +35,8 @@ class MbKiln(models.Model):
     name = fields.Char(required=True)
     active = fields.Boolean(default=True)
     company_id = fields.Many2one(
-        comodel_name="res.company", required=True, index=True,
-        default=lambda self: self.env.company)
+        comodel_name="res.company", required=True, index=True, default=lambda self: self.env.company
+    )
 
     equipment_id = fields.Many2one(
         comodel_name="maintenance.equipment",
@@ -49,7 +49,7 @@ class MbKiln(models.Model):
         check_company=True,
         string="Work centre",
         help="What routing operations point at, so a firing can be an operation "
-             "on a bill of materials.",
+        "on a bill of materials.",
     )
 
     program_ids = fields.One2many(
@@ -57,21 +57,23 @@ class MbKiln(models.Model):
         inverse_name="kiln_id",
         string="Programmes",
         help="The schedules this kiln fires, and how long each one takes. A "
-             "kiln that reports nothing still has them - they are simply typed "
-             "in rather than imported.",
+        "kiln that reports nothing still has them - they are simply typed "
+        "in rather than imported.",
     )
 
     manufacturer = fields.Char(
-        help="Who made the kiln. Filled from the provider where one reports "
-             "it, typed in otherwise.")
+        help="Who made the kiln. Filled from the provider where one reports it, typed in otherwise."
+    )
     model_number = fields.Char(
         string="Model",
         help="The manufacturer's model, such as 'TE 80 S'. This is what turns "
-             "a kiln called 'Leonardo' into something whose specification can "
-             "be looked up.")
+        "a kiln called 'Leonardo' into something whose specification can "
+        "be looked up.",
+    )
     series = fields.Char(
         help="The model range, such as 'TE-S'. Useful when a manual or a "
-             "spare part is published per range rather than per model.")
+        "spare part is published per range rather than per model."
+    )
     configuration = fields.Selection(
         selection=[
             ("top_loader", "Top loader"),
@@ -79,7 +81,7 @@ class MbKiln(models.Model):
             ("other", "Other"),
         ],
         help="How the kiln is loaded. It decides how the shelves stack and "
-             "therefore what actually fits in the chamber volume.",
+        "therefore what actually fits in the chamber volume.",
     )
     heating_method = fields.Selection(
         selection=[("electric", "Electric"), ("gas", "Gas"), ("other", "Other")],
@@ -87,36 +89,41 @@ class MbKiln(models.Model):
     max_temperature = fields.Float(
         string="Maximum temperature",
         help="The highest the kiln is rated for, in degrees Celsius. A "
-             "programme asking for more than this is asking for a kiln that "
-             "does not exist.")
+        "programme asking for more than this is asking for a kiln that "
+        "does not exist.",
+    )
     chamber_litres = fields.Float(
         string="Chamber volume (L)",
         help="What the chamber holds. Together with the loading configuration "
-             "it is the honest upper bound on a load.")
+        "it is the honest upper bound on a load.",
+    )
     power_kw = fields.Float(
         string="Power (kW)",
         help="Connected load. It is what a firing's energy cost is estimated "
-             "from when the controller does not report consumption itself.")
+        "from when the controller does not report consumption itself.",
+    )
     zone_count = fields.Integer(
         string="Zones",
         help="Independently controlled heating zones. A single-zone kiln "
-             "reports one temperature; a three-zone kiln can be even where a "
-             "single-zone one cannot.")
+        "reports one temperature; a three-zone kiln can be even where a "
+        "single-zone one cannot.",
+    )
     voltage = fields.Integer(help="Supply voltage the model is built for.")
     phases = fields.Integer(help="Supply phases the model is built for.")
     serial_number = fields.Char(
         help="The manufacturer's serial. Kept on the equipment record too, "
-             "which is where Odoo expects to find an asset's serial.")
+        "which is where Odoo expects to find an asset's serial."
+    )
     purchase_date = fields.Date()
 
     pieces_per_load = fields.Float(
         string="Pieces per load",
         help="How many pieces fit in one firing. This is what makes the kiln "
-             "behave as a batch rather than as per-piece work: Odoo computes a "
-             "work order as ceil(quantity / capacity) cycles, so at forty "
-             "pieces per load a firing of eight and a firing of forty both take "
-             "one firing's time, and forty-one takes two. Left at zero, Odoo "
-             "falls back on the quantity the bill of materials produces.",
+        "behave as a batch rather than as per-piece work: Odoo computes a "
+        "work order as ceil(quantity / capacity) cycles, so at forty "
+        "pieces per load a firing of eight and a firing of forty both take "
+        "one firing's time, and forty-one takes two. Left at zero, Odoo "
+        "falls back on the quantity the bill of materials produces.",
     )
 
     provider = fields.Selection(
@@ -127,7 +134,7 @@ class MbKiln(models.Model):
         default="none",
         required=True,
         help="Most kilns in most workshops report nothing, and that is a "
-             "supported configuration rather than a gap.",
+        "supported configuration rather than a gap.",
     )
     provider_external_id = fields.Char(
         string="Provider device id",
@@ -149,14 +156,23 @@ class MbKiln(models.Model):
             return self.env["resource.calendar"].browse()
         if template.company_id == company:
             return template
-        calendar = self.env["resource.calendar"].with_company(company).search([
-            ("name", "=", template.name),
-            ("company_id", "=", company.id),
-        ], limit=1)
+        calendar = (
+            self.env["resource.calendar"]
+            .with_company(company)
+            .search(
+                [
+                    ("name", "=", template.name),
+                    ("company_id", "=", company.id),
+                ],
+                limit=1,
+            )
+        )
         if not calendar:
-            calendar = template.with_company(company).copy({
-                "company_id": company.id,
-            })
+            calendar = template.with_company(company).copy(
+                {
+                    "company_id": company.id,
+                }
+            )
         return calendar
 
     @api.model
@@ -201,28 +217,38 @@ class MbKiln(models.Model):
             if not workcenter:
                 continue
             line = workcenter.capacity_ids.filtered(
-                lambda capacity: (
-                    not capacity.product_id and capacity.product_uom_id == unit
-                )
+                lambda capacity: not capacity.product_id and capacity.product_uom_id == unit
             )[:1]
             if not kiln.pieces_per_load:
                 line.unlink()
             elif line:
                 line.capacity = kiln.pieces_per_load
             else:
-                self.env["mrp.workcenter.capacity"].create({
-                    "workcenter_id": workcenter.id,
-                    "product_uom_id": unit.id,
-                    "capacity": kiln.pieces_per_load,
-                })
+                self.env["mrp.workcenter.capacity"].create(
+                    {
+                        "workcenter_id": workcenter.id,
+                        "product_uom_id": unit.id,
+                        "capacity": kiln.pieces_per_load,
+                    }
+                )
 
     # Fields that describe the hardware rather than the workshop's use of it.
     # A connector owns these; `pieces_per_load`, the name and the work centre
     # are the potter's and are never in this list.
     _SPEC_FIELDS = (
-        "manufacturer", "model_number", "series", "configuration",
-        "heating_method", "max_temperature", "chamber_litres", "power_kw",
-        "zone_count", "voltage", "phases", "serial_number", "purchase_date",
+        "manufacturer",
+        "model_number",
+        "series",
+        "configuration",
+        "heating_method",
+        "max_temperature",
+        "chamber_litres",
+        "power_kw",
+        "zone_count",
+        "voltage",
+        "phases",
+        "serial_number",
+        "purchase_date",
     )
 
     def _sync_equipment_identity(self):
@@ -237,8 +263,7 @@ class MbKiln(models.Model):
         Equipment = self.env["maintenance.equipment"]
         for kiln in self.filtered("equipment_id"):
             values = {}
-            model = " ".join(part for part in (kiln.manufacturer,
-                                               kiln.model_number) if part)
+            model = " ".join(part for part in (kiln.manufacturer, kiln.model_number) if part)
             if model:
                 values["model"] = model
             if kiln.purchase_date:
@@ -248,10 +273,12 @@ class MbKiln(models.Model):
                 # database. A serial already spoken for is left alone rather
                 # than allowed to raise: a duplicate is worth a quiet gap on
                 # one record, not a failed sync on every kiln behind it.
-                taken = Equipment.with_context(active_test=False).search_count([
-                    ("serial_no", "=", kiln.serial_number),
-                    ("id", "!=", kiln.equipment_id.id),
-                ])
+                taken = Equipment.with_context(active_test=False).search_count(
+                    [
+                        ("serial_no", "=", kiln.serial_number),
+                        ("id", "!=", kiln.equipment_id.id),
+                    ]
+                )
                 if not taken:
                     values["serial_no"] = kiln.serial_number
             if values:
@@ -261,11 +288,15 @@ class MbKiln(models.Model):
     def create(self, vals_list):
         for values in vals_list:
             if not values.get("workcenter_id"):
-                values["workcenter_id"] = self.env["mrp.workcenter"].create(
-                    self._prepare_workcenter_values(values)).id
+                values["workcenter_id"] = (
+                    self.env["mrp.workcenter"].create(self._prepare_workcenter_values(values)).id
+                )
             if not values.get("equipment_id"):
-                values["equipment_id"] = self.env["maintenance.equipment"].create(
-                    self._prepare_equipment_values(values)).id
+                values["equipment_id"] = (
+                    self.env["maintenance.equipment"]
+                    .create(self._prepare_equipment_values(values))
+                    .id
+                )
         kilns = super().create(vals_list)
         kilns.filtered("pieces_per_load")._sync_capacity()
         kilns._sync_equipment_identity()

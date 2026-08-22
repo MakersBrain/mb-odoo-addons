@@ -24,15 +24,20 @@ class PosConfig(models.Model):
             # No chart, no journals. The kanban says as much: its scenario
             # cards are disabled until a chart of accounts is installed.
             return self.browse()
-        bank_journal = self.env["account.journal"].sudo().search([
-            ("type", "=", "bank"),
-            ("company_id", "in", company.parent_ids.ids),
-        ], limit=1)
+        bank_journal = (
+            self.env["account.journal"]
+            .sudo()
+            .search(
+                [
+                    ("type", "=", "bank"),
+                    ("company_id", "in", company.parent_ids.ids),
+                ],
+                limit=1,
+            )
+        )
         if not bank_journal:
             # load_onboarding_retail_scenario raises UserError without one.
-            _logger.info(
-                "no bank journal for %s; POS counter not seeded", company.display_name
-            )
+            _logger.info("no bank journal for %s; POS counter not seeded", company.display_name)
             return self.browse()
         result = (
             self.sudo()

@@ -9,7 +9,6 @@ from markupsafe import Markup, escape
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
-
 HEX_64_RE = re.compile(r"^[0-9a-f]{64}$")
 SAFE_EXTERNAL_ID_RE = re.compile(r"^[A-Za-z0-9._:/-]{1,255}$")
 MAX_SOURCE_BYTES = 20 * 1024 * 1024
@@ -19,8 +18,7 @@ _INTERNAL_WRITE_TOKEN = object()
 def _is_internal_write(records):
     return (
         records.env.su
-        or records.env.context.get("mb_invoice_capture_internal_write")
-        is _INTERNAL_WRITE_TOKEN
+        or records.env.context.get("mb_invoice_capture_internal_write") is _INTERNAL_WRITE_TOKEN
     )
 
 
@@ -62,7 +60,10 @@ class InvoiceCapture(models.Model):
     }
 
     company_id = fields.Many2one(
-        "res.company", required=True, index=True, readonly=True,
+        "res.company",
+        required=True,
+        index=True,
+        readonly=True,
         default=lambda self: self.env.company,
     )
     external_document_id = fields.Char(required=True, index=True, readonly=True)
@@ -70,7 +71,10 @@ class InvoiceCapture(models.Model):
     content_digest = fields.Char(required=True, readonly=True)
     revision = fields.Integer(required=True, readonly=True, default=1)
     previous_revision_id = fields.Many2one(
-        "mb.invoice.capture", readonly=True, ondelete="restrict", check_company=True,
+        "mb.invoice.capture",
+        readonly=True,
+        ondelete="restrict",
+        check_company=True,
     )
     status = fields.Selection(
         [
@@ -86,17 +90,26 @@ class InvoiceCapture(models.Model):
     )
     review_reason = fields.Text(string="Review reason", readonly=True, tracking=True)
     move_id = fields.Many2one(
-        "account.move", readonly=True, ondelete="restrict", check_company=True,
+        "account.move",
+        readonly=True,
+        ondelete="restrict",
+        check_company=True,
     )
     purchase_order_id = fields.Many2one(
-        "purchase.order", string="Purchase order", readonly=True, ondelete="restrict",
+        "purchase.order",
+        string="Purchase order",
+        readonly=True,
+        ondelete="restrict",
         check_company=True,
     )
     review_line_ids = fields.One2many(
         "mb.invoice.capture.line", "capture_id", string="Product matching", copy=False
     )
     source_attachment_id = fields.Many2one(
-        "ir.attachment", readonly=True, ondelete="restrict", check_company=True,
+        "ir.attachment",
+        readonly=True,
+        ondelete="restrict",
+        check_company=True,
     )
     source_filename = fields.Char(required=True, readonly=True)
     source_mimetype = fields.Char(required=True, readonly=True)
@@ -141,12 +154,8 @@ class InvoiceCapture(models.Model):
     untaxed_amount_display = fields.Char(compute="_compute_review_fields")
     tax_amount_display = fields.Char(compute="_compute_review_fields")
     total_amount_display = fields.Char(compute="_compute_review_fields")
-    invoice_lines_summary = fields.Html(
-        compute="_compute_review_fields", sanitize=True
-    )
-    confidence_summary = fields.Html(
-        compute="_compute_review_fields", sanitize=True
-    )
+    invoice_lines_summary = fields.Html(compute="_compute_review_fields", sanitize=True)
+    confidence_summary = fields.Html(compute="_compute_review_fields", sanitize=True)
     received_at = fields.Datetime(required=True, default=fields.Datetime.now, readonly=True)
 
     @api.model_create_multi
@@ -158,13 +167,14 @@ class InvoiceCapture(models.Model):
     def write(self, values):
         protected = set(values) - self._review_editable_fields
         if protected and not _is_internal_write(self):
-            raise UserError(_(
-                "Captured source evidence and lifecycle fields cannot be edited."
-            ))
+            raise UserError(_("Captured source evidence and lifecycle fields cannot be edited."))
         return super().write(values)
 
     @api.constrains(
-        "previous_revision_id", "external_document_id", "revision", "company_id",
+        "previous_revision_id",
+        "external_document_id",
+        "revision",
+        "company_id",
     )
     def _check_previous_revision(self):
         for capture in self.filtered("previous_revision_id"):
@@ -175,18 +185,18 @@ class InvoiceCapture(models.Model):
                 or previous.external_document_id != capture.external_document_id
                 or previous.revision >= capture.revision
             ):
-                raise ValidationError(_(
-                    "The previous revision must be an earlier capture of the same document."
-                ))
+                raise ValidationError(
+                    _("The previous revision must be an earlier capture of the same document.")
+                )
 
     @api.constrains("source_attachment_id")
     def _check_source_attachment(self):
         for capture in self.filtered("source_attachment_id"):
             attachment = capture.source_attachment_id
             if attachment.res_model != capture._name or attachment.res_id != capture.id:
-                raise ValidationError(_(
-                    "The source attachment must belong to its invoice capture."
-                ))
+                raise ValidationError(
+                    _("The source attachment must belong to its invoice capture.")
+                )
 
     def _ensure_review_lines(self):
         for capture in self.filtered(lambda record: not record.review_line_ids):
@@ -202,20 +212,22 @@ class InvoiceCapture(models.Model):
                 product, match_method = capture._match_product(
                     value.get("product_code"), value.get("barcode"), supplier
                 )
-                _internal(self.env["mb.invoice.capture.line"]).create({
-                    "capture_id": capture.id,
-                    "sequence": position * 10,
-                    "description": value["description"],
-                    "extracted_product_code": value.get("product_code") or False,
-                    "extracted_barcode": value.get("barcode") or False,
-                    "extracted_quantity": float(value["quantity"]),
-                    "extracted_unit_price": float(value["unit_price"]),
-                    "review_product_id": product.id or False,
-                    "review_uom_id": product.uom_id.id if product else False,
-                    "review_quantity": float(value["quantity"]),
-                    "review_unit_price": float(value["unit_price"]),
-                    "match_method": match_method,
-                })
+                _internal(self.env["mb.invoice.capture.line"]).create(
+                    {
+                        "capture_id": capture.id,
+                        "sequence": position * 10,
+                        "description": value["description"],
+                        "extracted_product_code": value.get("product_code") or False,
+                        "extracted_barcode": value.get("barcode") or False,
+                        "extracted_quantity": float(value["quantity"]),
+                        "extracted_unit_price": float(value["unit_price"]),
+                        "review_product_id": product.id or False,
+                        "review_uom_id": product.uom_id.id if product else False,
+                        "review_quantity": float(value["quantity"]),
+                        "review_unit_price": float(value["unit_price"]),
+                        "match_method": match_method,
+                    }
+                )
 
     def _parsed_review_line_values(self, invoice):
         self.ensure_one()
@@ -232,22 +244,22 @@ class InvoiceCapture(models.Model):
                 except ValidationError:
                     continue
                 if description and quantity > 0 and unit_price >= 0:
-                    parsed.append({
-                        "description": description,
-                        "product_code": str(
-                            line.get("supplier_product_code")
-                            or line.get("product_default_code")
-                            or line.get("product_code")
-                            or ""
-                        ).strip(),
-                        "barcode": str(line.get("barcode") or "").strip(),
-                        "quantity": quantity,
-                        "unit_price": unit_price,
-                    })
+                    parsed.append(
+                        {
+                            "description": description,
+                            "product_code": str(
+                                line.get("supplier_product_code")
+                                or line.get("product_default_code")
+                                or line.get("product_code")
+                                or ""
+                            ).strip(),
+                            "barcode": str(line.get("barcode") or "").strip(),
+                            "quantity": quantity,
+                            "unit_price": unit_price,
+                        }
+                    )
         extracted_untaxed = _decimal(invoice.get("untaxed_amount") or 0, "untaxed_amount")
-        raw_total = sum(
-            (line["quantity"] * line["unit_price"] for line in parsed), Decimal(0)
-        )
+        raw_total = sum((line["quantity"] * line["unit_price"] for line in parsed), Decimal(0))
         if extracted_untaxed > 0 and raw_total > 0:
             for scale in (Decimal(10), Decimal(100), Decimal(1000)):
                 scaled_total = raw_total / (scale * scale)
@@ -265,26 +277,33 @@ class InvoiceCapture(models.Model):
         Product = self.env["product.product"].with_company(self.company_id)
 
         def unique_product(domain):
-            products = Product.search([
-                ("active", "=", True),
-                ("purchase_ok", "=", True),
-                ("company_id", "in", [False, self.company_id.id]),
-                *domain,
-            ], limit=2)
+            products = Product.search(
+                [
+                    ("active", "=", True),
+                    ("purchase_ok", "=", True),
+                    ("company_id", "in", [False, self.company_id.id]),
+                    *domain,
+                ],
+                limit=2,
+            )
             return products if len(products) == 1 else Product
 
         if product_code and supplier:
-            sellers = self.env["product.supplierinfo"].search([
-                ("partner_id", "child_of", supplier.commercial_partner_id.id),
-                ("product_code", "=", product_code),
-            ])
+            sellers = self.env["product.supplierinfo"].search(
+                [
+                    ("partner_id", "child_of", supplier.commercial_partner_id.id),
+                    ("product_code", "=", product_code),
+                ]
+            )
             products = Product
             for seller in sellers:
                 candidates = seller.product_id or seller.product_tmpl_id.product_variant_ids
                 products |= candidates.filtered(
-                    lambda product: product.active
-                    and product.purchase_ok
-                    and (not product.company_id or product.company_id == self.company_id)
+                    lambda product: (
+                        product.active
+                        and product.purchase_ok
+                        and (not product.company_id or product.company_id == self.company_id)
+                    )
                 )
             if len(products) == 1:
                 return products, "supplier_code"
@@ -350,18 +369,21 @@ class InvoiceCapture(models.Model):
         for position, line in enumerate(lines, start=1):
             if not isinstance(line, dict):
                 continue
-            rows.append(Markup("""
+            rows.append(
+                Markup("""
                 <tr>
                     <td>%s</td><td>%s</td><td class="text-end">%s</td>
                     <td class="text-end">%s</td><td class="text-end">%s</td>
                 </tr>
-            """) % (
-                position,
-                escape(line.get("description") or _("Invoice line")),
-                escape(line.get("quantity") if line.get("quantity") is not None else ""),
-                escape(line.get("unit_price") if line.get("unit_price") is not None else ""),
-                escape(line.get("tax_rate") if line.get("tax_rate") is not None else ""),
-            ))
+            """)
+                % (
+                    position,
+                    escape(line.get("description") or _("Invoice line")),
+                    escape(line.get("quantity") if line.get("quantity") is not None else ""),
+                    escape(line.get("unit_price") if line.get("unit_price") is not None else ""),
+                    escape(line.get("tax_rate") if line.get("tax_rate") is not None else ""),
+                )
+            )
         return Markup("""
             <div class="table-responsive"><table class="table table-sm table-hover mb-0">
                 <thead><tr><th>#</th><th>%s</th><th class="text-end">%s</th>
@@ -369,14 +391,19 @@ class InvoiceCapture(models.Model):
                 <tbody>%s</tbody>
             </table></div>
         """) % (
-            escape(_("Description")), escape(_("Quantity")),
-            escape(_("Unit price")), escape(_("Tax rate")), Markup(" ").join(rows),
+            escape(_("Description")),
+            escape(_("Quantity")),
+            escape(_("Unit price")),
+            escape(_("Tax rate")),
+            Markup(" ").join(rows),
         )
 
     @api.model
     def _confidence_html(self, confidence, labels):
         if not isinstance(confidence, dict) or not confidence:
-            return Markup("<p class='text-muted'>%s</p>") % escape(_("No confidence scores supplied."))
+            return Markup("<p class='text-muted'>%s</p>") % escape(
+                _("No confidence scores supplied.")
+            )
         rows = []
         for key, score in sorted(confidence.items()):
             try:
@@ -387,24 +414,31 @@ class InvoiceCapture(models.Model):
             else:
                 value = f"{percentage:.1f}%"
                 badge = (
-                    "text-bg-success" if percentage >= 85
-                    else "text-bg-warning" if percentage >= 75
+                    "text-bg-success"
+                    if percentage >= 85
+                    else "text-bg-warning"
+                    if percentage >= 75
                     else "text-bg-danger"
                 )
             fallback_label = re.sub(r"(?<!^)(?=[A-Z])", " ", key).replace("_", " ").capitalize()
             label = labels.get(key, fallback_label)
-            rows.append(Markup("""
+            rows.append(
+                Markup("""
                 <tr><td>%s</td><td class="text-end">
                     <span class="badge %s">%s</span>
                 </td></tr>
-            """) % (escape(label), badge, escape(value)))
+            """)
+                % (escape(label), badge, escape(value))
+            )
         return Markup("""
             <table class="table table-sm table-hover mb-0">
                 <thead><tr><th>%s</th><th class="text-end">%s</th></tr></thead>
                 <tbody>%s</tbody>
             </table>
         """) % (
-            escape(_("Extracted field")), escape(_("Confidence")), Markup(" ").join(rows),
+            escape(_("Extracted field")),
+            escape(_("Confidence")),
+            Markup(" ").join(rows),
         )
 
     _document_revision_unique = models.Constraint(
@@ -438,8 +472,12 @@ class InvoiceCapture(models.Model):
         if not filename or "/" in filename or "\\" in filename:
             raise ValidationError(_("source_filename must be a plain filename"))
         if mimetype not in {
-            "application/pdf", "image/jpeg", "image/png", "image/tiff",
-            "application/xml", "text/xml",
+            "application/pdf",
+            "image/jpeg",
+            "image/png",
+            "image/tiff",
+            "application/xml",
+            "text/xml",
         }:
             raise ValidationError(_("unsupported invoice source type"))
         page_count = payload.get("page_count", 1)
@@ -456,7 +494,17 @@ class InvoiceCapture(models.Model):
             raise ValidationError(_("invoice must be an object"))
         if not isinstance(confidence, dict):
             raise ValidationError(_("field_confidence must be an object"))
-        return company, external_id, digest, provider, filename, mimetype, page_count, normalized, confidence
+        return (
+            company,
+            external_id,
+            digest,
+            provider,
+            filename,
+            mimetype,
+            page_count,
+            normalized,
+            confidence,
+        )
 
     @api.model
     def _decode_source(self, encoded, digest):
@@ -476,20 +524,29 @@ class InvoiceCapture(models.Model):
 
     @api.model
     def _match_supplier(self, invoice, company):
-        candidates = self.env["res.partner"].search([
-            ("active", "=", True),
-            "|", ("company_id", "=", False), ("company_id", "=", company.id),
-        ])
+        candidates = self.env["res.partner"].search(
+            [
+                ("active", "=", True),
+                "|",
+                ("company_id", "=", False),
+                ("company_id", "=", company.id),
+            ]
+        )
         vat = _normalized_identifier(invoice.get("supplier_vat"))
         siren = _normalized_identifier(invoice.get("supplier_siren"))
         name = _normalized_name(invoice.get("supplier_name"))
         if vat:
-            matches = candidates.filtered(lambda partner: _normalized_identifier(partner.vat) == vat)
+            matches = candidates.filtered(
+                lambda partner: _normalized_identifier(partner.vat) == vat
+            )
             if len(matches) == 1:
                 return matches
             if len(matches) > 1:
-                return self.env["res.partner"], _("Several suppliers have the extracted VAT identifier.")
+                return self.env["res.partner"], _(
+                    "Several suppliers have the extracted VAT identifier."
+                )
         if siren:
+
             def partner_siren(partner):
                 siret = partner["siret"] if "siret" in partner._fields else ""
                 return _normalized_identifier(siret)[:9]
@@ -518,22 +575,36 @@ class InvoiceCapture(models.Model):
     def _account_for_code(self, code, company):
         if not isinstance(code, str) or not code.strip():
             return self.env["account.account"]
-        return self.env["account.account"].with_company(company).search([
-            ("code", "=", code.strip()),
-            ("company_ids", "in", company.id),
-            ("account_type", "in", ["expense", "expense_depreciation", "expense_direct_cost"]),
-        ], limit=2)
+        return (
+            self.env["account.account"]
+            .with_company(company)
+            .search(
+                [
+                    ("code", "=", code.strip()),
+                    ("company_ids", "in", company.id),
+                    (
+                        "account_type",
+                        "in",
+                        ["expense", "expense_depreciation", "expense_direct_cost"],
+                    ),
+                ],
+                limit=2,
+            )
+        )
 
     @api.model
     def _tax_for_rate(self, rate, company):
         value = float(_decimal(rate, "tax_rate"))
-        return self.env["account.tax"].search([
-            ("company_id", "=", company.id),
-            ("type_tax_use", "=", "purchase"),
-            ("amount_type", "=", "percent"),
-            ("amount", "=", value),
-            ("active", "=", True),
-        ], limit=2)
+        return self.env["account.tax"].search(
+            [
+                ("company_id", "=", company.id),
+                ("type_tax_use", "=", "purchase"),
+                ("amount_type", "=", "percent"),
+                ("amount", "=", value),
+                ("active", "=", True),
+            ],
+            limit=2,
+        )
 
     @api.model
     def _prepare_lines(self, invoice, company):
@@ -548,32 +619,51 @@ class InvoiceCapture(models.Model):
             quantity = _decimal(line.get("quantity"), f"line {position} quantity")
             price_unit = _decimal(line.get("unit_price"), f"line {position} unit_price")
             if not description or quantity <= 0:
-                return [], _("Invoice line %(line)s needs a description and a positive quantity.", line=position)
+                return [], _(
+                    "Invoice line %(line)s needs a description and a positive quantity.",
+                    line=position,
+                )
             account = self._account_for_code(line.get("account_code"), company)
             if len(account) != 1:
-                return [], _("Invoice line %(line)s does not map to one existing expense account.", line=position)
+                return [], _(
+                    "Invoice line %(line)s does not map to one existing expense account.",
+                    line=position,
+                )
             product = self.env["product.product"]
             sku = line.get("product_default_code")
             if sku:
-                product = self.env["product.product"].search([
-                    ("default_code", "=", sku),
-                    ("company_id", "in", [False, company.id]),
-                ], limit=2)
+                product = self.env["product.product"].search(
+                    [
+                        ("default_code", "=", sku),
+                        ("company_id", "in", [False, company.id]),
+                    ],
+                    limit=2,
+                )
                 if len(product) != 1:
-                    return [], _("Invoice line %(line)s does not map to one existing product.", line=position)
+                    return [], _(
+                        "Invoice line %(line)s does not map to one existing product.", line=position
+                    )
             taxes = self.env["account.tax"]
             if line.get("tax_rate") is not None:
                 taxes = self._tax_for_rate(line["tax_rate"], company)
                 if len(taxes) != 1:
-                    return [], _("Invoice line %(line)s does not map to one purchase tax.", line=position)
-            commands.append((0, 0, {
-                "name": description,
-                "quantity": float(quantity),
-                "price_unit": float(price_unit),
-                "account_id": account.id,
-                "product_id": product.id or False,
-                "tax_ids": [(6, 0, taxes.ids)],
-            }))
+                    return [], _(
+                        "Invoice line %(line)s does not map to one purchase tax.", line=position
+                    )
+            commands.append(
+                (
+                    0,
+                    0,
+                    {
+                        "name": description,
+                        "quantity": float(quantity),
+                        "price_unit": float(price_unit),
+                        "account_id": account.id,
+                        "product_id": product.id or False,
+                        "tax_ids": [(6, 0, taxes.ids)],
+                    },
+                )
+            )
         return commands, None
 
     @api.model
@@ -589,16 +679,22 @@ class InvoiceCapture(models.Model):
             return self.env["account.move"], reason
         if not invoice.get("invoice_date"):
             return self.env["account.move"], _("The extraction has no invoice date.")
-        move = self.env["account.move"].with_company(company).create({
-            "move_type": "in_invoice",
-            "company_id": company.id,
-            "partner_id": supplier.id,
-            "currency_id": currency.id,
-            "invoice_date": invoice["invoice_date"],
-            "invoice_date_due": invoice.get("due_date") or False,
-            "ref": invoice.get("invoice_number") or False,
-            "invoice_line_ids": line_commands,
-        })
+        move = (
+            self.env["account.move"]
+            .with_company(company)
+            .create(
+                {
+                    "move_type": "in_invoice",
+                    "company_id": company.id,
+                    "partner_id": supplier.id,
+                    "currency_id": currency.id,
+                    "invoice_date": invoice["invoice_date"],
+                    "invoice_date_due": invoice.get("due_date") or False,
+                    "ref": invoice.get("invoice_number") or False,
+                    "invoice_line_ids": line_commands,
+                }
+            )
+        )
         expected_untaxed = _decimal(invoice.get("untaxed_amount"), "untaxed_amount")
         expected_tax = _decimal(invoice.get("tax_amount"), "tax_amount")
         expected_total = _decimal(invoice.get("total_amount"), "total_amount")
@@ -613,7 +709,9 @@ class InvoiceCapture(models.Model):
             for left, right in zip(actual, expected, strict=True)
         ):
             move.unlink()
-            return self.env["account.move"], _("Extracted untaxed, tax and total amounts do not reconcile.")
+            return self.env["account.move"], _(
+                "Extracted untaxed, tax and total amounts do not reconcile."
+            )
         if move.state != "draft":
             move.unlink()
             return self.env["account.move"], _("Invoice capture may create draft bills only.")
@@ -623,63 +721,89 @@ class InvoiceCapture(models.Model):
     @api.model
     def ingest(self, payload):
         (
-            company, external_id, digest, provider, filename, mimetype,
-            page_count, invoice, confidence,
+            company,
+            external_id,
+            digest,
+            provider,
+            filename,
+            mimetype,
+            page_count,
+            invoice,
+            confidence,
         ) = self._validate_envelope(payload)
-        existing = self.search([
-            ("company_id", "=", company.id),
-            ("external_document_id", "=", external_id),
-            ("content_digest", "=", digest),
-        ], limit=1)
+        existing = self.search(
+            [
+                ("company_id", "=", company.id),
+                ("external_document_id", "=", external_id),
+                ("content_digest", "=", digest),
+            ],
+            limit=1,
+        )
         if existing:
             return existing._result(applied=False)
         source = self._decode_source(payload.get("source_base64"), digest)
-        previous = self.search([
-            ("company_id", "=", company.id),
-            ("external_document_id", "=", external_id),
-        ], order="revision desc", limit=1)
-        capture = self.create({
-            "company_id": company.id,
-            "external_document_id": external_id,
-            "source_document_url": payload.get("source_document_url") or False,
-            "content_digest": digest,
-            "revision": previous.revision + 1 if previous else 1,
-            "previous_revision_id": previous.id or False,
-            "source_filename": filename,
-            "source_mimetype": mimetype,
-            "extraction_provider": provider,
-            "extraction_model": payload.get("model") or False,
-            "extraction_model_version": payload.get("model_version") or False,
-            "extraction_operation_id": payload.get("provider_operation_id") or False,
-            "page_count": page_count,
-            "normalized_payload": invoice,
-            "field_confidence": confidence,
-        })
-        attachment = self.env["ir.attachment"].create({
-            "name": filename,
-            "type": "binary",
-            "datas": base64.b64encode(source),
-            "mimetype": mimetype,
-            "res_model": self._name,
-            "res_id": capture.id,
-        })
+        previous = self.search(
+            [
+                ("company_id", "=", company.id),
+                ("external_document_id", "=", external_id),
+            ],
+            order="revision desc",
+            limit=1,
+        )
+        capture = self.create(
+            {
+                "company_id": company.id,
+                "external_document_id": external_id,
+                "source_document_url": payload.get("source_document_url") or False,
+                "content_digest": digest,
+                "revision": previous.revision + 1 if previous else 1,
+                "previous_revision_id": previous.id or False,
+                "source_filename": filename,
+                "source_mimetype": mimetype,
+                "extraction_provider": provider,
+                "extraction_model": payload.get("model") or False,
+                "extraction_model_version": payload.get("model_version") or False,
+                "extraction_operation_id": payload.get("provider_operation_id") or False,
+                "page_count": page_count,
+                "normalized_payload": invoice,
+                "field_confidence": confidence,
+            }
+        )
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": filename,
+                "type": "binary",
+                "datas": base64.b64encode(source),
+                "mimetype": mimetype,
+                "res_model": self._name,
+                "res_id": capture.id,
+            }
+        )
         capture.source_attachment_id = attachment
         if previous:
-            capture.write({
-                "status": "review",
-                "review_reason": _("A changed Paperless document revision was retained without overwriting the prior bill."),
-            })
+            capture.write(
+                {
+                    "status": "review",
+                    "review_reason": _(
+                        "A changed Paperless document revision was retained without overwriting the prior bill."
+                    ),
+                }
+            )
             return capture._result(applied=True)
         move, reason = self._create_draft_bill(capture, invoice, company)
         requires_review = bool(payload.get("requires_review"))
         if reason:
             capture.write({"status": "review", "review_reason": reason})
         else:
-            capture.write({
-                "move_id": move.id,
-                "status": "review" if requires_review else "draft_bill",
-                "review_reason": _("Extraction confidence requires accountant review.") if requires_review else False,
-            })
+            capture.write(
+                {
+                    "move_id": move.id,
+                    "status": "review" if requires_review else "draft_bill",
+                    "review_reason": _("Extraction confidence requires accountant review.")
+                    if requires_review
+                    else False,
+                }
+            )
         return capture._result(applied=True)
 
     def _result(self, applied):
@@ -733,18 +857,18 @@ class InvoiceCapture(models.Model):
                 line.extracted_product_code, line.extracted_barcode, supplier
             )
             if product:
-                _internal(line).write({
-                    "review_product_id": product.id,
-                    "review_uom_id": product.uom_id.id,
-                    "match_method": match_method,
-                })
+                _internal(line).write(
+                    {
+                        "review_product_id": product.id,
+                        "review_uom_id": product.uom_id.id,
+                        "match_method": match_method,
+                    }
+                )
         return {"type": "ir.actions.client", "tag": "reload"}
 
     def action_create_purchase_order(self):
         self.ensure_one()
-        self.env.cr.execute(
-            "SELECT id FROM mb_invoice_capture WHERE id = %s FOR UPDATE", [self.id]
-        )
+        self.env.cr.execute("SELECT id FROM mb_invoice_capture WHERE id = %s FOR UPDATE", [self.id])
         self.invalidate_recordset(["purchase_order_id"])
         if self.purchase_order_id:
             return self.action_open_purchase_order()
@@ -760,33 +884,44 @@ class InvoiceCapture(models.Model):
             raise UserError(_("No valid extracted invoice lines are available to purchase."))
         unmatched = self.review_line_ids.filtered(lambda line: not line.review_product_id)
         if unmatched:
-            raise UserError(_(
-                "Match every invoice line to an existing product before creating the "
-                "purchase order."
-            ))
+            raise UserError(
+                _(
+                    "Match every invoice line to an existing product before creating the "
+                    "purchase order."
+                )
+            )
         invalid = self.review_line_ids.filtered(
-            lambda line: line.review_quantity <= 0
-            or line.review_unit_price < 0
-            or not line.review_uom_id
-            or line.review_uom_id not in (
-                line.review_product_id.uom_id
-                | line.review_product_id.uom_ids
-                | line.review_product_id.seller_ids.product_uom_id
+            lambda line: (
+                line.review_quantity <= 0
+                or line.review_unit_price < 0
+                or not line.review_uom_id
+                or line.review_uom_id
+                not in (
+                    line.review_product_id.uom_id
+                    | line.review_product_id.uom_ids
+                    | line.review_product_id.seller_ids.product_uom_id
+                )
             )
         )
         if invalid:
-            raise UserError(_(
-                "Every matched line needs a positive quantity, a non-negative price, and "
-                "a unit compatible with the product."
-            ))
-        bill_lines = self.move_id.invoice_line_ids.filtered(
-            lambda line: line.display_type == "product"
-        ) if self.move_id else self.env["account.move.line"]
+            raise UserError(
+                _(
+                    "Every matched line needs a positive quantity, a non-negative price, and "
+                    "a unit compatible with the product."
+                )
+            )
+        bill_lines = (
+            self.move_id.invoice_line_ids.filtered(lambda line: line.display_type == "product")
+            if self.move_id
+            else self.env["account.move.line"]
+        )
         if self.move_id and len(bill_lines) != len(self.review_line_ids):
-            raise UserError(_(
-                "The bill line count no longer matches the captured invoice. Reconcile the "
-                "bill lines before creating its purchase order."
-            ))
+            raise UserError(
+                _(
+                    "The bill line count no longer matches the captured invoice. Reconcile the "
+                    "bill lines before creating its purchase order."
+                )
+            )
         currency = self.move_id.currency_id or self._currency(
             (self.normalized_payload or {}).get("currency")
         )
@@ -808,49 +943,68 @@ class InvoiceCapture(models.Model):
                 if bill_line
                 else self.review_tax_id or review_line.review_product_id.supplier_taxes_id
             ).filtered(lambda tax: tax.company_id == self.company_id)
-            commands.append((0, 0, {
-                "sequence": review_line.sequence,
-                "product_id": review_line.review_product_id.id,
-                "name": review_line.description,
-                "product_qty": quantity,
-                "product_uom_id": review_line.review_uom_id.id,
-                "price_unit": price_unit,
-                "date_planned": purchase_datetime,
-                "tax_ids": [(6, 0, taxes.ids)],
-            }))
-        order = self.env["purchase.order"].with_company(self.company_id).create({
-            "company_id": self.company_id.id,
-            "partner_id": supplier.id,
-            "currency_id": currency.id,
-            "date_order": purchase_datetime,
-            "partner_ref": (self.normalized_payload or {}).get("invoice_number") or False,
-            "origin": self.external_document_id,
-            "order_line": commands,
-        })
+            commands.append(
+                (
+                    0,
+                    0,
+                    {
+                        "sequence": review_line.sequence,
+                        "product_id": review_line.review_product_id.id,
+                        "name": review_line.description,
+                        "product_qty": quantity,
+                        "product_uom_id": review_line.review_uom_id.id,
+                        "price_unit": price_unit,
+                        "date_planned": purchase_datetime,
+                        "tax_ids": [(6, 0, taxes.ids)],
+                    },
+                )
+            )
+        order = (
+            self.env["purchase.order"]
+            .with_company(self.company_id)
+            .create(
+                {
+                    "company_id": self.company_id.id,
+                    "partner_id": supplier.id,
+                    "currency_id": currency.id,
+                    "date_order": purchase_datetime,
+                    "partner_ref": (self.normalized_payload or {}).get("invoice_number") or False,
+                    "origin": self.external_document_id,
+                    "order_line": commands,
+                }
+            )
+        )
         if order.state not in ("draft", "sent"):
             order.unlink()
             raise UserError(_("Invoice capture may create draft purchase orders only."))
-        order_lines = order.order_line.filtered(lambda line: not line.display_type).sorted("sequence")
+        order_lines = order.order_line.filtered(lambda line: not line.display_type).sorted(
+            "sequence"
+        )
         for position, review_line in enumerate(self.review_line_ids.sorted("sequence")):
             _internal(review_line).purchase_line_id = order_lines[position]
             if bill_lines:
                 bill_line = bill_lines.sorted("sequence")[position]
                 values = {"purchase_line_id": order_lines[position].id}
                 if self.move_id.state == "draft":
-                    values.update({
-                        "product_id": review_line.review_product_id.id,
-                        "product_uom_id": review_line.review_uom_id.id,
-                    })
+                    values.update(
+                        {
+                            "product_id": review_line.review_product_id.id,
+                            "product_uom_id": review_line.review_uom_id.id,
+                        }
+                    )
                 bill_line.write(values)
         self._link_source(order, _("Source invoice"))
         _internal(self).purchase_order_id = order
-        order.message_post(body=Markup(
-            "<p>%s</p>"
-        ) % escape(_(
-            "This purchase order was reconstructed from a supplier invoice. Confirm it only "
-            "after reviewing the products and quantities; validate the receipt only after "
-            "physically receiving the goods."
-        )))
+        order.message_post(
+            body=Markup("<p>%s</p>")
+            % escape(
+                _(
+                    "This purchase order was reconstructed from a supplier invoice. Confirm it only "
+                    "after reviewing the products and quantities; validate the receipt only after "
+                    "physically receiving the goods."
+                )
+            )
+        )
         return self.action_open_purchase_order()
 
     def action_create_reviewed_bill(self):
@@ -889,9 +1043,7 @@ class InvoiceCapture(models.Model):
             return {"type": "ir.actions.client", "tag": "reload"}
         currency = self._currency(invoice.get("currency"))
         if not currency:
-            _internal(self).review_reason = _(
-                "The extracted currency is not active in Odoo."
-            )
+            _internal(self).review_reason = _("The extracted currency is not active in Odoo.")
             return {"type": "ir.actions.client", "tag": "reload"}
         untaxed = _decimal(invoice.get("untaxed_amount"), "untaxed_amount")
         gross_franchise_purchase = bool(
@@ -902,30 +1054,42 @@ class InvoiceCapture(models.Model):
         )
         line_amount = (
             _decimal(invoice.get("total_amount"), "total_amount")
-            if gross_franchise_purchase else untaxed
+            if gross_franchise_purchase
+            else untaxed
         )
         line_commands = self._prepare_reviewed_lines(
-            invoice, line_amount, self.review_expense_account_id, self.review_tax_id,
+            invoice,
+            line_amount,
+            self.review_expense_account_id,
+            self.review_tax_id,
         )
-        move = self.env["account.move"].with_company(self.company_id).create({
-            "move_type": "in_invoice",
-            "company_id": self.company_id.id,
-            "partner_id": supplier.id,
-            "currency_id": currency.id,
-            "invoice_date": invoice.get("invoice_date") or fields.Date.context_today(self),
-            "invoice_date_due": invoice.get("due_date") or False,
-            "ref": invoice.get("invoice_number") or False,
-            "invoice_line_ids": line_commands,
-        })
+        move = (
+            self.env["account.move"]
+            .with_company(self.company_id)
+            .create(
+                {
+                    "move_type": "in_invoice",
+                    "company_id": self.company_id.id,
+                    "partner_id": supplier.id,
+                    "currency_id": currency.id,
+                    "invoice_date": invoice.get("invoice_date") or fields.Date.context_today(self),
+                    "invoice_date_due": invoice.get("due_date") or False,
+                    "ref": invoice.get("invoice_number") or False,
+                    "invoice_line_ids": line_commands,
+                }
+            )
+        )
         self._link_source_to_bill(move)
-        _internal(self).write({
-            "move_id": move.id,
-            "status": "review",
-            "review_reason": _(
-                "Draft bill created from the reviewed header totals. Verify its supplier, "
-                "tax and line details before posting."
-            ),
-        })
+        _internal(self).write(
+            {
+                "move_id": move.id,
+                "status": "review",
+                "review_reason": _(
+                    "Draft bill created from the reviewed header totals. Verify its supplier, "
+                    "tax and line details before posting."
+                ),
+            }
+        )
         return self.action_open_bill()
 
     def _link_source_to_bill(self, move):
@@ -936,26 +1100,33 @@ class InvoiceCapture(models.Model):
         if not self.source_attachment_id or not record:
             return self.env["ir.attachment"]
         attachment_model = self.env["ir.attachment"].sudo()
-        attachment = attachment_model.search([
-            ("res_model", "=", record._name),
-            ("res_id", "=", record.id),
-            ("checksum", "=", self.source_attachment_id.checksum),
-        ], limit=1)
+        attachment = attachment_model.search(
+            [
+                ("res_model", "=", record._name),
+                ("res_id", "=", record.id),
+                ("checksum", "=", self.source_attachment_id.checksum),
+            ],
+            limit=1,
+        )
         if attachment:
             return attachment
-        attachment = self.source_attachment_id.sudo().copy({
-            "name": self.source_filename,
-            "res_model": record._name,
-            "res_id": record.id,
-            "description": _(
-                "%(label)s from %(reference)s",
-                label=source_label,
-                reference=self.external_document_id,
-            ),
-        })
+        attachment = self.source_attachment_id.sudo().copy(
+            {
+                "name": self.source_filename,
+                "res_model": record._name,
+                "res_id": record.id,
+                "description": _(
+                    "%(label)s from %(reference)s",
+                    label=source_label,
+                    reference=self.external_document_id,
+                ),
+            }
+        )
         reference = escape(self.external_document_id)
         if self.source_document_url:
-            body = Markup("<p>%s <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">%s</a></p>") % (
+            body = Markup(
+                '<p>%s <a href="%s" target="_blank" rel="noopener noreferrer">%s</a></p>'
+            ) % (
                 escape(_("Source document:")),
                 escape(self.source_document_url),
                 reference,
@@ -969,38 +1140,63 @@ class InvoiceCapture(models.Model):
         self.ensure_one()
         self._ensure_review_lines()
         parsed = [
-            [line.description, Decimal(str(line.review_quantity)), Decimal(str(line.review_unit_price)), line]
+            [
+                line.description,
+                Decimal(str(line.review_quantity)),
+                Decimal(str(line.review_unit_price)),
+                line,
+            ]
             for line in self.review_line_ids.sorted("sequence")
             if line.description and line.review_quantity > 0
         ]
         if not parsed:
-            return [(0, 0, {
-                "name": _("Captured invoice %(number)s", number=invoice.get("invoice_number") or ""),
-                "quantity": 1,
-                "price_unit": float(target_amount),
-                "account_id": account.id,
-                "tax_ids": [(6, 0, tax.ids)],
-            })]
+            return [
+                (
+                    0,
+                    0,
+                    {
+                        "name": _(
+                            "Captured invoice %(number)s",
+                            number=invoice.get("invoice_number") or "",
+                        ),
+                        "quantity": 1,
+                        "price_unit": float(target_amount),
+                        "account_id": account.id,
+                        "tax_ids": [(6, 0, tax.ids)],
+                    },
+                )
+            ]
 
-        raw_total = sum((quantity * unit_price for _, quantity, unit_price, _ in parsed), Decimal(0))
+        raw_total = sum(
+            (quantity * unit_price for _, quantity, unit_price, _ in parsed), Decimal(0)
+        )
         difference = target_amount - raw_total
         if not self.company_id.currency_id.is_zero(float(difference)):
-            raise UserError(_(
-                "The reviewed lines total %(lines)s but the extracted header is "
-                "%(header)s. Add an explicit freight, discount, or rounding line "
-                "before creating the bill.",
-                lines=raw_total,
-                header=target_amount,
-            ))
-        return [(0, 0, {
-            "name": description,
-            "quantity": float(quantity),
-            "price_unit": float(unit_price),
-            "account_id": account.id,
-            "product_id": review_line.review_product_id.id or False,
-            "product_uom_id": review_line.review_uom_id.id or False,
-            "tax_ids": [(6, 0, tax.ids)],
-        }) for description, quantity, unit_price, review_line in parsed]
+            raise UserError(
+                _(
+                    "The reviewed lines total %(lines)s but the extracted header is "
+                    "%(header)s. Add an explicit freight, discount, or rounding line "
+                    "before creating the bill.",
+                    lines=raw_total,
+                    header=target_amount,
+                )
+            )
+        return [
+            (
+                0,
+                0,
+                {
+                    "name": description,
+                    "quantity": float(quantity),
+                    "price_unit": float(unit_price),
+                    "account_id": account.id,
+                    "product_id": review_line.review_product_id.id or False,
+                    "product_uom_id": review_line.review_uom_id.id or False,
+                    "tax_ids": [(6, 0, tax.ids)],
+                },
+            )
+            for description, quantity, unit_price, review_line in parsed
+        ]
 
 
 class InvoiceCaptureLine(models.Model):
@@ -1019,7 +1215,10 @@ class InvoiceCaptureLine(models.Model):
     }
 
     capture_id = fields.Many2one(
-        "mb.invoice.capture", required=True, ondelete="cascade", index=True,
+        "mb.invoice.capture",
+        required=True,
+        ondelete="cascade",
+        index=True,
         check_company=True,
     )
     company_id = fields.Many2one(related="capture_id.company_id", store=True, index=True)
@@ -1038,23 +1237,27 @@ class InvoiceCaptureLine(models.Model):
     review_uom_id = fields.Many2one(
         "uom.uom", string="Purchase unit", domain="[('id', 'in', allowed_uom_ids)]"
     )
-    allowed_uom_ids = fields.Many2many(
-        "uom.uom", compute="_compute_allowed_uom_ids"
-    )
+    allowed_uom_ids = fields.Many2many("uom.uom", compute="_compute_allowed_uom_ids")
     review_quantity = fields.Float(string="Purchase quantity", digits="Product Unit")
     review_unit_price = fields.Float(string="Unit price", digits="Product Price")
-    match_method = fields.Selection([
-        ("supplier_code", "Supplier product code"),
-        ("barcode", "Barcode"),
-        ("internal_reference", "Internal reference"),
-        ("manual", "Manual"),
-        ("unmatched", "Not matched"),
-    ], required=True, default="unmatched", readonly=True)
-    is_storable = fields.Boolean(
-        related="review_product_id.is_storable", string="Tracks inventory"
+    match_method = fields.Selection(
+        [
+            ("supplier_code", "Supplier product code"),
+            ("barcode", "Barcode"),
+            ("internal_reference", "Internal reference"),
+            ("manual", "Manual"),
+            ("unmatched", "Not matched"),
+        ],
+        required=True,
+        default="unmatched",
+        readonly=True,
     )
+    is_storable = fields.Boolean(related="review_product_id.is_storable", string="Tracks inventory")
     purchase_line_id = fields.Many2one(
-        "purchase.order.line", readonly=True, ondelete="restrict", check_company=True,
+        "purchase.order.line",
+        readonly=True,
+        ondelete="restrict",
+        check_company=True,
     )
 
     _capture_sequence_unique = models.Constraint(
@@ -1064,8 +1267,9 @@ class InvoiceCaptureLine(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        protected = set().union(*(set(values) for values in vals_list)) \
-            - (self._review_editable_fields | {"capture_id"})
+        protected = set().union(*(set(values) for values in vals_list)) - (
+            self._review_editable_fields | {"capture_id"}
+        )
         if protected and not _is_internal_write(self):
             raise UserError(_("Extracted invoice-line evidence cannot be created manually."))
         return super().create(vals_list)
@@ -1093,5 +1297,6 @@ class InvoiceCaptureLine(models.Model):
             product = line.review_product_id
             line.allowed_uom_ids = (
                 product.uom_id | product.uom_ids | product.seller_ids.product_uom_id
-                if product else self.env["uom.uom"]
+                if product
+                else self.env["uom.uom"]
             )

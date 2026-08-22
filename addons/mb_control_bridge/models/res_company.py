@@ -4,10 +4,7 @@ import re
 from odoo import _, fields, models
 from odoo.exceptions import ValidationError
 
-
-UUID_RE = re.compile(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-)
+UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 HOSTNAME_RE = re.compile(
     r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+"
     r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"
@@ -54,7 +51,9 @@ class ResCompany(models.Model):
     mb_entitlement_plan = fields.Char(string="Entitlement plan", readonly=True, copy=False)
     mb_entitlement_status = fields.Selection(
         string="Entitlement status",
-        selection=[(value, value.replace("_", " ").title()) for value in sorted(ENTITLEMENT_STATUSES)],
+        selection=[
+            (value, value.replace("_", " ").title()) for value in sorted(ENTITLEMENT_STATUSES)
+        ],
         readonly=True,
         copy=False,
     )
@@ -78,10 +77,18 @@ class ResCompany(models.Model):
             raise ValidationError(_("webshop status workshop scope is invalid"))
         if "website" not in self.env or "mb_webshop_enabled" not in self.env["website"]._fields:
             raise ValidationError(_("the webshop capability is not installed"))
-        website = self.env["website"].sudo().search([
-            ("company_id", "in", [self.id, False]),
-            ("mb_webshop_enabled", "=", True),
-        ], order="company_id desc, id", limit=1)
+        website = (
+            self.env["website"]
+            .sudo()
+            .search(
+                [
+                    ("company_id", "in", [self.id, False]),
+                    ("mb_webshop_enabled", "=", True),
+                ],
+                order="company_id desc, id",
+                limit=1,
+            )
+        )
         if not website:
             raise ValidationError(_("no enabled webshop exists for this workshop"))
 
@@ -94,12 +101,14 @@ class ResCompany(models.Model):
             if not count:
                 return
             action = self.env.ref(action_xmlid, raise_if_not_found=False)
-            issues.append({
-                "kind": kind,
-                "state": "action_required",
-                "count": count,
-                "action_path": f"/odoo/action-{action.id}" if action else None,
-            })
+            issues.append(
+                {
+                    "kind": kind,
+                    "state": "action_required",
+                    "count": count,
+                    "action_path": f"/odoo/action-{action.id}" if action else None,
+                }
+            )
 
         add_issue(
             "mb.webshop.payment.exception",
@@ -136,10 +145,18 @@ class ResCompany(models.Model):
             raise ValidationError(_("webshop domain must be a lowercase fully qualified hostname"))
         if "website" not in self.env or "mb_webshop_enabled" not in self.env["website"]._fields:
             raise ValidationError(_("the webshop capability is not installed"))
-        website = self.env["website"].sudo().search([
-            ("company_id", "in", [self.id, False]),
-            ("mb_webshop_enabled", "=", True),
-        ], order="company_id desc, id", limit=1)
+        website = (
+            self.env["website"]
+            .sudo()
+            .search(
+                [
+                    ("company_id", "in", [self.id, False]),
+                    ("mb_webshop_enabled", "=", True),
+                ],
+                order="company_id desc, id",
+                limit=1,
+            )
+        )
         if not website:
             raise ValidationError(_("no enabled webshop exists for this workshop"))
         website_domain = f"https://{hostname}"
@@ -162,10 +179,7 @@ class ResCompany(models.Model):
             raise ValidationError(_("this company is linked to another workshop"))
         if not HOSTNAME_RE.fullmatch(public_hostname):
             raise ValidationError(_("public_hostname must be a lowercase fully qualified hostname"))
-        if (
-            self.mb_control_public_hostname
-            and self.mb_control_public_hostname != public_hostname
-        ):
+        if self.mb_control_public_hostname and self.mb_control_public_hostname != public_hostname:
             raise ValidationError(_("this company is linked to another public hostname"))
         if not client_id or not issuer.startswith(("https://", "http://rauthy.localhost:")):
             raise ValidationError(_("OIDC client and trusted issuer are required"))
@@ -192,16 +206,20 @@ class ResCompany(models.Model):
             provider = provider_model.create(values)
         if new_workshop:
             self._mb_bootstrap_french_accounting()
-        self.write({
-            "mb_control_workshop_id": workshop_id,
-            "mb_control_public_hostname": public_hostname,
-            "mb_control_bridge_token_hash": hashlib.sha256(bridge_token.encode()).hexdigest(),
-        })
+        self.write(
+            {
+                "mb_control_workshop_id": workshop_id,
+                "mb_control_public_hostname": public_hostname,
+                "mb_control_bridge_token_hash": hashlib.sha256(bridge_token.encode()).hexdigest(),
+            }
+        )
         if "website" in self.env:
-            self.env["website"].sudo().search([
-                ("company_id", "=", self.id),
-                ("domain", "=", False),
-            ]).write({"domain": public_hostname})
+            self.env["website"].sudo().search(
+                [
+                    ("company_id", "=", self.id),
+                    ("domain", "=", False),
+                ]
+            ).write({"domain": public_hostname})
         self._mb_configure_login_policy(provider)
         return {
             "applied": True,
@@ -214,16 +232,24 @@ class ResCompany(models.Model):
         """Give a newly provisioned workshop a usable French chart immediately."""
         self.ensure_one()
         france = self.env.ref("base.fr")
-        self.write({
-            "country_id": france.id,
-            "account_fiscal_country_id": france.id,
-        })
+        self.write(
+            {
+                "country_id": france.id,
+                "account_fiscal_country_id": france.id,
+            }
+        )
         self.invalidate_recordset(["country_id", "account_fiscal_country_id"])
         if self.chart_template == "fr":
             return
-        if self.env["account.move.line"].sudo().search_count([
-            ("company_id", "=", self.id),
-        ]):
+        if (
+            self.env["account.move.line"]
+            .sudo()
+            .search_count(
+                [
+                    ("company_id", "=", self.id),
+                ]
+            )
+        ):
             raise ValidationError(
                 _("French accounting cannot be initialized after journal items exist.")
             )
@@ -233,10 +259,12 @@ class ResCompany(models.Model):
 
     def _mb_configure_login_policy(self, provider):
         self.ensure_one()
-        self.env["auth.oauth.provider"].sudo().search([
-            ("enabled", "=", True),
-            ("id", "!=", provider.id),
-        ]).write({"enabled": False})
+        self.env["auth.oauth.provider"].sudo().search(
+            [
+                ("enabled", "=", True),
+                ("id", "!=", provider.id),
+            ]
+        ).write({"enabled": False})
         parameters = self.env["ir.config_parameter"].sudo()
         parameters.set_param("mb_control.oidc_provider_id", provider.id)
         parameters.set_param("auth_signup.reset_password", False)
@@ -252,21 +280,35 @@ class ResCompany(models.Model):
         expected = MODULE_BUNDLES.get(module_key)
         if expected is None or not isinstance(modules, list) or tuple(modules) != expected:
             raise ValidationError(_("unsupported module bundle"))
-        records = self.env["ir.module.module"].sudo().search([
-            ("name", "in", list(expected)),
-        ])
+        records = (
+            self.env["ir.module.module"]
+            .sudo()
+            .search(
+                [
+                    ("name", "in", list(expected)),
+                ]
+            )
+        )
         if set(records.mapped("name")) != set(expected):
             raise ValidationError(_("a supported module is unavailable in this release"))
         invalid = records.filtered(
-            lambda module: module.state not in (
-                "uninstalled", "to install", "installed", "to upgrade",
+            lambda module: (
+                module.state
+                not in (
+                    "uninstalled",
+                    "to install",
+                    "installed",
+                    "to upgrade",
+                )
             )
         )
         if invalid:
             raise ValidationError(_("a supported module cannot currently be enabled"))
-        policy = self.env["mb.control.capability.policy"].sudo().search([
-            ("workshop_id", "=", workshop_id), ("module_key", "=", module_key)
-        ], limit=1)
+        policy = (
+            self.env["mb.control.capability.policy"]
+            .sudo()
+            .search([("workshop_id", "=", workshop_id), ("module_key", "=", module_key)], limit=1)
+        )
         restriction_removed = bool(policy)
         if policy:
             policy.rule_ids.unlink()
@@ -338,13 +380,15 @@ class ResCompany(models.Model):
             if not same:
                 raise ValidationError(_("the entitlement version already contains different data"))
             return {"applied": False, "version": version, "workshop_id": workshop_id}
-        self.write({
-            "mb_control_workshop_id": workshop_id,
-            "mb_entitlement_version": version,
-            "mb_entitlement_plan": plan.strip(),
-            "mb_entitlement_status": status,
-            "mb_entitlement_limits": limits,
-            "mb_entitlement_expires_at": payload.get("expires_at") or False,
-            "mb_entitlement_signature": signature,
-        })
+        self.write(
+            {
+                "mb_control_workshop_id": workshop_id,
+                "mb_entitlement_version": version,
+                "mb_entitlement_plan": plan.strip(),
+                "mb_entitlement_status": status,
+                "mb_entitlement_limits": limits,
+                "mb_entitlement_expires_at": payload.get("expires_at") or False,
+                "mb_entitlement_signature": signature,
+            }
+        )
         return {"applied": True, "version": version, "workshop_id": workshop_id}

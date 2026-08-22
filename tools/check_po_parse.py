@@ -88,8 +88,7 @@ def main() -> int:
 
     translations = sum(1 for f in files if f.suffix == ".po")
     print(
-        f"{len(files)} catalogues parse; "
-        f"{translations} translation(s) carry a well-formed header"
+        f"{len(files)} catalogues parse; {translations} translation(s) carry a well-formed header"
     )
     return 0
 

@@ -31,10 +31,9 @@ import cv2
 import numpy as np
 import pytesseract
 import zxingcpp
+from evaluate_inventory_capture import sanitize
 from PIL import Image
 from pytesseract import Output
-
-from evaluate_inventory_capture import sanitize
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png"}
 ROTATIONS = (0, 90, 180, 270)
@@ -201,7 +200,9 @@ def ocr_lines(image: np.ndarray) -> list[OcrLine]:
             bottom = max(int(data["top"][index]) + int(data["height"][index]) for index in indexes)
             text = " ".join(str(data["text"][index]).strip() for index in indexes)
             confidence = sum(float(data["conf"][index]) for index in indexes) / len(indexes)
-            lines.append(OcrLine(rotation, text, confidence, (left, top, right - left, bottom - top)))
+            lines.append(
+                OcrLine(rotation, text, confidence, (left, top, right - left, bottom - top))
+            )
     return lines
 
 
@@ -227,7 +228,10 @@ def ocr_orientation(image: np.ndarray) -> tuple[np.ndarray, dict]:
             score += 1000
         attempts.append({"degrees": degrees, "text": rendered, "score": round(score, 2)})
     best = max(attempts, key=lambda item: item["score"])
-    return rotate(image, best["degrees"]), {"selected_degrees": best["degrees"], "attempts": attempts}
+    return rotate(image, best["degrees"]), {
+        "selected_degrees": best["degrees"],
+        "attempts": attempts,
+    }
 
 
 def candidate_codes(text: str, barcodes: set[str]) -> list[str]:
@@ -315,7 +319,9 @@ def write_image(path: Path, image: np.ndarray) -> dict:
     }
 
 
-def extract_crop_codes(variants: dict[str, np.ndarray], barcodes: set[str]) -> tuple[list[str], list[dict]]:
+def extract_crop_codes(
+    variants: dict[str, np.ndarray], barcodes: set[str]
+) -> tuple[list[str], list[dict]]:
     values = []
     attempts = []
     for variant_name, variant in variants.items():
@@ -343,9 +349,7 @@ def process_image(image: np.ndarray, filename: str, output_directory: Path) -> d
             output_directory / stem / f"barcode-{index:02d}-original.png", crop
         )
         candidate["variants"] = {
-            name: write_image(
-                output_directory / stem / f"barcode-{index:02d}-{name}.png", variant
-            )
+            name: write_image(output_directory / stem / f"barcode-{index:02d}-{name}.png", variant)
             for name, variant in enhance_variants(crop).items()
         }
 
@@ -395,10 +399,7 @@ def exact_score(report: dict, expected: dict) -> dict:
                 for code in [*region["codes"], *region["extracted_codes"]]
             }
             matched["lot_candidate"] += lot in values
-    return {
-        field: {"matched": matched[field], "expected": totals[field]}
-        for field in totals
-    }
+    return {field: {"matched": matched[field], "expected": totals[field]} for field in totals}
 
 
 def main() -> int:
