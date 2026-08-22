@@ -56,7 +56,7 @@ _show_discount(). The wizard sets both.
 Sourcing needs no third-party module: a sale from a depot is a sale from that
 warehouse, which is Odoo's own Warehouse field on the quotation.
 """,
-    "version": "19.0.4.0.8",
+    "version": "19.0.4.0.9",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
@@ -78,8 +78,8 @@ warehouse, which is Odoo's own Warehouse field on the quotation.
         "views/account_move_views.xml",
         "views/res_company_views.xml",
         "views/mb_depot_navigation_views.xml",
-        "wizards/mb_depot_create_views.xml",
-        "wizards/mb_depot_statement_views.xml",
+        "wizard/mb_depot_create_views.xml",
+        "wizard/mb_depot_statement_views.xml",
         "report/mb_depot_reports.xml",
         "report/mb_depot_statement_template.xml",
         "report/mb_depot_bon_template.xml",

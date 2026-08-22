@@ -380,7 +380,7 @@ msgstr "Copies"
 #. module: mb_label
 #. odoo-python
 #: code:addons/mb_label/models/label_print_job.py:0
-#: code:addons/mb_label/wizards/mb_label_print_wizard.py:0
+#: code:addons/mb_label/wizard/mb_label_print_wizard.py:0
 msgid "Copies must be between 1 and 99."
 msgstr "Le nombre d'exemplaires doit être compris entre 1 et 99."
 
@@ -1288,7 +1288,7 @@ msgstr "Enregistrer une nouvelle version"
 
 #. module: mb_label
 #. odoo-python
-#: code:addons/mb_label/wizards/mb_label_print_wizard.py:0
+#: code:addons/mb_label/wizard/mb_label_print_wizard.py:0
 msgid "Save the template in Label Studio before printing it."
 msgstr "Enregistrez le modèle dans Label Studio avant de l'imprimer."
 

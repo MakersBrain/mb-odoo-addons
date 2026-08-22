@@ -41,16 +41,16 @@ msgstr "%(product)s possède déjà la recette approuvée %(recipe)s."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "%(product)s must be reserved in the exact bill-of-material quantity."
 msgstr ""
 "%(product)s doit être réservé dans la quantité exacte de la nomenclature."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "%(product)s requires a lot or serial number before inspection."
 msgstr "%(product)s exige un lot ou un numéro de série avant le contrôle."
 
@@ -180,7 +180,7 @@ msgstr "Un produit ne peut pas être son propre produit de second choix."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
 msgid "A serial-tracked bisque quantity must be a whole number."
 msgstr ""
 "Une quantité de biscuit suivie par numéro de série doit être un nombre "
@@ -188,7 +188,7 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "A serial-tracked inspection quantity must be a whole number."
 msgstr ""
 "Une quantité de contrôle suivie par numéro de série doit être un nombre "
@@ -207,7 +207,7 @@ msgstr "Quantité acceptée"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
 msgid ""
 "Accepted and process-loss quantities must equal the selected green ware."
 msgstr ""
@@ -421,7 +421,7 @@ msgstr "Traçabilité céramique - %(lot)s"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "Choose the internal location that receives seconds."
 msgstr "Choisissez l'emplacement interne qui reçoit les seconds choix."
 
@@ -461,13 +461,13 @@ msgstr "Société"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
 msgid "Complete every bisque operation before inspection."
 msgstr "Terminez chaque opération de biscuit avant le contrôle."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "Complete every operation before final inspection."
 msgstr "Terminez chaque opération avant le contrôle final."
 
@@ -488,7 +488,7 @@ msgstr "Intégrité des lignes de séance céramique terminée"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "Configure a seconds product before recording seconds."
 msgstr ""
 "Configurez un produit de second choix avant d'enregistrer des seconds choix."
@@ -636,14 +636,14 @@ msgstr "Ordre de travail éligible"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
 msgid "Every bisque firing operation must be unloaded before inspection."
 msgstr ""
 "Chaque opération de cuisson biscuit doit être défournée avant le contrôle."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "Every firing operation must be unloaded before inspection."
 msgstr "Chaque opération de cuisson doit être défournée avant le contrôle."
 
@@ -701,7 +701,7 @@ msgstr "Cuissons"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid ""
 "First-quality, second and process-loss quantities must equal selected "
 "blanks."
@@ -861,8 +861,8 @@ msgstr "Contrôler la sortie de cuisson biscuit"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "Inspection quantities cannot be negative."
 msgstr "Les quantités de contrôle ne peuvent pas être négatives."
 
@@ -1138,7 +1138,7 @@ msgstr "Seule une recette au brouillon peut être approuvée."
 #. module: mb_ceramics_workflow
 #. odoo-python
 #: code:addons/mb_ceramics_workflow/models/mb_firing.py:0
-#: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_firing_load.py:0
 msgid "Only a loading firing can receive work."
 msgstr "Seule une cuisson en cours d'enfournement peut recevoir du travail."
 
@@ -1350,8 +1350,8 @@ msgstr "Enregistrer le tournage"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "Record why the pieces were lost."
 msgstr "Indiquez pourquoi les pièces ont été perdues."
 
@@ -1405,7 +1405,7 @@ msgstr "Sélectionnez au moins un lot de biscuit."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_firing_load.py:0
 msgid "Select at least one compatible work order or board."
 msgstr "Sélectionnez au moins un ordre de travail ou une plaque compatible."
 
@@ -1450,7 +1450,7 @@ msgstr "Ligne de séance"
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_firing_load.py:0
 msgid "Some selected work orders are not compatible with this firing."
 msgstr ""
 "Certains ordres de travail sélectionnés ne sont pas compatibles avec cette "
@@ -1564,14 +1564,14 @@ msgstr "Le lot de biscuit appartient à un autre produit."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
 msgid "The bisque order needs manual review before completion."
 msgstr ""
 "L'ordre de biscuit nécessite une révision manuelle avant d'être terminé."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
 msgid "The bisque order needs manual review before its loss can be scrapped."
 msgstr ""
 "L'ordre de biscuit nécessite une révision manuelle avant que sa perte puisse"
@@ -1662,7 +1662,7 @@ msgstr "L'opération de la perte doit appartenir à son ordre de fabrication."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
 msgid ""
 "The manufactured loss is not available in the destination location for "
 "scrapping."
@@ -1672,7 +1672,7 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "The manufacturing order needs manual review before completion."
 msgstr ""
 "L'ordre de fabrication nécessite une révision manuelle avant d'être terminé."
@@ -1691,7 +1691,7 @@ msgstr "La révision de recette figée sur %s ne peut pas être remplacée."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_firing_load.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_firing_load.py:0
 msgid ""
 "The same firing work order also stands on: %(boards)s. Load those boards or "
 "split the manufacturing order first."
@@ -1785,13 +1785,13 @@ msgstr ""
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_bisque_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_bisque_inspection.py:0
 msgid "This bisque manufacturing order has already been closed."
 msgstr "Cet ordre de fabrication de biscuit a déjà été clôturé."
 
 #. module: mb_ceramics_workflow
 #. odoo-python
-#: code:addons/mb_ceramics_workflow/wizards/mb_inspection.py:0
+#: code:addons/mb_ceramics_workflow/wizard/mb_inspection.py:0
 msgid "This manufacturing order has already been closed."
 msgstr "Cet ordre de fabrication a déjà été clôturé."
 

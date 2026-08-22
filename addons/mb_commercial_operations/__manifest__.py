@@ -1,7 +1,7 @@
 {
     "name": "MakersBrain Commercial Operations",
     "summary": "Plan markets and site obligations, travel costs, and profitability.",
-    "version": "19.0.2.2.0",
+    "version": "19.0.2.2.1",
     "license": "LGPL-3",
     "category": "Services/Project",
     "author": "MakersBrain",
@@ -20,7 +20,7 @@
         "views/commercial_planning_views.xml",
         "views/profitability_report_views.xml",
         "views/mb_commercial_operations_menus.xml",
-        "reports/commercial_operation_report.xml",
+        "report/commercial_operation_report.xml",
     ],
     "installable": True,
     "application": True,
