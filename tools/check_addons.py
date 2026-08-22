@@ -231,6 +231,30 @@ def check_graph(manifests: dict[str, dict]) -> None:
         visit(addon, [])
 
 
+def check_spec_versions(manifests: dict[str, dict]) -> None:
+    """SPEC.md publishes a version table. Keep it honest.
+
+    It drifted once already -- one row sat two minor versions behind its
+    manifest -- and nothing noticed, because a stale documentation table
+    breaks no test. Cheap to check, so check it.
+    """
+    spec = ADDONS.parent / "SPEC.md"
+    if not spec.is_file():
+        return
+    published = dict(re.findall(r"`(\w+)` \| (\d[\d.]*)", spec.read_text(encoding="utf-8")))
+    for addon, manifest in sorted(manifests.items()):
+        version = manifest.get("version")
+        if addon not in published:
+            fail(addon, "is absent from the version table in SPEC.md")
+        elif published[addon] != version:
+            fail(
+                addon,
+                f"SPEC.md lists version {published[addon]}, but the manifest declares {version}",
+            )
+    for addon in sorted(set(published) - set(manifests)):
+        fail(addon, "appears in the SPEC.md version table but has no manifest")
+
+
 def main() -> int:
     if not ADDONS.is_dir():
         print(f"no addons directory at {ADDONS}", file=sys.stderr)
@@ -249,6 +273,7 @@ def main() -> int:
         check_access_csv(addon_dir)
 
     check_graph(manifests)
+    check_spec_versions(manifests)
 
     if failures:
         for line in failures:
@@ -258,7 +283,7 @@ def main() -> int:
 
     print(
         f"OK  {len(addon_dirs)} addons: manifests, data paths, assets, XML, "
-        f"access rules and dependency graph"
+        f"access rules, dependency graph and SPEC.md versions"
     )
     return 0
 
