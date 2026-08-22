@@ -289,6 +289,23 @@ class ProductProduct(models.Model):
             self._register_mb_primary_barcodes()
         return result
 
+    @api.model
+    def _register_mb_existing_primary_barcodes(self, batch_size=1000):
+        """Backfill the identifier registry without building an unbounded domain."""
+        if batch_size <= 0:
+            raise ValueError("batch_size must be greater than zero")
+        last_id = 0
+        while products := self.search(
+            [("barcode", "!=", False), ("id", ">", last_id)],
+            order="id",
+            limit=batch_size,
+        ):
+            products._register_mb_primary_barcodes()
+            # Each completed batch writes its claims to the registry. The next
+            # batch's normal lookup therefore still catches a GTIN claimed by
+            # an earlier batch rather than treating batches as isolated.
+            last_id = products[-1].id
+
     def _register_mb_primary_barcodes(self):
         registry = self.env["mb.product.identifier"].sudo()
         normalized_by_product = {}

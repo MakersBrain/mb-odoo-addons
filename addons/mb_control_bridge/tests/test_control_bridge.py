@@ -21,6 +21,7 @@ from ..controllers.login import (
     MBCodeFlowController,
     OAuthControllerBase,
     _base64url,
+    _pending_attempts,
     _safe_return_target,
     should_redirect_to_mb_sso,
 )
@@ -325,8 +326,66 @@ class TestControlBridge(TransactionCase):
             self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [other])
             with self.assertRaises(AccessDenied):
                 controller._consume_attempt("expected-state")
+            self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [other])
             self.assertEqual(controller._consume_attempt("other-state"), other)
             self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [])
+
+    def test_oidc_pending_attempt_read_prunes_invalid_timestamps(self):
+        valid = {"state": "live", "created_at": 100}
+        fake_request = MagicMock()
+        fake_request.session = {
+            ATTEMPT_SESSION_KEY: [
+                valid,
+                {"state": "expired", "created_at": -200},
+                {"state": "malformed", "created_at": "100"},
+                {"state": "future", "created_at": 107},
+                "not-an-attempt",
+            ]
+        }
+        with (
+            patch("odoo.addons.mb_control_bridge.controllers.login.request", fake_request),
+            patch("odoo.addons.mb_control_bridge.controllers.login.time.time", return_value=101),
+        ):
+            self.assertEqual(_pending_attempts(), [valid])
+        self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [valid])
+
+    def test_unmatched_oidc_state_falls_through_without_spending_other_attempts(self):
+        other = {"state": "other-tab", "created_at": 100}
+        fake_request = MagicMock()
+        fake_request.session = {ATTEMPT_SESSION_KEY: [other]}
+        fake_request.env.__getitem__.return_value.sudo.return_value.get_param.return_value = "0"
+        parent_response = object()
+        with (
+            patch("odoo.addons.mb_control_bridge.controllers.login.request", fake_request),
+            patch("odoo.addons.mb_control_bridge.controllers.login.ensure_db"),
+            patch("odoo.addons.mb_control_bridge.controllers.login.time.time", return_value=101),
+            patch.object(
+                OAuthControllerBase, "signin", return_value=parent_response
+            ) as parent_signin,
+        ):
+            result = MBCodeFlowController.signin.original_endpoint(
+                MBCodeFlowController(), state="unrelated-state", access_token="parent-token"
+            )
+        self.assertIs(result, parent_response)
+        parent_signin.assert_called_once_with(state="unrelated-state", access_token="parent-token")
+        self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [other])
+
+    def test_expired_oidc_state_is_pruned_and_falls_through(self):
+        fake_request = MagicMock()
+        fake_request.session = {ATTEMPT_SESSION_KEY: [{"state": "stale", "created_at": -200}]}
+        fake_request.env.__getitem__.return_value.sudo.return_value.get_param.return_value = "0"
+        parent_response = object()
+        with (
+            patch("odoo.addons.mb_control_bridge.controllers.login.request", fake_request),
+            patch("odoo.addons.mb_control_bridge.controllers.login.ensure_db"),
+            patch("odoo.addons.mb_control_bridge.controllers.login.time.time", return_value=101),
+            patch.object(OAuthControllerBase, "signin", return_value=parent_response),
+        ):
+            result = MBCodeFlowController.signin.original_endpoint(
+                MBCodeFlowController(), state="stale", access_token="parent-token"
+            )
+        self.assertIs(result, parent_response)
+        self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [])
 
     def test_oidc_login_does_not_walk_past_a_pending_second_factor(self):
         fake_request = MagicMock()

@@ -677,6 +677,31 @@ class TestInventoryCapture(TransactionCase):
         self.assertFalse(identifier.company_id)
         self.assertEqual(identifier.source, "primary_barcode")
 
+    def test_existing_primary_barcodes_are_backfilled_in_keyset_batches(self):
+        with self.assertRaisesRegex(ValueError, "batch_size must be greater than zero"):
+            self.env["product.product"]._register_mb_existing_primary_barcodes(batch_size=0)
+
+        other = self.env["product.product"].create(
+            {
+                "name": "Other barcoded glaze",
+                "barcode": "4006381333931",
+            }
+        )
+        products = self.product | other
+        products.mb_identifier_ids.filtered(
+            lambda identifier: identifier.source == "primary_barcode"
+        ).unlink()
+
+        self.env["product.product"]._register_mb_existing_primary_barcodes(batch_size=1)
+
+        identifiers = self.env["mb.product.identifier"].search(
+            [
+                ("product_id", "in", products.ids),
+                ("source", "=", "primary_barcode"),
+            ]
+        )
+        self.assertEqual(identifiers.product_id, products)
+
     def test_capture_evidence_is_isolated_by_active_company(self):
         other_company = self.env["res.company"].sudo().create({"name": "Other workshop"})
         other_capture = (

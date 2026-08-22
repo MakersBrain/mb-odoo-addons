@@ -25,30 +25,16 @@ class MbCommercialOperation(models.Model):
         "analytic_account_id",
         "urssaf_source_ids",
         "urssaf_source_ids.declaration_state",
-        # The `pending` branch asks whether any revenue exists yet, via
-        # `_get_operation_profitability_items()`. That is a registry which
-        # optional bridge addons extend, so no single addon can name its whole
-        # dependency set; `analytic_evidence_ids` is the native revenue source
-        # every installation has. An operation whose only revenue arrives
-        # through another bridge's evidence may therefore read `pending` one
-        # transaction late. That is a display lag on a computed indicator, not
-        # a declared figure -- the declaration itself is built by
-        # l10n_fr_micro_urssaf from the sources, not from this field.
+        # The recognizable-revenue hook deliberately owns its protected reads;
+        # `analytic_evidence_ids` is the native source every installation has.
+        # Optional bridges may add dependencies when extending the hook.
         "analytic_evidence_ids.amount",
     )
     def _compute_urssaf_recognition_status(self):
         for operation in self:
-            # Read privileged, assign to the record in `self`. The field is
-            # rendered on the operation form, which `group_commercial_operations_user`
-            # opens, but both inputs sit behind accounting rights: the source
-            # model is readable only by the accounting groups (and narrowed
-            # further by a record rule), and the revenue test reaches
-            # `analytic_evidence_ids` on account.analytic.line. The indicator
-            # says whether the operation has been picked up by a declaration,
-            # not what the declaration says, so it is derivable without
-            # granting sight of either.
-            privileged = operation.sudo()
-            sources = privileged.urssaf_source_ids
+            # Elevate only the protected evidence read. In particular, never
+            # invoke an extension registry with a sudoed operation record.
+            sources = operation.sudo().urssaf_source_ids
             # Evidence outranks the analytic account: an operation a
             # declaration has already recognised is not "no recognizable
             # revenue" merely because its project carries no analytic account.
@@ -59,14 +45,28 @@ class MbCommercialOperation(models.Model):
                     else "computed"
                 )
                 continue
-            if not privileged.analytic_account_id:
+            if not operation.sudo().analytic_account_id:
                 operation.urssaf_recognition_status = "not_applicable"
                 continue
-            has_revenue = any(
-                item["component"] == "revenue"
-                for item in privileged._get_operation_profitability_items()
-            )
+            has_revenue = operation._mb_has_recognizable_revenue()
             operation.urssaf_recognition_status = "pending" if has_revenue else "not_applicable"
+
+    def _mb_has_recognizable_revenue(self):
+        """Extension hook whose implementations elevate only their own reads."""
+        self.ensure_one()
+        protected = self.sudo()
+        if any(line.amount > 0 for line in protected.analytic_evidence_ids):
+            return True
+        if any(
+            move.state == "posted" and move.move_type in ("out_invoice", "out_refund")
+            for move in (protected.account_move_ids | protected.direct_account_move_ids)
+        ):
+            return True
+        return bool(
+            protected.pos_order_ids.filtered(
+                lambda order: order.state not in ("cancel", "invoiced")
+            )
+        )
 
     def action_view_urssaf_sources(self):
         self.ensure_one()

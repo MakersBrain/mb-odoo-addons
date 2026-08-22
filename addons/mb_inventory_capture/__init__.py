@@ -3,4 +3,4 @@ from . import models
 
 
 def post_init_hook(env):
-    env["product.product"].sudo().search([("barcode", "!=", False)])._register_mb_primary_barcodes()
+    env["product.product"].sudo()._register_mb_existing_primary_barcodes()

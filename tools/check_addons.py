@@ -240,6 +240,7 @@ def check_spec_versions(manifests: dict[str, dict]) -> None:
     """
     spec = ADDONS.parent / "SPEC.md"
     if not spec.is_file():
+        fail("SPEC.md", "is missing; addon version documentation cannot be verified")
         return
     published = dict(re.findall(r"`(\w+)` \| (\d[\d.]*)", spec.read_text(encoding="utf-8")))
     for addon, manifest in sorted(manifests.items()):
@@ -283,7 +284,7 @@ def main() -> int:
 
     print(
         f"OK  {len(addon_dirs)} addons: manifests, data paths, assets, XML, "
-        f"access rules, dependency graph and SPEC.md versions"
+        f"access CSV structure, dependency graph and SPEC.md versions"
     )
     return 0
 

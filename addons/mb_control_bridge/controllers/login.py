@@ -75,8 +75,40 @@ def _bounded_json(response):
 def _pending_attempts():
     stored = request.session.get(ATTEMPT_SESSION_KEY)
     if not isinstance(stored, list):
+        if stored is not None:
+            request.session[ATTEMPT_SESSION_KEY] = []
         return []
-    return [attempt for attempt in stored if isinstance(attempt, dict)]
+    now = int(time.time())
+    pending = []
+    for attempt in stored:
+        if not isinstance(attempt, dict):
+            continue
+        if (
+            not isinstance(attempt.get("state"), str)
+            or not attempt["state"]
+            or not attempt["state"].isascii()
+        ):
+            continue
+        created_at = attempt.get("created_at")
+        # Attempts are written by this controller with an integer timestamp.
+        # Reject rather than coerce corrupted session data: booleans, floats,
+        # and numeric strings should not acquire a fresh interpretation here.
+        if not isinstance(created_at, int) or isinstance(created_at, bool):
+            continue
+        if now - created_at > ATTEMPT_LIFETIME_SECONDS or created_at > now + 5:
+            continue
+        pending.append(attempt)
+    if pending != stored:
+        request.session[ATTEMPT_SESSION_KEY] = pending
+    return pending
+
+
+def _has_pending_attempt(state, pending=None):
+    if not isinstance(state, str) or not state.isascii():
+        return False
+    if pending is None:
+        pending = _pending_attempts()
+    return any(secrets.compare_digest(attempt["state"], state) for attempt in pending)
 
 
 def should_redirect_to_mb_sso(method, authenticated, params):
@@ -105,12 +137,7 @@ class MBLogin(OAuthLoginBase):
         # per code-flow provider on every render, so a second provider -- or
         # the same login page open in another tab -- would otherwise overwrite
         # the only slot and strand every attempt but the last as oauth_error=2.
-        pending = [
-            candidate
-            for candidate in _pending_attempts()
-            if attempt["created_at"] - int(candidate.get("created_at", 0))
-            <= ATTEMPT_LIFETIME_SECONDS
-        ]
+        pending = _pending_attempts()
         pending.append(attempt)
         request.session[ATTEMPT_SESSION_KEY] = pending[-MAX_PENDING_ATTEMPTS:]
         callback = urljoin(request.httprequest.url_root, "auth_oauth/signin")
@@ -165,9 +192,7 @@ class MBCodeFlowController(OAuthControllerBase):
         matched = None
         remaining = []
         for attempt in _pending_attempts():
-            if matched is None and secrets.compare_digest(
-                str(attempt.get("state", "")), str(state or "")
-            ):
+            if matched is None and _has_pending_attempt(state, [attempt]):
                 matched = attempt
             else:
                 remaining.append(attempt)
@@ -271,7 +296,8 @@ class MBCodeFlowController(OAuthControllerBase):
     @http.route()
     def signin(self, **params):
         ensure_db()
-        if not _pending_attempts():
+        pending = _pending_attempts()
+        if not _has_pending_attempt(params.get("state"), pending):
             configured = int(
                 request.env["ir.config_parameter"]
                 .sudo()
