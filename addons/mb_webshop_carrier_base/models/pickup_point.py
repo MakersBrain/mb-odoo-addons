@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import hashlib
 
 from odoo import _, api, fields, models

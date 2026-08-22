@@ -4,8 +4,6 @@ This module deliberately imports no Odoo model API. Parsing produces normalized
 plain dictionaries; the batch model decides whether and how to persist them.
 """
 
-from __future__ import annotations
-
 import csv
 import gzip
 import hashlib

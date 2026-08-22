@@ -5,8 +5,6 @@ original host name. Redirects repeat the complete validation process, preventing
 DNS rebinding between validation and connection.
 """
 
-from __future__ import annotations
-
 import http.client
 import io
 import ipaddress
