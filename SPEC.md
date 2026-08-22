@@ -39,7 +39,7 @@ past schemas, retired formats, or upgrade paths.
 | `mb_commercial_operations_expense` | 19.0.2.0.1 | `mb_commercial_operations_fleet` | 19.0.2.0.1 |
 | `mb_commercial_operations_mrp` | 19.0.2.0.1 | `mb_commercial_operations_pos` | 19.0.2.0.1 |
 | `mb_commercial_operations_purchase` | 19.0.2.0.1 | `mb_commercial_operations_sale` | 19.0.2.0.1 |
-| `mb_commercial_operations_stock` | 19.0.2.0.1 | `mb_commercial_operations_urssaf` | 19.0.2.2.0 |
+| `mb_commercial_operations_stock` | 19.0.2.0.1 | `mb_commercial_operations_urssaf` | 19.0.2.3.0 |
 | `mb_control_bridge` | 19.0.2.0.0 | `mb_dbfilter_gateway` | 19.0.1.0.2 |
 | `mb_depot` | 19.0.4.0.9 | `mb_email_bridge` | 19.0.1.1.1 |
 | `mb_inventory_capture` | 19.0.1.1.1 | `mb_inventory_capture_catalogue` | 19.0.1.0.3 |

@@ -44,7 +44,7 @@ TAGS_ARG := $(subst $(space),$(comma),$(TAGS))
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \
         test check lint format format-check typecheck oca reset-test-db brand-check landing \
-        dependency-check
+        dependency-check bridge-contract-check po-parse-check
 
 help: ## Show available targets
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  %-12s %s\n", $$1, $$2}'
@@ -113,8 +113,15 @@ test: ## Install MODULES on a fresh disposable database and run their tests
 		--test-tags "$(TAGS_ARG)" \
 		--stop-after-init --http-port=0 --gevent-port=0 --log-level=test
 
-check: lint format-check typecheck i18n-check brand-check dependency-check ## Everything CI runs that needs no container
+check: lint format-check typecheck i18n-check po-parse-check brand-check dependency-check \
+       bridge-contract-check ## Everything CI runs that needs no container
 	python3 tools/check_addons.py
+
+bridge-contract-check: ## Fail if the committed control-bridge contract has drifted
+	python3 tools/bridge_contract.py --check
+
+po-parse-check: ## Independently parse translation catalogues and validate headers
+	uv run --no-project --with polib python tools/check_po_parse.py
 
 dependency-check: ## Validate declared imports and the hash-checked empty lock
 	python3 tools/dependency_policy.py

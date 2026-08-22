@@ -14,8 +14,9 @@ extend-exclude = ["oca", ".direnv", ".venv"]
 # addon used spaces, and imports were unsorted in 139 blocks. Both are now
 # mechanically enforced rather than reviewed, which is the point.
 #
-# The reformat touched 272 of 479 files in one commit, listed in
-# `.git-blame-ignore-revs` so `git blame` steps over it.
+# The formatter remains authoritative, but the original formatting-only commit
+# was folded into a squash that also contains semantic changes. There is no
+# safe reachable revision for `.git-blame-ignore-revs` to skip.
 quote-style = "double"              # matches Odoo core and the prevailing style here
 indent-style = "space"
 line-ending = "lf"
@@ -104,7 +105,7 @@ exclude = [
     "^\\.venv/",
     # Fed to `odoo shell`, which injects `env` and `self` as globals. Excluded
     # from ruff's F821 for the same reason.
-    "/scripts/",
+    "^scripts/",
 ]
 
 [[tool.mypy.overrides]]

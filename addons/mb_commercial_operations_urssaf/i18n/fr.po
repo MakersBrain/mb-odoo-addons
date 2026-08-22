@@ -20,6 +20,16 @@ msgid "<strong>Recognition:</strong>"
 msgstr "<strong>Reconnaissance :</strong>"
 
 #. module: mb_commercial_operations_urssaf
+#. odoo-python
+#: code:addons/mb_commercial_operations_urssaf/models/commercial_operation_attribution.py:0
+msgid ""
+"A commercial operation referenced by filed URSSAF evidence cannot be moved "
+"to another company."
+msgstr ""
+"Une opération commerciale référencée par un justificatif URSSAF déposé ne "
+"peut pas être transférée vers une autre société."
+
+#. module: mb_commercial_operations_urssaf
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
 msgid "ACRE coefficient"
 msgstr "Coefficient ACRE"
@@ -66,10 +76,12 @@ msgid "Date"
 msgstr "Date"
 
 #. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_account_move__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_l10n_fr_micro_urssaf_declaration_source__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation_plan_wizard_line__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__display_name
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_pos_order__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
 
@@ -79,10 +91,12 @@ msgid "Filed"
 msgstr "Déposé"
 
 #. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_account_move__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_l10n_fr_micro_urssaf_declaration_source__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation_plan_wizard_line__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__id
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_pos_order__id
 msgid "ID"
 msgstr "ID"
 
@@ -90,6 +104,11 @@ msgstr "ID"
 #: model:ir.model.fields.selection,name:mb_commercial_operations_urssaf.selection__mb_commercial_operation__urssaf_recognition_status__computed
 msgid "Included in Draft Declaration"
 msgstr "Inclus dans la déclaration brouillon"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model,name:mb_commercial_operations_urssaf.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
 
 #. module: mb_commercial_operations_urssaf
 #: model:ir.model.fields.selection,name:mb_commercial_operations_urssaf.selection__mb_commercial_operation__urssaf_recognition_status__not_applicable
@@ -100,6 +119,11 @@ msgstr "Aucun chiffre d'affaires reconnaissable"
 #: model:ir.model.fields.selection,name:mb_commercial_operations_urssaf.selection__mb_commercial_operation__urssaf_recognition_status__pending
 msgid "Pending Recognition"
 msgstr "Reconnaissance en attente"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model,name:mb_commercial_operations_urssaf.model_pos_order
+msgid "Point of Sale Orders"
+msgstr "Commandes du point de vente"
 
 #. module: mb_commercial_operations_urssaf
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
@@ -147,6 +171,19 @@ msgstr "Reconnaissance URSSAF"
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
 msgid "URSSAF planning estimate and legal recognition"
 msgstr "Estimation de planification URSSAF et reconnaissance légale"
+
+#. module: mb_commercial_operations_urssaf
+#. odoo-python
+#: code:addons/mb_commercial_operations_urssaf/models/urssaf_declaration_source.py:0
+msgid ""
+"URSSAF receipt evidence cannot link POS order %(order)s (%(pos_operation)s) "
+"and invoice %(invoice)s (%(invoice_operation)s) because they belong to "
+"different commercial operations."
+msgstr ""
+"Le justificatif d'encaissement URSSAF ne peut pas associer la commande de "
+"point de vente %(order)s (%(pos_operation)s) et la facture %(invoice)s "
+"(%(invoice_operation)s), car elles appartiennent à des opérations "
+"commerciales différentes."
 
 #. module: mb_commercial_operations_urssaf
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__urssaf_acre_coefficient

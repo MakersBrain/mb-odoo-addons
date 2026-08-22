@@ -72,9 +72,10 @@ core uses everywhere.
 
 - Constraints are declarative: `models.Constraint(...)`, not `_sql_constraints`.
   Every one of the 41 addons is already migrated; keep it that way.
-- Every new model needs a row in `security/ir.model.access.csv`. All 96 models
-  have one and `tools/check_addons.py` will fail the build if one appears
-  without it.
+- Every new model that users access needs a row in `security/ir.model.access.csv`.
+  `tools/check_addons.py` validates the header and row width of access files that
+  exist; it does not discover models or prove that every model has an ACL row,
+  so coverage still has to be checked in review.
 - No search inside a per-record loop. Batch it into one query keyed by record.
   When batching changes a subtlety — self-exclusion, or claims made within the
   batch — say so in a comment; that is where the behaviour gets lost.
