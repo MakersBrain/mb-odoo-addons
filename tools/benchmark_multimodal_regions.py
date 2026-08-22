@@ -14,6 +14,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
+from typing import Any
 
 MAX_CROPS = 2
 MAX_CROP_BYTES = 5 * 1024 * 1024
@@ -104,7 +105,7 @@ def safe_crop(path: Path, root: Path) -> tuple[bytes, str]:
 
 
 def call_gemini(key: str, model: str, crops: list[bytes]) -> tuple[dict, dict]:
-    parts = [
+    parts: list[dict[str, Any]] = [
         {
             "inline_data": {
                 "mime_type": "image/png",

@@ -19,6 +19,7 @@ import urllib.parse
 import urllib.request
 import zipfile
 from pathlib import Path, PurePosixPath
+from typing import Any
 
 from evaluate_inventory_capture import EXPECTED, sanitize
 
@@ -122,7 +123,7 @@ def result_text(result: dict) -> tuple[str, int]:
 
 def evaluate(content: str, expected: dict) -> dict:
     haystack = compact(content)
-    decisions = {}
+    decisions: dict[str, Any] = {}
     for field in ("barcode", "lot"):
         wanted = expected.get(field)
         decisions[field] = None if wanted is None else compact(str(wanted)) in haystack
@@ -158,7 +159,7 @@ def main() -> int:
         raise SystemExit("AZURE_DOCUMENT_KEY is required")
 
     expected = json.loads(EXPECTED.read_text())
-    report = {
+    report: dict[str, Any] = {
         "provider": "azure-document-intelligence",
         "model": "prebuilt-read",
         "api_version": API_VERSION,

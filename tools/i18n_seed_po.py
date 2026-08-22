@@ -24,6 +24,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 try:
     import polib
@@ -62,7 +63,7 @@ def seed(module: str, prefill: bool, report_only: bool) -> int:
         return 1
 
     pot = polib.pofile(str(pot_path))
-    existing: dict[tuple[str, str, str], object] = {}
+    existing: dict[tuple[str, str, str], Any] = {}
     if po_path.exists():
         for entry in polib.pofile(str(po_path)):
             if not entry.obsolete:

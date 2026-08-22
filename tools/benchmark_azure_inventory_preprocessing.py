@@ -11,6 +11,7 @@ import time
 import urllib.parse
 import zipfile
 from pathlib import Path, PurePosixPath
+from typing import Any
 
 from benchmark_azure_inventory_capture import analyze, evaluate, result_text
 from evaluate_inventory_capture import EXPECTED, MAX_BYTES, sanitize
@@ -109,7 +110,7 @@ def main() -> int:
     if unknown:
         raise SystemExit(f"unknown sample name(s): {', '.join(unknown)}")
     variants = args.variant or list(VARIANTS)
-    report = {"images": {}, "variants": variants}
+    report: dict[str, Any] = {"images": {}, "variants": variants}
     with zipfile.ZipFile(args.zip_path) as archive:
         members = {
             PurePosixPath(info.filename).name: info

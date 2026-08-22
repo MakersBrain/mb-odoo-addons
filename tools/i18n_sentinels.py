@@ -92,7 +92,7 @@ def worth_asserting(entry, surface: str, inherited: set[str]) -> bool:
 
 
 def generate() -> int:
-    sentinels = []
+    sentinels: list[dict[str, str]] = []
     inherited = inherited_terms()
     for module_dir in sorted((REPO / "addons").iterdir()):
         po_path = module_dir / "i18n" / "fr.po"
@@ -233,8 +233,7 @@ def main() -> int:
         return generate()
     if args.check:
         return check(args.check, args.container)
-    parser.error("choose --generate or --check DB")
-    return 2
+    parser.error("choose --generate or --check DB")  # exits 2; never returns
 
 
 if __name__ == "__main__":

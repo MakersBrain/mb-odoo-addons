@@ -19,6 +19,7 @@ import urllib.parse
 import urllib.request
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 ENDPOINT = "https://api.upcitemdb.com/prod/trial/lookup"
 MAX_BATCH_SIZE = 2
@@ -284,7 +285,7 @@ def main() -> int:
         if not gs1_check_digit_valid(barcode):
             raise SystemExit(f"invalid expected barcode: {barcode}")
 
-    report = {
+    report: dict[str, Any] = {
         "provider": "upcitemdb",
         "endpoint_tier": "trial",
         "images": {},

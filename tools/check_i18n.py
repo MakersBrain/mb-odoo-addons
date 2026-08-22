@@ -296,9 +296,9 @@ def check_module(module: Path, allowlist: dict, report: Report) -> tuple[int, in
             continue
         po_by_key.setdefault(entry_key(entry), []).append(entry)
 
-    for key, entries in po_by_key.items():
+    for entry_key_, entries in po_by_key.items():
         if len(entries) > 1:
-            report.fail(str(rel_po), f"duplicate entry: {short(key[1])}")
+            report.fail(str(rel_po), f"duplicate entry: {short(entry_key_[1])}")
 
     translated = 0
     for _key, entries in po_by_key.items():
@@ -323,12 +323,12 @@ def check_module(module: Path, allowlist: dict, report: Report) -> tuple[int, in
             if entry.msgstr.strip():
                 translated += 1
 
-    for key in sorted(pot_keys - set(po_by_key)):
-        report.fail(str(rel_po), f"POT entry absent from the catalogue: {short(key[1])}")
-    for key in sorted(set(po_by_key) - pot_keys):
-        if key[1] in stale_ok:
+    for missing_key in sorted(pot_keys - set(po_by_key)):
+        report.fail(str(rel_po), f"POT entry absent from the catalogue: {short(missing_key[1])}")
+    for stale_key in sorted(set(po_by_key) - pot_keys):
+        if stale_key[1] in stale_ok:
             continue
-        report.fail(str(rel_po), f"stale entry not in the POT: {short(key[1])}")
+        report.fail(str(rel_po), f"stale entry not in the POT: {short(stale_key[1])}")
 
     return (translated, len(pot_keys))
 

@@ -26,6 +26,7 @@ import sys
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
+from typing import Any
 
 import cv2
 import numpy as np
@@ -207,7 +208,7 @@ def ocr_lines(image: np.ndarray) -> list[OcrLine]:
 
 
 def ocr_orientation(image: np.ndarray) -> tuple[np.ndarray, dict]:
-    attempts = []
+    attempts: list[dict[str, Any]] = []
     for degrees in ROTATIONS:
         candidate = rotate(image, degrees)
         gray = enhance_variants(candidate)["clahe"]
@@ -323,7 +324,7 @@ def extract_crop_codes(
     variants: dict[str, np.ndarray], barcodes: set[str]
 ) -> tuple[list[str], list[dict]]:
     values = []
-    attempts = []
+    attempts: list[dict[str, Any]] = []
     for variant_name, variant in variants.items():
         for page_segmentation in (6, 11):
             text = pytesseract.image_to_string(
@@ -416,7 +417,7 @@ def main() -> int:
     output_directory = args.output_directory.resolve()
     report_path = args.report.resolve()
     output_directory.mkdir(parents=True, exist_ok=True)
-    report = {"images": {}, "output_directory": str(output_directory)}
+    report: dict[str, Any] = {"images": {}, "output_directory": str(output_directory)}
     selected = set(args.only or [])
     with zipfile.ZipFile(args.zip_path) as archive:
         members = [

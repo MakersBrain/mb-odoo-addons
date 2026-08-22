@@ -14,6 +14,7 @@ import json
 import sys
 import zipfile
 from pathlib import Path, PurePosixPath
+from typing import Any
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 
@@ -84,7 +85,7 @@ def main() -> int:
     parser.add_argument("--results", type=Path)
     args = parser.parse_args()
     expected = json.loads(EXPECTED.read_text())
-    report = {"images": {}, "missing": [], "unexpected": []}
+    report: dict[str, Any] = {"images": {}, "missing": [], "unexpected": []}
     with zipfile.ZipFile(args.zip_path) as archive:
         members = {
             PurePosixPath(info.filename).name: info
