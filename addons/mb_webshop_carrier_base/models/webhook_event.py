@@ -5,6 +5,9 @@ from odoo import _, api, fields, models
 
 from ..provider import ProviderError, ProviderWebhookEvent, TrackingSnapshot
 
+MAX_ATTEMPTS = 10
+MAX_BACKOFF_MINUTES = 60
+
 
 class CarrierWebhookEvent(models.Model):
     _name = "mb.carrier.webhook.event"
@@ -115,6 +118,24 @@ class CarrierWebhookEvent(models.Model):
             status_message=self.status_message or "",
         )
 
+    def _defer(self, reason):
+        """Back off one attempt, or give up once MAX_ATTEMPTS is reached.
+
+        Both callers used to carry their own copy of this arithmetic, which is
+        how the retry ceiling and the backoff curve end up disagreeing.
+        """
+        self.ensure_one()
+        attempts = self.attempts + 1
+        self.write(
+            {
+                "state": "failed" if attempts >= MAX_ATTEMPTS else "retry",
+                "attempts": attempts,
+                "next_attempt_at": fields.Datetime.now()
+                + timedelta(minutes=min(MAX_BACKOFF_MINUTES, 2**attempts)),
+                "last_error": reason,
+            }
+        )
+
     def _process_one(self):
         self.ensure_one()
         shipment = (
@@ -131,16 +152,7 @@ class CarrierWebhookEvent(models.Model):
             )
         )
         if not shipment:
-            attempts = self.attempts + 1
-            self.write(
-                {
-                    "state": "failed" if attempts >= 10 else "retry",
-                    "attempts": attempts,
-                    "next_attempt_at": fields.Datetime.now()
-                    + timedelta(minutes=min(60, 2**attempts)),
-                    "last_error": "shipment_not_visible_yet",
-                }
-            )
+            self._defer("shipment_not_visible_yet")
             return
         started = time.monotonic()
         try:
@@ -189,22 +201,13 @@ class CarrierWebhookEvent(models.Model):
                 }
             )
         except ProviderError:
-            attempts = self.attempts + 1
             shipment._log(
                 started,
                 "unavailable",
                 "provider_document_unavailable",
                 operation="webhook_document",
             )
-            self.write(
-                {
-                    "state": "failed" if attempts >= 10 else "retry",
-                    "attempts": attempts,
-                    "next_attempt_at": fields.Datetime.now()
-                    + timedelta(minutes=min(60, 2**attempts)),
-                    "last_error": "provider_document_unavailable",
-                }
-            )
+            self._defer("provider_document_unavailable")
 
     @api.model
     def _cron_process(self, limit=50):

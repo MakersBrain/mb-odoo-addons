@@ -39,7 +39,7 @@ past schemas, retired formats, or upgrade paths.
 | `mb_commercial_operations_expense` | 19.0.2.0.1 | `mb_commercial_operations_fleet` | 19.0.2.0.1 |
 | `mb_commercial_operations_mrp` | 19.0.2.0.1 | `mb_commercial_operations_pos` | 19.0.2.0.1 |
 | `mb_commercial_operations_purchase` | 19.0.2.0.1 | `mb_commercial_operations_sale` | 19.0.2.0.1 |
-| `mb_commercial_operations_stock` | 19.0.2.0.1 | `mb_commercial_operations_urssaf` | 19.0.2.1.0 |
+| `mb_commercial_operations_stock` | 19.0.2.0.1 | `mb_commercial_operations_urssaf` | 19.0.2.2.0 |
 | `mb_control_bridge` | 19.0.2.0.0 | `mb_dbfilter_gateway` | 19.0.1.0.2 |
 | `mb_depot` | 19.0.4.0.9 | `mb_email_bridge` | 19.0.1.1.1 |
 | `mb_inventory_capture` | 19.0.1.1.1 | `mb_inventory_capture_catalogue` | 19.0.1.0.3 |
@@ -48,7 +48,7 @@ past schemas, retired formats, or upgrade paths.
 | `mb_payment_sumup` | 19.0.1.1.1 | `mb_pos_sumup` | 19.0.1.1.2 |
 | `mb_shop_import` | 19.0.1.0.1 | `mb_shop_import_ceramics` | 19.0.1.0.0 |
 | `mb_shop_import_depot` | 19.0.1.0.0 | `mb_webshop` | 19.0.1.5.2 |
-| `mb_webshop_carrier_base` | 19.0.1.1.2 | `mb_webshop_carrier_boxtal` | 19.0.1.1.1 |
+| `mb_webshop_carrier_base` | 19.0.1.1.3 | `mb_webshop_carrier_boxtal` | 19.0.1.1.1 |
 | `mb_webshop_carrier_sendcloud` | 19.0.1.0.1 | `mb_workshop_base` | 19.0.2.0.0 |
 | `mb_workshop_pos` | 19.0.1.0.0 |  |  |
 
