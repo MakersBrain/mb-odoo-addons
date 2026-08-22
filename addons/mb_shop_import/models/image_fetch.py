@@ -53,7 +53,12 @@ def _validated_address(hostname: str) -> str:
         answers = socket.getaddrinfo(hostname, 443, type=socket.SOCK_STREAM)
     except socket.gaierror as error:
         raise ImageFetchError("The image hostname could not be resolved.") from error
-    addresses = sorted({answer[4][0] for answer in answers})
+    # sockaddr is (host, port) for AF_INET and (host, port, flowinfo, scope_id)
+    # for AF_INET6, so the element type is `str | int` as far as the checker is
+    # concerned even though index 0 is always the address string. Narrow it
+    # here: `ipaddress.ip_address` accepts an int and reads it as a packed
+    # address, which is not a distinction an SSRF guard should leave open.
+    addresses = sorted({str(answer[4][0]) for answer in answers})
     if not addresses:
         raise ImageFetchError("The image hostname has no address.")
     for address in addresses:

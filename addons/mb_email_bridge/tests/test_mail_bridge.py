@@ -297,6 +297,38 @@ class TestTransactionalMailBridge(TransactionCase):
         finally:
             guard._SMTP_PIN.reset(pin)
 
+    def test_socket_hook_is_inert_when_no_pin_is_set(self):
+        """The hook sits under every socket in the worker, so with no pin set
+        it must forward its arguments to the original function untouched.
+        """
+        from odoo.addons.mb_email_bridge.models import ir_mail_server as guard
+
+        self.assertIsNone(guard._SMTP_PIN.get(), "a previous test leaked a pin")
+        with patch.object(guard, "_ORIGINAL_CREATE_CONNECTION") as connect:
+            guard._create_connection_to_pinned_smtp(
+                ("example.invalid", 443), 7, source_address=("0.0.0.0", 0)
+            )
+        connect.assert_called_once_with(("example.invalid", 443), 7, source_address=("0.0.0.0", 0))
+
+    def test_pin_does_not_affect_unrelated_connections(self):
+        """An active pin rewrites only the address it pinned. Any other host or
+        port -- an HTTP client in another addon, say -- passes through.
+        """
+        from odoo.addons.mb_email_bridge.models import ir_mail_server as guard
+
+        pin = guard._SMTP_PIN.set(("smtp.example.fr", 587, "8.8.8.8"))
+        try:
+            for label, address in [
+                ("different host", ("api.example.fr", 587)),
+                ("different port", ("smtp.example.fr", 465)),
+            ]:
+                with self.subTest(case=label):
+                    with patch.object(guard, "_ORIGINAL_CREATE_CONNECTION") as connect:
+                        guard._create_connection_to_pinned_smtp(address)
+                    connect.assert_called_once_with(address)
+        finally:
+            guard._SMTP_PIN.reset(pin)
+
     def test_failed_company_projection_does_not_leave_smtp_candidate(self):
         payload = {
             "workshop_id": self.workshop_id,
