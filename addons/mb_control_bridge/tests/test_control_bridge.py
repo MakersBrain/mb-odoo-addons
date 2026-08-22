@@ -298,7 +298,9 @@ class TestControlBridge(TransactionCase):
     def test_oidc_helpers_enforce_pkce_encoding_and_local_redirects(self):
         self.assertEqual(_base64url(b"\xff"), "_w")
         self.assertEqual(_safe_return_target("/odoo/action-1"), "/odoo/action-1")
-        for target in ("https://evil.test", "//evil.test", "relative"):
+        # The backslash forms parse entirely into `path`, so neither urlparse
+        # nor `local=True` rejects them, but browsers normalise them to `//`.
+        for target in ("https://evil.test", "//evil.test", "relative", "/\\evil.test", "/\\"):
             self.assertEqual(_safe_return_target(target), "/odoo")
 
     def test_oidc_attempt_is_consumed_before_any_upstream_request(self):
@@ -306,17 +308,45 @@ class TestControlBridge(TransactionCase):
             "state": "expected-state",
             "created_at": 100,
         }
+        other = {
+            "state": "other-state",
+            "created_at": 100,
+        }
         fake_request = MagicMock()
-        fake_request.session = {ATTEMPT_SESSION_KEY: attempt}
+        fake_request.session = {ATTEMPT_SESSION_KEY: [other, attempt]}
         with (
             patch("odoo.addons.mb_control_bridge.controllers.login.request", fake_request),
             patch("odoo.addons.mb_control_bridge.controllers.login.time.time", return_value=101),
         ):
             controller = MBCodeFlowController()
             self.assertEqual(controller._consume_attempt("expected-state"), attempt)
-            self.assertNotIn(ATTEMPT_SESSION_KEY, fake_request.session)
+            # Only the redeemed one is spent: a second provider, or the login
+            # page open in another tab, can still finish its own attempt.
+            self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [other])
             with self.assertRaises(AccessDenied):
                 controller._consume_attempt("expected-state")
+            self.assertEqual(controller._consume_attempt("other-state"), other)
+            self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [])
+
+    def test_oidc_login_does_not_walk_past_a_pending_second_factor(self):
+        fake_request = MagicMock()
+        fake_request.session = MagicMock()
+        user = fake_request.env["res.users"].with_user.return_value.search.return_value
+        user.__len__.return_value = 1
+        user._mfa_url.return_value = "/web/login/totp"
+        with (
+            patch("odoo.addons.mb_control_bridge.controllers.login.request", fake_request),
+            patch(
+                "odoo.addons.mb_control_bridge.controllers.login._get_login_redirect_url",
+                return_value="/web/login/totp?redirect=%2Fodoo",
+            ),
+        ):
+            controller = MBCodeFlowController()
+            controller._login_existing_user(MagicMock(), "subject", "/odoo")
+            fake_request.session.finalize.assert_not_called()
+            user._mfa_url.return_value = False
+            controller._login_existing_user(MagicMock(), "subject", "/odoo")
+            fake_request.session.finalize.assert_called_once()
 
     def test_implicit_callback_for_configured_provider_fails_closed(self):
         fake_request = MagicMock()
