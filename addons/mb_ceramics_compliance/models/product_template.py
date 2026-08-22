@@ -8,8 +8,8 @@ class ProductTemplate(models.Model):
     mb_food_contact = fields.Boolean(
         string="Food contact",
         help="Intended to come into contact with foodstuffs. This is the only "
-             "reason an article is tracked, and it is what brings 84/500/EEC "
-             "migration limits and a declaration of compliance into scope.",
+        "reason an article is tracked, and it is what brings 84/500/EEC "
+        "migration limits and a declaration of compliance into scope.",
     )
     mb_migration_limit_class = fields.Selection(
         selection=[
@@ -19,13 +19,13 @@ class ProductTemplate(models.Model):
         ],
         string="Migration limit class",
         help="Which set of lead and cadmium limits applies under 84/500/EEC. "
-             "Named a class rather than a category because categ_id already "
-             "means something else, and the two are unrelated.",
+        "Named a class rather than a category because categ_id already "
+        "means something else, and the two are unrelated.",
     )
     mb_tableware_form = fields.Boolean(
         string="Tableware form",
         help="Shaped like an article for food use. A decorative plate is still "
-             "a plate to whoever buys it, so the label has to say what it is not.",
+        "a plate to whoever buys it, so the label has to say what it is not.",
     )
     mb_label_food_warning = fields.Boolean(
         string="Label carries food warning",
@@ -37,7 +37,8 @@ class ProductTemplate(models.Model):
     def _compute_mb_label_food_warning(self):
         for template in self:
             template.mb_label_food_warning = (
-                template.mb_tableware_form and not template.mb_food_contact)
+                template.mb_tableware_form and not template.mb_food_contact
+            )
 
     @api.onchange("mb_food_contact")
     def _onchange_mb_food_contact(self):
@@ -50,20 +51,24 @@ class ProductTemplate(models.Model):
     def _check_food_contact_tracking(self):
         for template in self:
             if template.mb_food_contact and template.tracking == "none":
-                raise ValidationError(_(
-                    "%s is a food-contact article and must be tracked by lot or "
-                    "serial number. Article 17 of Regulation 1935/2004 requires "
-                    "the business it was supplied to be identifiable, and an "
-                    "untracked product cannot answer that.",
-                    template.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "%s is a food-contact article and must be tracked by lot or "
+                        "serial number. Article 17 of Regulation 1935/2004 requires "
+                        "the business it was supplied to be identifiable, and an "
+                        "untracked product cannot answer that.",
+                        template.display_name,
+                    )
+                )
 
     @api.constrains("mb_food_contact", "mb_migration_limit_class")
     def _check_migration_limit_class_scope(self):
         for template in self:
             if template.mb_migration_limit_class and not template.mb_food_contact:
-                raise ValidationError(_(
-                    "%s is not intended for food contact, so 84/500/EEC does not "
-                    "reach it and it has no migration limit class.",
-                    template.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "%s is not intended for food contact, so 84/500/EEC does not "
+                        "reach it and it has no migration limit class.",
+                        template.display_name,
+                    )
+                )

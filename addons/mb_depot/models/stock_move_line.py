@@ -8,11 +8,14 @@ class StockMoveLine(models.Model):
         string="Sold on",
         index=True,
         help="The date the depositary reports the piece actually sold.\n\n"
-             "The line's own date is when the transfer was validated here. A "
-             "gallery that reports March's sales in April would otherwise have "
-             "every one of them counted as April business.",
+        "The line's own date is when the transfer was validated here. A "
+        "gallery that reports March's sales in April would otherwise have "
+        "every one of them counted as April business.",
     )
     mb_depot_sale_report_line_id = fields.Many2one(
-        "mb.depot.sale.report.line", string="Depot report line",
-        copy=False, readonly=True, index=True,
+        "mb.depot.sale.report.line",
+        string="Depot report line",
+        copy=False,
+        readonly=True,
+        index=True,
     )

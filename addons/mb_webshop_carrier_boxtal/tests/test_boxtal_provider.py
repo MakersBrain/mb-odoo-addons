@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import hashlib
 import hmac
 import json
@@ -19,8 +17,8 @@ from odoo.addons.mb_webshop_carrier_base.provider import (
     ShipmentRequest,
 )
 
-from ..provider import BoxtalProvider
 from ..models import delivery_carrier as delivery_carrier_model
+from ..provider import BoxtalProvider
 
 
 class Response:
@@ -41,22 +39,26 @@ class TestBoxtalProvider(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        product = cls.env["product.product"].create({
-            "name": "Boxtal delivery",
-            "type": "service",
-        })
-        cls.carrier = cls.env["delivery.carrier"].create({
-            "name": "Boxtal fixture",
-            "delivery_type": "mb_boxtal",
-            "product_id": product.id,
-            "mb_provider_service_code": "MONR-CpourToi",
-            "mb_boxtal_use_locations": True,
-            "mb_boxtal_length_cm": 30,
-            "mb_boxtal_width_cm": 20,
-            "mb_boxtal_height_cm": 15,
-            "mb_boxtal_content_category": "content:v1:10150",
-            "mb_boxtal_content_description": "Handmade ceramic bowl",
-        })
+        product = cls.env["product.product"].create(
+            {
+                "name": "Boxtal delivery",
+                "type": "service",
+            }
+        )
+        cls.carrier = cls.env["delivery.carrier"].create(
+            {
+                "name": "Boxtal fixture",
+                "delivery_type": "mb_boxtal",
+                "product_id": product.id,
+                "mb_provider_service_code": "MONR-CpourToi",
+                "mb_boxtal_use_locations": True,
+                "mb_boxtal_length_cm": 30,
+                "mb_boxtal_width_cm": 20,
+                "mb_boxtal_height_cm": 15,
+                "mb_boxtal_content_category": "content:v1:10150",
+                "mb_boxtal_content_description": "Handmade ceramic bowl",
+            }
+        )
 
     def setUp(self):
         super().setUp()
@@ -90,20 +92,24 @@ class TestBoxtalProvider(TransactionCase):
         )
 
     def test_order_payload_matches_current_v31_contract(self):
-        self.session.request.return_value = Response(payload={
-            "status": 200,
-            "content": {
-                "id": "2440000050MONR4IA9FR",
-                "deliveryPriceExclTax": {"value": 4.3, "currency": "EUR"},
-            },
-        })
+        self.session.request.return_value = Response(
+            payload={
+                "status": 200,
+                "content": {
+                    "id": "2440000050MONR4IA9FR",
+                    "deliveryPriceExclTax": {"value": 4.3, "currency": "EUR"},
+                },
+            }
+        )
 
         submission = self.provider.create_shipment(self._request())
 
         self.assertEqual(submission.provider_ref, "2440000050MONR4IA9FR")
         self.assertEqual(submission.state, "pending")
         args, kwargs = self.session.request.call_args
-        self.assertEqual(args[:2], ("POST", "https://api.boxtal.build/shipping/v3.1/shipping-order"))
+        self.assertEqual(
+            args[:2], ("POST", "https://api.boxtal.build/shipping/v3.1/shipping-order")
+        )
         payload = kwargs["json"]
         self.assertEqual(payload["shippingOfferCode"], "MONR-CpourToi")
         self.assertEqual(payload["shipment"]["externalId"], "stable-client-reference")
@@ -143,33 +149,39 @@ class TestBoxtalProvider(TransactionCase):
             self.carrier.mb_label_format = "A5"
 
     def test_production_connection_requires_manual_commercial_readiness(self):
-        self.carrier.write({
-            "prod_environment": True,
-            "mb_boxtal_commercial_readiness_confirmed": False,
-        })
+        self.carrier.write(
+            {
+                "prod_environment": True,
+                "mb_boxtal_commercial_readiness_confirmed": False,
+            }
+        )
 
         with self.assertRaisesRegex(UserError, "deferred-payment"):
             self.carrier.action_mb_test_connection()
 
     def test_pickup_point_search_uses_v32_offer_filter(self):
-        self.session.request.return_value = Response(payload={
-            "content": [{
-                "distanceFromSearchLocation": 450,
-                "parcelpoint": {
-                    "code": "POINT-1",
-                    "name": "Minute Phone",
-                    "location": {
-                        "number": "4",
-                        "street": "boulevard des Capucines",
-                        "postalCode": "75009",
-                        "city": "Paris",
-                        "countryIsoCode": "FR",
-                        "position": {"latitude": "48.87", "longitude": "2.33"},
-                    },
-                    "openingDays": {"MONDAY": [{"start": "09:00", "end": "18:00"}]},
-                },
-            }],
-        })
+        self.session.request.return_value = Response(
+            payload={
+                "content": [
+                    {
+                        "distanceFromSearchLocation": 450,
+                        "parcelpoint": {
+                            "code": "POINT-1",
+                            "name": "Minute Phone",
+                            "location": {
+                                "number": "4",
+                                "street": "boulevard des Capucines",
+                                "postalCode": "75009",
+                                "city": "Paris",
+                                "countryIsoCode": "FR",
+                                "position": {"latitude": "48.87", "longitude": "2.33"},
+                            },
+                            "openingDays": {"MONDAY": [{"start": "09:00", "end": "18:00"}]},
+                        },
+                    }
+                ],
+            }
+        )
         query = PickupQuery("FR", "75009", "Paris", "MONR-CpourToi")
 
         points = self.provider.search_pickup_points(query)
@@ -186,12 +198,10 @@ class TestBoxtalProvider(TransactionCase):
         secret = "webhook-secret-that-is-long-enough"
         signature = hmac.new(secret.encode(), raw, hashlib.sha256).hexdigest()
 
-        self.assertTrue(self.provider.verify_webhook(
-            raw, {"x-bxt-signature": signature}, secret
-        ))
-        self.assertFalse(self.provider.verify_webhook(
-            raw + b"\n", {"x-bxt-signature": signature}, secret
-        ))
+        self.assertTrue(self.provider.verify_webhook(raw, {"x-bxt-signature": signature}, secret))
+        self.assertFalse(
+            self.provider.verify_webhook(raw + b"\n", {"x-bxt-signature": signature}, secret)
+        )
         self.assertFalse(self.provider.verify_webhook(raw, {}, secret))
 
     def test_tracking_webhook_requires_a_safe_https_link(self):
@@ -200,10 +210,14 @@ class TestBoxtalProvider(TransactionCase):
             "type": "TRACKING_CHANGED",
             "shippingOrderId": "order-1",
             "timestamp": "2026-08-16T12:00:00Z",
-            "payload": {"trackings": [{
-                "trackingNumber": "TRACK-1",
-                "packageTrackingUrl": "https://carrier.example/track/TRACK-1",
-            }]},
+            "payload": {
+                "trackings": [
+                    {
+                        "trackingNumber": "TRACK-1",
+                        "packageTrackingUrl": "https://carrier.example/track/TRACK-1",
+                    }
+                ]
+            },
         }
         parsed = self.provider.parse_webhook(json.dumps(event).encode())
         self.assertEqual(parsed.tracking_number, "TRACK-1")
@@ -229,49 +243,70 @@ class TestBoxtalProvider(TransactionCase):
 
     def test_capability_suspension_deletes_only_matching_webhook_subscriptions(self):
         self.session.request.side_effect = [
-            Response(payload={"content": [
-                {"id": "subscription-1", "callbackUrl": "https://shop.test/callback"},
-                {"id": "subscription-2", "callbackUrl": "https://other.test/callback"},
-            ]}),
+            Response(
+                payload={
+                    "content": [
+                        {"id": "subscription-1", "callbackUrl": "https://shop.test/callback"},
+                        {"id": "subscription-2", "callbackUrl": "https://other.test/callback"},
+                    ]
+                }
+            ),
             Response(status=204, content=b""),
         ]
 
         self.provider.suspend_subscriptions("https://shop.test/callback")
 
         self.assertEqual(self.session.request.call_count, 2)
-        self.assertEqual(self.session.request.call_args.args[:2], (
-            "DELETE", "https://api.boxtal.build/shipping/v3.1/subscription/subscription-1"
-        ))
+        self.assertEqual(
+            self.session.request.call_args.args[:2],
+            ("DELETE", "https://api.boxtal.build/shipping/v3.1/subscription/subscription-1"),
+        )
 
     def test_subscription_health_requires_both_active_event_types(self):
-        self.session.request.return_value = Response(payload={"content": [
-            {"eventType": "DOCUMENT_CREATED", "callbackUrl": "https://shop.test/callback", "status": "ACTIVE"},
-            {"eventType": "TRACKING_CHANGED", "callbackUrl": "https://shop.test/callback", "status": "ACTIVE"},
-        ]})
+        self.session.request.return_value = Response(
+            payload={
+                "content": [
+                    {
+                        "eventType": "DOCUMENT_CREATED",
+                        "callbackUrl": "https://shop.test/callback",
+                        "status": "ACTIVE",
+                    },
+                    {
+                        "eventType": "TRACKING_CHANGED",
+                        "callbackUrl": "https://shop.test/callback",
+                        "status": "ACTIVE",
+                    },
+                ]
+            }
+        )
         self.assertTrue(self.provider.check_subscriptions("https://shop.test/callback"))
 
     def test_subscription_reconciliation_rotates_the_webhook_secret(self):
         self.session.request.side_effect = [
-            Response(payload={"content": [
-                {
-                    "id": "subscription-document",
-                    "eventType": "DOCUMENT_CREATED",
-                    "callbackUrl": "https://shop.test/callback",
-                    "status": "ACTIVE",
-                },
-                {
-                    "id": "subscription-tracking",
-                    "eventType": "TRACKING_CHANGED",
-                    "callbackUrl": "https://shop.test/callback",
-                    "status": "ACTIVE",
-                },
-                {
-                    "id": "subscription-other",
-                    "eventType": "DOCUMENT_CREATED",
-                    "callbackUrl": "https://other.test/callback",
-                    "status": "ACTIVE",
-                },
-            ]}),
+            Response(
+                payload={
+                    "content": [
+                        {
+                            "id": "subscription-document",
+                            "eventType": "DOCUMENT_CREATED",
+                            "callbackUrl": "https://shop.test/callback",
+                            "status": "ACTIVE",
+                        },
+                        {
+                            "id": "subscription-tracking",
+                            "eventType": "TRACKING_CHANGED",
+                            "callbackUrl": "https://shop.test/callback",
+                            "status": "ACTIVE",
+                        },
+                        {
+                            "id": "subscription-other",
+                            "eventType": "DOCUMENT_CREATED",
+                            "callbackUrl": "https://other.test/callback",
+                            "status": "ACTIVE",
+                        },
+                    ]
+                }
+            ),
             Response(status=204, content=b""),
             Response(status=204, content=b""),
             Response(payload={"content": {"id": "new-document"}}),
@@ -284,30 +319,40 @@ class TestBoxtalProvider(TransactionCase):
 
         calls = self.session.request.call_args_list
         self.assertEqual(len(calls), 5)
-        self.assertEqual(calls[1].args[:2], (
-            "DELETE",
-            "https://api.boxtal.build/shipping/v3.1/subscription/subscription-document",
-        ))
-        self.assertEqual(calls[2].args[:2], (
-            "DELETE",
-            "https://api.boxtal.build/shipping/v3.1/subscription/subscription-tracking",
-        ))
+        self.assertEqual(
+            calls[1].args[:2],
+            (
+                "DELETE",
+                "https://api.boxtal.build/shipping/v3.1/subscription/subscription-document",
+            ),
+        )
+        self.assertEqual(
+            calls[2].args[:2],
+            (
+                "DELETE",
+                "https://api.boxtal.build/shipping/v3.1/subscription/subscription-tracking",
+            ),
+        )
         created = [call.kwargs["json"] for call in calls[3:]]
         self.assertEqual(
             {payload["eventType"] for payload in created},
             {"DOCUMENT_CREATED", "TRACKING_CHANGED"},
         )
-        self.assertTrue(all(
-            payload["webhookSecret"] == "new-webhook-secret-that-is-long-enough"
-            for payload in created
-        ))
+        self.assertTrue(
+            all(
+                payload["webhookSecret"] == "new-webhook-secret-that-is-long-enough"
+                for payload in created
+            )
+        )
 
     def test_capability_restriction_keeps_webhook_cleanup_path_available(self):
         runtime = Mock()
-        self.carrier.write({
-            "mb_secret_ref": "carrier-secret-boxtal",
-            "mb_provider_enabled": True,
-        })
+        self.carrier.write(
+            {
+                "mb_secret_ref": "carrier-secret-boxtal",
+                "mb_provider_enabled": True,
+            }
+        )
         with patch.object(
             type(self.carrier), "_mb_provider", autospec=True, return_value=runtime
         ) as provider_resolver:
@@ -321,9 +366,7 @@ class TestBoxtalProvider(TransactionCase):
 
         self.assertTrue(self.carrier.mb_provider_enabled)
         self.assertFalse(self.carrier.mb_provider_restricted)
-        provider_resolver.assert_called_once_with(
-            self.carrier, purpose="webhook_processing"
-        )
+        provider_resolver.assert_called_once_with(self.carrier, purpose="webhook_processing")
         runtime.suspend_subscriptions.assert_not_called()
 
     def test_secret_rotation_prepares_a_fresh_signed_callback(self):
@@ -339,9 +382,7 @@ class TestBoxtalProvider(TransactionCase):
         parameters.set_param("web.base.url", "https://shop.test")
         self.addCleanup(parameters.set_param, "web.base.url", previous_url)
 
-        with patch.object(
-            delivery_carrier_model, "provider_class", return_value=provider_type
-        ):
+        with patch.object(delivery_carrier_model, "provider_class", return_value=provider_type):
             subscription_id = self.carrier._mb_prepare_secret_rotation(credentials)
 
         provider_type.assert_called_once_with(

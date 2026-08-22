@@ -8,12 +8,9 @@ import requests
 from odoo import _, api, models
 from odoo.exceptions import UserError, ValidationError
 
-
 MAX_JOB_PAYLOAD_CHARS = 131_072
 MAX_OPERATION_KEY_CHARS = 255
-UUID_RE = re.compile(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-)
+UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 FORBIDDEN_PAYLOAD_KEYS = {
     "api_key",
     "authorization",
@@ -65,9 +62,9 @@ class AiGateway(models.AbstractModel):
             raise ValidationError(_("An AI job payload must be an object."))
         forbidden = FORBIDDEN_PAYLOAD_KEYS.intersection(_walk_keys(payload))
         if forbidden:
-            raise ValidationError(_(
-                "AI job payloads may contain descriptors, never image bytes or credentials."
-            ))
+            raise ValidationError(
+                _("AI job payloads may contain descriptors, never image bytes or credentials.")
+            )
         try:
             encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True)
         except (TypeError, ValueError) as error:
@@ -82,8 +79,11 @@ class AiGateway(models.AbstractModel):
         if not UUID_RE.fullmatch(workshop_id):
             raise UserError(_("This company is not linked to a control-plane workshop."))
         operation_key = str(operation_key or "")
-        if (not operation_key or len(operation_key) > MAX_OPERATION_KEY_CHARS
-                or any(character in operation_key for character in "\r\n")):
+        if (
+            not operation_key
+            or len(operation_key) > MAX_OPERATION_KEY_CHARS
+            or any(character in operation_key for character in "\r\n")
+        ):
             raise ValidationError(_("The AI operation key is invalid."))
         self._validate_payload(payload)
         contract = self._contract(task)
@@ -91,7 +91,7 @@ class AiGateway(models.AbstractModel):
         base_url = os.environ.get("MB_CONTROL_API_URL", "").strip().rstrip("/")
         token = os.environ.get("MB_CONTROL_BRIDGE_TOKEN", "")
         parsed_url = urlparse(base_url)
-        if (parsed_url.scheme not in {"http", "https"} or not parsed_url.hostname or not token):
+        if parsed_url.scheme not in {"http", "https"} or not parsed_url.hostname or not token:
             raise UserError(_("The MakersBrain AI gateway is not configured."))
         relative_path = contract["path"].format(workshop_id=workshop_id)
         endpoint = urljoin(f"{base_url}/", relative_path)
@@ -140,7 +140,8 @@ class AiGateway(models.AbstractModel):
         if parsed_url.scheme not in {"http", "https"} or not parsed_url.hostname or not token:
             raise UserError(_("The MakersBrain AI gateway is not configured."))
         endpoint = urljoin(
-            f"{base_url}/", contract["path"].format(workshop_id=workshop_id),
+            f"{base_url}/",
+            contract["path"].format(workshop_id=workshop_id),
         )
         timeout = (
             float(contract.get("connect_timeout", 3.05)),

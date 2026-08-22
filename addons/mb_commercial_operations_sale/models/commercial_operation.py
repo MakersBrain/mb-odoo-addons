@@ -6,10 +6,14 @@ class MbCommercialOperation(models.Model):
     _inherit = "mb.commercial.operation"
 
     sale_order_ids = fields.One2many(
-        "sale.order", "mb_commercial_operation_id", string="Sales Orders",
+        "sale.order",
+        "mb_commercial_operation_id",
+        string="Sales Orders",
     )
     customer_invoice_ids = fields.One2many(
-        "account.move", "mb_commercial_operation_id", string="Customer Invoices",
+        "account.move",
+        "mb_commercial_operation_id",
+        string="Customer Invoices",
     )
     sales_documents_expected = fields.Boolean()
     sales_documents_complete = fields.Boolean(compute="_compute_sales_documents_complete")
@@ -18,24 +22,33 @@ class MbCommercialOperation(models.Model):
         self.ensure_one()
         items = super()._get_operation_profitability_items()
         for invoice in self.customer_invoice_ids.filtered(lambda move: move.state == "posted"):
-            items.append({
-                "model": invoice._name, "res_id": invoice.id,
-                "component": "revenue" if invoice.move_type in ("out_invoice", "out_refund") else "cost",
-                "date": invoice.date,
-                "amount": (-1 if invoice.move_type in ("out_refund", "in_refund") else 1)
-                          * abs(invoice.amount_untaxed_signed),
-                "currency": self.currency_id,
-            })
+            items.append(
+                {
+                    "model": invoice._name,
+                    "res_id": invoice.id,
+                    "component": "revenue"
+                    if invoice.move_type in ("out_invoice", "out_refund")
+                    else "cost",
+                    "date": invoice.date,
+                    "amount": (-1 if invoice.move_type in ("out_refund", "in_refund") else 1)
+                    * abs(invoice.amount_untaxed_signed),
+                    "currency": self.currency_id,
+                }
+            )
         return items
 
     @api.depends("sales_documents_expected", "sale_order_ids.state", "customer_invoice_ids.state")
     def _compute_sales_documents_complete(self):
         for operation in self:
             orders = operation.sale_order_ids.filtered(lambda order: order.state != "cancel")
-            invoices = operation.customer_invoice_ids.filtered(lambda invoice: invoice.state != "cancel")
+            invoices = operation.customer_invoice_ids.filtered(
+                lambda invoice: invoice.state != "cancel"
+            )
             operation.sales_documents_complete = (
                 not operation.sales_documents_expected
-                or bool(orders) and bool(invoices) and all(invoice.state == "posted" for invoice in invoices)
+                or bool(orders)
+                and bool(invoices)
+                and all(invoice.state == "posted" for invoice in invoices)
             )
 
     def action_view_sale_orders(self):
@@ -58,5 +71,7 @@ class MbCommercialOperation(models.Model):
 
     def action_financial_close(self):
         if self.filtered(lambda operation: not operation.sales_documents_complete):
-            raise UserError(_("Complete and post the expected market sales documents before financial close."))
+            raise UserError(
+                _("Complete and post the expected market sales documents before financial close.")
+            )
         return super().action_financial_close()

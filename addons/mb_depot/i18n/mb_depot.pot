@@ -25,7 +25,7 @@ msgstr ""
 
 #. module: mb_depot
 #. odoo-python
-#: code:addons/mb_depot/wizards/mb_depot_create.py:0
+#: code:addons/mb_depot/wizard/mb_depot_create.py:0
 msgid "%(partner)s (-%(pct)s%%)"
 msgstr ""
 
@@ -108,7 +108,7 @@ msgstr ""
 
 #. module: mb_depot
 #. odoo-python
-#: code:addons/mb_depot/wizards/mb_depot_create.py:0
+#: code:addons/mb_depot/wizard/mb_depot_create.py:0
 msgid "A commission must be between 0 and 100 percent."
 msgstr ""
 
@@ -1864,7 +1864,7 @@ msgstr ""
 
 #. module: mb_depot
 #. odoo-python
-#: code:addons/mb_depot/wizards/mb_depot_statement.py:0
+#: code:addons/mb_depot/wizard/mb_depot_statement.py:0
 msgid "The period ends before it starts."
 msgstr ""
 
@@ -1899,7 +1899,7 @@ msgstr ""
 
 #. module: mb_depot
 #. odoo-python
-#: code:addons/mb_depot/wizards/mb_depot_statement.py:0
+#: code:addons/mb_depot/wizard/mb_depot_statement.py:0
 msgid ""
 "This depot is a mandate. Its retail sales and commission must be booked from"
 " the gallery report; the purchase-resale statement would understate "

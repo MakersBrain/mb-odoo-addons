@@ -14,36 +14,57 @@ class TestTransactionalMailBridge(TransactionCase):
         super().setUpClass()
         cls.company = cls.env.company.sudo()
         cls.workshop_id = str(uuid.uuid4())
-        cls.company.write({
-            "email": "orders@atelier.test",
-            "mb_control_workshop_id": cls.workshop_id,
-        })
-        website = cls.env["website"].sudo().search([
-            ("company_id", "in", [cls.company.id, False]),
-        ], limit=1)
-        website.write({
-            "company_id": cls.company.id,
-            "mb_webshop_enabled": True,
-        })
-        partner = cls.env["res.partner"].create({
-            "name": "Webshop customer",
-            "email": "customer@example.fr",
-        })
-        cls.order = cls.env["sale.order"].create({
-            "partner_id": partner.id,
-            "company_id": cls.company.id,
-        })
+        cls.company.write(
+            {
+                "email": "orders@atelier.test",
+                "mb_control_workshop_id": cls.workshop_id,
+            }
+        )
+        website = (
+            cls.env["website"]
+            .sudo()
+            .search(
+                [
+                    ("company_id", "in", [cls.company.id, False]),
+                ],
+                limit=1,
+            )
+        )
+        website.write(
+            {
+                "company_id": cls.company.id,
+                "mb_webshop_enabled": True,
+            }
+        )
+        partner = cls.env["res.partner"].create(
+            {
+                "name": "Webshop customer",
+                "email": "customer@example.fr",
+            }
+        )
+        cls.order = cls.env["sale.order"].create(
+            {
+                "partner_id": partner.id,
+                "company_id": cls.company.id,
+            }
+        )
 
     def _mail(self):
-        return self.env["mail.mail"].sudo().create({
-            "model": "sale.order",
-            "res_id": self.order.id,
-            "email_from": "orders@atelier.test",
-            "email_to": "customer@example.fr",
-            "reply_to": "studio@atelier.test",
-            "subject": "Order confirmed",
-            "body_html": "<p>Your order is confirmed.</p>",
-        })
+        return (
+            self.env["mail.mail"]
+            .sudo()
+            .create(
+                {
+                    "model": "sale.order",
+                    "res_id": self.order.id,
+                    "email_from": "orders@atelier.test",
+                    "email_to": "customer@example.fr",
+                    "reply_to": "studio@atelier.test",
+                    "subject": "Order confirmed",
+                    "body_html": "<p>Your order is confirmed.</p>",
+                }
+            )
+        )
 
     def test_approved_webshop_mail_is_durably_submitted_before_marking_sent(self):
         mail = self._mail()
@@ -58,10 +79,13 @@ class TestTransactionalMailBridge(TransactionCase):
                 "MB_CONTROL_API_URL": "http://control-api:8080",
                 "MB_ODOO_CLIENT_TOKEN_ROOT": root,
             }
-            with patch.dict(os.environ, environment), patch(
-                "odoo.addons.mb_email_bridge.models.mail_mail.requests.post",
-                return_value=response,
-            ) as submit:
+            with (
+                patch.dict(os.environ, environment),
+                patch(
+                    "odoo.addons.mb_email_bridge.models.mail_mail.requests.post",
+                    return_value=response,
+                ) as submit,
+            ):
                 mail.with_context(mb_force_mail_relay=True).send(raise_exception=True)
 
         mail.invalidate_recordset()
@@ -115,9 +139,7 @@ class TestTransactionalMailBridge(TransactionCase):
             "password": "application-password",
             "from_email": "orders@example.fr",
         }
-        with patch(
-            "odoo.addons.base.models.ir_mail_server.IrMail_Server.test_smtp_connection"
-        ):
+        with patch("odoo.addons.base.models.ir_mail_server.IrMail_Server.test_smtp_connection"):
             self.company.mb_configure_webshop_smtp(payload)
         server = self.company.mb_webshop_smtp_server_id.sudo()
         self.assertEqual(server.smtp_encryption, "ssl_strict")
@@ -141,87 +163,123 @@ class TestTransactionalMailBridge(TransactionCase):
         self.assertFalse(self.company.mb_webshop_smtp_server_id)
 
     def test_managed_smtp_rejects_private_dns_answers(self):
-        server = self.env["ir.mail_server"].sudo().create({
-            "name": "Unsafe SMTP",
-            "smtp_host": "smtp.example.fr",
-            "smtp_port": 587,
-            "smtp_encryption": "starttls_strict",
-            "mb_webshop_smtp": True,
-        })
+        server = (
+            self.env["ir.mail_server"]
+            .sudo()
+            .create(
+                {
+                    "name": "Unsafe SMTP",
+                    "smtp_host": "smtp.example.fr",
+                    "smtp_port": 587,
+                    "smtp_encryption": "starttls_strict",
+                    "mb_webshop_smtp": True,
+                }
+            )
+        )
         answer = [(2, 1, 6, "", ("127.0.0.1", 587))]
-        with patch(
-            "odoo.addons.mb_email_bridge.models.ir_mail_server.socket.getaddrinfo",
-            return_value=answer,
-        ), self.assertRaises(Exception):
+        with (
+            patch(
+                "odoo.addons.mb_email_bridge.models.ir_mail_server.socket.getaddrinfo",
+                return_value=answer,
+            ),
+            self.assertRaises(Exception),
+        ):
             server._mb_check_public_smtp_host()
 
     def test_managed_smtp_rejects_dns_rebinding_and_positional_server_id(self):
-        server = self.env["ir.mail_server"].sudo().create({
-            "name": "Rebinding SMTP",
-            "smtp_host": "smtp.example.fr",
-            "smtp_port": 587,
-            "smtp_encryption": "starttls_strict",
-            "mb_webshop_smtp": True,
-        })
+        server = (
+            self.env["ir.mail_server"]
+            .sudo()
+            .create(
+                {
+                    "name": "Rebinding SMTP",
+                    "smtp_host": "smtp.example.fr",
+                    "smtp_port": 587,
+                    "smtp_encryption": "starttls_strict",
+                    "mb_webshop_smtp": True,
+                }
+            )
+        )
         answer = [(2, 1, 6, "", ("8.8.8.8", 587))]
         connection = Mock()
         connection.sock.getpeername.return_value = ("127.0.0.1", 587)
         positional = (None, None, None, None, None, None, None, None, False, server.id)
-        with patch(
-            "odoo.addons.mb_email_bridge.models.ir_mail_server.socket.getaddrinfo",
-            return_value=answer,
-        ), patch(
-            "odoo.addons.base.models.ir_mail_server.IrMail_Server._connect__",
-            return_value=connection,
-        ), self.assertRaises(ValidationError):
+        with (
+            patch(
+                "odoo.addons.mb_email_bridge.models.ir_mail_server.socket.getaddrinfo",
+                return_value=answer,
+            ),
+            patch(
+                "odoo.addons.base.models.ir_mail_server.IrMail_Server._connect__",
+                return_value=connection,
+            ),
+            self.assertRaises(ValidationError),
+        ):
             server._connect__(*positional)
         connection.close.assert_called_once()
 
     def test_default_managed_smtp_selection_is_bound_to_dns_pin(self):
-        server = self.env["ir.mail_server"].sudo().create({
-            "name": "Default managed SMTP",
-            "smtp_host": "smtp.example.fr",
-            "smtp_port": 587,
-            "smtp_encryption": "starttls_strict",
-            "mb_webshop_smtp": True,
-        })
+        server = (
+            self.env["ir.mail_server"]
+            .sudo()
+            .create(
+                {
+                    "name": "Default managed SMTP",
+                    "smtp_host": "smtp.example.fr",
+                    "smtp_port": 587,
+                    "smtp_encryption": "starttls_strict",
+                    "mb_webshop_smtp": True,
+                }
+            )
+        )
         answer = [(2, 1, 6, "", ("8.8.8.8", 587))]
         connection = Mock()
         connection.sock.getpeername.return_value = ("8.8.8.8", 587)
-        with patch.object(
-            type(server),
-            "_find_mail_server",
-            return_value=(server, "notifications@example.fr"),
-        ), patch(
-            "odoo.addons.mb_email_bridge.models.ir_mail_server.socket.getaddrinfo",
-            return_value=answer,
-        ), patch(
-            "odoo.addons.base.models.ir_mail_server.IrMail_Server._connect__",
-            return_value=connection,
-        ) as connect:
+        with (
+            patch.object(
+                type(server),
+                "_find_mail_server",
+                return_value=(server, "notifications@example.fr"),
+            ),
+            patch(
+                "odoo.addons.mb_email_bridge.models.ir_mail_server.socket.getaddrinfo",
+                return_value=answer,
+            ),
+            patch(
+                "odoo.addons.base.models.ir_mail_server.IrMail_Server._connect__",
+                return_value=connection,
+            ) as connect,
+        ):
             result = server._connect__(smtp_from="orders@example.fr")
 
         self.assertEqual(result, connection)
         self.assertEqual(connect.call_args.kwargs["mail_server_id"], server.id)
-        self.assertEqual(
-            connect.call_args.kwargs["smtp_from"], "notifications@example.fr"
-        )
+        self.assertEqual(connect.call_args.kwargs["smtp_from"], "notifications@example.fr")
 
     def test_explicit_standard_smtp_server_is_not_subject_to_managed_pin(self):
-        server = self.env["ir.mail_server"].sudo().create({
-            "name": "Standard SMTP",
-            "smtp_host": "smtp.example.fr",
-            "smtp_port": 587,
-            "smtp_encryption": "starttls_strict",
-            "mb_webshop_smtp": False,
-        })
+        server = (
+            self.env["ir.mail_server"]
+            .sudo()
+            .create(
+                {
+                    "name": "Standard SMTP",
+                    "smtp_host": "smtp.example.fr",
+                    "smtp_port": 587,
+                    "smtp_encryption": "starttls_strict",
+                    "mb_webshop_smtp": False,
+                }
+            )
+        )
         connection = Mock()
-        with patch(
-            "odoo.addons.mb_email_bridge.models.ir_mail_server.socket.getaddrinfo"
-        ) as resolve, patch(
-            "odoo.addons.base.models.ir_mail_server.IrMail_Server._connect__",
-            return_value=connection,
-        ) as connect:
+        with (
+            patch(
+                "odoo.addons.mb_email_bridge.models.ir_mail_server.socket.getaddrinfo"
+            ) as resolve,
+            patch(
+                "odoo.addons.base.models.ir_mail_server.IrMail_Server._connect__",
+                return_value=connection,
+            ) as connect,
+        ):
             result = server._connect__(mail_server_id=server.id)
 
         self.assertEqual(result, connection)
@@ -239,6 +297,38 @@ class TestTransactionalMailBridge(TransactionCase):
         finally:
             guard._SMTP_PIN.reset(pin)
 
+    def test_socket_hook_is_inert_when_no_pin_is_set(self):
+        """The hook sits under every socket in the worker, so with no pin set
+        it must forward its arguments to the original function untouched.
+        """
+        from odoo.addons.mb_email_bridge.models import ir_mail_server as guard
+
+        self.assertIsNone(guard._SMTP_PIN.get(), "a previous test leaked a pin")
+        with patch.object(guard, "_ORIGINAL_CREATE_CONNECTION") as connect:
+            guard._create_connection_to_pinned_smtp(
+                ("example.invalid", 443), 7, source_address=("0.0.0.0", 0)
+            )
+        connect.assert_called_once_with(("example.invalid", 443), 7, source_address=("0.0.0.0", 0))
+
+    def test_pin_does_not_affect_unrelated_connections(self):
+        """An active pin rewrites only the address it pinned. Any other host or
+        port -- an HTTP client in another addon, say -- passes through.
+        """
+        from odoo.addons.mb_email_bridge.models import ir_mail_server as guard
+
+        pin = guard._SMTP_PIN.set(("smtp.example.fr", 587, "8.8.8.8"))
+        try:
+            for label, address in [
+                ("different host", ("api.example.fr", 587)),
+                ("different port", ("smtp.example.fr", 465)),
+            ]:
+                with self.subTest(case=label):
+                    with patch.object(guard, "_ORIGINAL_CREATE_CONNECTION") as connect:
+                        guard._create_connection_to_pinned_smtp(address)
+                    connect.assert_called_once_with(address)
+        finally:
+            guard._SMTP_PIN.reset(pin)
+
     def test_failed_company_projection_does_not_leave_smtp_candidate(self):
         payload = {
             "workshop_id": self.workshop_id,
@@ -249,18 +339,30 @@ class TestTransactionalMailBridge(TransactionCase):
             "password": "application-password",
             "from_email": "orders@example.fr",
         }
-        before = self.env["ir.mail_server"].sudo().search_count([
-            ("mb_webshop_smtp", "=", True),
-        ])
-        with patch(
-            "odoo.addons.base.models.ir_mail_server.IrMail_Server.test_smtp_connection"
-        ), patch.object(
-            type(self.company), "write", side_effect=ValidationError("projection failed")
-        ), self.assertRaises(ValidationError):
+        before = (
+            self.env["ir.mail_server"]
+            .sudo()
+            .search_count(
+                [
+                    ("mb_webshop_smtp", "=", True),
+                ]
+            )
+        )
+        with (
+            patch("odoo.addons.base.models.ir_mail_server.IrMail_Server.test_smtp_connection"),
+            patch.object(
+                type(self.company), "write", side_effect=ValidationError("projection failed")
+            ),
+            self.assertRaises(ValidationError),
+        ):
             self.company.mb_configure_webshop_smtp(payload)
         self.assertEqual(
-            self.env["ir.mail_server"].sudo().search_count([
-                ("mb_webshop_smtp", "=", True),
-            ]),
+            self.env["ir.mail_server"]
+            .sudo()
+            .search_count(
+                [
+                    ("mb_webshop_smtp", "=", True),
+                ]
+            ),
             before,
         )

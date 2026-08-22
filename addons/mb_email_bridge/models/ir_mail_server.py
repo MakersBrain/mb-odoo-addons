@@ -1,3 +1,38 @@
+"""Pin managed SMTP connections to an address that was checked to be public.
+
+The threat is DNS rebinding. `_mb_check_public_smtp_host` resolves the
+configured SMTP host and refuses any answer that is not globally routable, but
+between that check and smtplib's own connect there is a second resolution, and
+a hostile DNS server is free to answer differently the second time -- returning
+a link-local or RFC1918 address and turning the mail server into a probe of the
+internal network. Closing that window means the address checked has to be the
+address connected to, and smtplib offers no seam for supplying one.
+
+Scope of the patch, stated plainly
+----------------------------------
+This module replaces `socket.create_connection` -- a *standard library*
+function, not an Odoo one -- for the whole worker process. Every socket opened
+by every library in the process passes through `_create_connection_to_pinned_smtp`
+afterwards, including all the HTTP clients in the other MakersBrain addons.
+
+That is acceptable only because the hook is inert by default. It reads a
+`ContextVar` that is set solely by `_connect__`, around the single `super()`
+call, and reset in a `finally`. With no pin set the hook forwards its arguments
+to the original function unchanged, and with a pin set it rewrites only an
+address that matches the pinned `(host, port)` exactly. Anything else -- a
+different host, a different port, any socket opened by any other code -- is
+passed through untouched. `test_socket_hook_is_inert_when_no_pin_is_set` and
+`test_pin_does_not_affect_unrelated_connections` hold that line.
+
+The original function is stashed on the `socket` module itself rather than in a
+module global, so that reloading this module during development re-wraps the
+true original instead of wrapping the previous wrapper.
+
+Only the TCP destination is substituted. smtplib keeps the configured hostname
+for TLS SNI and certificate validation, so pinning the address does not weaken
+certificate checking.
+"""
+
 import ipaddress
 import socket
 from contextvars import ContextVar
@@ -5,12 +40,13 @@ from contextvars import ContextVar
 from odoo import _, fields, models
 from odoo.exceptions import ValidationError
 
-
 _SMTP_PIN = ContextVar("mb_webshop_smtp_pin", default=None)
 _ORIGINAL_CREATE_CONNECTION = getattr(
     socket, "_mb_webshop_original_create_connection", socket.create_connection
 )
-socket._mb_webshop_original_create_connection = _ORIGINAL_CREATE_CONNECTION
+# mypy cannot know about an attribute stashed on a stdlib module at import
+# time. The stash is deliberate; see the reload note in the module docstring.
+socket._mb_webshop_original_create_connection = _ORIGINAL_CREATE_CONNECTION  # type: ignore[attr-defined]
 
 
 def _create_connection_to_pinned_smtp(address, *args, **kwargs):
@@ -96,7 +132,7 @@ class IrMailServer(models.Model):
             peer = connection.sock.getpeername()[0]
             if peer != pinned_address or not ipaddress.ip_address(peer).is_global:
                 connection.close()
-                raise ValidationError(_(
-                    "The SMTP connection did not use an approved public address."
-                ))
+                raise ValidationError(
+                    _("The SMTP connection did not use an approved public address.")
+                )
         return connection

@@ -6,7 +6,7 @@
   "provider_addons": {
     "mb_control_bridge": "19.0.2.0.0",
     "mb_email_bridge": "19.0.1.1.1",
-    "mb_inventory_capture": "19.0.1.1.0",
+    "mb_inventory_capture": "19.0.1.1.1",
     "mb_invoice_capture": "19.0.1.5.3"
   },
   "duplicate_paths": [],

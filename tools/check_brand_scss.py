@@ -43,12 +43,14 @@ def resolve(subpath: str) -> pathlib.Path:
     try:
         out = subprocess.run(
             ["node", "-e", script],
-            cwd=BRAND_ROOT, check=True, capture_output=True, text=True,
+            cwd=BRAND_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
         ).stdout
     except (subprocess.CalledProcessError, FileNotFoundError):
         print(
-            f"cannot resolve @makersbrain/brand/{subpath}; "
-            f"run `npm ci` in {BRAND_ROOT}. Skipping.",
+            f"cannot resolve @makersbrain/brand/{subpath}; run `npm ci` in {BRAND_ROOT}. Skipping.",
             file=sys.stderr,
         )
         raise SystemExit(0) from None
@@ -84,9 +86,7 @@ def brand_lines(text: str):
             yield number, line
     if depth:
         # An unclosed region would silently exempt the rest of the file.
-        raise ValueError(
-            f"line {opened_at}: `brand-check: upstream-start` is never closed"
-        )
+        raise ValueError(f"line {opened_at}: `brand-check: upstream-start` is never closed")
 
 
 def main() -> int:

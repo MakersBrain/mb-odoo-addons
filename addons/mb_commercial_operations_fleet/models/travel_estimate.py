@@ -19,11 +19,15 @@ class MbTravelEstimate(models.Model):
             if vehicle:
                 vals.setdefault("vehicle_class", vehicle.mb_tollquote_vehicle_class)
                 vals.setdefault("payment_option", vehicle.mb_tollquote_payment_option)
-                vals.setdefault("fuel_consumption_l_per_100km", vehicle.mb_fuel_consumption_l_per_100km)
+                vals.setdefault(
+                    "fuel_consumption_l_per_100km", vehicle.mb_fuel_consumption_l_per_100km
+                )
                 vals.setdefault("driver_cost_eur_per_hour", vehicle.mb_driver_cost_eur_per_hour)
         return super().create(vals_list)
 
     def write(self, vals):
-        if "vehicle_id" in vals and self.filtered(lambda estimate: estimate.state in ("accepted", "superseded")):
+        if "vehicle_id" in vals and self.filtered(
+            lambda estimate: estimate.state in ("accepted", "superseded")
+        ):
             raise UserError(_("Accepted travel estimates are immutable; calculate a new revision."))
         return super().write(vals)

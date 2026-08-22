@@ -6,8 +6,7 @@ from odoo import api, fields, models
 class StockLot(models.Model):
     _inherit = "stock.lot"
 
-    mb_food_contact = fields.Boolean(
-        related="product_id.mb_food_contact", store=True)
+    mb_food_contact = fields.Boolean(related="product_id.mb_food_contact", store=True)
     mb_glaze_lot_ids = fields.Many2many(
         comodel_name="stock.lot",
         relation="mb_lot_glaze_lot_rel",
@@ -16,8 +15,8 @@ class StockLot(models.Model):
         string="Glaze lots consumed",
         compute="_compute_mb_glaze_lot_ids",
         help="Derived from the manufacturing order's consumed components. Not "
-             "stored: Odoo already keeps this on the move lines, and a copy "
-             "would be a second answer to the one question a regulator asks.",
+        "stored: Odoo already keeps this on the move lines, and a copy "
+        "would be a second answer to the one question a regulator asks.",
     )
     mb_migration_passed = fields.Boolean(
         string="Migration test passed",
@@ -39,8 +38,7 @@ class StockLot(models.Model):
     def _compute_mb_glaze_lot_ids(self):
         glazes_by_lot = defaultdict(lambda: self.env["stock.lot"])
         if self.ids:
-            productions = self.env["mrp.production"].search(
-                [("lot_producing_ids", "in", self.ids)])
+            productions = self.env["mrp.production"].search([("lot_producing_ids", "in", self.ids)])
             for production in productions:
                 consumed = production._mb_consumed_glaze_lots()
                 for lot in production.lot_producing_ids & self:

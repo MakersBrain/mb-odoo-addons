@@ -1,9 +1,8 @@
-from __future__ import annotations
-
 import secrets
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+
 from odoo.addons.mb_webshop_carrier_base.provider import ProviderError, provider_class
 
 
@@ -55,16 +54,22 @@ class DeliveryCarrier(models.Model):
         return super().write(values)
 
     @api.constrains(
-        "delivery_type", "mb_boxtal_length_cm", "mb_boxtal_width_cm", "mb_boxtal_height_cm",
+        "delivery_type",
+        "mb_boxtal_length_cm",
+        "mb_boxtal_width_cm",
+        "mb_boxtal_height_cm",
         "mb_label_format",
     )
     def _check_boxtal_dimensions(self):
         for carrier in self.filtered(lambda record: record.delivery_type == "mb_boxtal"):
-            if min(
-                carrier.mb_boxtal_length_cm,
-                carrier.mb_boxtal_width_cm,
-                carrier.mb_boxtal_height_cm,
-            ) <= 0:
+            if (
+                min(
+                    carrier.mb_boxtal_length_cm,
+                    carrier.mb_boxtal_width_cm,
+                    carrier.mb_boxtal_height_cm,
+                )
+                <= 0
+            ):
                 raise ValidationError(_("Boxtal parcel dimensions must be greater than zero."))
             if carrier.mb_label_format not in ("A4", "10x15"):
                 raise ValidationError(_("Boxtal supports only A4 and 10 × 15 cm PDF labels."))
@@ -72,7 +77,9 @@ class DeliveryCarrier(models.Model):
     @api.depends("delivery_type")
     def _compute_can_generate_return(self):
         super()._compute_can_generate_return()
-        self.filtered(lambda carrier: carrier.delivery_type == "mb_boxtal").can_generate_return = False
+        self.filtered(
+            lambda carrier: carrier.delivery_type == "mb_boxtal"
+        ).can_generate_return = False
 
     def mb_boxtal_rate_shipment(self, order):
         return self.base_on_rule_rate_shipment(order)
@@ -95,31 +102,37 @@ class DeliveryCarrier(models.Model):
     def action_mb_test_connection(self):
         for carrier in self.filtered(lambda record: record.delivery_type == "mb_boxtal"):
             if not carrier.mb_provider_service_code:
-                raise UserError(_("Configure a Boxtal shipping offer before testing the connection."))
+                raise UserError(
+                    _("Configure a Boxtal shipping offer before testing the connection.")
+                )
             if carrier.prod_environment and not carrier.mb_boxtal_commercial_readiness_confirmed:
-                raise UserError(_(
-                    "Confirm Boxtal deferred-payment and shipping-offer readiness before enabling production."
-                ))
+                raise UserError(
+                    _(
+                        "Confirm Boxtal deferred-payment and shipping-offer readiness before enabling production."
+                    )
+                )
         result = super().action_mb_test_connection()
         for carrier in self.filtered(lambda record: record.delivery_type == "mb_boxtal"):
             try:
                 if not carrier.mb_subscription_id:
                     raise UserError(_("The Boxtal webhook endpoint is not configured."))
-                base_url = self.env["ir.config_parameter"].sudo().get_param(
-                    "web.base.url", ""
-                ).rstrip("/")
-                if not base_url.startswith("https://"):
-                    raise UserError(_("A public HTTPS web base URL is required for Boxtal webhooks."))
-                callback = (
-                    f"{base_url}/mb_carrier/webhook/boxtal/{carrier.mb_subscription_id}"
+                base_url = (
+                    self.env["ir.config_parameter"].sudo().get_param("web.base.url", "").rstrip("/")
                 )
+                if not base_url.startswith("https://"):
+                    raise UserError(
+                        _("A public HTTPS web base URL is required for Boxtal webhooks.")
+                    )
+                callback = f"{base_url}/mb_carrier/webhook/boxtal/{carrier.mb_subscription_id}"
                 provider = carrier._mb_provider()
                 provider.reconcile_subscriptions(callback, carrier._mb_webhook_secret())
             except (ProviderError, UserError) as error:
-                carrier.sudo().write({
-                    "mb_credential_state": "unconfigured",
-                    "mb_last_error": "webhook_subscription_failed",
-                })
+                carrier.sudo().write(
+                    {
+                        "mb_credential_state": "unconfigured",
+                        "mb_last_error": "webhook_subscription_failed",
+                    }
+                )
                 raise UserError(_("Boxtal webhook setup failed.")) from error
         return result
 
@@ -129,9 +142,7 @@ class DeliveryCarrier(models.Model):
         )
         if not carriers:
             return True
-        base_url = self.env["ir.config_parameter"].sudo().get_param(
-            "web.base.url", ""
-        ).rstrip("/")
+        base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url", "").rstrip("/")
         if not base_url.startswith("https://"):
             raise UserError(_("A public HTTPS web base URL is required for Boxtal webhooks."))
         for carrier in carriers:
@@ -161,9 +172,7 @@ class DeliveryCarrier(models.Model):
             or len(webhook_secret) < 24
         ):
             raise UserError(_("The carrier rotation material is invalid."))
-        base_url = self.env["ir.config_parameter"].sudo().get_param(
-            "web.base.url", ""
-        ).rstrip("/")
+        base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url", "").rstrip("/")
         if not base_url.startswith("https://"):
             raise UserError(_("A public HTTPS web base URL is required for Boxtal webhooks."))
         subscription_id = secrets.token_urlsafe(24)

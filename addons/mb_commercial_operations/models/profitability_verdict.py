@@ -26,8 +26,16 @@ class MbProfitabilityVerdict(models.AbstractModel):
     _description = "Profitability Verdict Rules"
 
     def _verdict(
-        self, *, blocked, judgeable, margin, below_break_even,
-        effort_hours, margin_per_hour, target_per_hour, headroom_ratio,
+        self,
+        *,
+        blocked,
+        judgeable,
+        margin,
+        below_break_even,
+        effort_hours,
+        margin_per_hour,
+        target_per_hour,
+        headroom_ratio,
     ):
         """Return (verdict, reason) from the figures every engagement can produce."""
         if blocked:

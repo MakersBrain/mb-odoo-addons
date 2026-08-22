@@ -20,7 +20,9 @@ class ResCompany(models.Model):
     def _mb_remove_capability_restriction(self, module_key):
         result = super()._mb_remove_capability_restriction(module_key)
         if module_key == "webshop":
-            self.env["website"].sudo().search([
-                ("company_id", "in", self.ids),
-            ]).write({"mb_webshop_enabled": True})
+            self.env["website"].sudo().search(
+                [
+                    ("company_id", "in", self.ids),
+                ]
+            ).write({"mb_webshop_enabled": True})
         return result

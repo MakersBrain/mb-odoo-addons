@@ -6,9 +6,10 @@ import tempfile
 import uuid
 from unittest.mock import MagicMock, patch
 
-from odoo.addons.base.models.ir_module import IrModuleModule
 from odoo.exceptions import AccessDenied, ValidationError
 from odoo.tests import TransactionCase, tagged
+
+from odoo.addons.base.models.ir_module import IrModuleModule
 
 from ..controllers.auth import (
     bootstrap_credential,
@@ -53,29 +54,44 @@ class TestControlBridge(TransactionCase):
     def test_webshop_domain_projection_is_workshop_scoped_and_idempotent(self):
         self.company.write({"mb_control_workshop_id": self.workshop_id})
         with self.assertRaises(ValidationError):
-            self.company.mb_project_webshop_domain({
-                "workshop_id": str(uuid.uuid4()),
-                "hostname": "www.atelier-luna.fr",
-            })
+            self.company.mb_project_webshop_domain(
+                {
+                    "workshop_id": str(uuid.uuid4()),
+                    "hostname": "www.atelier-luna.fr",
+                }
+            )
         with self.assertRaises(ValidationError):
-            self.company.mb_project_webshop_domain({
-                "workshop_id": self.workshop_id,
-                "hostname": "www.atelier-luna.fr;return 200",
-            })
+            self.company.mb_project_webshop_domain(
+                {
+                    "workshop_id": self.workshop_id,
+                    "hostname": "www.atelier-luna.fr;return 200",
+                }
+            )
         if "website" not in self.env or "mb_webshop_enabled" not in self.env["website"]._fields:
             self.skipTest("optional webshop module is not installed")
-        website = self.env["website"].sudo().search([
-            ("company_id", "in", [self.company.id, False]),
-        ], limit=1)
+        website = (
+            self.env["website"]
+            .sudo()
+            .search(
+                [
+                    ("company_id", "in", [self.company.id, False]),
+                ],
+                limit=1,
+            )
+        )
         website.write({"company_id": self.company.id, "mb_webshop_enabled": True})
-        first = self.company.mb_project_webshop_domain({
-            "workshop_id": self.workshop_id,
-            "hostname": "www.atelier-luna.fr",
-        })
-        replay = self.company.mb_project_webshop_domain({
-            "workshop_id": self.workshop_id,
-            "hostname": "www.atelier-luna.fr",
-        })
+        first = self.company.mb_project_webshop_domain(
+            {
+                "workshop_id": self.workshop_id,
+                "hostname": "www.atelier-luna.fr",
+            }
+        )
+        replay = self.company.mb_project_webshop_domain(
+            {
+                "workshop_id": self.workshop_id,
+                "hostname": "www.atelier-luna.fr",
+            }
+        )
         self.assertTrue(first["projected"])
         self.assertFalse(replay["projected"])
         self.assertEqual(website.domain, "https://www.atelier-luna.fr")
@@ -86,19 +102,37 @@ class TestControlBridge(TransactionCase):
             self.company.mb_webshop_status({"workshop_id": str(uuid.uuid4())})
         if "website" not in self.env or "mb_webshop_enabled" not in self.env["website"]._fields:
             self.skipTest("optional webshop module is not installed")
-        website = self.env["website"].sudo().search([
-            ("company_id", "in", [self.company.id, False]),
-        ], limit=1)
+        website = (
+            self.env["website"]
+            .sudo()
+            .search(
+                [
+                    ("company_id", "in", [self.company.id, False]),
+                ],
+                limit=1,
+            )
+        )
         website.write({"company_id": self.company.id, "mb_webshop_enabled": True})
 
         status = self.company.mb_webshop_status({"workshop_id": self.workshop_id})
 
         self.assertEqual(status["workshop_id"], self.workshop_id)
         self.assertEqual(status["website_id"], website.id)
-        self.assertEqual(set(status["readiness"]), {
-            "catalog", "online_payment", "fulfilment", "sender", "domain", "returns",
-            "product_count", "payment_count", "fulfilment_count", "launch_ready",
-        })
+        self.assertEqual(
+            set(status["readiness"]),
+            {
+                "catalog",
+                "online_payment",
+                "fulfilment",
+                "sender",
+                "domain",
+                "returns",
+                "product_count",
+                "payment_count",
+                "fulfilment_count",
+                "launch_ready",
+            },
+        )
         self.assertIsInstance(status["issues"], list)
 
     def test_membership_reconciliation_is_monotonic_and_idempotent(self):
@@ -116,12 +150,8 @@ class TestControlBridge(TransactionCase):
 
     def test_normal_login_redirects_but_break_glass_and_errors_do_not(self):
         self.assertTrue(should_redirect_to_mb_sso("GET", False, {}))
-        self.assertFalse(
-            should_redirect_to_mb_sso("GET", False, {"local": "1"})
-        )
-        self.assertFalse(
-            should_redirect_to_mb_sso("GET", False, {"oauth_error": "2"})
-        )
+        self.assertFalse(should_redirect_to_mb_sso("GET", False, {"local": "1"}))
+        self.assertFalse(should_redirect_to_mb_sso("GET", False, {"oauth_error": "2"}))
         self.assertFalse(should_redirect_to_mb_sso("POST", False, {}))
         self.assertFalse(should_redirect_to_mb_sso("GET", True, {}))
 
@@ -129,24 +159,28 @@ class TestControlBridge(TransactionCase):
         if "auth.oauth.provider" not in self.env:
             self.skipTest("optional auth_oauth module is not installed")
         providers = self.env["auth.oauth.provider"].sudo()
-        other = providers.create({
-            "name": "Other",
-            "client_id": "other-client",
-            "enabled": True,
-            "auth_endpoint": "https://other.example.test/authorize",
-            "body": "Log in with Other",
-            "scope": "openid",
-            "validation_endpoint": "https://other.example.test/userinfo",
-        })
-        mb_provider = providers.create({
-            "name": "MakersBrain",
-            "client_id": "mb-test-client",
-            "enabled": True,
-            "auth_endpoint": "https://auth.example.test/authorize",
-            "body": "Log in with MakersBrain",
-            "scope": "openid profile email",
-            "validation_endpoint": "https://auth.example.test/userinfo",
-        })
+        other = providers.create(
+            {
+                "name": "Other",
+                "client_id": "other-client",
+                "enabled": True,
+                "auth_endpoint": "https://other.example.test/authorize",
+                "body": "Log in with Other",
+                "scope": "openid",
+                "validation_endpoint": "https://other.example.test/userinfo",
+            }
+        )
+        mb_provider = providers.create(
+            {
+                "name": "MakersBrain",
+                "client_id": "mb-test-client",
+                "enabled": True,
+                "auth_endpoint": "https://auth.example.test/authorize",
+                "body": "Log in with MakersBrain",
+                "scope": "openid profile email",
+                "validation_endpoint": "https://auth.example.test/userinfo",
+            }
+        )
         self.company._mb_configure_login_policy(mb_provider)
         parameters = self.env["ir.config_parameter"].sudo()
 
@@ -166,23 +200,31 @@ class TestControlBridge(TransactionCase):
         self.assertEqual(company.country_id, self.env.ref("base.fr"))
         self.assertEqual(company.account_fiscal_country_id, self.env.ref("base.fr"))
         self.assertEqual(company.chart_template, "fr")
-        self.assertTrue(self.env["account.tax"].sudo().search_count([
-            ("company_id", "=", company.id),
-            ("country_id", "=", self.env.ref("base.fr").id),
-        ]))
+        self.assertTrue(
+            self.env["account.tax"]
+            .sudo()
+            .search_count(
+                [
+                    ("company_id", "=", company.id),
+                    ("country_id", "=", self.env.ref("base.fr").id),
+                ]
+            )
+        )
 
     def test_tenant_bootstrap_stores_only_the_bridge_credential_hash(self):
         workshop = str(uuid.uuid4())
         token = "A" * 64
         self.company.write({"mb_control_workshop_id": workshop})
 
-        self.company.mb_bootstrap_tenant({
-            "workshop_id": workshop,
-            "oidc_client_id": f"mb-odoo-{workshop}",
-            "oidc_issuer": "https://identity.example.test",
-            "bridge_token": token,
-            "public_hostname": "atelier.makersbrain.fr",
-        })
+        self.company.mb_bootstrap_tenant(
+            {
+                "workshop_id": workshop,
+                "oidc_client_id": f"mb-odoo-{workshop}",
+                "oidc_issuer": "https://identity.example.test",
+                "bridge_token": token,
+                "public_hostname": "atelier.makersbrain.fr",
+            }
+        )
 
         self.assertEqual(
             self.company.mb_control_bridge_token_hash,
@@ -194,9 +236,7 @@ class TestControlBridge(TransactionCase):
             "atelier.makersbrain.fr",
         )
         provider_id = int(
-            self.env["ir.config_parameter"].sudo().get_param(
-                "mb_control.oidc_provider_id"
-            )
+            self.env["ir.config_parameter"].sudo().get_param("mb_control.oidc_provider_id")
         )
         provider = self.env["auth.oauth.provider"].browse(provider_id)
         self.assertTrue(provider.mb_code_flow)
@@ -226,12 +266,8 @@ class TestControlBridge(TransactionCase):
 
         self.assertTrue(credential_matches(global_token, "", global_token, True))
         self.assertFalse(credential_matches(tenant_token, "", global_token, True))
-        self.assertTrue(
-            credential_matches(tenant_token, tenant_hash, global_token, True)
-        )
-        self.assertFalse(
-            credential_matches(global_token, tenant_hash, global_token, True)
-        )
+        self.assertTrue(credential_matches(tenant_token, tenant_hash, global_token, True))
+        self.assertFalse(credential_matches(global_token, tenant_hash, global_token, True))
 
     def test_bridge_credential_file_is_strict_and_exclusive(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -244,10 +280,12 @@ class TestControlBridge(TransactionCase):
                 "fixture-secret",
             )
             with self.assertRaises(ValueError):
-                bootstrap_credential({
-                    "MB_CONTROL_BRIDGE_TOKEN": "plaintext",
-                    "MB_CONTROL_BRIDGE_TOKEN_FILE": path,
-                })
+                bootstrap_credential(
+                    {
+                        "MB_CONTROL_BRIDGE_TOKEN": "plaintext",
+                        "MB_CONTROL_BRIDGE_TOKEN_FILE": path,
+                    }
+                )
             with open(path, "w", encoding="utf-8") as stream:
                 stream.write("first\nsecond\n")
             with self.assertRaises(ValueError):
@@ -260,7 +298,9 @@ class TestControlBridge(TransactionCase):
     def test_oidc_helpers_enforce_pkce_encoding_and_local_redirects(self):
         self.assertEqual(_base64url(b"\xff"), "_w")
         self.assertEqual(_safe_return_target("/odoo/action-1"), "/odoo/action-1")
-        for target in ("https://evil.test", "//evil.test", "relative"):
+        # The backslash forms parse entirely into `path`, so neither urlparse
+        # nor `local=True` rejects them, but browsers normalise them to `//`.
+        for target in ("https://evil.test", "//evil.test", "relative", "/\\evil.test", "/\\"):
             self.assertEqual(_safe_return_target(target), "/odoo")
 
     def test_oidc_attempt_is_consumed_before_any_upstream_request(self):
@@ -268,17 +308,45 @@ class TestControlBridge(TransactionCase):
             "state": "expected-state",
             "created_at": 100,
         }
+        other = {
+            "state": "other-state",
+            "created_at": 100,
+        }
         fake_request = MagicMock()
-        fake_request.session = {ATTEMPT_SESSION_KEY: attempt}
+        fake_request.session = {ATTEMPT_SESSION_KEY: [other, attempt]}
         with (
             patch("odoo.addons.mb_control_bridge.controllers.login.request", fake_request),
             patch("odoo.addons.mb_control_bridge.controllers.login.time.time", return_value=101),
         ):
             controller = MBCodeFlowController()
             self.assertEqual(controller._consume_attempt("expected-state"), attempt)
-            self.assertNotIn(ATTEMPT_SESSION_KEY, fake_request.session)
+            # Only the redeemed one is spent: a second provider, or the login
+            # page open in another tab, can still finish its own attempt.
+            self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [other])
             with self.assertRaises(AccessDenied):
                 controller._consume_attempt("expected-state")
+            self.assertEqual(controller._consume_attempt("other-state"), other)
+            self.assertEqual(fake_request.session[ATTEMPT_SESSION_KEY], [])
+
+    def test_oidc_login_does_not_walk_past_a_pending_second_factor(self):
+        fake_request = MagicMock()
+        fake_request.session = MagicMock()
+        user = fake_request.env["res.users"].with_user.return_value.search.return_value
+        user.__len__.return_value = 1
+        user._mfa_url.return_value = "/web/login/totp"
+        with (
+            patch("odoo.addons.mb_control_bridge.controllers.login.request", fake_request),
+            patch(
+                "odoo.addons.mb_control_bridge.controllers.login._get_login_redirect_url",
+                return_value="/web/login/totp?redirect=%2Fodoo",
+            ),
+        ):
+            controller = MBCodeFlowController()
+            controller._login_existing_user(MagicMock(), "subject", "/odoo")
+            fake_request.session.finalize.assert_not_called()
+            user._mfa_url.return_value = False
+            controller._login_existing_user(MagicMock(), "subject", "/odoo")
+            fake_request.session.finalize.assert_called_once()
 
     def test_implicit_callback_for_configured_provider_fails_closed(self):
         fake_request = MagicMock()
@@ -292,8 +360,7 @@ class TestControlBridge(TransactionCase):
             patch.object(OAuthControllerBase, "signin", side_effect=AssertionError),
         ):
             result = MBCodeFlowController.signin.original_endpoint(
-                MBCodeFlowController(),
-                state=json.dumps({"p": 42}), access_token="must-not-be-used"
+                MBCodeFlowController(), state=json.dumps({"p": 42}), access_token="must-not-be-used"
             )
         self.assertIs(result, redirect)
 
@@ -324,9 +391,7 @@ class TestControlBridge(TransactionCase):
     def test_identity_collision_is_rejected(self):
         self.Users.mb_reconcile_membership(self.membership())
         with self.assertRaises(ValidationError):
-            self.Users.mb_reconcile_membership(self.membership(
-                user_id=str(uuid.uuid4()), epoch=2
-            ))
+            self.Users.mb_reconcile_membership(self.membership(user_id=str(uuid.uuid4()), epoch=2))
 
     def test_erasure_replay_anonymizes_identity_and_is_idempotent(self):
         self.company.mb_control_workshop_id = self.workshop_id
@@ -358,28 +423,34 @@ class TestControlBridge(TransactionCase):
         self.Users.mb_reconcile_membership(self.membership())
         user = self.Users.search([("mb_control_user_id", "=", self.user_id)])
         attachments = self.env["ir.attachment"].sudo()
-        attachments.create({
-            "name": "subject-proof.txt",
-            "res_model": "res.partner",
-            "res_id": user.partner_id.id,
-            "type": "binary",
-            "datas": base64.b64encode(b"subject content"),
-            "mimetype": "text/plain",
-        })
+        attachments.create(
+            {
+                "name": "subject-proof.txt",
+                "res_model": "res.partner",
+                "res_id": user.partner_id.id,
+                "type": "binary",
+                "datas": base64.b64encode(b"subject content"),
+                "mimetype": "text/plain",
+            }
+        )
         unrelated = self.env["res.partner"].sudo().create({"name": "Unrelated"})
-        attachments.create({
-            "name": "unrelated.txt",
-            "res_model": "res.partner",
-            "res_id": unrelated.id,
-            "type": "binary",
-            "datas": base64.b64encode(b"must not leak"),
-            "mimetype": "text/plain",
-        })
+        attachments.create(
+            {
+                "name": "unrelated.txt",
+                "res_model": "res.partner",
+                "res_id": unrelated.id,
+                "type": "binary",
+                "datas": base64.b64encode(b"must not leak"),
+                "mimetype": "text/plain",
+            }
+        )
 
-        result = self.Users.mb_export_personal_data({
-            "workshop_id": self.workshop_id,
-            "user_id": self.user_id,
-        })
+        result = self.Users.mb_export_personal_data(
+            {
+                "workshop_id": self.workshop_id,
+                "user_id": self.user_id,
+            }
+        )
 
         self.assertTrue(result["found"])
         self.assertEqual(result["user_id"], self.user_id)
@@ -387,10 +458,12 @@ class TestControlBridge(TransactionCase):
         self.assertIn("subject-proof.txt", names)
         self.assertNotIn("unrelated.txt", names)
         with self.assertRaises(ValidationError):
-            self.Users.mb_export_personal_data({
-                "workshop_id": str(uuid.uuid4()),
-                "user_id": self.user_id,
-            })
+            self.Users.mb_export_personal_data(
+                {
+                    "workshop_id": str(uuid.uuid4()),
+                    "user_id": self.user_id,
+                }
+            )
 
     def test_entitlements_are_monotonic(self):
         payload = {
@@ -421,32 +494,50 @@ class TestControlBridge(TransactionCase):
         )
 
         with self.assertRaises(ValidationError):
-            self.company.mb_enable_module_bundle({
-                "workshop_id": self.workshop_id,
-                "module_key": "system",
-                "modules": ["base"],
-            })
+            self.company.mb_enable_module_bundle(
+                {
+                    "workshop_id": self.workshop_id,
+                    "module_key": "system",
+                    "modules": ["base"],
+                }
+            )
 
     def test_module_enable_is_scheduled_without_immediate_registry_rebuild(self):
         self.company.mb_control_workshop_id = self.workshop_id
-        module = self.env["ir.module.module"].sudo().search([
-            ("name", "=", "mb_ceramics_firing"),
-        ], limit=1)
+        module = (
+            self.env["ir.module.module"]
+            .sudo()
+            .search(
+                [
+                    ("name", "=", "mb_ceramics_firing"),
+                ],
+                limit=1,
+            )
+        )
         # Simulate the lifecycle state this endpoint handles. The addon may
         # already be installed when the full repository suite runs.
         module.write({"state": "uninstalled"})
         self.assertEqual(module.state, "uninstalled")
 
-        with patch.object(
-            IrModuleModule, "button_install", autospec=True,
-        ) as button_install, patch.object(
-            IrModuleModule, "button_immediate_install", autospec=True,
-        ) as immediate_install:
-            result = self.company.mb_enable_module_bundle({
-                "workshop_id": self.workshop_id,
-                "module_key": "firings",
-                "modules": ["mb_ceramics_firing"],
-            })
+        with (
+            patch.object(
+                IrModuleModule,
+                "button_install",
+                autospec=True,
+            ) as button_install,
+            patch.object(
+                IrModuleModule,
+                "button_immediate_install",
+                autospec=True,
+            ) as immediate_install,
+        ):
+            result = self.company.mb_enable_module_bundle(
+                {
+                    "workshop_id": self.workshop_id,
+                    "module_key": "firings",
+                    "modules": ["mb_ceramics_firing"],
+                }
+            )
 
         button_install.assert_called_once()
         immediate_install.assert_not_called()
@@ -455,9 +546,11 @@ class TestControlBridge(TransactionCase):
 
     def test_module_restriction_blocks_writes_and_retains_historical_reads(self):
         self.company.mb_control_workshop_id = self.workshop_id
-        owned_models = self.env["ir.model.data"].sudo().search([
-            ("module", "=", "mb_ceramics_firing"), ("model", "=", "ir.model")
-        ])
+        owned_models = (
+            self.env["ir.model.data"]
+            .sudo()
+            .search([("module", "=", "mb_ceramics_firing"), ("model", "=", "ir.model")])
+        )
         if not owned_models:
             self.skipTest("the post-install firing models are not loaded")
         payload = {
@@ -468,9 +561,11 @@ class TestControlBridge(TransactionCase):
         }
         first = self.company.mb_restrict_module_bundle(payload)
         replay = self.company.mb_restrict_module_bundle(payload)
-        policy = self.env["mb.control.capability.policy"].sudo().search([
-            ("workshop_id", "=", self.workshop_id), ("module_key", "=", "firings")
-        ])
+        policy = (
+            self.env["mb.control.capability.policy"]
+            .sudo()
+            .search([("workshop_id", "=", self.workshop_id), ("module_key", "=", "firings")])
+        )
 
         self.assertTrue(first["applied"])
         self.assertFalse(replay["applied"])
@@ -484,11 +579,13 @@ class TestControlBridge(TransactionCase):
         self.assertTrue(all(policy.rule_ids.mapped("perm_unlink")))
         rule_ids = policy.rule_ids.ids
 
-        enabled = self.company.mb_enable_module_bundle({
-            "workshop_id": self.workshop_id,
-            "module_key": "firings",
-            "modules": ["mb_ceramics_firing"],
-        })
+        enabled = self.company.mb_enable_module_bundle(
+            {
+                "workshop_id": self.workshop_id,
+                "module_key": "firings",
+                "modules": ["mb_ceramics_firing"],
+            }
+        )
         self.assertTrue(enabled["restriction_removed"])
         self.assertFalse(policy.exists())
         self.assertFalse(self.env["ir.rule"].sudo().browse(rule_ids).exists())

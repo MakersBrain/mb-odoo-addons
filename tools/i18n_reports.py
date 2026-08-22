@@ -50,8 +50,15 @@ CONTAINER_DEFAULT = "mb-odoo-web"
 PROBES = {
     "mb.commercial.operation": [
         ("res.partner", "partner_id", {"name": "i18n render probe"}),
-        (None, None, {"name": "i18n render probe",
-                      "planned_start": "2026-01-05", "planned_end": "2026-01-06"}),
+        (
+            None,
+            None,
+            {
+                "name": "i18n render probe",
+                "planned_start": "2026-01-05",
+                "planned_end": "2026-01-06",
+            },
+        ),
     ],
 }
 
@@ -182,22 +189,33 @@ def catalogues() -> dict[str, dict[str, str]]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("database")
     parser.add_argument("--container", default=CONTAINER_DEFAULT)
     args = parser.parse_args()
 
     script = "import json\n" + (
-        SCRIPT_TEMPLATE
-        .replace("__CATALOGUES__", json.dumps(catalogues()).replace('"""', '\\"\\"\\"'))
-        .replace("__PROBES__", json.dumps(PROBES))
+        SCRIPT_TEMPLATE.replace(
+            "__CATALOGUES__", json.dumps(catalogues()).replace('"""', '\\"\\"\\"')
+        ).replace("__PROBES__", json.dumps(PROBES))
     )
 
     result = subprocess.run(
         [
-            "docker", "exec", "-i", args.container,
-            "odoo", "shell", "-c", "/etc/odoo/odoo.conf", "-d", args.database,
-            "--no-http", "--log-level=error",
+            "docker",
+            "exec",
+            "-i",
+            args.container,
+            "odoo",
+            "shell",
+            "-c",
+            "/etc/odoo/odoo.conf",
+            "-d",
+            args.database,
+            "--no-http",
+            "--log-level=error",
         ],
         input=script,
         capture_output=True,
@@ -205,7 +223,8 @@ def main() -> int:
     )
     output = result.stdout + result.stderr
     interesting = [
-        line for line in output.splitlines()
+        line
+        for line in output.splitlines()
         if line.startswith(("REPORT FAIL", "REPORT SUMMARY", "REPORT SKIP", "REPORT PROBE"))
     ]
     if not interesting:

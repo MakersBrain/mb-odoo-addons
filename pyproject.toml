@@ -7,17 +7,24 @@ line-length = 100
 target-version = "py312"          # exact official odoo:19 runtime ABI
 extend-exclude = ["oca", ".direnv", ".venv"]
 
-[tool.ruff.lint]
-# Correctness rules, not house style. The gate is deliberately narrow so a red
-# CI run means something is wrong rather than something is unformatted.
+[tool.ruff.format]
+# The formatter is the style authority as of the repo-wide reformat. Before it,
+# style was hand-maintained and had drifted into two dialects: the two
+# `l10n_fr_micro_*` addons were tab-indented (3,328 W191) while every other
+# addon used spaces, and imports were unsorted in 139 blocks. Both are now
+# mechanically enforced rather than reviewed, which is the point.
 #
-# Style debt is real and deliberately outside this gate, because fixing it in
-# the same change as adding the gate would bury both:
-#   - `l10n_fr_micro_enterprise` and 12 files in `l10n_fr_micro_urssaf` are
-#     indented with tabs while the other addons use spaces (763 W191 total);
-#   - imports are unsorted repo-wide (42 I001), 44 of them auto-fixable.
-# Enable W191 and I once those are settled, in their own commit.
-select = ["E4", "E7", "E9", "F", "B", "C4", "PIE"]
+# The reformat touched 272 of 479 files in one commit, listed in
+# `.git-blame-ignore-revs` so `git blame` steps over it.
+quote-style = "double"              # matches Odoo core and the prevailing style here
+indent-style = "space"
+line-ending = "lf"
+
+[tool.ruff.lint]
+# Correctness rules, plus the two mechanical style rules the formatter settles:
+# W191 (tab indentation) and I (import ordering). Everything else stays out, so
+# a red CI run still means something is wrong rather than merely unconventional.
+select = ["E4", "E7", "E9", "F", "B", "C4", "PIE", "W191", "I"]
 
 ignore = [
     # `_inherit`, `_depends` and friends are Odoo's declarative surface, and
@@ -25,10 +32,35 @@ ignore = [
     "E741",
 ]
 
+[tool.ruff.lint.isort]
+# The Odoo guideline orders imports in three blocks: external libraries, then
+# `odoo` itself, then `from odoo.addons...`. Plain isort collapses the last two
+# into one third-party block, so the two Odoo blocks are declared explicitly.
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "odoo",
+    "odoo-addons",
+    "first-party",
+    "local-folder",
+]
+
+[tool.ruff.lint.isort.sections]
+"odoo" = ["odoo"]
+"odoo-addons" = ["odoo.addons"]
+
 [tool.ruff.lint.per-file-ignores]
 # An Odoo addon's `__init__.py` exists to import its submodules for their side
 # effect of registering models. Every import in it is "unused" by definition.
-"**/__init__.py" = ["F401"]
+#
+# `I001` is off here for a second, stronger reason: these imports are executed
+# for their side effects, so their order is occasionally load-bearing — a model
+# that references another at class-definition time has to be imported after it.
+# Sorting them alphabetically would be a silent runtime change, and isort also
+# wants to collapse `from . import a` / `from . import b` onto one line, against
+# the one-per-line form Odoo core uses everywhere.
+"**/__init__.py" = ["F401", "I001"]
 
 # A manifest *is* a bare dict literal. That is the file format.
 "**/__manifest__.py" = ["B018"]
@@ -42,3 +74,41 @@ ignore = [
 # These are fed to `odoo shell`, which injects `env` and `self` as globals. Ruff
 # is right that they are undefined; the interpreter that runs them disagrees.
 "scripts/*.py" = ["F821"]
+
+# ---------------------------------------------------------------------------
+# mypy
+#
+# Scoped deliberately, because mypy over Odoo addons is mostly theatre: `odoo`
+# ships no stubs and is not importable outside the container, so every ORM
+# symbol resolves to `Any` and 425 addon files "pass" while almost nothing is
+# actually checked. A gate that green-lights unchecked code is worse than no
+# gate, so the two lanes are enforced differently:
+#
+#   tools/    real, dependency-light Python with no Odoo import. Blocking.
+#   addons/   advisory. Near-vacuous on ORM code, but the typed pure-Python
+#             modules (the carrier providers, the shop-import fetchers) are
+#             genuinely checked, and it has already earned its keep there.
+#
+# Run both with `make typecheck`; CI blocks on the first and reports the second.
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true       # `odoo` has no stubs and is container-only
+explicit_package_bases = true
+namespace_packages = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+exclude = [
+    "^oca/",
+    "^node_modules/",
+    "^\\.venv/",
+    # Fed to `odoo shell`, which injects `env` and `self` as globals. Excluded
+    # from ruff's F821 for the same reason.
+    "/scripts/",
+]
+
+[[tool.mypy.overrides]]
+# Test helpers subclass Odoo test cases, which are `Any` from here. Checking
+# them produces noise about the base class, not about the tests.
+module = ["*.tests.*"]
+ignore_errors = true

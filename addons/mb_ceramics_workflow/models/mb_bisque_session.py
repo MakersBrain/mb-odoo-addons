@@ -19,7 +19,9 @@ class MbBisqueSession(models.Model):
         check_company=True,
     )
     source_location_id = fields.Many2one(
-        "stock.location", required=True, domain=[("usage", "=", "internal")],
+        "stock.location",
+        required=True,
+        domain=[("usage", "=", "internal")],
         check_company=True,
     )
     bisque_location_id = fields.Many2one(
@@ -41,36 +43,36 @@ class MbBisqueSession(models.Model):
         default="draft",
     )
     company_id = fields.Many2one(
-        "res.company", required=True, index=True,
-        default=lambda self: self.env.company
+        "res.company", required=True, index=True, default=lambda self: self.env.company
     )
 
     @api.model_create_multi
     def create(self, vals_list):
         for values in vals_list:
             if values.get("name", _("New")) == _("New"):
-                values["name"] = self.env["ir.sequence"].next_by_code(
-                    "mb.bisque.session"
-                ) or _("New")
+                values["name"] = self.env["ir.sequence"].next_by_code("mb.bisque.session") or _(
+                    "New"
+                )
         return super().create(vals_list)
 
-    @api.constrains(
-        "board_id", "source_location_id", "bisque_location_id", "company_id"
-    )
+    @api.constrains("board_id", "source_location_id", "bisque_location_id", "company_id")
     def _check_company_and_locations(self):
         for session in self:
             if session.source_location_id == session.bisque_location_id:
-                raise ValidationError(_("Green stock and accepted bisque stock need different locations."))
+                raise ValidationError(
+                    _("Green stock and accepted bisque stock need different locations.")
+                )
             records = (
                 session.board_id,
                 session.source_location_id,
                 session.bisque_location_id,
             )
             if any(
-                record.company_id and record.company_id != session.company_id
-                for record in records
+                record.company_id and record.company_id != session.company_id for record in records
             ):
-                raise ValidationError(_("The board, locations and bisque session must share a company."))
+                raise ValidationError(
+                    _("The board, locations and bisque session must share a company.")
+                )
 
     def action_start(self):
         for session in self:
@@ -92,7 +94,9 @@ class MbBisqueSessionLine(models.Model):
     _check_company_auto = True
 
     session_id = fields.Many2one(
-        "mb.bisque.session", required=True, ondelete="cascade",
+        "mb.bisque.session",
+        required=True,
+        ondelete="cascade",
         check_company=True,
     )
     green_product_id = fields.Many2one(
@@ -102,7 +106,9 @@ class MbBisqueSessionLine(models.Model):
         check_company=True,
     )
     green_lot_id = fields.Many2one(
-        "stock.lot", required=True, domain="[('product_id', '=', green_product_id)]",
+        "stock.lot",
+        required=True,
+        domain="[('product_id', '=', green_product_id)]",
         check_company=True,
     )
     quantity = fields.Float(required=True, digits="Product Unit", default=1.0)
@@ -116,40 +122,20 @@ class MbBisqueSessionLine(models.Model):
         check_company=True,
     )
     bom_id = fields.Many2one("mrp.bom", required=True, check_company=True)
-    production_id = fields.Many2one(
-        "mrp.production", readonly=True, copy=False, check_company=True)
+    production_id = fields.Many2one("mrp.production", readonly=True, copy=False, check_company=True)
     company_id = fields.Many2one(
-        related="session_id.company_id", store=True, required=True, index=True,
-        precompute=True)
+        related="session_id.company_id", store=True, required=True, index=True, precompute=True
+    )
 
     _positive_quantity = models.Constraint(
         "CHECK(quantity > 0)", "The selected green-ware quantity must be positive."
     )
 
-    @api.depends(
-        "green_product_id", "green_lot_id", "session_id.source_location_id"
-    )
+    @api.depends("green_product_id", "green_lot_id", "session_id.source_location_id")
     def _compute_available_quantity(self):
-        for line in self:
-            if not (
-                line.green_product_id
-                and line.green_lot_id
-                and line.session_id.source_location_id
-            ):
-                line.available_quantity = 0
-                continue
-            line.available_quantity = self.env[
-                "stock.quant"
-            ]._get_available_quantity(
-                line.green_product_id,
-                line.session_id.source_location_id,
-                lot_id=line.green_lot_id,
-                strict=True,
-            )
+        self._mb_available_quantity("green_product_id", "green_lot_id")
 
-    @api.constrains(
-        "green_product_id", "green_lot_id", "bisque_product_id", "bom_id"
-    )
+    @api.constrains("green_product_id", "green_lot_id", "bisque_product_id", "bom_id")
     def _check_selection(self):
         for line in self:
             if line.green_product_id.product_tmpl_id.mb_ceramics_stage != "green":
@@ -164,16 +150,19 @@ class MbBisqueSessionLine(models.Model):
                 line.bisque_product_id,
             )
             if any(
-                record.company_id
-                and record.company_id != line.session_id.company_id
+                record.company_id and record.company_id != line.session_id.company_id
                 for record in records
             ):
-                raise ValidationError(_("The selected products, lot and bisque session must share a company."))
+                raise ValidationError(
+                    _("The selected products, lot and bisque session must share a company.")
+                )
             outputs = line.bom_id.product_id | line.bom_id.product_tmpl_id.product_variant_ids
             if line.bisque_product_id not in outputs:
                 raise ValidationError(_("The bill of materials does not produce this bisque ware."))
             if line.green_product_id not in line.bom_id.bom_line_ids.product_id:
-                raise ValidationError(_("The bisque bill of materials does not consume the green ware."))
+                raise ValidationError(
+                    _("The bisque bill of materials does not consume the green ware.")
+                )
 
     @api.onchange("green_product_id")
     def _onchange_green_product_id(self):
@@ -185,18 +174,20 @@ class MbBisqueSessionLine(models.Model):
         if self.production_id:
             return self.production_id
         session = self.session_id
-        production = self.env["mrp.production"].create({
-            "product_id": self.bisque_product_id.id,
-            "product_qty": self.quantity,
-            "product_uom_id": self.bisque_product_id.uom_id.id,
-            "bom_id": self.bom_id.id,
-            "location_src_id": session.source_location_id.id,
-            "location_dest_id": session.bisque_location_id.id,
-            "origin": session.name,
-            "company_id": session.company_id.id,
-            "mb_workflow_kind": "bisque",
-            "mb_bisque_session_id": session.id,
-        })
+        production = self.env["mrp.production"].create(
+            {
+                "product_id": self.bisque_product_id.id,
+                "product_qty": self.quantity,
+                "product_uom_id": self.bisque_product_id.uom_id.id,
+                "bom_id": self.bom_id.id,
+                "location_src_id": session.source_location_id.id,
+                "location_dest_id": session.bisque_location_id.id,
+                "origin": session.name,
+                "company_id": session.company_id.id,
+                "mb_workflow_kind": "bisque",
+                "mb_bisque_session_id": session.id,
+            }
+        )
         production.action_confirm()
         production.move_raw_ids.filtered(
             lambda move: move.state in ("assigned", "partially_available")
@@ -205,11 +196,13 @@ class MbBisqueSessionLine(models.Model):
             lambda move: move.product_id == self.green_product_id
         )[:1]
         if not green_move:
-            raise UserError(_(
-                "The bill of materials of %(product)s does not consume the "
-                "selected green ware.",
-                product=self.bisque_product_id.display_name,
-            ))
+            raise UserError(
+                _(
+                    "The bill of materials of %(product)s does not consume the "
+                    "selected green ware.",
+                    product=self.bisque_product_id.display_name,
+                )
+            )
         required = green_move.product_uom_qty
         required_product_uom = green_move.product_uom._compute_quantity(
             required, self.green_product_id.uom_id, rounding_method="HALF-UP"
@@ -220,11 +213,14 @@ class MbBisqueSessionLine(models.Model):
             lot_id=self.green_lot_id,
             strict=True,
         )
-        if float_compare(
-            available,
-            required_product_uom,
-            precision_rounding=self.green_product_id.uom_id.rounding,
-        ) < 0:
+        if (
+            float_compare(
+                available,
+                required_product_uom,
+                precision_rounding=self.green_product_id.uom_id.rounding,
+            )
+            < 0
+        ):
             raise UserError(_("The selected green lot does not have enough available stock."))
         taken = green_move._update_reserved_quantity(
             required,
@@ -232,19 +228,24 @@ class MbBisqueSessionLine(models.Model):
             lot_id=self.green_lot_id,
             strict=True,
         )
-        if float_compare(
-            taken,
-            required_product_uom,
-            precision_rounding=self.green_product_id.uom_id.rounding,
-        ) != 0:
+        if (
+            float_compare(
+                taken,
+                required_product_uom,
+                precision_rounding=self.green_product_id.uom_id.rounding,
+            )
+            != 0
+        ):
             raise UserError(_("The exact selected green lot could not be reserved."))
         (production.move_raw_ids - green_move)._action_assign()
         green_move.picked = True
         green_move._action_done(cancel_backorder=True)
-        self.env["mb.board.content"].create({
-            "board_id": session.board_id.id,
-            "production_id": production.id,
-            "quantity": self.quantity,
-        })
+        self.env["mb.board.content"].create(
+            {
+                "board_id": session.board_id.id,
+                "production_id": production.id,
+                "quantity": self.quantity,
+            }
+        )
         self.production_id = production
         return production

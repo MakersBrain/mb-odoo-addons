@@ -60,12 +60,14 @@ def resolve(subpath: str) -> pathlib.Path:
     try:
         out = subprocess.run(
             ["node", "-e", script],
-            cwd=BRAND_ROOT, check=True, capture_output=True, text=True,
+            cwd=BRAND_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
         ).stdout
     except subprocess.CalledProcessError:
         sys.exit(
-            f"cannot resolve @makersbrain/brand/{subpath}.\n"
-            f"Run `npm ci` in {BRAND_ROOT} first."
+            f"cannot resolve @makersbrain/brand/{subpath}.\nRun `npm ci` in {BRAND_ROOT} first."
         )
     return pathlib.Path(out)
 

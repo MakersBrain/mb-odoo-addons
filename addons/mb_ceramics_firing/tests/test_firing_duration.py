@@ -12,23 +12,28 @@ class TestFiringDuration(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.kiln = cls.env["mb.kiln"].create({
-            "name": "Rohde Ecotop 80",
-            "pieces_per_load": 40,
-        })
-        cls.program = cls.env["mb.kiln.program"].create({
-            "kiln_id": cls.kiln.id,
-            "name": "Programme 4",
-            "kind": "glaze",
-            "firing_hours": 11.0,
-            "cooling_hours": 13.0,
-        })
-        cls.product = cls.env["product.product"].create({
-            "name": "Mug", "is_storable": True})
-        cls.bom = cls.env["mrp.bom"].create({
-            "product_tmpl_id": cls.product.product_tmpl_id.id,
-            "product_qty": 1.0,
-        })
+        cls.kiln = cls.env["mb.kiln"].create(
+            {
+                "name": "Rohde Ecotop 80",
+                "pieces_per_load": 40,
+            }
+        )
+        cls.program = cls.env["mb.kiln.program"].create(
+            {
+                "kiln_id": cls.kiln.id,
+                "name": "Programme 4",
+                "kind": "glaze",
+                "firing_hours": 11.0,
+                "cooling_hours": 13.0,
+            }
+        )
+        cls.product = cls.env["product.product"].create({"name": "Mug", "is_storable": True})
+        cls.bom = cls.env["mrp.bom"].create(
+            {
+                "product_tmpl_id": cls.product.product_tmpl_id.id,
+                "product_qty": 1.0,
+            }
+        )
 
     def _operation(self, **overrides):
         values = {
@@ -58,23 +63,26 @@ class TestFiringDuration(TransactionCase):
 
     def test_an_undeclared_programme_overrides_nothing(self):
         """Half-configured data must not schedule an instant firing."""
-        blank = self.env["mb.kiln.program"].create({
-            "kiln_id": self.kiln.id,
-            "name": "Programme 9",
-            "cooling_hours": 8.0,
-        })
-        operation = self._operation(
-            mb_kiln_program_id=blank.id, time_cycle_manual=90.0)
+        blank = self.env["mb.kiln.program"].create(
+            {
+                "kiln_id": self.kiln.id,
+                "name": "Programme 9",
+                "cooling_hours": 8.0,
+            }
+        )
+        operation = self._operation(mb_kiln_program_id=blank.id, time_cycle_manual=90.0)
         self.assertEqual(operation.time_cycle_manual, 90.0)
 
     def test_an_operation_without_a_programme_is_untouched(self):
         bench = self.env.ref("mb_ceramics_base.mb_workcenter_throwing")
-        operation = self.env["mrp.routing.workcenter"].create({
-            "name": "Throwing",
-            "bom_id": self.bom.id,
-            "workcenter_id": bench.id,
-            "time_cycle_manual": 12.0,
-        })
+        operation = self.env["mrp.routing.workcenter"].create(
+            {
+                "name": "Throwing",
+                "bom_id": self.bom.id,
+                "workcenter_id": bench.id,
+                "time_cycle_manual": 12.0,
+            }
+        )
         self.assertEqual(operation.time_cycle_manual, 12.0)
         self.assertFalse(operation.mb_kiln_program_id)
 
@@ -86,36 +94,40 @@ class TestFiringDuration(TransactionCase):
         operation = self._operation()
         expected = self.env["mrp.routing.workcenter"].browse(operation.id)
         with_qty = expected.with_context(
-            product=self.product, quantity=20, unit=self.product.uom_id)
+            product=self.product, quantity=20, unit=self.product.uom_id
+        )
         self.assertEqual(with_qty.cycle_number, 1)
         self.assertEqual(with_qty.time_total, 24 * 60)
 
     def test_forty_one_pieces_need_a_second_firing(self):
         operation = self._operation()
         with_qty = operation.with_context(
-            product=self.product, quantity=41, unit=self.product.uom_id)
+            product=self.product, quantity=41, unit=self.product.uom_id
+        )
         self.assertEqual(with_qty.cycle_number, 2)
         self.assertEqual(with_qty.time_total, 48 * 60)
 
     def test_planned_firing_earmarks_then_loads_ready_work(self):
         operation = self._operation()
-        production = self.env["mrp.production"].create({
-            "product_id": self.product.id,
-            "product_qty": 1,
-            "product_uom_id": self.product.uom_id.id,
-            "bom_id": self.bom.id,
-        })
-        production.action_confirm()
-        workorder = production.workorder_ids.filtered(
-            lambda wo: wo.operation_id == operation
+        production = self.env["mrp.production"].create(
+            {
+                "product_id": self.product.id,
+                "product_qty": 1,
+                "product_uom_id": self.product.uom_id.id,
+                "bom_id": self.bom.id,
+            }
         )
+        production.action_confirm()
+        workorder = production.workorder_ids.filtered(lambda wo: wo.operation_id == operation)
         start = fields.Datetime.now() + timedelta(days=3)
-        firing = self.env["mb.firing"].create({
-            "kiln_id": self.kiln.id,
-            "program_id": self.program.id,
-            "kind": "glaze",
-            "date_planned_start": start,
-        })
+        firing = self.env["mb.firing"].create(
+            {
+                "kiln_id": self.kiln.id,
+                "program_id": self.program.id,
+                "kind": "glaze",
+                "date_planned_start": start,
+            }
+        )
         workorder.mb_plan_firing(firing)
         self.assertEqual(workorder.mb_firing_planned_id, firing)
         self.assertFalse(workorder.mb_firing_id)
@@ -136,10 +148,12 @@ class TestFiringDuration(TransactionCase):
         }
         self.env["mb.firing"].create(values)
         with self.assertRaises(ValidationError):
-            self.env["mb.firing"].create({
-                **values,
-                "date_planned_start": start + timedelta(hours=12),
-            })
+            self.env["mb.firing"].create(
+                {
+                    **values,
+                    "date_planned_start": start + timedelta(hours=12),
+                }
+            )
 
 
 @tagged("post_install", "-at_install")
@@ -150,23 +164,27 @@ class TestMeasuredDuration(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.kiln = cls.env["mb.kiln"].create({"name": "Rohde Ecotop 80"})
-        cls.program = cls.env["mb.kiln.program"].create({
-            "kiln_id": cls.kiln.id,
-            "name": "Programme 4",
-            "kind": "glaze",
-            "firing_hours": 11.0,
-        })
+        cls.program = cls.env["mb.kiln.program"].create(
+            {
+                "kiln_id": cls.kiln.id,
+                "name": "Programme 4",
+                "kind": "glaze",
+                "firing_hours": 11.0,
+            }
+        )
 
     def _firing(self, hours, state="done"):
         start = datetime(2026, 3, 1, 6, 0, 0)
-        return self.env["mb.firing"].create({
-            "kiln_id": self.kiln.id,
-            "program_id": self.program.id,
-            "kind": "glaze",
-            "state": state,
-            "date_start": start,
-            "date_end": start + timedelta(hours=hours),
-        })
+        return self.env["mb.firing"].create(
+            {
+                "kiln_id": self.kiln.id,
+                "program_id": self.program.id,
+                "kind": "glaze",
+                "state": state,
+                "date_start": start,
+                "date_end": start + timedelta(hours=hours),
+            }
+        )
 
     def test_duration_hours_is_end_minus_start(self):
         self.assertEqual(self._firing(11.5).duration_hours, 11.5)

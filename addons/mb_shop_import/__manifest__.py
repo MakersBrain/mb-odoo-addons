@@ -8,7 +8,7 @@ files never mutate business data during parsing; exact variant bindings make
 re-import idempotent and stock baselines prevent stale snapshots from
 overwriting newer Odoo activity.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "license": "LGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",

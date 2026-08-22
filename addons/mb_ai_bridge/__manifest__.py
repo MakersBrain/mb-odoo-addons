@@ -17,4 +17,3 @@ SDKs, routing, quotas, and retries remain outside Odoo in the extraction broker.
     "installable": True,
     "application": False,
 }
-

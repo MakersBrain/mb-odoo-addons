@@ -73,10 +73,17 @@ class Website(models.Model):
             or "." not in hostname
             or hostname == "localhost"
             or hostname in {"example.com", "example.net", "example.org"}
-            or hostname.endswith((
-                ".localhost", ".local", ".test", ".invalid",
-                ".example.com", ".example.net", ".example.org",
-            ))
+            or hostname.endswith(
+                (
+                    ".localhost",
+                    ".local",
+                    ".test",
+                    ".invalid",
+                    ".example.com",
+                    ".example.net",
+                    ".example.org",
+                )
+            )
         ):
             return False
         try:
@@ -94,30 +101,54 @@ class Website(models.Model):
         self.ensure_one()
         website_scope = [False, self.id]
         company_scope = [False, self.company_id.id]
-        products = self.env["product.template"].sudo().search_count([
-            ("active", "=", True),
-            ("sale_ok", "=", True),
-            ("is_published", "=", True),
-            ("website_id", "in", website_scope),
-            ("company_id", "in", company_scope),
-        ])
-        payments = self.env["payment.provider"].sudo().search_count([
-            ("state", "=", "enabled"),
-            ("is_published", "=", True),
-            ("code", "not in", ["none", "custom", "demo"]),
-            ("website_id", "in", website_scope),
-            ("company_id", "=", self.company_id.id),
-        ])
-        fulfilment = self.env["delivery.carrier"].sudo().search_count([
-            ("active", "=", True),
-            ("is_published", "=", True),
-            ("website_id", "in", website_scope),
-            ("company_id", "in", company_scope),
-        ])
-        platform_relay = self.env["ir.module.module"].sudo().search_count([
-            ("name", "=", "mb_email_bridge"),
-            ("state", "=", "installed"),
-        ])
+        products = (
+            self.env["product.template"]
+            .sudo()
+            .search_count(
+                [
+                    ("active", "=", True),
+                    ("sale_ok", "=", True),
+                    ("is_published", "=", True),
+                    ("website_id", "in", website_scope),
+                    ("company_id", "in", company_scope),
+                ]
+            )
+        )
+        payments = (
+            self.env["payment.provider"]
+            .sudo()
+            .search_count(
+                [
+                    ("state", "=", "enabled"),
+                    ("is_published", "=", True),
+                    ("code", "not in", ["none", "custom", "demo"]),
+                    ("website_id", "in", website_scope),
+                    ("company_id", "=", self.company_id.id),
+                ]
+            )
+        )
+        fulfilment = (
+            self.env["delivery.carrier"]
+            .sudo()
+            .search_count(
+                [
+                    ("active", "=", True),
+                    ("is_published", "=", True),
+                    ("website_id", "in", website_scope),
+                    ("company_id", "in", company_scope),
+                ]
+            )
+        )
+        platform_relay = (
+            self.env["ir.module.module"]
+            .sudo()
+            .search_count(
+                [
+                    ("name", "=", "mb_email_bridge"),
+                    ("state", "=", "installed"),
+                ]
+            )
+        )
         company = self.company_id.sudo()
         managed_transport = "mb_webshop_mail_transport" in company._fields
         transport = getattr(company, "mb_webshop_mail_transport", "platform")
@@ -130,10 +161,14 @@ class Website(models.Model):
                 (transport == "platform" and platform_relay)
                 or (
                     not managed_transport
-                    and self.env["ir.mail_server"].sudo().search_count([
-                        ("active", "=", True),
-                        ("smtp_host", "!=", False),
-                    ])
+                    and self.env["ir.mail_server"]
+                    .sudo()
+                    .search_count(
+                        [
+                            ("active", "=", True),
+                            ("smtp_host", "!=", False),
+                        ]
+                    )
                 )
                 or (
                     transport == "smtp"
@@ -159,9 +194,7 @@ class Website(models.Model):
         }
         result["launch_ready"] = self.mb_webshop_enabled and all(
             result[key]
-            for key in (
-                "catalog", "online_payment", "fulfilment", "sender", "domain", "returns"
-            )
+            for key in ("catalog", "online_payment", "fulfilment", "sender", "domain", "returns")
         )
         return result
 
@@ -190,14 +223,12 @@ class Website(models.Model):
     def _check_mb_cart_hold_minutes(self):
         for website in self:
             if not 5 <= website.mb_cart_hold_minutes <= 60:
-                raise ValidationError(_(
-                    "Cart stock holds must last between 5 and 60 minutes."
-                ))
+                raise ValidationError(_("Cart stock holds must last between 5 and 60 minutes."))
 
     @api.constrains("mb_return_window_days")
     def _check_mb_return_window_days(self):
         for website in self:
             if not 7 <= website.mb_return_window_days <= 90:
-                raise ValidationError(_(
-                    "The customer return window must be between 7 and 90 days."
-                ))
+                raise ValidationError(
+                    _("The customer return window must be between 7 and 90 days.")
+                )

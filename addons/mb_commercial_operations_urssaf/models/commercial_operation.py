@@ -14,44 +14,59 @@ class MbCommercialOperation(models.Model):
         compute="_compute_urssaf_recognition_status",
         string="URSSAF Recognition",
     )
-    urssaf_source_ids = fields.Many2many(
+    urssaf_source_ids = fields.One2many(
         "l10n.fr.micro.urssaf.declaration.source",
-        compute="_compute_urssaf_recognition_status",
+        "mb_commercial_operation_id",
         string="URSSAF Evidence",
+        readonly=True,
     )
 
-    @api.depends("analytic_account_id", "company_id")
+    @api.depends(
+        "analytic_account_id",
+        "urssaf_source_ids",
+        "urssaf_source_ids.declaration_state",
+        # The `pending` branch asks whether any revenue exists yet, via
+        # `_get_operation_profitability_items()`. That is a registry which
+        # optional bridge addons extend, so no single addon can name its whole
+        # dependency set; `analytic_evidence_ids` is the native revenue source
+        # every installation has. An operation whose only revenue arrives
+        # through another bridge's evidence may therefore read `pending` one
+        # transaction late. That is a display lag on a computed indicator, not
+        # a declared figure -- the declaration itself is built by
+        # l10n_fr_micro_urssaf from the sources, not from this field.
+        "analytic_evidence_ids.amount",
+    )
     def _compute_urssaf_recognition_status(self):
-        source_model = self.env["l10n.fr.micro.urssaf.declaration.source"].sudo()
         for operation in self:
-            account = operation.analytic_account_id
-            if not account:
-                operation.urssaf_source_ids = False
-                operation.urssaf_recognition_status = "not_applicable"
-                continue
-            candidates = source_model.search([
-                ("company_id", "=", operation.company_id.id),
-            ])
-            sources = candidates.filtered(
-                lambda source, current_operation=operation: (
-                    source.pos_order_id.mb_commercial_operation_id == current_operation
-                    or source.origin_move_id.mb_commercial_operation_id == current_operation
-                )
-            )
-            operation.urssaf_source_ids = sources
+            # Read privileged, assign to the record in `self`. The field is
+            # rendered on the operation form, which `group_commercial_operations_user`
+            # opens, but both inputs sit behind accounting rights: the source
+            # model is readable only by the accounting groups (and narrowed
+            # further by a record rule), and the revenue test reaches
+            # `analytic_evidence_ids` on account.analytic.line. The indicator
+            # says whether the operation has been picked up by a declaration,
+            # not what the declaration says, so it is derivable without
+            # granting sight of either.
+            privileged = operation.sudo()
+            sources = privileged.urssaf_source_ids
+            # Evidence outranks the analytic account: an operation a
+            # declaration has already recognised is not "no recognizable
+            # revenue" merely because its project carries no analytic account.
             if sources:
                 operation.urssaf_recognition_status = (
-                    "filed" if all(source.declaration_state == "filed" for source in sources)
+                    "filed"
+                    if all(source.declaration_state == "filed" for source in sources)
                     else "computed"
                 )
                 continue
+            if not privileged.analytic_account_id:
+                operation.urssaf_recognition_status = "not_applicable"
+                continue
             has_revenue = any(
                 item["component"] == "revenue"
-                for item in operation._get_operation_profitability_items()
+                for item in privileged._get_operation_profitability_items()
             )
-            operation.urssaf_recognition_status = (
-                "pending" if has_revenue else "not_applicable"
-            )
+            operation.urssaf_recognition_status = "pending" if has_revenue else "not_applicable"
 
     def action_view_urssaf_sources(self):
         self.ensure_one()

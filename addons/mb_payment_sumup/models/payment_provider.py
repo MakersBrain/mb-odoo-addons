@@ -8,13 +8,12 @@ from .. import const
 class PaymentProvider(models.Model):
     _inherit = "payment.provider"
 
-    code = fields.Selection(
-        selection_add=[("sumup", "SumUp")], ondelete={"sumup": "set default"})
+    code = fields.Selection(selection_add=[("sumup", "SumUp")], ondelete={"sumup": "set default"})
 
     sumup_api_key = fields.Char(
         string="SumUp Secret Key",
         help="The secret key (sup_sk_...) of this workshop's SumUp account, "
-             "from Developer settings in the SumUp dashboard.",
+        "from Developer settings in the SumUp dashboard.",
         required_if_provider="sumup",
         copy=False,
         # Same posture as every other provider in Odoo: the key is a column in
@@ -25,8 +24,8 @@ class PaymentProvider(models.Model):
     sumup_merchant_code = fields.Char(
         string="SumUp Merchant Code",
         help="The merchant account that receives the money. Every checkout "
-             "names it explicitly, so it has to be the account whose legal "
-             "identity is printed on the invoice.",
+        "names it explicitly, so it has to be the account whose legal "
+        "identity is printed on the invoice.",
         required_if_provider="sumup",
         copy=False,
     )
@@ -36,18 +35,21 @@ class PaymentProvider(models.Model):
     def _compute_feature_support_fields(self):
         """Override of `payment` to declare what SumUp supports."""
         super()._compute_feature_support_fields()
-        self.filtered(lambda p: p.code == "sumup").update({
-            # SumUp refunds a transaction fully or in part, from a separate
-            # endpoint. Capture is not separable: the hosted checkout captures.
-            "support_refund": "partial",
-        })
+        self.filtered(lambda p: p.code == "sumup").update(
+            {
+                # SumUp refunds a transaction fully or in part, from a separate
+                # endpoint. Capture is not separable: the hosted checkout captures.
+                "support_refund": "partial",
+            }
+        )
 
     def _get_supported_currencies(self):
         """Override of `payment` to return the supported currencies."""
         supported_currencies = super()._get_supported_currencies()
         if self.code == "sumup":
             supported_currencies = supported_currencies.filtered(
-                lambda c: c.name in const.SUPPORTED_CURRENCIES)
+                lambda c: c.name in const.SUPPORTED_CURRENCIES
+            )
         return supported_currencies
 
     # === CRUD METHODS === #
@@ -117,9 +119,12 @@ class PaymentProvider(models.Model):
         self.ensure_one()
         merchant_code = self.sudo().sumup_merchant_code
         if not merchant_code:
-            raise UserError(_(
-                "No SumUp merchant code is set on the provider %s. No payment "
-                "can be taken until it is, because the merchant code is what "
-                "decides which account receives the money.", self.display_name
-            ))
+            raise UserError(
+                _(
+                    "No SumUp merchant code is set on the provider %s. No payment "
+                    "can be taken until it is, because the merchant code is what "
+                    "decides which account receives the money.",
+                    self.display_name,
+                )
+            )
         return merchant_code

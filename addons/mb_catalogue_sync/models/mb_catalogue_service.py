@@ -25,8 +25,8 @@ class MbCatalogueService(models.Model):
 
     name = fields.Char(required=True, default="MakersBrain catalogue")
     base_url = fields.Char(
-        string="Base URL", required=True,
-        help="Root URL of the catalogue read API.")
+        string="Base URL", required=True, help="Root URL of the catalogue read API."
+    )
     # Optional bearer credential for this configured catalogue service. Access
     # is restricted to system administrators by the field's group.
     api_key = fields.Char(string="API key", groups="base.group_system")
@@ -91,18 +91,23 @@ class MbCatalogueService(models.Model):
             for reason, count in refused.items():
                 summary["refused"][reason] = summary["refused"].get(reason, 0) + count
 
-        self.write({
-            "last_import_at": fields.Datetime.now(),
-            "last_import_summary": self._format_summary(summary),
-        })
+        self.write(
+            {
+                "last_import_at": fields.Datetime.now(),
+                "last_import_summary": self._format_summary(summary),
+            }
+        )
         return summary
 
     @api.model
     def _format_summary(self, summary):
         lines = [
-            _("%(created)s created, %(updated)s updated, %(offers)s supplier prices.",
-              created=summary["imported"], updated=summary["updated"],
-              offers=summary["offers"]),
+            _(
+                "%(created)s created, %(updated)s updated, %(offers)s supplier prices.",
+                created=summary["imported"],
+                updated=summary["updated"],
+                offers=summary["offers"],
+            ),
         ]
         # Refusals are reported, never hidden. An import that silently dropped
         # half the offers looks exactly like a supplier that has no prices.

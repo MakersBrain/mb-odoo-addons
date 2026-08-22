@@ -4,7 +4,6 @@ Functional modules remain installed. This only controls their root menu tiles,
 so dependencies keep working underneath the workshop features that use them.
 """
 
-
 VISIBLE_APPS = (
     "sale.sale_menu_root",
     "mb_workshop_base.menu_mb_workshop_root",
@@ -48,10 +47,12 @@ admin_only, missing_admin = resolve(ADMIN_ONLY_APPS)
 
 visible.write({"active": True})
 hidden.write({"active": False})
-admin_only.write({
-    "active": True,
-    "group_ids": [(6, 0, [env.ref("base.group_system").id])],
-})
+admin_only.write(
+    {
+        "active": True,
+        "group_ids": [(6, 0, [env.ref("base.group_system").id])],
+    }
+)
 
 env.cr.commit()
 

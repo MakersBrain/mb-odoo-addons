@@ -4,7 +4,6 @@ import re
 from odoo import _, fields, models, tools
 from odoo.exceptions import ValidationError
 
-
 HOSTNAME_RE = re.compile(
     r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+"
     r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"
@@ -45,8 +44,10 @@ class ResCompany(models.Model):
             "host": server.smtp_host if server else None,
             "port": server.smtp_port if server else None,
             "encryption": (
-                "starttls" if server and server.smtp_encryption == "starttls_strict"
-                else "ssl" if server and server.smtp_encryption == "ssl_strict"
+                "starttls"
+                if server and server.smtp_encryption == "starttls_strict"
+                else "ssl"
+                if server and server.smtp_encryption == "ssl_strict"
                 else None
             ),
             "username": server.smtp_user if server else None,
@@ -88,29 +89,37 @@ class ResCompany(models.Model):
         # The controller converts exceptions into JSON responses, so this savepoint
         # must roll back the candidate even when the outer request keeps running.
         with self.env.cr.savepoint():
-            candidate = self.env["ir.mail_server"].sudo().create({
-                "name": f"MakersBrain webshop SMTP · {self.name}",
-                "from_filter": from_email,
-                "smtp_host": host,
-                "smtp_port": port,
-                "smtp_authentication": "login",
-                "smtp_user": username,
-                "smtp_pass": password,
-                "smtp_encryption": {
-                    "starttls": "starttls_strict",
-                    "ssl": "ssl_strict",
-                }[encryption],
-                "sequence": 1,
-                "active": True,
-                "smtp_debug": False,
-                "mb_webshop_smtp": True,
-            })
+            candidate = (
+                self.env["ir.mail_server"]
+                .sudo()
+                .create(
+                    {
+                        "name": f"MakersBrain webshop SMTP · {self.name}",
+                        "from_filter": from_email,
+                        "smtp_host": host,
+                        "smtp_port": port,
+                        "smtp_authentication": "login",
+                        "smtp_user": username,
+                        "smtp_pass": password,
+                        "smtp_encryption": {
+                            "starttls": "starttls_strict",
+                            "ssl": "ssl_strict",
+                        }[encryption],
+                        "sequence": 1,
+                        "active": True,
+                        "smtp_debug": False,
+                        "mb_webshop_smtp": True,
+                    }
+                )
+            )
             candidate.test_smtp_connection()
-            self.write({
-                "email": from_email,
-                "mb_webshop_mail_transport": "smtp",
-                "mb_webshop_smtp_server_id": candidate.id,
-            })
+            self.write(
+                {
+                    "email": from_email,
+                    "mb_webshop_mail_transport": "smtp",
+                    "mb_webshop_smtp_server_id": candidate.id,
+                }
+            )
         if old_server and old_server != candidate:
             old_server.unlink()
         return self.mb_webshop_smtp_status(payload)
@@ -118,10 +127,12 @@ class ResCompany(models.Model):
     def mb_reset_webshop_smtp(self, payload):
         self._mb_check_smtp_scope(payload)
         server = self.mb_webshop_smtp_server_id.sudo().exists()
-        self.write({
-            "mb_webshop_mail_transport": "platform",
-            "mb_webshop_smtp_server_id": False,
-        })
+        self.write(
+            {
+                "mb_webshop_mail_transport": "platform",
+                "mb_webshop_smtp_server_id": False,
+            }
+        )
         if server:
             server.unlink()
         return self.mb_webshop_smtp_status(payload)

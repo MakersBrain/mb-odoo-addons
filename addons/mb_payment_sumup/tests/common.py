@@ -2,15 +2,17 @@ from odoo.addons.payment.tests.common import PaymentCommon
 
 
 class SumUpCommon(PaymentCommon):
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.sumup = cls._prepare_provider("sumup", update_values={
-            "sumup_api_key": "sup_sk_dummy",
-            "sumup_merchant_code": "MCTEST01",
-        })
+        cls.sumup = cls._prepare_provider(
+            "sumup",
+            update_values={
+                "sumup_api_key": "sup_sk_dummy",
+                "sumup_merchant_code": "MCTEST01",
+            },
+        )
         cls.provider = cls.sumup
         cls.currency = cls.currency_euro
 
@@ -35,11 +37,13 @@ class SumUpCommon(PaymentCommon):
         return dict(
             cls.checkout_data,
             status="PAID",
-            transactions=[{
-                "id": transaction_id,
-                "transaction_code": "TEEPUC2VLF",
-                "amount": cls.amount,
-                "currency": "EUR",
-                "status": "SUCCESSFUL",
-            }],
+            transactions=[
+                {
+                    "id": transaction_id,
+                    "transaction_code": "TEEPUC2VLF",
+                    "amount": cls.amount,
+                    "currency": "EUR",
+                    "status": "SUCCESSFUL",
+                }
+            ],
         )

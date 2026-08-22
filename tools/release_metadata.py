@@ -84,7 +84,9 @@ def selected_runtime(runtime, qualified):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--extension-ref", required=True)
-    parser.add_argument("--extension-subject-kind", choices=("image_index", "image_manifest"), required=True)
+    parser.add_argument(
+        "--extension-subject-kind", choices=("image_index", "image_manifest"), required=True
+    )
     parser.add_argument("--extension-manifest-digest", required=True)
     parser.add_argument("--extension-config-digest", required=True)
     parser.add_argument("--payload-manifest", required=True)
@@ -107,9 +109,7 @@ def main():
         evidence = read_json(args.evidence)
         required_evidence = {"signature_bundle", "sbom", "vulnerability_report"}
         if set(evidence) != required_evidence:
-            raise ValueError(
-                f"extension evidence keys must be exactly {sorted(required_evidence)}"
-            )
+            raise ValueError(f"extension evidence keys must be exactly {sorted(required_evidence)}")
         selected_runtime(runtime, payload["qualified_odoo_runtime"])
         checked_digest(payload["payload_digest"], "payload tree")
         for name, item in evidence.items():
@@ -175,14 +175,16 @@ def main():
         "bridge_contract": bridge,
         "bridge_contract_digest": f"sha256:{bridge['sha256']}",
         "evidence_object_digest": canonical_digest(evidence),
-        "pair_qualifications": [{
-            "platform": payload["platform"],
-            "odoo_manifest_digest": payload["qualified_odoo_runtime"]["manifest_digest"],
-            "extension_manifest_digest": extension_manifest_digest,
-            "payload_digest": payload["payload_digest"],
-            "qualification_digest": canonical_digest(pair_input),
-            "qualification_result": args.qualification_result,
-        }],
+        "pair_qualifications": [
+            {
+                "platform": payload["platform"],
+                "odoo_manifest_digest": payload["qualified_odoo_runtime"]["manifest_digest"],
+                "extension_manifest_digest": extension_manifest_digest,
+                "payload_digest": payload["payload_digest"],
+                "qualification_digest": canonical_digest(pair_input),
+                "qualification_result": args.qualification_result,
+            }
+        ],
     }
     rendered = json.dumps(metadata, indent=2, sort_keys=True) + "\n"
     if args.output:

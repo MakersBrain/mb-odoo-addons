@@ -8,8 +8,8 @@ class ProductTemplate(models.Model):
     mb_supplier_lot_required = fields.Boolean(
         string="Supplier lot required",
         help="Require this purchased material to retain the supplier's physical "
-             "batch in Odoo lot traceability. This is independent from whether a "
-             "finished article is intended for food contact.",
+        "batch in Odoo lot traceability. This is independent from whether a "
+        "finished article is intended for food contact.",
     )
 
     @api.onchange("mb_supplier_lot_required")
@@ -23,8 +23,10 @@ class ProductTemplate(models.Model):
     def _check_supplier_lot_tracking(self):
         for template in self:
             if template.mb_supplier_lot_required and template.tracking == "none":
-                raise ValidationError(_(
-                    "%s requires its supplier batch to be retained and must be "
-                    "tracked by lot or serial number.",
-                    template.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "%s requires its supplier batch to be retained and must be "
+                        "tracked by lot or serial number.",
+                        template.display_name,
+                    )
+                )

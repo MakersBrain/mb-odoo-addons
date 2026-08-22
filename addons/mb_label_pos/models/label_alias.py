@@ -21,7 +21,8 @@ class MbLabelQrAlias(models.Model):
         if not location:
             return 0.0
         return self.env["stock.quant"]._get_available_quantity(
-            product, location, lot_id=lot or None, strict=False)
+            product, location, lot_id=lot or None, strict=False
+        )
 
     @api.model
     def _load_pos_data_domain(self, data, config):
@@ -35,14 +36,20 @@ class MbLabelQrAlias(models.Model):
     @api.model
     def _load_pos_data_fields(self, config):
         return [
-            "id", "value", "active", "product_id", "lot_name", "qr_url_prefix",
+            "id",
+            "value",
+            "active",
+            "product_id",
+            "lot_name",
+            "qr_url_prefix",
             "pos_available_quantity",
         ]
 
     @api.model
     def _load_pos_data_search_read(self, data, config):
-        return super(MbLabelQrAlias, self.with_context(active_test=False))._load_pos_data_search_read(
-            data, config)
+        return super(
+            MbLabelQrAlias, self.with_context(active_test=False)
+        )._load_pos_data_search_read(data, config)
 
     @api.model
     def _load_pos_data_read(self, records, config):
@@ -57,13 +64,17 @@ class MbLabelQrAlias(models.Model):
             # Match stock.quant._get_available_quantity(), which is sudoed.
             # The source location and products are already bounded by the POS
             # config and its product projection.
-            grouped_quants = self.env["stock.quant"].sudo()._read_group(
-                [
-                    ("location_id", "child_of", location.id),
-                    ("product_id", "in", product_ids),
-                ],
-                ["product_id", "lot_id"],
-                ["quantity:sum", "reserved_quantity:sum"],
+            grouped_quants = (
+                self.env["stock.quant"]
+                .sudo()
+                ._read_group(
+                    [
+                        ("location_id", "child_of", location.id),
+                        ("product_id", "in", product_ids),
+                    ],
+                    ["product_id", "lot_id"],
+                    ["quantity:sum", "reserved_quantity:sum"],
+                )
             )
             tracked_products = storable_aliases.product_id.filtered(
                 lambda product: product.tracking != "none"
@@ -104,17 +115,22 @@ class MbLabelQrAlias(models.Model):
         if not config:
             return {"status": "invalid_config"}
         value = normalize_qr(value)
-        exact = self.with_context(active_test=False).search([
-            ("company_id", "=", config.company_id.id),
-            ("value", "=", value),
-        ], limit=1)
+        exact = self.with_context(active_test=False).search(
+            [
+                ("company_id", "=", config.company_id.id),
+                ("value", "=", value),
+            ],
+            limit=1,
+        )
         if exact:
             if not exact.active:
                 return {"status": "retired"}
-            if not exact.product_id.product_tmpl_id.available_in_pos or not exact.product_id.sale_ok:
+            if (
+                not exact.product_id.product_tmpl_id.available_in_pos
+                or not exact.product_id.sale_ok
+            ):
                 return {"status": "not_available"}
-            available = self._pos_available_quantity(
-                exact.product_id, exact.lot_id, config)
+            available = self._pos_available_quantity(exact.product_id, exact.lot_id, config)
             if available is not None and available <= 0:
                 return {"status": "out_of_stock"}
             return {
@@ -126,10 +142,17 @@ class MbLabelQrAlias(models.Model):
                 "available_quantity": available,
             }
 
-        foreign = self.sudo().with_context(active_test=False).search([
-            ("company_id", "!=", config.company_id.id),
-            ("value", "=", value),
-        ], limit=1)
+        foreign = (
+            self.sudo()
+            .with_context(active_test=False)
+            .search(
+                [
+                    ("company_id", "!=", config.company_id.id),
+                    ("value", "=", value),
+                ],
+                limit=1,
+            )
+        )
         if foreign:
             return {"status": "wrong_company"}
 

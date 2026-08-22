@@ -24,6 +24,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 try:
     import polib
@@ -62,7 +63,7 @@ def seed(module: str, prefill: bool, report_only: bool) -> int:
         return 1
 
     pot = polib.pofile(str(pot_path))
-    existing: dict[tuple[str, str, str], object] = {}
+    existing: dict[tuple[str, str, str], Any] = {}
     if po_path.exists():
         for entry in polib.pofile(str(po_path)):
             if not entry.obsolete:
@@ -79,7 +80,9 @@ def seed(module: str, prefill: bool, report_only: bool) -> int:
         f"\t* {module}\n"
     )
     catalogue.metadata = dict(
-        line.split(": ", 1) for line in HEADER.strip().splitlines() if ": " in line or line.endswith(": ")
+        line.split(": ", 1)
+        for line in HEADER.strip().splitlines()
+        if ": " in line or line.endswith(": ")
     )
     # Preserve the two headers whose value is legitimately empty.
     catalogue.metadata.setdefault("Report-Msgid-Bugs-To", "")
@@ -145,7 +148,9 @@ def seed(module: str, prefill: bool, report_only: bool) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("modules", nargs="+", metavar="MODULE")
     parser.add_argument("--no-prefill", action="store_true", help="leave every new entry empty")
     parser.add_argument("--report", action="store_true", help="report counts without writing")

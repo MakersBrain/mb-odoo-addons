@@ -23,13 +23,11 @@ def append_sale_selector_price(products):
 
     for product in products:
         price = (
-            pricelist._get_product_price(
-                product, 1.0, uom=uom or None, date=price_date or None)
+            pricelist._get_product_price(product, 1.0, uom=uom or None, date=price_date or None)
             if pricelist
             else product.list_price
         )
-        formatted_price = format_amount(
-            products.env, price, currency, trailing_zeroes=False)
+        formatted_price = format_amount(products.env, price, currency, trailing_zeroes=False)
         product.display_name = f"{product.display_name} — {formatted_price}"
 
 

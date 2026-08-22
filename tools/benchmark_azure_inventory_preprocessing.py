@@ -11,11 +11,11 @@ import time
 import urllib.parse
 import zipfile
 from pathlib import Path, PurePosixPath
-
-from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+from typing import Any
 
 from benchmark_azure_inventory_capture import analyze, evaluate, result_text
 from evaluate_inventory_capture import EXPECTED, MAX_BYTES, sanitize
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 
 VARIANTS = ("grayscale_autocontrast", "grayscale_high_contrast", "black_white")
 
@@ -56,8 +56,10 @@ def preprocess(source: bytes, variant: str) -> tuple[bytes, str]:
             image_format = "JPEG"
             mimetype = "image/jpeg"
         elif variant == "grayscale_high_contrast":
-            output_image = ImageEnhance.Contrast(contrasted).enhance(1.8).filter(
-                ImageFilter.UnsharpMask(radius=1.5, percent=160, threshold=2)
+            output_image = (
+                ImageEnhance.Contrast(contrasted)
+                .enhance(1.8)
+                .filter(ImageFilter.UnsharpMask(radius=1.5, percent=160, threshold=2))
             )
             image_format = "JPEG"
             mimetype = "image/jpeg"
@@ -92,10 +94,14 @@ def main() -> int:
     endpoint = os.environ.get("AZURE_DOCUMENT_ENDPOINT", "").strip()
     key = os.environ.get("AZURE_DOCUMENT_KEY", "").strip()
     parsed = urllib.parse.urlsplit(endpoint)
-    if parsed.scheme != "https" or not parsed.hostname or not parsed.hostname.endswith(
-        ".cognitiveservices.azure.com"
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or not parsed.hostname.endswith(".cognitiveservices.azure.com")
     ):
-        raise SystemExit("AZURE_DOCUMENT_ENDPOINT must be an Azure Cognitive Services HTTPS endpoint")
+        raise SystemExit(
+            "AZURE_DOCUMENT_ENDPOINT must be an Azure Cognitive Services HTTPS endpoint"
+        )
     if not key:
         raise SystemExit("AZURE_DOCUMENT_KEY is required")
 
@@ -104,7 +110,7 @@ def main() -> int:
     if unknown:
         raise SystemExit(f"unknown sample name(s): {', '.join(unknown)}")
     variants = args.variant or list(VARIANTS)
-    report = {"images": {}, "variants": variants}
+    report: dict[str, Any] = {"images": {}, "variants": variants}
     with zipfile.ZipFile(args.zip_path) as archive:
         members = {
             PurePosixPath(info.filename).name: info

@@ -1,11 +1,9 @@
-from __future__ import annotations
-
-from datetime import datetime
 import hashlib
 import hmac
 import json
 import re
 import time
+from datetime import datetime
 from urllib.parse import urlsplit
 
 import requests
@@ -29,7 +27,6 @@ from odoo.addons.mb_webshop_carrier_base.provider import (
     register_provider,
 )
 
-
 BASE_URL = "https://panel.sendcloud.sc"
 JSON_LIMIT = 2 * 1024 * 1024
 DOCUMENT_LIMIT = 16 * 1024 * 1024
@@ -37,9 +34,33 @@ SIGNATURE = re.compile(r"^[0-9a-fA-F]{64}$")
 TERMINAL_CANCELLED = {"CANCELLED", "CANCELLATION_REQUESTED_AND_ACCEPTED"}
 TERMINAL_CANCEL_REJECTED = {"CANCELLATION_FAILED", "CANCELLATION_REJECTED"}
 EU_COUNTRIES = {
-    "AT", "BE", "BG", "HR", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR",
-    "GR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO",
-    "SE", "SI", "SK",
+    "AT",
+    "BE",
+    "BG",
+    "HR",
+    "CY",
+    "CZ",
+    "DE",
+    "DK",
+    "EE",
+    "ES",
+    "FI",
+    "FR",
+    "GR",
+    "HU",
+    "IE",
+    "IT",
+    "LT",
+    "LU",
+    "LV",
+    "MT",
+    "NL",
+    "PL",
+    "PT",
+    "RO",
+    "SE",
+    "SI",
+    "SK",
 }
 
 
@@ -154,13 +175,18 @@ class SendcloudProvider:
         if response.status_code >= 500:
             raise ProviderUnavailableError("provider_unavailable")
         if response.status_code == 404 and operation in {
-            "tracking", "shipment_lookup", "return_lookup", "document"
+            "tracking",
+            "shipment_lookup",
+            "return_lookup",
+            "document",
         }:
             raise ProviderTransientError("resource_not_ready")
         if response.status_code >= 400:
             raise ProviderValidationError("request_rejected")
 
-    def _request(self, method, path, *, params=None, payload=None, operation="read", allow_409=False):
+    def _request(
+        self, method, path, *, params=None, payload=None, operation="read", allow_409=False
+    ):
         mutation = method in {"POST", "PUT", "PATCH", "DELETE"}
         attempts = 1 if mutation else 3
         for attempt in range(attempts):
@@ -190,7 +216,9 @@ class SendcloudProvider:
                 if mutation or attempt + 1 >= attempts:
                     raise
                 retry_after = response.headers.get("Retry-After", "")
-                delay = min(float(retry_after), 1.0) if retry_after.isdigit() else 0.05 * (2**attempt)
+                delay = (
+                    min(float(retry_after), 1.0) if retry_after.isdigit() else 0.05 * (2**attempt)
+                )
                 time.sleep(delay)
                 continue
             return response, self._bounded_json(response)
@@ -207,8 +235,11 @@ class SendcloudProvider:
                 else "application/pdf"
             )
             response = self.session.get(
-                link, auth=self.auth, headers={"Accept": wanted},
-                timeout=(3.05, 20), allow_redirects=False,
+                link,
+                auth=self.auth,
+                headers={"Accept": wanted},
+                timeout=(3.05, 20),
+                allow_redirects=False,
             )
         except (requests.Timeout, requests.ConnectionError) as error:
             raise ProviderUnavailableError("document_unavailable") from error
@@ -233,7 +264,9 @@ class SendcloudProvider:
             "name": str(value["name"])[:255],
             "company_name": str(value.get("company") or "")[:255],
             "address_line_1": str(value["street_name"])[:255],
-            "address_line_2": str(value.get("street2") or value.get("house_number_addition") or "")[:255],
+            "address_line_2": str(value.get("street2") or value.get("house_number_addition") or "")[
+                :255
+            ],
             "house_number": str(value["house_number"])[:32],
             "postal_code": str(value["zip"])[:32],
             "city": str(value["city"])[:128],
@@ -247,8 +280,7 @@ class SendcloudProvider:
         if not sender_id:
             raise ProviderValidationError("sender_address_required")
         _, payload = self._request(
-            "GET", f"/api/v3/addresses/sender-addresses/{sender_id}",
-            operation="sender_address"
+            "GET", f"/api/v3/addresses/sender-addresses/{sender_id}", operation="sender_address"
         )
         data = payload.get("data", payload)
         if not isinstance(data, dict) or str(data.get("id", sender_id)) != str(sender_id):
@@ -270,21 +302,27 @@ class SendcloudProvider:
 
     def _dimensions(self, parcel):
         return {
-            "length": parcel.length_cm or float(getattr(self.carrier, "mb_sendcloud_length_cm", 0) or 0),
-            "width": parcel.width_cm or float(getattr(self.carrier, "mb_sendcloud_width_cm", 0) or 0),
-            "height": parcel.height_cm or float(getattr(self.carrier, "mb_sendcloud_height_cm", 0) or 0),
+            "length": parcel.length_cm
+            or float(getattr(self.carrier, "mb_sendcloud_length_cm", 0) or 0),
+            "width": parcel.width_cm
+            or float(getattr(self.carrier, "mb_sendcloud_width_cm", 0) or 0),
+            "height": parcel.height_cm
+            or float(getattr(self.carrier, "mb_sendcloud_height_cm", 0) or 0),
             "unit": "cm",
         }
 
     def check_credentials(self):
         self._request("GET", "/api/v3/user/auth/metadata", operation="credentials")
         _, addresses = self._request(
-            "GET", "/api/v3/addresses/sender-addresses",
+            "GET",
+            "/api/v3/addresses/sender-addresses",
             operation="sender_addresses",
         )
         data = addresses.get("data", addresses if isinstance(addresses, list) else [])
         sender_id = int(getattr(self.carrier, "mb_sendcloud_sender_address_id", 0) or 0)
-        sender_valid = any(str(item.get("id")) == str(sender_id) for item in data if isinstance(item, dict))
+        sender_valid = any(
+            str(item.get("id")) == str(sender_id) for item in data if isinstance(item, dict)
+        )
         service = getattr(self.carrier, "mb_provider_service_code", "") or ""
         return CredentialStatus(
             bool(sender_valid and service),
@@ -295,7 +333,11 @@ class SendcloudProvider:
 
     def list_services(self):
         code = getattr(self.carrier, "mb_provider_service_code", "") or ""
-        return [ShippingService(code, code, supports_pickup_points=True, supports_returns=True)] if code else []
+        return (
+            [ShippingService(code, code, supports_pickup_points=True, supports_returns=True)]
+            if code
+            else []
+        )
 
     def shipping_options(self, query):
         payload = {
@@ -330,21 +372,23 @@ class SendcloudProvider:
                 continue
             quotes = item.get("quotes") or []
             quote = quotes[0] if quotes and isinstance(quotes[0], dict) else {}
-            price = ((quote.get("price") or {}).get("total") or quote.get("price") or {})
+            price = (quote.get("price") or {}).get("total") or quote.get("price") or {}
             functionalities = item.get("functionalities") or {}
             requirements = item.get("requirements") or {}
-            result.append(ShippingOption(
-                code=str(item["code"]),
-                name=str(item.get("name") or item["code"]),
-                carrier_code=str((item.get("carrier") or {}).get("code") or ""),
-                price=float(price.get("value") or 0),
-                currency=str(price.get("currency") or "EUR"),
-                supports_pickup_points=bool(
-                    requirements.get("is_service_point_required")
-                    or functionalities.get("last_mile") == "service_point"
-                ),
-                supports_returns=bool(functionalities.get("returns")),
-            ))
+            result.append(
+                ShippingOption(
+                    code=str(item["code"]),
+                    name=str(item.get("name") or item["code"]),
+                    carrier_code=str((item.get("carrier") or {}).get("code") or ""),
+                    price=float(price.get("value") or 0),
+                    currency=str(price.get("currency") or "EUR"),
+                    supports_pickup_points=bool(
+                        requirements.get("is_service_point_required")
+                        or functionalities.get("last_mile") == "service_point"
+                    ),
+                    supports_returns=bool(functionalities.get("returns")),
+                )
+            )
         return result
 
     def search_pickup_points(self, query):
@@ -371,15 +415,24 @@ class SendcloudProvider:
         return PickupPoint(
             code=str(item.get("id") or item.get("code") or ""),
             name=str(item.get("name") or address.get("company_name") or "Service point"),
-            street=" ".join(filter(None, (
-                str(address.get("street") or address.get("address_line_1") or "").strip(),
-                str(address.get("house_number") or "").strip(),
-            ))),
+            street=" ".join(
+                filter(
+                    None,
+                    (
+                        str(address.get("street") or address.get("address_line_1") or "").strip(),
+                        str(address.get("house_number") or "").strip(),
+                    ),
+                )
+            ),
             zip=str(address.get("postal_code") or ""),
             city=str(address.get("city") or ""),
             country_code=str(address.get("country_code") or ""),
-            latitude=float(location.get("latitude")) if location.get("latitude") is not None else None,
-            longitude=float(location.get("longitude")) if location.get("longitude") is not None else None,
+            latitude=float(location.get("latitude"))
+            if location.get("latitude") is not None
+            else None,
+            longitude=float(location.get("longitude"))
+            if location.get("longitude") is not None
+            else None,
             opening_hours=item.get("opening_times") or item.get("opening_hours") or {},
         )
 
@@ -420,8 +473,7 @@ class SendcloudProvider:
         if international and (
             not parcel_items
             or any(
-                not item.get("hs_code") or not item.get("origin_country")
-                for item in parcel_items
+                not item.get("hs_code") or not item.get("origin_country") for item in parcel_items
             )
         ):
             raise ProviderValidationError("shipment_customs_data_required")
@@ -434,14 +486,18 @@ class SendcloudProvider:
                 "type": "shipping_option_code",
                 "properties": {"shipping_option_code": service},
             },
-            "parcels": [{
-                "source_id": request.idempotency_key,
-                "weight": {"value": parcel.weight_kg, "unit": "kg"},
-                "dimensions": self._dimensions(parcel),
-                "parcel_items": parcel_items,
-            }],
+            "parcels": [
+                {
+                    "source_id": request.idempotency_key,
+                    "weight": {"value": parcel.weight_kg, "unit": "kg"},
+                    "dimensions": self._dimensions(parcel),
+                    "parcel_items": parcel_items,
+                }
+            ],
             "label_details": {
-                "mime_type": "application/zpl" if getattr(self.carrier, "mb_label_format", "") == "ZPL" else "application/pdf",
+                "mime_type": "application/zpl"
+                if getattr(self.carrier, "mb_label_format", "") == "ZPL"
+                else "application/pdf",
                 "size": {"A4": "a4", "A5": "a5", "10x15": "a6", "ZPL": "a6"}.get(
                     getattr(self.carrier, "mb_label_format", "A4"), "a4"
                 ),
@@ -475,7 +531,9 @@ class SendcloudProvider:
             tracking_url = tracking_url or str(parcel.get("tracking_url") or "")
             document_entries = parcel.get("documents") or []
             if not document_entries and parcel.get("id"):
-                document_entries = [{"link": f"{BASE_URL}/api/v3/parcels/{parcel['id']}/documents/label"}]
+                document_entries = [
+                    {"link": f"{BASE_URL}/api/v3/parcels/{parcel['id']}/documents/label"}
+                ]
             for entry in document_entries:
                 if entry.get("type", "label") == "label" and entry.get("link"):
                     try:
@@ -496,8 +554,11 @@ class SendcloudProvider:
 
     def create_shipment(self, request):
         response, payload = self._request(
-            "POST", "/api/v3/shipments/announce", payload=self._shipment_payload(request),
-            operation="create_shipment", allow_409=True,
+            "POST",
+            "/api/v3/shipments/announce",
+            payload=self._shipment_payload(request),
+            operation="create_shipment",
+            allow_409=True,
         )
         if response.status_code == 409:
             associated = payload.get("data") or payload.get("shipment")
@@ -511,7 +572,8 @@ class SendcloudProvider:
 
     def reconcile_shipment(self, request):
         _, payload = self._request(
-            "GET", "/api/v3/shipments",
+            "GET",
+            "/api/v3/shipments",
             params={"external_reference_id": request.idempotency_key},
             operation="shipment_lookup",
         )
@@ -528,16 +590,15 @@ class SendcloudProvider:
             else f"/api/v3/shipments/{provider_ref}"
         )
         _, payload = self._request(
-            "GET", path,
+            "GET",
+            path,
             operation="return_lookup" if direction == "return" else "shipment_lookup",
         )
         if direction == "return":
             data = payload.get("data", payload)
             label = data.get("label") or {}
             link = (
-                label.get("normal_printer")
-                or label.get("label_printer")
-                or data.get("label_url")
+                label.get("normal_printer") or label.get("label_printer") or data.get("label_url")
             )
             shaped = dict(data)
             shaped["id"] = provider_ref
@@ -548,8 +609,10 @@ class SendcloudProvider:
 
     def cancel_shipment(self, provider_ref):
         response, payload = self._request(
-            "POST", f"/api/v3/shipments/{provider_ref}/cancel",
-            operation="cancel_shipment", allow_409=True,
+            "POST",
+            f"/api/v3/shipments/{provider_ref}/cancel",
+            operation="cancel_shipment",
+            allow_409=True,
         )
         if response.status_code == 409:
             return CancellationResult("pending")
@@ -564,16 +627,18 @@ class SendcloudProvider:
         parcel = request.parcels[0]
         items = []
         for item in request.items:
-            items.append({
-                "description": item.get("description"),
-                "quantity": item.get("quantity"),
-                "weight": {"value": item.get("weight_kg"), "unit": "kg"},
-                "value": {"value": item.get("value"), "currency": item.get("currency", "EUR")},
-                "hs_code": item.get("hs_code") or None,
-                "origin_country": item.get("origin_country") or None,
-                "sku": item.get("sku") or None,
-                "product_id": item.get("product_id") or None,
-            })
+            items.append(
+                {
+                    "description": item.get("description"),
+                    "quantity": item.get("quantity"),
+                    "weight": {"value": item.get("weight_kg"), "unit": "kg"},
+                    "value": {"value": item.get("value"), "currency": item.get("currency", "EUR")},
+                    "hs_code": item.get("hs_code") or None,
+                    "origin_country": item.get("origin_country") or None,
+                    "sku": item.get("sku") or None,
+                    "product_id": item.get("product_id") or None,
+                }
+            )
         payload = {
             "from_address": self._address(request.sender),
             "to_address": self._selected_sender(request.recipient),
@@ -601,24 +666,21 @@ class SendcloudProvider:
         )
         if international and (
             not items
-            or any(
-                not item.get("hs_code") or not item.get("origin_country")
-                for item in items
-            )
+            or any(not item.get("hs_code") or not item.get("origin_country") for item in items)
         ):
             raise ProviderValidationError("return_customs_data_required")
         response, result = self._request(
-            "POST", "/api/v3/returns/announce-synchronously",
-            payload=payload, operation="create_return",
+            "POST",
+            "/api/v3/returns/announce-synchronously",
+            payload=payload,
+            operation="create_return",
         )
         if response.status_code != 201:
             raise ProviderValidationError("return_rejected")
         return self._submission(result, kind="return_label")
 
     def cancel_return(self, provider_ref):
-        self._request(
-            "PATCH", f"/api/v3/returns/{provider_ref}/cancel", operation="cancel_return"
-        )
+        self._request("PATCH", f"/api/v3/returns/{provider_ref}/cancel", operation="cancel_return")
         return CancellationResult("pending")
 
     def reconcile_cancellation(self, provider_ref, direction="outbound"):
@@ -628,7 +690,8 @@ class SendcloudProvider:
             else f"/api/v3/shipments/{provider_ref}"
         )
         _, payload = self._request(
-            "GET", path,
+            "GET",
+            path,
             operation="return_lookup" if direction == "return" else "shipment_lookup",
         )
         data = payload.get("data", payload)
@@ -658,7 +721,9 @@ class SendcloudProvider:
                 "GET", f"/api/v3/shipments/{provider_ref}", operation="shipment_lookup"
             )
             parcels = shipment.get("data", shipment).get("parcels", [])
-            tracking_number = next((str(p.get("tracking_number")) for p in parcels if p.get("tracking_number")), "")
+            tracking_number = next(
+                (str(p.get("tracking_number")) for p in parcels if p.get("tracking_number")), ""
+            )
             if not tracking_number:
                 raise ProviderTransientError("tracking_not_available_yet")
         _, payload = self._request(
@@ -676,25 +741,27 @@ class SendcloudProvider:
                 ),
                 message=str(
                     (item.get("status") or {}).get("message")
-                    or item.get("status_description") or item.get("message") or ""
+                    or item.get("status_description")
+                    or item.get("message")
+                    or ""
                 )[:512],
                 occurred_at=_parse_datetime(
                     item.get("event_at") or item.get("timestamp") or item.get("occurred_at")
                 ),
             )
-            for item in timeline[:50] if isinstance(item, dict)
+            for item in timeline[:50]
+            if isinstance(item, dict)
         )
         latest = max(
             events,
             key=lambda event: event.occurred_at or datetime.min,
             default=None,
         )
-        code = _status_key(
-            latest.status_code if latest else data.get("parent_status") or "UNKNOWN"
-        )
+        code = _status_key(latest.status_code if latest else data.get("parent_status") or "UNKNOWN")
         tracking = next(
             (
-                item for item in data.get("tracking_numbers", [])
+                item
+                for item in data.get("tracking_numbers", [])
                 if str(item.get("tracking_number") or "") == tracking_number
             ),
             {},
@@ -706,8 +773,10 @@ class SendcloudProvider:
             message=(latest.message if latest else "")[:512],
             tracking_number=tracking_number,
             tracking_url=str(
-                tracking.get("tracking_url") or data.get("tracking_url")
-                or data.get("tracking_page_url") or ""
+                tracking.get("tracking_url")
+                or data.get("tracking_url")
+                or data.get("tracking_page_url")
+                or ""
             ),
             event_at=event_at,
             expected_delivery_at=_parse_datetime(
@@ -738,16 +807,22 @@ class SendcloudProvider:
         timeline = parcel.get("events") or parcel.get("timeline") or []
         latest = max(
             (item for item in timeline if isinstance(item, dict)),
-            key=lambda item: _parse_datetime(
-                item.get("event_at") or item.get("timestamp") or item.get("occurred_at")
-            ) or datetime.min,
+            key=lambda item: (
+                _parse_datetime(
+                    item.get("event_at") or item.get("timestamp") or item.get("occurred_at")
+                )
+                or datetime.min
+            ),
             default={},
         )
         status = parcel.get("status") or {}
         code = _status_key(
             (latest.get("status") or {}).get("code")
-            or latest.get("status_code") or status.get("code")
-            or parcel.get("parent_status") or parcel.get("status_code") or "UNKNOWN"
+            or latest.get("status_code")
+            or status.get("code")
+            or parcel.get("parent_status")
+            or parcel.get("status_code")
+            or "UNKNOWN"
         )
         tracking_entry = next(
             (item for item in parcel.get("tracking_numbers", []) if isinstance(item, dict)),
@@ -757,8 +832,11 @@ class SendcloudProvider:
             parcel.get("tracking_number") or tracking_entry.get("tracking_number") or ""
         )
         provider_ref = str(
-            shipment.get("id") or parcel.get("shipment_id") or parcel.get("return_id")
-            or parcel.get("source_id") or tracking_number
+            shipment.get("id")
+            or parcel.get("shipment_id")
+            or parcel.get("return_id")
+            or parcel.get("source_id")
+            or tracking_number
         )
         if not provider_ref:
             raise ProviderValidationError("webhook_reference_missing")
@@ -771,14 +849,19 @@ class SendcloudProvider:
                 parcel.get("tracking_url") or tracking_entry.get("tracking_url") or ""
             ),
             occurred_at=str(
-                latest.get("event_at") or latest.get("timestamp")
-                or payload.get("timestamp") or parcel.get("updated_at") or ""
+                latest.get("event_at")
+                or latest.get("timestamp")
+                or payload.get("timestamp")
+                or parcel.get("updated_at")
+                or ""
             ),
             status_code=code,
             status_category=_category(code),
             status_message=str(
                 (latest.get("status") or {}).get("message")
-                or latest.get("status_description") or status.get("message") or ""
+                or latest.get("status_description")
+                or status.get("message")
+                or ""
             )[:512],
         )
 

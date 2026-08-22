@@ -38,10 +38,30 @@ ODOO_CONTAINER = "mb-odoo-web"
 # script is the "someone configured it" step - so anything it writes here is
 # exactly as good as this table.
 VAT_BY_COUNTRY = {
-    "FR": 20.0, "BE": 21.0, "NL": 21.0, "DE": 19.0, "ES": 21.0, "PT": 23.0,
-    "IT": 22.0, "PL": 23.0, "SE": 25.0, "DK": 25.0, "AT": 20.0, "IE": 23.0,
-    "FI": 25.5, "LT": 21.0, "LV": 21.0, "CZ": 21.0, "SK": 23.0, "HU": 27.0,
-    "RO": 21.0, "GR": 24.0, "MT": 18.0, "GB": 20.0, "CH": 8.1, "NO": 25.0,
+    "FR": 20.0,
+    "BE": 21.0,
+    "NL": 21.0,
+    "DE": 19.0,
+    "ES": 21.0,
+    "PT": 23.0,
+    "IT": 22.0,
+    "PL": 23.0,
+    "SE": 25.0,
+    "DK": 25.0,
+    "AT": 20.0,
+    "IE": 23.0,
+    "FI": 25.5,
+    "LT": 21.0,
+    "LV": 21.0,
+    "CZ": 21.0,
+    "SK": 23.0,
+    "HU": 27.0,
+    "RO": 21.0,
+    "GR": 24.0,
+    "MT": 18.0,
+    "GB": 20.0,
+    "CH": 8.1,
+    "NO": 25.0,
 }
 # Countries whose shops publish prices without tax. Everywhere else in this set
 # is retail-facing and publishes gross.
@@ -92,9 +112,22 @@ select coalesce(jsonb_object_agg(id, jsonb_build_object(
 
 def psql(sql):
     result = subprocess.run(
-        ["docker", "exec", "-i", CATALOGUE_CONTAINER, "psql",
-         "-U", CATALOGUE_USER, "-d", CATALOGUE_DB, "-tAc", sql],
-        capture_output=True, text=True)
+        [
+            "docker",
+            "exec",
+            "-i",
+            CATALOGUE_CONTAINER,
+            "psql",
+            "-U",
+            CATALOGUE_USER,
+            "-d",
+            CATALOGUE_DB,
+            "-tAc",
+            sql,
+        ],
+        capture_output=True,
+        text=True,
+    )
     if result.returncode != 0:
         sys.exit(f"catalogue query failed:\n{result.stderr.strip()}")
     return json.loads(result.stdout)
@@ -108,9 +141,23 @@ def literal(value):
 def run_in_odoo(script, database, prefixes):
     """Pipe a script into `odoo shell` and echo the lines it meant to report."""
     result = subprocess.run(
-        ["docker", "exec", "-i", ODOO_CONTAINER, "odoo", "shell",
-         "-d", database, "--log-level=error", "--http-port=8199", "--no-http"],
-        input=script, capture_output=True, text=True)
+        [
+            "docker",
+            "exec",
+            "-i",
+            ODOO_CONTAINER,
+            "odoo",
+            "shell",
+            "-d",
+            database,
+            "--log-level=error",
+            "--http-port=8199",
+            "--no-http",
+        ],
+        input=script,
+        capture_output=True,
+        text=True,
+    )
     for line in result.stdout.splitlines():
         if line.startswith(prefixes):
             print("  " + line)
@@ -132,7 +179,7 @@ def vendor_config(source_id, sources):
     return {"vat_status": "inclusive", "vat_rate": rate}
 
 
-SEED_TEMPLATE = '''
+SEED_TEMPLATE = """
 import json
 
 from odoo import fields
@@ -189,10 +236,10 @@ print("VARIANTS", sum(len(t.product_variant_ids) for t in template_model.search(
 print("SUPPLIER PRICES", summary["offers"])
 for reason, count in sorted(summary["refused"].items()):
     print("REFUSED", reason, count)
-'''
+"""
 
 
-PURGE_TEMPLATE = '''
+PURGE_TEMPLATE = """
 manufacturer = {manufacturer!r}
 
 domain = [("mb_canonical_id", "!=", False)]
@@ -238,28 +285,38 @@ data.unlink()
 drop.unlink()
 env.cr.commit()
 print("REMAINING", env["product.template"].search_count([("mb_canonical_id", "!=", False)]))
-'''
+"""
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--database", default="odoo", help="Odoo database to seed")
     parser.add_argument("--manufacturer", help="catalogue manufacturer id, e.g. mayco")
     parser.add_argument("--sku", help="comma-separated manufacturer codes")
     parser.add_argument("--limit", type=int, default=25)
-    parser.add_argument("--list-sources", action="store_true",
-                        help="print the catalogue sources and their VAT basis, seed nothing")
-    parser.add_argument("--purge", action="store_true",
-                        help="delete previously imported products, keeping any that "
-                             "stock, orders or a bill of materials refer to")
+    parser.add_argument(
+        "--list-sources",
+        action="store_true",
+        help="print the catalogue sources and their VAT basis, seed nothing",
+    )
+    parser.add_argument(
+        "--purge",
+        action="store_true",
+        help="delete previously imported products, keeping any that "
+        "stock, orders or a bill of materials refer to",
+    )
     options = parser.parse_args()
 
     if options.purge:
         script = PURGE_TEMPLATE.format(manufacturer=options.manufacturer)
         print(f"purging imported products from '{options.database}' ...")
-        return run_in_odoo(script, options.database,
-                           prefixes=("FOUND", "IN USE", "DELETING", "REMAINING", "  KEPT"))
+        return run_in_odoo(
+            script,
+            options.database,
+            prefixes=("FOUND", "IN USE", "DELETING", "REMAINING", "  KEPT"),
+        )
 
     sources = psql(SOURCES_SQL)
 
@@ -279,27 +336,34 @@ def main():
         codes = ",".join(literal(code.strip().upper()) for code in options.sku.split(","))
         sku_filter = f"and upper(c.manufacturer_sku) in ({codes})"
 
-    products = psql(PRODUCTS_SQL.format(
-        manufacturer_filter=manufacturer_filter,
-        sku_filter=sku_filter,
-        limit=int(options.limit)))
+    products = psql(
+        PRODUCTS_SQL.format(
+            manufacturer_filter=manufacturer_filter, sku_filter=sku_filter, limit=int(options.limit)
+        )
+    )
     if not products:
         sys.exit("no canonical products matched - has the promotion been run?")
 
     # Only the shops that actually sell what is being imported.
     wanted = {offer["source_id"] for product in products for offer in product["offers"]}
     vendors = {
-        source_id: {**sources.get(source_id, {"label": source_id}),
-                    **vendor_config(source_id, sources)}
+        source_id: {
+            **sources.get(source_id, {"label": source_id}),
+            **vendor_config(source_id, sources),
+        }
         for source_id in sorted(wanted)
     }
 
-    script = SEED_TEMPLATE.format(
-        products=json.dumps(products), vendors=json.dumps(vendors))
-    print(f"seeding {len(products)} products from {len(vendors)} sources "
-          f"into '{options.database}' ...")
-    run_in_odoo(script, options.database,
-                prefixes=("VENDORS", "PRODUCTS", "VARIANTS", "SUPPLIER", "REFUSED"))
+    script = SEED_TEMPLATE.format(products=json.dumps(products), vendors=json.dumps(vendors))
+    print(
+        f"seeding {len(products)} products from {len(vendors)} sources "
+        f"into '{options.database}' ..."
+    )
+    run_in_odoo(
+        script,
+        options.database,
+        prefixes=("VENDORS", "PRODUCTS", "VARIANTS", "SUPPLIER", "REFUSED"),
+    )
 
 
 if __name__ == "__main__":

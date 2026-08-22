@@ -12,8 +12,7 @@ class MbDepotStatement(models.TransientModel):
         required=True,
         domain=[("is_depot", "=", True)],
     )
-    partner_id = fields.Many2one(
-        related="depot_id.depot_partner_id", string="Depositary")
+    partner_id = fields.Many2one(related="depot_id.depot_partner_id", string="Depositary")
     date_from = fields.Date(
         required=True,
         default=lambda self: fields.Date.today().replace(day=1),
@@ -38,8 +37,7 @@ class MbDepotStatement(models.TransientModel):
         for statement in self:
             statement.total_sold = sum(statement.line_ids.mapped("amount_net"))
             statement.total_gross = sum(statement.line_ids.mapped("amount_gross"))
-            statement.total_commission = sum(
-                statement.line_ids.mapped("amount_commission"))
+            statement.total_commission = sum(statement.line_ids.mapped("amount_commission"))
 
     @api.constrains("date_from", "date_to")
     def _check_period(self):
@@ -78,20 +76,26 @@ class MbDepotStatement(models.TransientModel):
         self.ensure_one()
         MoveLine = self.env["stock.move.line"]
         depot = self.depot_id.view_location_id.id
-        incoming = MoveLine.search([
-            "&",
-            ("state", "=", "done"),
-            "&",
-            ("location_dest_id", "child_of", depot),
-            "!", ("location_id", "child_of", depot),
-        ])
-        outgoing = MoveLine.search([
-            "&",
-            ("state", "=", "done"),
-            "&",
-            ("location_id", "child_of", depot),
-            "!", ("location_dest_id", "child_of", depot),
-        ])
+        incoming = MoveLine.search(
+            [
+                "&",
+                ("state", "=", "done"),
+                "&",
+                ("location_dest_id", "child_of", depot),
+                "!",
+                ("location_id", "child_of", depot),
+            ]
+        )
+        outgoing = MoveLine.search(
+            [
+                "&",
+                ("state", "=", "done"),
+                "&",
+                ("location_id", "child_of", depot),
+                "!",
+                ("location_dest_id", "child_of", depot),
+            ]
+        )
         return incoming, outgoing
 
     def _values(self, move_line):
@@ -115,11 +119,13 @@ class MbDepotStatement(models.TransientModel):
     def action_compute(self):
         self.ensure_one()
         if self.depot_id.mb_depot_legal_structure == "mandate":
-            raise UserError(_(
-                "This depot is a mandate. Its retail sales and commission must "
-                "be booked from the gallery report; the purchase-resale statement "
-                "would understate turnover."
-            ))
+            raise UserError(
+                _(
+                    "This depot is a mandate. Its retail sales and commission must "
+                    "be booked from the gallery report; the purchase-resale statement "
+                    "would understate turnover."
+                )
+            )
         self.line_ids.unlink()
         incoming, outgoing = self._crossing_moves()
 
@@ -136,8 +142,12 @@ class MbDepotStatement(models.TransientModel):
                     "statement_id": self.id,
                     "product_id": move_line.product_id.id,
                     "lot_id": move_line.lot_id.id or False,
-                    "qty_opening": 0.0, "qty_placed": 0.0, "qty_sold": 0.0,
-                    "qty_returned": 0.0, "amount_gross": 0.0, "amount_net": 0.0,
+                    "qty_opening": 0.0,
+                    "qty_placed": 0.0,
+                    "qty_sold": 0.0,
+                    "qty_returned": 0.0,
+                    "amount_gross": 0.0,
+                    "amount_net": 0.0,
                 }
             return rows[key]
 
@@ -199,7 +209,8 @@ class MbDepotStatementLine(models.TransientModel):
     _order = "product_id, lot_name"
 
     statement_id = fields.Many2one(
-        comodel_name="mb.depot.statement", required=True, ondelete="cascade")
+        comodel_name="mb.depot.statement", required=True, ondelete="cascade"
+    )
     product_id = fields.Many2one(comodel_name="product.product", string="Piece")
     lot_id = fields.Many2one(comodel_name="stock.lot", string="Serial")
     lot_name = fields.Char(related="lot_id.name", store=True)
@@ -208,14 +219,16 @@ class MbDepotStatementLine(models.TransientModel):
     date_sold = fields.Date(
         "Sold on",
         help="The day the piece sold, as reported by the depositary. Blank when "
-             "the row covers sales on more than one day.")
+        "the row covers sales on more than one day.",
+    )
 
     qty_opening = fields.Float("Opening", digits="Product Unit of Measure")
     qty_placed = fields.Float("Placed", digits="Product Unit of Measure")
     qty_sold = fields.Float("Sold", digits="Product Unit of Measure")
     qty_returned = fields.Float("Returned", digits="Product Unit of Measure")
     qty_closing = fields.Float(
-        "Closing", compute="_compute_qty_closing", digits="Product Unit of Measure")
+        "Closing", compute="_compute_qty_closing", digits="Product Unit of Measure"
+    )
 
     amount_gross = fields.Monetary("Retail", help="At the price the piece sold for.")
     amount_net = fields.Monetary("Due to us", help="After the depositary's commission.")
@@ -225,7 +238,8 @@ class MbDepotStatementLine(models.TransientModel):
     def _compute_qty_closing(self):
         for line in self:
             line.qty_closing = (
-                line.qty_opening + line.qty_placed - line.qty_sold - line.qty_returned)
+                line.qty_opening + line.qty_placed - line.qty_sold - line.qty_returned
+            )
 
     @api.depends("amount_gross", "amount_net")
     def _compute_amount_commission(self):

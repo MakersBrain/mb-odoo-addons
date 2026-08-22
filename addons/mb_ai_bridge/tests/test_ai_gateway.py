@@ -40,14 +40,19 @@ class TestAiGateway(TransactionCase):
         operation_id = str(uuid.uuid4())
         response.json.return_value = {"operation_id": operation_id}
         with (
-            patch.object(type(self.gateway), "_task_contracts", autospec=True,
-                         return_value=self.contracts()),
-            patch.dict(os.environ, {
-                "MB_CONTROL_API_URL": "https://control.internal",
-                "MB_CONTROL_BRIDGE_TOKEN": "secret",
-            }),
-            patch("odoo.addons.mb_ai_bridge.models.gateway.requests.post",
-                  return_value=response) as post,
+            patch.object(
+                type(self.gateway), "_task_contracts", autospec=True, return_value=self.contracts()
+            ),
+            patch.dict(
+                os.environ,
+                {
+                    "MB_CONTROL_API_URL": "https://control.internal",
+                    "MB_CONTROL_BRIDGE_TOKEN": "secret",
+                },
+            ),
+            patch(
+                "odoo.addons.mb_ai_bridge.models.gateway.requests.post", return_value=response
+            ) as post,
         ):
             result = self.gateway.submit(
                 company=self.company,
@@ -69,14 +74,20 @@ class TestAiGateway(TransactionCase):
 
     def test_timeout_has_unknown_outcome_for_safe_retry(self):
         with (
-            patch.object(type(self.gateway), "_task_contracts", autospec=True,
-                         return_value=self.contracts()),
-            patch.dict(os.environ, {
-                "MB_CONTROL_API_URL": "https://control.internal",
-                "MB_CONTROL_BRIDGE_TOKEN": "secret",
-            }),
-            patch("odoo.addons.mb_ai_bridge.models.gateway.requests.post",
-                  side_effect=requests.Timeout),
+            patch.object(
+                type(self.gateway), "_task_contracts", autospec=True, return_value=self.contracts()
+            ),
+            patch.dict(
+                os.environ,
+                {
+                    "MB_CONTROL_API_URL": "https://control.internal",
+                    "MB_CONTROL_BRIDGE_TOKEN": "secret",
+                },
+            ),
+            patch(
+                "odoo.addons.mb_ai_bridge.models.gateway.requests.post",
+                side_effect=requests.Timeout,
+            ),
         ):
             result = self.gateway.submit(
                 company=self.company,
@@ -99,7 +110,8 @@ class TestAiGateway(TransactionCase):
 
         payload["raw_response"] = {"retained": False}
         metadata = self.gateway.validate_callback_envelope(
-            payload, kinds={"multimodal"},
+            payload,
+            kinds={"multimodal"},
         )
         self.assertEqual(metadata["diagnostic"], {"retained": False})
 
@@ -108,17 +120,24 @@ class TestAiGateway(TransactionCase):
         response.raise_for_status.return_value = None
         response.json.return_value = {"candidates": []}
         with (
-            patch.object(type(self.gateway), "_task_contracts", autospec=True,
-                         return_value=self.contracts()),
-            patch.dict(os.environ, {
-                "MB_CONTROL_API_URL": "https://control.internal",
-                "MB_CONTROL_BRIDGE_TOKEN": "secret",
-            }),
-            patch("odoo.addons.mb_ai_bridge.models.gateway.requests.post",
-                  return_value=response) as post,
+            patch.object(
+                type(self.gateway), "_task_contracts", autospec=True, return_value=self.contracts()
+            ),
+            patch.dict(
+                os.environ,
+                {
+                    "MB_CONTROL_API_URL": "https://control.internal",
+                    "MB_CONTROL_BRIDGE_TOKEN": "secret",
+                },
+            ),
+            patch(
+                "odoo.addons.mb_ai_bridge.models.gateway.requests.post", return_value=response
+            ) as post,
         ):
             result = self.gateway.request(
-                company=self.company, task="fixture-request", payload={"value": "safe"},
+                company=self.company,
+                task="fixture-request",
+                payload={"value": "safe"},
             )
         self.assertEqual(result, {"candidates": []})
         self.assertNotIn("Idempotency-Key", post.call_args.kwargs["headers"])

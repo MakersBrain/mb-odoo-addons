@@ -35,9 +35,12 @@ class SaleOrder(models.Model):
             }
             if order.partner_shipping_id.mb_pickup_ref:
                 cleanup["partner_shipping_id"] = order.partner_id.id
-            super(SaleOrder, order.with_context(
-                update_delivery_shipping_partner=True,
-            )).write(cleanup)
+            super(
+                SaleOrder,
+                order.with_context(
+                    update_delivery_shipping_partner=True,
+                ),
+            ).write(cleanup)
         return result
 
     def _mb_resolve_selected_pickup(self):
@@ -90,20 +93,24 @@ class SaleOrder(models.Model):
             self._mb_pickup_rate_identity(), "search", 30
         )
         if zip_code:
-            partner_address = self.env["res.partner"].new({
-                "active": False,
-                "country_id": country.id,
-                "zip": str(zip_code)[:16],
-            })
+            partner_address = self.env["res.partner"].new(
+                {
+                    "active": False,
+                    "country_id": country.id,
+                    "zip": str(zip_code)[:16],
+                }
+            )
         else:
             partner_address = self.partner_shipping_id
         try:
             locations = carrier._mb_get_close_locations(partner_address)
         except UserError as error:
             return {"error": str(error)}
-        return {"pickup_locations": locations} if locations else {
-            "error": _("No pick-up points are available for this delivery address.")
-        }
+        return (
+            {"pickup_locations": locations}
+            if locations
+            else {"error": _("No pick-up points are available for this delivery address.")}
+        )
 
     def _set_pickup_location(self, pickup_location_data):
         self.ensure_one()
@@ -122,9 +129,7 @@ class SaleOrder(models.Model):
         if not isinstance(submitted, dict) or not isinstance(submitted.get("id"), str):
             raise ValidationError(_("The pickup-point selection is invalid."))
         try:
-            point = carrier._mb_get_pickup_point(
-                submitted["id"], self.partner_shipping_id
-            )
+            point = carrier._mb_get_pickup_point(submitted["id"], self.partner_shipping_id)
         except ProviderError as error:
             raise ValidationError(_("The selected pickup point is no longer available.")) from error
         if point.code != submitted["id"]:
@@ -156,7 +161,9 @@ class SaleOrder(models.Model):
             carrier = order.carrier_id.sudo()
             if not carrier.mb_provider_code:
                 if order.partner_shipping_id.mb_pickup_ref:
-                    raise ValidationError(_("A pickup address requires its matching delivery method."))
+                    raise ValidationError(
+                        _("A pickup address requires its matching delivery method.")
+                    )
                 continue
             provider_type = provider_class(carrier.mb_provider_code)
             uses_pickup = (
@@ -184,9 +191,7 @@ class SaleOrder(models.Model):
 
     def _action_confirm(self):
         resolved_points = {}
-        for order in self.filtered(
-            lambda candidate: candidate.carrier_id.sudo().mb_provider_code
-        ):
+        for order in self.filtered(lambda candidate: candidate.carrier_id.sudo().mb_provider_code):
             carrier = order.carrier_id.sudo()
             provider_type = provider_class(carrier.mb_provider_code)
             if (
@@ -195,32 +200,43 @@ class SaleOrder(models.Model):
             ):
                 resolved_points[order.id] = order._mb_resolve_selected_pickup()
                 recipient = order.partner_shipping_id
-                order.sudo().write({
-                    "mb_delivery_recipient_partner_id": recipient.id,
-                    "mb_delivery_recipient_snapshot": self.env[
-                        "mb.carrier.shipment"
-                    ]._partner_payload(recipient),
-                })
+                order.sudo().write(
+                    {
+                        "mb_delivery_recipient_partner_id": recipient.id,
+                        "mb_delivery_recipient_snapshot": self.env[
+                            "mb.carrier.shipment"
+                        ]._partner_payload(recipient),
+                    }
+                )
         result = super()._action_confirm()
         for order in self.filtered(lambda candidate: candidate.id in resolved_points):
             order.picking_ids.filtered(
                 lambda picking: picking.picking_type_code == "outgoing"
-            ).sudo().write({
-                "mb_delivery_recipient_partner_id": order.mb_delivery_recipient_partner_id.id,
-                "mb_delivery_recipient_snapshot": order.mb_delivery_recipient_snapshot,
-            })
+            ).sudo().write(
+                {
+                    "mb_delivery_recipient_partner_id": order.mb_delivery_recipient_partner_id.id,
+                    "mb_delivery_recipient_snapshot": order.mb_delivery_recipient_snapshot,
+                }
+            )
         for order in self.filtered(lambda candidate: candidate.id in resolved_points):
             point = resolved_points[order.id]
             carrier = order.carrier_id
             current = order.partner_shipping_id
             owner = current.parent_id or order.partner_id
-            pickup = self.env["res.partner"].sudo().search([
-                ("parent_id", "=", owner.id),
-                ("type", "=", "delivery"),
-                ("mb_pickup_ref", "=", point.code),
-                ("mb_pickup_provider", "=", carrier.mb_provider_code),
-                ("mb_pickup_service", "=", carrier.mb_provider_service_code),
-            ], limit=1)
+            pickup = (
+                self.env["res.partner"]
+                .sudo()
+                .search(
+                    [
+                        ("parent_id", "=", owner.id),
+                        ("type", "=", "delivery"),
+                        ("mb_pickup_ref", "=", point.code),
+                        ("mb_pickup_provider", "=", carrier.mb_provider_code),
+                        ("mb_pickup_service", "=", carrier.mb_provider_service_code),
+                    ],
+                    limit=1,
+                )
+            )
             # Core may just have created an unclassified pickup address. Reuse
             # it, but never turn a customer's ordinary delivery address into
             # an immutable carrier location merely because its street matches.
@@ -231,9 +247,12 @@ class SaleOrder(models.Model):
                 and current.parent_id == owner
             ):
                 pickup = current.sudo()
-            country = self.env["res.country"].search([
-                ("code", "=", point.country_code),
-            ], limit=1)
+            country = self.env["res.country"].search(
+                [
+                    ("code", "=", point.country_code),
+                ],
+                limit=1,
+            )
             if not country:
                 raise ValidationError(_("The pickup point country is unavailable."))
             values = {
@@ -257,7 +276,9 @@ class SaleOrder(models.Model):
                 pickup.write(values)
             else:
                 pickup = self.env["res.partner"].sudo().create(values)
-            order.with_context(update_delivery_shipping_partner=True).write({
-                "partner_shipping_id": pickup.id,
-            })
+            order.with_context(update_delivery_shipping_partner=True).write(
+                {
+                    "partner_shipping_id": pickup.id,
+                }
+            )
         return result

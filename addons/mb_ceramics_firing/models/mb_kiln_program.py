@@ -54,71 +54,82 @@ class MbKilnProgram(models.Model):
     _check_company_auto = True
 
     kiln_id = fields.Many2one(
-        comodel_name="mb.kiln", required=True, ondelete="cascade", index=True,
-        check_company=True)
+        comodel_name="mb.kiln", required=True, ondelete="cascade", index=True, check_company=True
+    )
     name = fields.Char(
         required=True,
         help="The programme label exactly as the provider reports it, such as "
-             "'Programme 4'. On a kiln with no telemetry it is whatever the "
-             "controller calls it.")
+        "'Programme 4'. On a kiln with no telemetry it is whatever the "
+        "controller calls it.",
+    )
     program_number = fields.Integer(
         string="Slot",
         help="Which numbered slot this programme occupies on the controller. "
-             "It is how a firing says which programme it ran, and it survives "
-             "the potter renaming the programme to something they recognise.",
+        "It is how a firing says which programme it ran, and it survives "
+        "the potter renaming the programme to something they recognise.",
     )
     kind = fields.Selection(
         selection=[("bisque", "Bisque"), ("glaze", "Glaze"), ("other", "Other")],
-        required=True, default="bisque")
+        required=True,
+        default="bisque",
+    )
     active = fields.Boolean(default=True)
 
     source = fields.Selection(
         selection=[("manual", "Entered here"), ("provider", "Read from the kiln")],
-        default="manual", required=True, readonly=True,
+        default="manual",
+        required=True,
+        readonly=True,
         help="Where the segments came from. A programme read from the kiln is "
-             "refreshed as the controller's own programme changes; one entered "
-             "here is never touched by a refresh.",
+        "refreshed as the controller's own programme changes; one entered "
+        "here is never touched by a refresh.",
     )
     provider_synced_at = fields.Datetime(
-        readonly=True, copy=False, string="Segments read at",
-        help="When the segments were last refreshed from the controller.")
+        readonly=True,
+        copy=False,
+        string="Segments read at",
+        help="When the segments were last refreshed from the controller.",
+    )
     provider_firing_at = fields.Datetime(
-        readonly=True, copy=False, string="As fired on",
+        readonly=True,
+        copy=False,
+        string="As fired on",
         # Not the sync time: the start of the firing the segments were read
         # from. A backfill walking old history must not overwrite the current
         # profile with an older one, and this is what it compares.
         help="The start of the firing these segments were read from. The "
-             "controller reports a programme as it ran, so the most recent "
-             "firing is the most current profile.",
+        "controller reports a programme as it ran, so the most recent "
+        "firing is the most current profile.",
     )
 
     firing_hours = fields.Float(
         string="Firing (hours)",
         help="How long the programme runs, from the start of the first ramp to "
-             "the end of the last segment. This is what a routing operation "
-             "takes its duration from, so a firing on a bill of materials stops "
-             "being a number somebody typed and starts being the schedule.",
+        "the end of the last segment. This is what a routing operation "
+        "takes its duration from, so a firing on a bill of materials stops "
+        "being a number somebody typed and starts being the schedule.",
     )
     cooling_hours = fields.Float(
         default=12.0,
         string="Cooling (hours)",
         help="How long after the firing ends before the load may be unloaded. "
-             "Sets the cooling hold on every firing imported under this "
-             "programme, and - because a kiln cannot take the next load while "
-             "it is still hot - counts toward how long the work centre is "
-             "occupied.",
+        "Sets the cooling hold on every firing imported under this "
+        "programme, and - because a kiln cannot take the next load while "
+        "it is still hot - counts toward how long the work centre is "
+        "occupied.",
     )
     peak_temperature = fields.Float(
         help="Expected peak, for reference. Not enforced: a firing that missed "
-             "its peak is exactly the thing you want to be able to see.")
+        "its peak is exactly the thing you want to be able to see."
+    )
 
     segment_ids = fields.One2many(
         comodel_name="mb.kiln.program.segment",
         inverse_name="program_id",
         string="Segments",
         help="The ramps and holds the controller runs, in order. Typed in for "
-             "a kiln that reports nothing, read from the controller for one "
-             "that does.",
+        "a kiln that reports nothing, read from the controller for one "
+        "that does.",
     )
     segment_count = fields.Integer(compute="_compute_scheduled", store=True)
     scheduled_hours = fields.Float(
@@ -126,37 +137,41 @@ class MbKilnProgram(models.Model):
         compute="_compute_scheduled",
         store=True,
         help="What the segments add up to: every ramp at its stated rate plus "
-             "every hold. Zero when the programme has no segments, or when "
-             "every ramp is at full power and so cannot be scheduled at all.",
+        "every hold. Zero when the programme has no segments, or when "
+        "every ramp is at full power and so cannot be scheduled at all.",
     )
 
     firing_ids = fields.One2many(
-        comodel_name="mb.firing", inverse_name="program_id", string="Firings")
+        comodel_name="mb.firing", inverse_name="program_id", string="Firings"
+    )
     firing_count = fields.Integer(compute="_compute_measured", store=False)
     measured_hours = fields.Float(
         string="Measured (hours)",
         compute="_compute_measured",
         store=False,
         help="The median duration of the firings actually recorded under this "
-             "programme. Compare it with the declared figure; press Adopt to "
-             "make it the one plans are built on.",
+        "programme. Compare it with the declared figure; press Adopt to "
+        "make it the one plans are built on.",
     )
 
     company_id = fields.Many2one(
-        related="kiln_id.company_id", store=True, required=True, index=True,
-        precompute=True)
+        related="kiln_id.company_id", store=True, required=True, index=True, precompute=True
+    )
 
     _kiln_program_uniq = models.Constraint(
         "unique (kiln_id, name)",
         "A programme is mapped once per kiln.",
     )
 
-    @api.depends("segment_ids.ramp_rate", "segment_ids.target_temperature",
-                 "segment_ids.soak_time", "segment_ids.number")
+    @api.depends(
+        "segment_ids.ramp_rate",
+        "segment_ids.target_temperature",
+        "segment_ids.soak_time",
+        "segment_ids.number",
+    )
     def _compute_scheduled(self):
         for program in self:
-            segments = program.segment_ids.sorted(
-                key=lambda segment: (segment.number, segment.id))
+            segments = program.segment_ids.sorted(key=lambda segment: (segment.number, segment.id))
             program.segment_count = len(segments)
             program.scheduled_hours = total_minutes(segments) / 60.0
 
@@ -164,13 +179,10 @@ class MbKilnProgram(models.Model):
     def _compute_measured(self):
         for program in self:
             durations = program.firing_ids.filtered(
-                lambda firing: (
-                    firing.state in ("cooling", "done") and firing.duration_hours > 0
-                )
+                lambda firing: firing.state in ("cooling", "done") and firing.duration_hours > 0
             ).mapped("duration_hours")
             program.firing_count = len(durations)
-            program.measured_hours = (
-                statistics.median(durations) if durations else 0.0)
+            program.measured_hours = statistics.median(durations) if durations else 0.0
 
     def write(self, values):
         """A programme's hours reach every routing that fires it.
@@ -181,15 +193,17 @@ class MbKilnProgram(models.Model):
         """
         result = super().write(values)
         if {"firing_hours", "cooling_hours"} & set(values):
-            self.env["mrp.routing.workcenter"].with_context(
-                active_test=False
-            ).search([
-                ("mb_kiln_program_id", "in", self.ids),
-            ])._apply_kiln_program()
-            self.env["mb.firing"].search([
-                ("program_id", "in", self.ids),
-                ("state", "in", ("draft", "firing", "cooling")),
-            ])._mb_sync_group_duration()
+            self.env["mrp.routing.workcenter"].with_context(active_test=False).search(
+                [
+                    ("mb_kiln_program_id", "in", self.ids),
+                ]
+            )._apply_kiln_program()
+            self.env["mb.firing"].search(
+                [
+                    ("program_id", "in", self.ids),
+                    ("state", "in", ("draft", "firing", "cooling")),
+                ]
+            )._mb_sync_group_duration()
         return result
 
     def action_adopt_measured(self):
@@ -243,17 +257,23 @@ class MbKilnProgram(models.Model):
         if not kiln:
             return self.browse()
         if program_name:
-            found = self.search([
-                ("kiln_id", "=", kiln.id),
-                ("name", "=", program_name),
-            ], limit=1)
+            found = self.search(
+                [
+                    ("kiln_id", "=", kiln.id),
+                    ("name", "=", program_name),
+                ],
+                limit=1,
+            )
             if found:
                 return found
         if program_number:
-            return self.search([
-                ("kiln_id", "=", kiln.id),
-                ("program_number", "=", program_number),
-            ], limit=1)
+            return self.search(
+                [
+                    ("kiln_id", "=", kiln.id),
+                    ("program_number", "=", program_number),
+                ],
+                limit=1,
+            )
         return self.browse()
 
     @api.model
@@ -285,27 +305,28 @@ class MbKilnProgram(models.Model):
         exactly as they are. The single exception is a programme's first sight
         of its own segments, where there is no prior answer to protect.
         """
-        program = self._match(kiln, payload.get("name"),
-                              payload.get("program_number"))
+        program = self._match(kiln, payload.get("name"), payload.get("program_number"))
         segments = payload.get("segments") or []
         peak = schedule_peak(segments)
         now = fields.Datetime.now()
         fired_at = payload.get("fired_at")
 
         if not program:
-            program = self.create({
-                "kiln_id": kiln.id,
-                "name": payload.get("name") or _("Programme %s",
-                                                 payload.get("program_number")),
-                "program_number": payload.get("program_number") or 0,
-                "kind": self._infer_kind(peak),
-                "peak_temperature": peak or 0.0,
-                "source": "provider",
-                "provider_synced_at": now,
-                "provider_firing_at": fired_at,
-                "segment_ids": [fields.Command.create(values)
-                                for values in self._segment_values(segments)],
-            })
+            program = self.create(
+                {
+                    "kiln_id": kiln.id,
+                    "name": payload.get("name") or _("Programme %s", payload.get("program_number")),
+                    "program_number": payload.get("program_number") or 0,
+                    "kind": self._infer_kind(peak),
+                    "peak_temperature": peak or 0.0,
+                    "source": "provider",
+                    "provider_synced_at": now,
+                    "provider_firing_at": fired_at,
+                    "segment_ids": [
+                        fields.Command.create(values) for values in self._segment_values(segments)
+                    ],
+                }
+            )
             # Only here, and only because there is nothing to move: a
             # programme created with no duration is invisible to planning, so
             # it starts at what the controller is programmed to take. Every
@@ -318,24 +339,25 @@ class MbKilnProgram(models.Model):
         if program.source == "manual" and program.segment_ids:
             # Hand-typed segments are an answer, not a gap. Leave them.
             return program
-        if (program.provider_firing_at and fired_at
-                and fired_at <= program.provider_firing_at):
+        if program.provider_firing_at and fired_at and fired_at <= program.provider_firing_at:
             # An older firing than the one already recorded. This is the whole
             # reason the firing date is kept: a backfill walking history
             # backwards would otherwise leave the programme showing its oldest
             # profile rather than its current one.
             return program
 
-        program.write({
-            "source": "provider",
-            "provider_synced_at": now,
-            "provider_firing_at": fired_at or program.provider_firing_at,
-            "peak_temperature": peak if peak is not None else program.peak_temperature,
-            "segment_ids": (
-                [fields.Command.clear()]
-                + [fields.Command.create(values)
-                   for values in self._segment_values(segments)]),
-        })
+        program.write(
+            {
+                "source": "provider",
+                "provider_synced_at": now,
+                "provider_firing_at": fired_at or program.provider_firing_at,
+                "peak_temperature": peak if peak is not None else program.peak_temperature,
+                "segment_ids": (
+                    [fields.Command.clear()]
+                    + [fields.Command.create(values) for values in self._segment_values(segments)]
+                ),
+            }
+        )
         return program
 
     @api.model
@@ -343,11 +365,12 @@ class MbKilnProgram(models.Model):
         """Provider segment dicts, ordered and cleaned into writable values."""
         values = []
         for index, segment in enumerate(segments, start=1):
-            values.append({
-                "number": int(segment.get("number") or index),
-                "ramp_rate": float(segment.get("ramp_rate") or 0.0),
-                "target_temperature": float(
-                    segment.get("target_temperature") or 0.0),
-                "soak_time": float(segment.get("soak_time") or 0.0),
-            })
+            values.append(
+                {
+                    "number": int(segment.get("number") or index),
+                    "ramp_rate": float(segment.get("ramp_rate") or 0.0),
+                    "target_temperature": float(segment.get("target_temperature") or 0.0),
+                    "soak_time": float(segment.get("soak_time") or 0.0),
+                }
+            )
         return sorted(values, key=lambda row: row["number"])

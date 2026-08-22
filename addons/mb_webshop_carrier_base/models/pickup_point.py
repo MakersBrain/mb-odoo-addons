@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import hashlib
 
 from odoo import _, api, fields, models
@@ -77,50 +75,57 @@ class CarrierPickupPoint(models.Model):
         if cached:
             return [point._checkout_value() for point in cached]
         try:
-            points = carrier._mb_provider().search_pickup_points(PickupQuery(
-                country_code=country.code,
-                zip=zip_code,
-                city=partner_address.city or "",
-                service_code=service,
-                limit=20,
-            ))
+            points = carrier._mb_provider().search_pickup_points(
+                PickupQuery(
+                    country_code=country.code,
+                    zip=zip_code,
+                    city=partner_address.city or "",
+                    service_code=service,
+                    limit=20,
+                )
+            )
         except ProviderError as error:
             raise UserError(_("Pickup points are temporarily unavailable.")) from error
         country_by_code = {
-            record.code: record for record in self.env["res.country"].search([
-                ("code", "in", list({point.country_code for point in points}))
-            ])
+            record.code: record
+            for record in self.env["res.country"].search(
+                [("code", "in", list({point.country_code for point in points}))]
+            )
         }
-        self.search([
-            ("carrier_id", "=", carrier.id),
-            ("service_code", "=", service),
-            ("query_country_id", "=", country.id),
-            ("query_zip", "=", zip_code),
-        ]).unlink()
+        self.search(
+            [
+                ("carrier_id", "=", carrier.id),
+                ("service_code", "=", service),
+                ("query_country_id", "=", country.id),
+                ("query_zip", "=", zip_code),
+            ]
+        ).unlink()
         records = self.browse()
         for point in points[:20]:
             point_country = country_by_code.get(point.country_code)
             if not point_country:
                 continue
-            records |= self.create({
-                "company_id": carrier.company_id.id,
-                "carrier_id": carrier.id,
-                "provider_code": carrier.mb_provider_code,
-                "service_code": service,
-                "query_country_id": country.id,
-                "query_zip": zip_code,
-                "code": point.code[:128],
-                "name": point.name[:255],
-                "street": point.street[:255],
-                "zip": point.zip[:16],
-                "city": point.city[:128],
-                "country_id": point_country.id,
-                "latitude": point.latitude,
-                "longitude": point.longitude,
-                "opening_hours": point.opening_hours,
-                "distance_m": point.distance_m or 0,
-                "fetched_at": fields.Datetime.now(),
-            })
+            records |= self.create(
+                {
+                    "company_id": carrier.company_id.id,
+                    "carrier_id": carrier.id,
+                    "provider_code": carrier.mb_provider_code,
+                    "service_code": service,
+                    "query_country_id": country.id,
+                    "query_zip": zip_code,
+                    "code": point.code[:128],
+                    "name": point.name[:255],
+                    "street": point.street[:255],
+                    "zip": point.zip[:16],
+                    "city": point.city[:128],
+                    "country_id": point_country.id,
+                    "latitude": point.latitude,
+                    "longitude": point.longitude,
+                    "opening_hours": point.opening_hours,
+                    "distance_m": point.distance_m or 0,
+                    "fetched_at": fields.Datetime.now(),
+                }
+            )
         return [point._checkout_value() for point in records]
 
     @api.model
@@ -146,7 +151,8 @@ class CarrierPublicRate(models.Model):
     def consume(self, identity, route, maximum):
         now = fields.Datetime.now().replace(second=0, microsecond=0)
         key_hash = hashlib.sha256(identity.encode()).hexdigest()
-        self.env.cr.execute("""
+        self.env.cr.execute(
+            """
             INSERT INTO mb_carrier_public_rate(key_hash, route, window_start, count,
                                                create_uid, create_date, write_uid, write_date)
             VALUES (%s, %s, %s, 1, %s, now(), %s, now())
@@ -154,7 +160,9 @@ class CarrierPublicRate(models.Model):
             DO UPDATE SET count = mb_carrier_public_rate.count + 1,
                           write_uid = EXCLUDED.write_uid, write_date = now()
             RETURNING count
-        """, [key_hash, route, now, self.env.uid, self.env.uid])
+        """,
+            [key_hash, route, now, self.env.uid, self.env.uid],
+        )
         if self.env.cr.fetchone()[0] > maximum:
             raise UserError(_("Too many pickup-point requests. Please wait a minute."))
 

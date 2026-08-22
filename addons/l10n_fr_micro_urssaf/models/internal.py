@@ -9,8 +9,8 @@ INTERNAL_CAPABILITY = object()
 
 
 def is_internal(env):
-	return env.context.get(INTERNAL_CONTEXT_KEY) is INTERNAL_CAPABILITY
+    return env.context.get(INTERNAL_CONTEXT_KEY) is INTERNAL_CAPABILITY
 
 
 def internal_context():
-	return {INTERNAL_CONTEXT_KEY: INTERNAL_CAPABILITY}
+    return {INTERNAL_CONTEXT_KEY: INTERNAL_CAPABILITY}

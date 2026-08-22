@@ -22,7 +22,7 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "A VAT number is required when VAT-liable mode is selected."
 msgstr ""
 
@@ -230,7 +230,7 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "Factur-X setup is incomplete:"
 msgstr ""
 
@@ -305,7 +305,7 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "French EI setup saved"
 msgstr ""
 
@@ -498,7 +498,7 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid ""
 "Ready. Click Save and validate below to apply this setup to the company."
 msgstr ""
@@ -515,7 +515,7 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "SIREN must contain 9 digits and pass its checksum."
 msgstr ""
 
@@ -532,7 +532,7 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "SIRET must contain 14 digits and pass its checksum."
 msgstr ""
 
@@ -615,7 +615,7 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid ""
 "The French chart of accounts cannot replace an accounting localization after"
 " journal items exist. Ask an Accounting Administrator to migrate it."
@@ -623,19 +623,19 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "The SIRET must belong to the entered SIREN."
 msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_vat_switch_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_vat_switch_wizard.py:0
 msgid "The VAT regime is recorded as effective from %s."
 msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "The company identity, payment details, and tax setup were updated."
 msgstr ""
 
@@ -723,7 +723,7 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "VAT regime"
 msgstr ""
 
@@ -736,7 +736,7 @@ msgstr ""
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
 #: code:addons/l10n_fr_micro_enterprise/models/res_company.py:0
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_vat_switch_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_vat_switch_wizard.py:0
 msgid "VAT-liable mode activated"
 msgstr ""
 
@@ -747,7 +747,7 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "email"
 msgstr ""
 
@@ -759,36 +759,36 @@ msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "legal name"
 msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "phone"
 msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "professional IBAN"
 msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "registered address"
 msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "valid SIREN"
 msgstr ""
 
 #. module: l10n_fr_micro_enterprise
 #. odoo-python
-#: code:addons/l10n_fr_micro_enterprise/wizards/l10n_fr_micro_setup_wizard.py:0
+#: code:addons/l10n_fr_micro_enterprise/wizard/l10n_fr_micro_setup_wizard.py:0
 msgid "valid SIRET"
 msgstr ""

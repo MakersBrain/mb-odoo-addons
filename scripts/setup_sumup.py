@@ -32,24 +32,29 @@ if not api_key or not merchant_code:
 # One provider record exists per company. Configure the one belonging to the
 # company this shell is running as, because that is the company whose name will
 # be on the invoice the customer pays.
-provider = env["payment.provider"].search([
-    ("code", "=", "sumup"),
-    ("company_id", "=", env.company.id),
-], limit=1)
+provider = env["payment.provider"].search(
+    [
+        ("code", "=", "sumup"),
+        ("company_id", "=", env.company.id),
+    ],
+    limit=1,
+)
 if not provider:
     raise SystemExit(
         f"No SumUp provider for {env.company.display_name}. Install mb_payment_sumup first."
     )
 
-provider.write({
-    "sumup_api_key": api_key,
-    "sumup_merchant_code": merchant_code,
-    # 'test' rather than 'enabled': the account behind a development credential
-    # is a sandbox merchant, and a provider marked enabled is one the portal
-    # offers to real customers.
-    "state": "test",
-    "is_published": True,
-})
+provider.write(
+    {
+        "sumup_api_key": api_key,
+        "sumup_merchant_code": merchant_code,
+        # 'test' rather than 'enabled': the account behind a development credential
+        # is a sandbox merchant, and a provider marked enabled is one the portal
+        # offers to real customers.
+        "state": "test",
+        "is_published": True,
+    }
+)
 print(f"payment.provider {provider.id}: SumUp -> merchant {merchant_code}, state {provider.state}")
 
 # Confirm the credential actually acts for that merchant before anyone tries to
@@ -67,22 +72,29 @@ elif len(codes) > 1:
 
 affiliate_key = os.environ.get("SUMUP_AFFILIATE_KEY")
 if affiliate_key:
-    method = env["pos.payment.method"].search([
-        ("use_payment_terminal", "=", "sumup_mobile"),
-    ], limit=1)
+    method = env["pos.payment.method"].search(
+        [
+            ("use_payment_terminal", "=", "sumup_mobile"),
+        ],
+        limit=1,
+    )
     if not method:
         journal = env["account.journal"].search([("type", "=", "bank")], limit=1)
-        method = env["pos.payment.method"].create({
-            "name": "SumUp",
-            "journal_id": journal.id,
-            "payment_method_type": "terminal",
-            "use_payment_terminal": "sumup_mobile",
-        })
-    method.write({
-        "sumup_affiliate_key": affiliate_key,
-        "sumup_app_id": os.environ.get("SUMUP_APP_ID") or False,
-        "sumup_payment_provider_id": provider.id,
-    })
+        method = env["pos.payment.method"].create(
+            {
+                "name": "SumUp",
+                "journal_id": journal.id,
+                "payment_method_type": "terminal",
+                "use_payment_terminal": "sumup_mobile",
+            }
+        )
+    method.write(
+        {
+            "sumup_affiliate_key": affiliate_key,
+            "sumup_app_id": os.environ.get("SUMUP_APP_ID") or False,
+            "sumup_payment_provider_id": provider.id,
+        }
+    )
     print(f"pos.payment.method {method.id}: {method.name} -> SumUp app handover")
     print("  add it to the POS configuration's payment methods to use it")
 else:

@@ -7,13 +7,16 @@ class SupplierLotMigration(models.TransientModel):
     _description = "Supplier lot tracking cutover analysis"
 
     product_ids = fields.Many2many(
-        "product.product", required=True,
+        "product.product",
+        required=True,
         domain="[('is_storable', '=', True)]",
         help="Products whose future receipts must preserve supplier lots.",
     )
     eligible_product_ids = fields.Many2many(
-        "product.product", "mb_supplier_lot_migration_eligible_rel",
-        string="Safe to update", readonly=True,
+        "product.product",
+        "mb_supplier_lot_migration_eligible_rel",
+        string="Safe to update",
+        readonly=True,
     )
     report = fields.Text(readonly=True)
     analyzed = fields.Boolean(readonly=True)
@@ -27,31 +30,58 @@ class SupplierLotMigration(models.TransientModel):
                 lines.append(_("%(product)s: already lot-tracked", product=product.display_name))
                 continue
             if product.tracking == "serial":
-                lines.append(_("%(product)s: blocked (serial-tracked)", product=product.display_name))
+                lines.append(
+                    _("%(product)s: blocked (serial-tracked)", product=product.display_name)
+                )
                 continue
-            has_stock = bool(self.env["stock.quant"].sudo().search_count([
-                ("product_id", "=", product.id),
-                ("company_id", "=", self.env.company.id),
-                ("quantity", "!=", 0),
-            ], limit=1))
+            has_stock = bool(
+                self.env["stock.quant"]
+                .sudo()
+                .search_count(
+                    [
+                        ("product_id", "=", product.id),
+                        ("company_id", "=", self.env.company.id),
+                        ("quantity", "!=", 0),
+                    ],
+                    limit=1,
+                )
+            )
             if has_stock:
-                lines.append(_(
-                    "%(product)s: blocked (on-hand stock must be cut over with an explicit "
-                    "inventory adjustment and lot allocation)", product=product.display_name,
-                ))
+                lines.append(
+                    _(
+                        "%(product)s: blocked (on-hand stock must be cut over with an explicit "
+                        "inventory adjustment and lot allocation)",
+                        product=product.display_name,
+                    )
+                )
                 continue
             eligible |= product
-            prior_moves = self.env["stock.move"].sudo().search_count([
-                ("product_id", "=", product.id), ("state", "=", "done"),
-            ], limit=1)
+            prior_moves = (
+                self.env["stock.move"]
+                .sudo()
+                .search_count(
+                    [
+                        ("product_id", "=", product.id),
+                        ("state", "=", "done"),
+                    ],
+                    limit=1,
+                )
+            )
             suffix = _("; historical moves remain unchanged") if prior_moves else ""
-            lines.append(_("%(product)s: safe for future lot tracking%(suffix)s",
-                           product=product.display_name, suffix=suffix))
-        self.write({
-            "eligible_product_ids": [(6, 0, eligible.ids)],
-            "report": "\n".join(lines) or _("No products selected."),
-            "analyzed": True,
-        })
+            lines.append(
+                _(
+                    "%(product)s: safe for future lot tracking%(suffix)s",
+                    product=product.display_name,
+                    suffix=suffix,
+                )
+            )
+        self.write(
+            {
+                "eligible_product_ids": [(6, 0, eligible.ids)],
+                "report": "\n".join(lines) or _("No products selected."),
+                "analyzed": True,
+            }
+        )
         return self._reopen()
 
     def action_apply_safe(self):
@@ -66,10 +96,12 @@ class SupplierLotMigration(models.TransientModel):
         self.action_analyze()
         if selected != self.eligible_product_ids:
             raise UserError(_("Stock changed after analysis. Review the refreshed report."))
-        self.eligible_product_ids.write({
-            "tracking": "lot",
-            "mb_supplier_lot_required": True,
-        })
+        self.eligible_product_ids.write(
+            {
+                "tracking": "lot",
+                "mb_supplier_lot_required": True,
+            }
+        )
         self.report += _("\nUpdated %(count)s product(s).", count=len(selected))
         return self._reopen()
 

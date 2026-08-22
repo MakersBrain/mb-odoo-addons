@@ -53,13 +53,20 @@ class ProductTemplate(models.Model):
     # record through _mb_apply_ceramics without this connector declaring a
     # second set of ceramics fields.
     mb_canonical_id = fields.Char(
-        string="Catalogue id", index=True, copy=False, readonly=True,
-        help="Identifier of the curated identity in the master catalogue.")
+        string="Catalogue id",
+        index=True,
+        copy=False,
+        readonly=True,
+        help="Identifier of the curated identity in the master catalogue.",
+    )
     mb_manufacturer = fields.Char(string="Manufacturer", readonly=True)
     mb_manufacturer_sku = fields.Char(
-        string="Manufacturer code", index=True, readonly=True,
+        string="Manufacturer code",
+        index=True,
+        readonly=True,
         help="The maker's own code (PC-20, SC74). The only key that compares "
-             "across suppliers; a shop's article number is never promoted to it.")
+        "across suppliers; a shop's article number is never promoted to it.",
+    )
     mb_catalogue_synced_at = fields.Datetime(string="Last catalogue sync", readonly=True)
 
     # -- identity ----------------------------------------------------------
@@ -70,11 +77,14 @@ class ProductTemplate(models.Model):
 
     @api.model
     def _mb_find_by_canonical(self, canonical_id):
-        data = self.env["ir.model.data"].search([
-            ("module", "=", IMD_MODULE),
-            ("name", "=", self._mb_xmlid(canonical_id)),
-            ("model", "=", "product.template"),
-        ], limit=1)
+        data = self.env["ir.model.data"].search(
+            [
+                ("module", "=", IMD_MODULE),
+                ("name", "=", self._mb_xmlid(canonical_id)),
+                ("model", "=", "product.template"),
+            ],
+            limit=1,
+        )
         if not data:
             return self.browse()
         # A user may have deleted the product; the external id can outlive it.
@@ -97,30 +107,35 @@ class ProductTemplate(models.Model):
         # so overwriting one always does.
         if not template or not template.categ_id:
             values["categ_id"] = self.env.ref(
-                FAMILY_CATEGORY.get(record.get("family"), FAMILY_FALLBACK)).id
+                FAMILY_CATEGORY.get(record.get("family"), FAMILY_FALLBACK)
+            ).id
         created = not template
         if created:
-            values.update({
-                # Set once, on creation only. After that the name is the
-                # artisan's: they rename a glaze to what they call it on the
-                # shelf, and a nightly refresh that renamed it back would be a
-                # bug they cannot fix.
-                "name": record.get("canonical_name") or record.get("manufacturer_sku"),
-                "type": "consu",
-                "is_storable": True,
-                "purchase_ok": True,
-                "sale_ok": False,
-            })
+            values.update(
+                {
+                    # Set once, on creation only. After that the name is the
+                    # artisan's: they rename a glaze to what they call it on the
+                    # shelf, and a nightly refresh that renamed it back would be a
+                    # bug they cannot fix.
+                    "name": record.get("canonical_name") or record.get("manufacturer_sku"),
+                    "type": "consu",
+                    "is_storable": True,
+                    "purchase_ok": True,
+                    "sale_ok": False,
+                }
+            )
             template = self.create(values)
-            self.env["ir.model.data"].create({
-                "module": IMD_MODULE,
-                "name": self._mb_xmlid(canonical_id),
-                "model": "product.template",
-                "res_id": template.id,
-                # The record belongs to the tenant once imported; an addon
-                # upgrade must not overwrite what they have since edited.
-                "noupdate": True,
-            })
+            self.env["ir.model.data"].create(
+                {
+                    "module": IMD_MODULE,
+                    "name": self._mb_xmlid(canonical_id),
+                    "model": "product.template",
+                    "res_id": template.id,
+                    # The record belongs to the tenant once imported; an addon
+                    # upgrade must not overwrite what they have since edited.
+                    "noupdate": True,
+                }
+            )
         else:
             template.write(values)
 
@@ -159,7 +174,7 @@ class ProductTemplate(models.Model):
     # -- packs -------------------------------------------------------------
 
     def _mb_pack_label(self, quantity, uom):
-        """"473 ml", "1000 g" - what the artisan sees in the variant selector."""
+        """ "473 ml", "1000 g" - what the artisan sees in the variant selector."""
         rounded = int(quantity) if float(quantity).is_integer() else round(quantity, 2)
         return f"{rounded} {uom.name}"
 
@@ -189,7 +204,8 @@ class ProductTemplate(models.Model):
         groups = {}
         for offer in offers:
             quantity, uom = units._package_to_uom(
-                offer.get("package_quantity"), offer.get("package_unit"))
+                offer.get("package_quantity"), offer.get("package_unit")
+            )
             if not quantity:
                 continue
             key = (units._pack_key(quantity), uom.id)
@@ -206,10 +222,10 @@ class ProductTemplate(models.Model):
             # 8 oz is 236.6 ml and 236 and 237 are both roundings of it. What
             # matters is that the label is the same on every run, because an
             # arbitrary winner renames the variant each time a supplier is added.
-            common = max(set(quantities),
-                         key=lambda value: (quantities.count(value),
-                                            float(value).is_integer(),
-                                            value))
+            common = max(
+                set(quantities),
+                key=lambda value: (quantities.count(value), float(value).is_integer(), value),
+            )
             labels[self._mb_pack_label(common, members[0][1])] = True
         if not labels:
             return
@@ -218,7 +234,8 @@ class ProductTemplate(models.Model):
         pack_values = value_model.browse()
         for label in sorted(labels):
             value = value_model.search(
-                [("attribute_id", "=", attribute.id), ("name", "=", label)], limit=1)
+                [("attribute_id", "=", attribute.id), ("name", "=", label)], limit=1
+            )
             if not value:
                 value = value_model.create({"attribute_id": attribute.id, "name": label})
             pack_values |= value
@@ -229,10 +246,16 @@ class ProductTemplate(models.Model):
             if missing:
                 line.value_ids = [(4, value.id) for value in missing]
         else:
-            self.attribute_line_ids = [(0, 0, {
-                "attribute_id": attribute.id,
-                "value_ids": [(6, 0, pack_values.ids)],
-            })]
+            self.attribute_line_ids = [
+                (
+                    0,
+                    0,
+                    {
+                        "attribute_id": attribute.id,
+                        "value_ids": [(6, 0, pack_values.ids)],
+                    },
+                )
+            ]
 
     def _mb_variant_for_pack(self, quantity, uom):
         """The product.product carrying that pack, if the template has one.
@@ -295,8 +318,11 @@ class ProductTemplate(models.Model):
             # active_test=False: Odoo ships every currency but activates only the
             # ones a company uses, and a vendor billing in SEK is exactly the case
             # where the currency is not active yet.
-            currency = self.env["res.currency"].with_context(active_test=False).search(
-                [("name", "=", offer.get("currency"))], limit=1)
+            currency = (
+                self.env["res.currency"]
+                .with_context(active_test=False)
+                .search([("name", "=", offer.get("currency"))], limit=1)
+            )
             if not currency:
                 # Refused rather than converted. The catalogue's EUR figures come
                 # from ECB daily reference rates and are indicative, not the rate
@@ -305,7 +331,8 @@ class ProductTemplate(models.Model):
                 continue
 
             quantity, uom = units._package_to_uom(
-                offer.get("package_quantity"), offer.get("package_unit"))
+                offer.get("package_quantity"), offer.get("package_unit")
+            )
             variant = self._mb_variant_for_pack(quantity, uom) if quantity else None
 
             minimum_quantity = offer.get("min_order_quantity") or 0.0
@@ -321,13 +348,16 @@ class ProductTemplate(models.Model):
                 "product_code": offer.get("supplier_reference") or False,
                 "product_name": offer.get("supplier_name") or False,
             }
-            existing = info.search([
-                ("partner_id", "=", supplier.partner_id.id),
-                ("product_tmpl_id", "=", self.id),
-                ("product_id", "=", variant.id if variant else False),
-                ("company_id", "=", self.env.company.id),
-                ("min_qty", "=", minimum_quantity),
-            ], limit=1)
+            existing = info.search(
+                [
+                    ("partner_id", "=", supplier.partner_id.id),
+                    ("product_tmpl_id", "=", self.id),
+                    ("product_id", "=", variant.id if variant else False),
+                    ("company_id", "=", self.env.company.id),
+                    ("min_qty", "=", minimum_quantity),
+                ],
+                limit=1,
+            )
             if existing:
                 existing.write(values)
             else:

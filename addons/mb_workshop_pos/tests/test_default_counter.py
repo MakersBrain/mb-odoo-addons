@@ -18,7 +18,9 @@ class TestDefaultCounter(TransactionCase):
         company = self.Company.create({"name": "Counter workshop"})
 
         self.env["account.chart.template"].sudo().try_loading(
-            "fr", company=company, install_demo=False,
+            "fr",
+            company=company,
+            install_demo=False,
         )
 
         counter = self.counters(company)
@@ -31,7 +33,9 @@ class TestDefaultCounter(TransactionCase):
     def test_seeding_is_idempotent(self):
         company = self.Company.create({"name": "Idempotent workshop"})
         self.env["account.chart.template"].sudo().try_loading(
-            "fr", company=company, install_demo=False,
+            "fr",
+            company=company,
+            install_demo=False,
         )
         first = self.counters(company)
 
@@ -47,7 +51,9 @@ class TestDefaultCounter(TransactionCase):
     def test_a_seeded_counter_retires_the_shop_type_screen(self):
         company = self.Company.create({"name": "Kanban workshop"})
         self.env["account.chart.template"].sudo().try_loading(
-            "fr", company=company, install_demo=False,
+            "fr",
+            company=company,
+            install_demo=False,
         )
 
         state = (
@@ -67,7 +73,9 @@ class TestDefaultCounter(TransactionCase):
             side_effect=ValueError("no counter today"),
         ):
             self.env["account.chart.template"].sudo().try_loading(
-                "fr", company=company, install_demo=False,
+                "fr",
+                company=company,
+                install_demo=False,
             )
 
         self.assertEqual(company.chart_template, "fr")

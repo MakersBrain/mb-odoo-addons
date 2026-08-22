@@ -10,17 +10,17 @@ class MbCeramicsSessionMixin(models.AbstractModel):
 
     def write(self, values):
         if any(record.state in self._mb_terminal_states for record in self):
-            raise UserError(_(
-                "A completed or cancelled workshop session is immutable. "
-                "Create a correcting session instead."
-            ))
+            raise UserError(
+                _(
+                    "A completed or cancelled workshop session is immutable. "
+                    "Create a correcting session instead."
+                )
+            )
         return super().write(values)
 
     def unlink(self):
         if any(record.state in self._mb_terminal_states for record in self):
-            raise UserError(_(
-                "A completed or cancelled workshop session cannot be deleted."
-            ))
+            raise UserError(_("A completed or cancelled workshop session cannot be deleted."))
         return super().unlink()
 
 
@@ -31,10 +31,32 @@ class MbCeramicsSessionLineMixin(models.AbstractModel):
     def _mb_check_session_open(self, sessions=None):
         sessions = sessions or self.mapped("session_id")
         if any(session.state in session._mb_terminal_states for session in sessions):
-            raise UserError(_(
-                "Lines of a completed or cancelled workshop session are immutable. "
-                "Create a correcting session instead."
-            ))
+            raise UserError(
+                _(
+                    "Lines of a completed or cancelled workshop session are immutable. "
+                    "Create a correcting session instead."
+                )
+            )
+
+    def _mb_available_quantity(self, product_field, lot_field):
+        """Strict on-hand quantity of one line's tracked input at the session source.
+
+        Bisque and glazing lines carried byte-identical copies of this, differing
+        only in which field names their stage uses. Throwing has no counterpart:
+        it consumes clay by weight, not tracked pieces.
+        """
+        for line in self:
+            product = line[product_field]
+            lot = line[lot_field]
+            if not (product and lot and line.session_id.source_location_id):
+                line.available_quantity = 0
+                continue
+            line.available_quantity = self.env["stock.quant"]._get_available_quantity(
+                product,
+                line.session_id.source_location_id,
+                lot_id=lot,
+                strict=True,
+            )
 
     @api.model_create_multi
     def create(self, vals_list):

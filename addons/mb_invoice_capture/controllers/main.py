@@ -12,7 +12,6 @@ from odoo.addons.mb_control_bridge.controllers.auth import (
     payload_digest,
 )
 
-
 _logger = logging.getLogger(__name__)
 
 
@@ -41,9 +40,7 @@ class InvoiceCaptureController(http.Controller):
             receipts.record(operation_key, "invoice.capture", digest, result)
             return request.make_json_response(result)
         except HTTPException as error:
-            return request.make_json_response(
-                {"error": error.description}, status=error.code
-            )
+            return request.make_json_response({"error": error.description}, status=error.code)
         except ValidationError as error:
             return request.make_json_response({"error": str(error)}, status=422)
         except Exception:

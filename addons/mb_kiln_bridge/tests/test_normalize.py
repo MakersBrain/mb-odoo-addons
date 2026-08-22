@@ -1,7 +1,10 @@
 from odoo.tests.common import TransactionCase, tagged
 
 from ..models.mykiln_normalize import (
-    kiln_specification, index_kiln_types, normalize_firing, normalize_kilns,
+    index_kiln_types,
+    kiln_specification,
+    normalize_firing,
+    normalize_kilns,
     normalize_program,
 )
 from . import fixtures
@@ -53,19 +56,22 @@ class TestNormalize(TransactionCase):
         reports cooling and whose samples already peaked. Left at "firing" the
         cooling gate would never open."""
         firing = normalize_firing(
-            fixtures.RUNNING_DETAIL, fixtures.FIRING_SAMPLES, kiln_state="cooling")
+            fixtures.RUNNING_DETAIL, fixtures.FIRING_SAMPLES, kiln_state="cooling"
+        )
         self.assertEqual(firing["state"], "cooling")
 
     def test_closed_firing_stays_done_whatever_the_kiln_says(self):
         firing = normalize_firing(
-            fixtures.FIRING_DETAIL, fixtures.FIRING_SAMPLES, kiln_state="cooling")
+            fixtures.FIRING_DETAIL, fixtures.FIRING_SAMPLES, kiln_state="cooling"
+        )
         self.assertEqual(firing["state"], "done")
 
     def test_unkeyable_firing_is_refused(self):
         """No id or no start means it cannot be keyed, so it must not import."""
         self.assertIsNone(normalize_firing({"kiln": {"id": 41}}, {}))
-        self.assertIsNone(normalize_firing(
-            {"id": 1, "kiln": {"id": 41}, "start_date_time": ""}, {}))
+        self.assertIsNone(
+            normalize_firing({"id": 1, "kiln": {"id": 41}, "start_date_time": ""}, {})
+        )
 
     # -- specification -----------------------------------------------------
 
@@ -92,8 +98,7 @@ class TestNormalize(TransactionCase):
         self.assertEqual(index[("rohde", "te 80 s")]["id"], 468)
 
     def test_a_kiln_with_no_model_gets_no_specification(self):
-        spec = kiln_specification(
-            fixtures.KILNS[1], index_kiln_types(fixtures.KILN_TYPES))
+        spec = kiln_specification(fixtures.KILNS[1], index_kiln_types(fixtures.KILN_TYPES))
         self.assertIsNone(spec["manufacturer"])
         self.assertIsNone(spec["series"])
         self.assertIsNone(spec["chamber_litres"])
@@ -102,15 +107,14 @@ class TestNormalize(TransactionCase):
         """A kiln whose model is not in the catalogue still reports its own
         volume and maximum, which are the figures that matter."""
         spec = kiln_specification(
-            dict(fixtures.KILNS[0], model_number="TE 9000 Z"),
-            index_kiln_types(fixtures.KILN_TYPES))
+            dict(fixtures.KILNS[0], model_number="TE 9000 Z"), index_kiln_types(fixtures.KILN_TYPES)
+        )
         self.assertEqual(spec["chamber_litres"], 80)
         self.assertIsNone(spec["series"])
         self.assertEqual(spec["heating_method"], "electric")
 
     def test_kilns_carry_their_specification(self):
-        kilns = normalize_kilns(
-            fixtures.KILNS, fixtures.CONTROLLERS, fixtures.KILN_TYPES)
+        kilns = normalize_kilns(fixtures.KILNS, fixtures.CONTROLLERS, fixtures.KILN_TYPES)
         self.assertEqual(kilns[0]["specification"]["model_number"], "TE 80 S")
 
     # -- programmes --------------------------------------------------------
@@ -136,13 +140,11 @@ class TestNormalize(TransactionCase):
         self.assertEqual(firing["program_number"], 4)
 
     def test_a_firing_naming_no_slot_yields_no_programme(self):
-        self.assertIsNone(normalize_program(
-            dict(fixtures.FIRING_DETAIL, program_number=None)))
+        self.assertIsNone(normalize_program(dict(fixtures.FIRING_DETAIL, program_number=None)))
 
     def test_a_slot_with_no_segments_is_still_a_programme(self):
         """A firing predating the app's programme capture. A slot with no
         profile is a gap, not a failure."""
-        program = normalize_program(
-            dict(fixtures.FIRING_DETAIL, program=None))
+        program = normalize_program(dict(fixtures.FIRING_DETAIL, program=None))
         self.assertEqual(program["program_number"], 3)
         self.assertEqual(program["segments"], [])

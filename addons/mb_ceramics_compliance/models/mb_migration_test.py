@@ -29,8 +29,7 @@ class MbMigrationTest(models.Model):
         index=True,
         check_company=True,
     )
-    product_id = fields.Many2one(
-        related="lot_id.product_id", store=True, string="Material")
+    product_id = fields.Many2one(related="lot_id.product_id", store=True, string="Material")
     test_date = fields.Date(required=True, default=fields.Date.context_today)
     laboratory = fields.Char()
     migration_limit_class = fields.Selection(
@@ -41,18 +40,19 @@ class MbMigrationTest(models.Model):
         ],
         required=True,
         help="The article geometry the sample was tested as. The limits differ "
-             "by class, so a result is only meaningful alongside it.",
+        "by class, so a result is only meaningful alongside it.",
     )
     lead_result = fields.Float(string="Lead migration", digits=(16, 4))
     cadmium_result = fields.Float(string="Cadmium migration", digits=(16, 4))
     passed = fields.Boolean(
         required=True,
         help="The laboratory's verdict, as issued. Not derived from the figures "
-             "above, because the limits in force are the lab's to apply.",
+        "above, because the limits in force are the lab's to apply.",
     )
     report_ids = fields.Many2many(
-        comodel_name="ir.attachment", string="Laboratory report", check_company=True)
+        comodel_name="ir.attachment", string="Laboratory report", check_company=True
+    )
     note = fields.Text()
     company_id = fields.Many2one(
-        comodel_name="res.company", required=True, index=True,
-        default=lambda self: self.env.company)
+        comodel_name="res.company", required=True, index=True, default=lambda self: self.env.company
+    )

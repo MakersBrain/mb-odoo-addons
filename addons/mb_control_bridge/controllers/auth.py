@@ -8,7 +8,6 @@ from werkzeug.exceptions import BadRequest, ServiceUnavailable, Unauthorized
 
 from odoo.http import request
 
-
 TOKEN_ENV = "MB_CONTROL_BRIDGE_TOKEN"
 TOKEN_FILE_ENV = "MB_CONTROL_BRIDGE_TOKEN_FILE"
 MAX_SECRET_BYTES = 64 * 1024
@@ -36,9 +35,7 @@ def bootstrap_credential(environ=None):
     plaintext = environ.get(TOKEN_ENV, "")
     secret_file = environ.get(TOKEN_FILE_ENV, "")
     if plaintext and secret_file:
-        raise ValueError(
-            f"{TOKEN_ENV} and {TOKEN_FILE_ENV} are mutually exclusive"
-        )
+        raise ValueError(f"{TOKEN_ENV} and {TOKEN_FILE_ENV} are mutually exclusive")
     if secret_file:
         return read_single_line_secret(secret_file)
     return plaintext
@@ -70,16 +67,12 @@ def authenticate_control_request(allow_initial_bootstrap=False):
     try:
         bootstrap_token = bootstrap_credential()
     except (OSError, UnicodeError, ValueError) as exc:
-        raise ServiceUnavailable(
-            "control-plane bootstrap credential is unavailable"
-        ) from exc
+        raise ServiceUnavailable("control-plane bootstrap credential is unavailable") from exc
     if not expected_hash and allow_initial_bootstrap and not bootstrap_token:
         raise ServiceUnavailable("control-plane bootstrap credential is not configured")
     if not expected_hash and not allow_initial_bootstrap:
         raise ServiceUnavailable("tenant bridge credential is not provisioned")
-    valid = credential_matches(
-        supplied, expected_hash, bootstrap_token, allow_initial_bootstrap
-    )
+    valid = credential_matches(supplied, expected_hash, bootstrap_token, allow_initial_bootstrap)
     if not valid:
         raise Unauthorized("invalid service credential")
 

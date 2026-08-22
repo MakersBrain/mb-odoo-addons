@@ -15,14 +15,11 @@ from odoo.exceptions import AccessError, UserError, ValidationError
 
 from .identifier import expand_upc_e, normalize_any_gtin, parse_gs1_element_string
 
-
 MAX_SOURCE_BYTES = 15 * 1024 * 1024
 MAX_DECODE_PIXELS = 50_000_000
 MAX_SANITIZED_PIXELS = 12_000_000
 MAX_RAW_RESPONSE_CHARS = 65_536
-UUID_RE = re.compile(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-)
+UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _INTERNAL_WRITE_TOKEN = object()
 
@@ -105,14 +102,19 @@ def sanitize_image(encoded):
                     converted.save(output, format="PNG", optimize=True)
                 sanitized = output.getvalue()
                 if len(sanitized) > MAX_SOURCE_BYTES:
-                    raise ValidationError(_(
-                        "The sanitized image exceeds the 15 MB evidence limit."
-                    ))
+                    raise ValidationError(
+                        _("The sanitized image exceeds the 15 MB evidence limit.")
+                    )
                 width, height = converted.size
     except ValidationError:
         raise
-    except (Image.DecompressionBombError, Image.DecompressionBombWarning,
-            UnidentifiedImageError, OSError, ValueError) as error:
+    except (
+        Image.DecompressionBombError,
+        Image.DecompressionBombWarning,
+        UnidentifiedImageError,
+        OSError,
+        ValueError,
+    ) as error:
         raise ValidationError(_("The upload is not a safe decodable JPEG or PNG image.")) from error
     return {
         "received_sha256": hashlib.sha256(received).hexdigest(),
@@ -135,13 +137,26 @@ class InventoryCapture(models.Model):
     name = fields.Char(required=True, readonly=True, copy=False, default=lambda self: _("New"))
     capture_uuid = fields.Char(required=True, readonly=True, copy=False, index=True)
     company_id = fields.Many2one(
-        "res.company", required=True, readonly=True, default=lambda self: self.env.company,
+        "res.company",
+        required=True,
+        readonly=True,
+        default=lambda self: self.env.company,
         index=True,
     )
     state = fields.Selection(
-        [("draft", "Draft"), ("processing", "Processing"), ("review", "Review"),
-         ("applied", "Applied"), ("failed", "Failed"), ("cancelled", "Cancelled")],
-        required=True, default="draft", readonly=True, tracking=True, index=True,
+        [
+            ("draft", "Draft"),
+            ("processing", "Processing"),
+            ("review", "Review"),
+            ("applied", "Applied"),
+            ("failed", "Failed"),
+            ("cancelled", "Cancelled"),
+        ],
+        required=True,
+        default="draft",
+        readonly=True,
+        tracking=True,
+        index=True,
     )
     picking_id = fields.Many2one("stock.picking", ondelete="restrict", check_company=True)
     move_id = fields.Many2one("stock.move", ondelete="restrict", check_company=True)
@@ -150,7 +165,10 @@ class InventoryCapture(models.Model):
     attempt_ids = fields.One2many("mb.inventory.capture.attempt", "capture_id", copy=False)
     candidate_ids = fields.One2many("mb.inventory.capture.candidate", "capture_id", copy=False)
     product_id = fields.Many2one(
-        "product.product", ondelete="restrict", check_company=True, tracking=True,
+        "product.product",
+        ondelete="restrict",
+        check_company=True,
+        tracking=True,
     )
     lot_id = fields.Many2one("stock.lot", ondelete="restrict", check_company=True, tracking=True)
     proposed_lot = fields.Char(tracking=True)
@@ -176,20 +194,30 @@ class InventoryCapture(models.Model):
             values = dict(values)
             values.setdefault("capture_uuid", str(uuid.uuid4()))
             if values.get("name", _("New")) == _("New"):
-                values["name"] = self.env["ir.sequence"].next_by_code(
-                    "mb.inventory.capture"
-                ) or _("New")
+                values["name"] = self.env["ir.sequence"].next_by_code("mb.inventory.capture") or _(
+                    "New"
+                )
             prepared.append(values)
         return super().create(prepared)
 
     def write(self, values):
         protected = {
-            "capture_uuid", "company_id", "state", "asset_ids", "attempt_ids",
-            "candidate_ids", "applied_by", "applied_at", "failure_code", "failure_detail",
+            "capture_uuid",
+            "company_id",
+            "state",
+            "asset_ids",
+            "attempt_ids",
+            "candidate_ids",
+            "applied_by",
+            "applied_at",
+            "failure_code",
+            "failure_detail",
         }
         if protected.intersection(values) and not _is_internal(self):
             raise UserError(_("Capture evidence and lifecycle fields cannot be edited directly."))
-        if self.filtered(lambda capture: capture.state in {"applied", "cancelled"}) and not _is_internal(self):
+        if self.filtered(
+            lambda capture: capture.state in {"applied", "cancelled"}
+        ) and not _is_internal(self):
             raise UserError(_("An applied or cancelled capture is immutable."))
         return super().write(values)
 
@@ -198,9 +226,17 @@ class InventoryCapture(models.Model):
         for capture in self:
             if capture.picking_id and capture.picking_id.picking_type_code != "incoming":
                 raise ValidationError(_("A capture can only be attached to an incoming transfer."))
-            if capture.move_id and capture.picking_id and capture.move_id.picking_id != capture.picking_id:
+            if (
+                capture.move_id
+                and capture.picking_id
+                and capture.move_id.picking_id != capture.picking_id
+            ):
                 raise ValidationError(_("The stock move does not belong to the capture receipt."))
-            if capture.move_line_id and capture.move_id and capture.move_line_id.move_id != capture.move_id:
+            if (
+                capture.move_line_id
+                and capture.move_id
+                and capture.move_line_id.move_id != capture.move_id
+            ):
                 raise ValidationError(_("The stock move line does not belong to the capture move."))
 
     @api.model
@@ -215,24 +251,29 @@ class InventoryCapture(models.Model):
                 move_id = open_moves.id
                 if len(open_moves.move_line_ids) == 1:
                     move_line_id = open_moves.move_line_ids.id
-        return self.create({
-            "company_id": picking.company_id.id,
-            "picking_id": picking.id,
-            "move_id": int(move_id) if move_id else False,
-            "move_line_id": int(move_line_id) if move_line_id else False,
-        }).read(["id", "capture_uuid", "name"])[0]
+        return self.create(
+            {
+                "company_id": picking.company_id.id,
+                "picking_id": picking.id,
+                "move_id": int(move_id) if move_id else False,
+                "move_line_id": int(move_line_id) if move_line_id else False,
+            }
+        ).read(["id", "capture_uuid", "name"])[0]
 
     def upload_image(self, encoded, role="front", filename=None):
         self.ensure_one()
         self.check_access("write")
         if self.state not in {"draft", "review"}:
-            raise UserError(_("Images can only be added before extraction starts or the capture is applied."))
+            raise UserError(
+                _("Images can only be added before extraction starts or the capture is applied.")
+            )
         if role not in {"front", "lot_detail"}:
             raise ValidationError(_("The source image role must be front or lot detail."))
         sanitized = sanitize_image(encoded)
         existing = self.asset_ids.filtered(
-            lambda asset: asset.role == role
-            and asset.sanitized_sha256 == sanitized["sanitized_sha256"]
+            lambda asset: (
+                asset.role == role and asset.sanitized_sha256 == sanitized["sanitized_sha256"]
+            )
         )[:1]
         if existing:
             replaced = self.asset_ids.filtered(
@@ -254,28 +295,32 @@ class InventoryCapture(models.Model):
         replaced = current_sources.filtered(lambda asset: asset.role == role)
         if not replaced and len(current_sources) >= 2:
             raise ValidationError(_("The first release accepts at most two current source images."))
-        asset = _internal(self.env["mb.inventory.capture.asset"]).create({
-            "capture_id": self.id,
-            "company_id": self.company_id.id,
-            "asset_uuid": str(uuid.uuid4()),
-            "role": role,
-            "mimetype": sanitized["mimetype"],
-            "pixel_width": sanitized["width"],
-            "pixel_height": sanitized["height"],
-            "byte_length": len(sanitized["data"]),
-            "received_sha256": sanitized["received_sha256"],
-            "sanitized_sha256": sanitized["sanitized_sha256"],
-            "sanitizer_version": "pillow-orient-strip-v1",
-        })
+        asset = _internal(self.env["mb.inventory.capture.asset"]).create(
+            {
+                "capture_id": self.id,
+                "company_id": self.company_id.id,
+                "asset_uuid": str(uuid.uuid4()),
+                "role": role,
+                "mimetype": sanitized["mimetype"],
+                "pixel_width": sanitized["width"],
+                "pixel_height": sanitized["height"],
+                "byte_length": len(sanitized["data"]),
+                "received_sha256": sanitized["received_sha256"],
+                "sanitized_sha256": sanitized["sanitized_sha256"],
+                "sanitizer_version": "pillow-orient-strip-v1",
+            }
+        )
         safe_stem = re.sub(r"[^A-Za-z0-9._-]", "_", (filename or role))[:80]
-        attachment = self.env["ir.attachment"].create({
-            "name": f"{safe_stem}.{sanitized['extension']}",
-            "res_model": asset._name,
-            "res_id": asset.id,
-            "company_id": self.company_id.id,
-            "mimetype": sanitized["mimetype"],
-            "datas": base64.b64encode(sanitized["data"]),
-        })
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": f"{safe_stem}.{sanitized['extension']}",
+                "res_model": asset._name,
+                "res_id": asset.id,
+                "company_id": self.company_id.id,
+                "mimetype": sanitized["mimetype"],
+                "datas": base64.b64encode(sanitized["data"]),
+            }
+        )
         _internal(asset).write({"attachment_id": attachment.id})
         if replaced:
             derived_crops = self.asset_ids.filtered(
@@ -294,20 +339,28 @@ class InventoryCapture(models.Model):
         if self.state not in {"draft", "review"}:
             raise UserError(_("A lot crop can only be added before extraction starts."))
         parent = self.asset_ids.filtered(
-            lambda item: item.id == int(parent_asset_id or 0)
-            and item.role in {"front", "lot_detail"}
+            lambda item: (
+                item.id == int(parent_asset_id or 0) and item.role in {"front", "lot_detail"}
+            )
         )[:1]
         if not parent or not parent.attachment_id:
             raise ValidationError(_("The crop source is not part of this capture."))
         previous_derivatives = self.asset_ids.filtered(
             lambda item: item.is_current and item.role in {"crop", "ocr_variant"}
         )
-        if (not isinstance(rectangle, list) or len(rectangle) != 4
-                or any(not isinstance(value, (int, float)) for value in rectangle)):
+        if (
+            not isinstance(rectangle, list)
+            or len(rectangle) != 4
+            or any(not isinstance(value, (int, float)) for value in rectangle)
+        ):
             raise ValidationError(_("The crop rectangle must contain four normalized numbers."))
         left, top, right, bottom = (float(value) for value in rectangle)
-        if not (0 <= left < right <= 1 and 0 <= top < bottom <= 1
-                and right - left >= 0.05 and bottom - top >= 0.05):
+        if not (
+            0 <= left < right <= 1
+            and 0 <= top < bottom <= 1
+            and right - left >= 0.05
+            and bottom - top >= 0.05
+        ):
             raise ValidationError(_("The crop rectangle is outside the image or too small."))
         rotation = int(rotation or 0)
         if rotation not in {0, 90, 180, 270}:
@@ -316,12 +369,14 @@ class InventoryCapture(models.Model):
             raise ValidationError(_("The enhancement option must be true or false."))
         try:
             source = base64.b64decode(
-                parent.attachment_id.with_context(bin_size=False).datas, validate=True,
+                parent.attachment_id.with_context(bin_size=False).datas,
+                validate=True,
             )
             with Image.open(io.BytesIO(source)) as opened:
                 image = opened.convert("RGB")
                 box = (
-                    int(left * image.width), int(top * image.height),
+                    int(left * image.width),
+                    int(top * image.height),
                     max(int(left * image.width) + 1, int(right * image.width)),
                     max(int(top * image.height) + 1, int(bottom * image.height)),
                 )
@@ -333,31 +388,36 @@ class InventoryCapture(models.Model):
         except (binascii.Error, UnidentifiedImageError, OSError, ValueError) as error:
             raise ValidationError(_("The sanitized source image could not be cropped.")) from error
         sanitized = sanitize_image(base64.b64encode(output.getvalue()).decode())
-        asset = _internal(self.env["mb.inventory.capture.asset"]).create({
-            "capture_id": self.id,
-            "company_id": self.company_id.id,
-            "asset_uuid": str(uuid.uuid4()),
-            "role": "crop",
-            "mimetype": sanitized["mimetype"],
-            "pixel_width": sanitized["width"],
-            "pixel_height": sanitized["height"],
-            "byte_length": len(sanitized["data"]),
-            "received_sha256": sanitized["received_sha256"],
-            "sanitized_sha256": sanitized["sanitized_sha256"],
-            "sanitizer_version": "pillow-reviewed-crop-v1",
-            "parent_asset_id": parent.id,
-            "crop_rectangle": {
-                "normalized": [left, top, right, bottom], "rotation": rotation,
-            },
-        })
-        attachment = self.env["ir.attachment"].create({
-            "name": f"lot-crop-{asset.asset_uuid}.jpg",
-            "res_model": asset._name,
-            "res_id": asset.id,
-            "company_id": self.company_id.id,
-            "mimetype": sanitized["mimetype"],
-            "datas": base64.b64encode(sanitized["data"]),
-        })
+        asset = _internal(self.env["mb.inventory.capture.asset"]).create(
+            {
+                "capture_id": self.id,
+                "company_id": self.company_id.id,
+                "asset_uuid": str(uuid.uuid4()),
+                "role": "crop",
+                "mimetype": sanitized["mimetype"],
+                "pixel_width": sanitized["width"],
+                "pixel_height": sanitized["height"],
+                "byte_length": len(sanitized["data"]),
+                "received_sha256": sanitized["received_sha256"],
+                "sanitized_sha256": sanitized["sanitized_sha256"],
+                "sanitizer_version": "pillow-reviewed-crop-v1",
+                "parent_asset_id": parent.id,
+                "crop_rectangle": {
+                    "normalized": [left, top, right, bottom],
+                    "rotation": rotation,
+                },
+            }
+        )
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": f"lot-crop-{asset.asset_uuid}.jpg",
+                "res_model": asset._name,
+                "res_id": asset.id,
+                "company_id": self.company_id.id,
+                "mimetype": sanitized["mimetype"],
+                "datas": base64.b64encode(sanitized["data"]),
+            }
+        )
         _internal(asset).write({"attachment_id": attachment.id})
         if previous_derivatives:
             _internal(previous_derivatives).write({"is_current": False})
@@ -369,32 +429,37 @@ class InventoryCapture(models.Model):
             enhanced_output = io.BytesIO()
             enhanced.save(enhanced_output, format="PNG", optimize=True)
             variant = sanitize_image(base64.b64encode(enhanced_output.getvalue()).decode())
-            variant_asset = _internal(self.env["mb.inventory.capture.asset"]).create({
-                "capture_id": self.id,
-                "company_id": self.company_id.id,
-                "asset_uuid": str(uuid.uuid4()),
-                "role": "ocr_variant",
-                "mimetype": variant["mimetype"],
-                "pixel_width": variant["width"],
-                "pixel_height": variant["height"],
-                "byte_length": len(variant["data"]),
-                "received_sha256": variant["received_sha256"],
-                "sanitized_sha256": variant["sanitized_sha256"],
-                "sanitizer_version": "pillow-bw-autocontrast-v1",
-                "parent_asset_id": asset.id,
-                "crop_rectangle": {
-                    "normalized": [left, top, right, bottom], "rotation": rotation,
-                    "enhancement": "grayscale_autocontrast_threshold_v1",
-                },
-            })
-            variant_attachment = self.env["ir.attachment"].create({
-                "name": f"lot-crop-bw-{variant_asset.asset_uuid}.png",
-                "res_model": variant_asset._name,
-                "res_id": variant_asset.id,
-                "company_id": self.company_id.id,
-                "mimetype": variant["mimetype"],
-                "datas": base64.b64encode(variant["data"]),
-            })
+            variant_asset = _internal(self.env["mb.inventory.capture.asset"]).create(
+                {
+                    "capture_id": self.id,
+                    "company_id": self.company_id.id,
+                    "asset_uuid": str(uuid.uuid4()),
+                    "role": "ocr_variant",
+                    "mimetype": variant["mimetype"],
+                    "pixel_width": variant["width"],
+                    "pixel_height": variant["height"],
+                    "byte_length": len(variant["data"]),
+                    "received_sha256": variant["received_sha256"],
+                    "sanitized_sha256": variant["sanitized_sha256"],
+                    "sanitizer_version": "pillow-bw-autocontrast-v1",
+                    "parent_asset_id": asset.id,
+                    "crop_rectangle": {
+                        "normalized": [left, top, right, bottom],
+                        "rotation": rotation,
+                        "enhancement": "grayscale_autocontrast_threshold_v1",
+                    },
+                }
+            )
+            variant_attachment = self.env["ir.attachment"].create(
+                {
+                    "name": f"lot-crop-bw-{variant_asset.asset_uuid}.png",
+                    "res_model": variant_asset._name,
+                    "res_id": variant_asset.id,
+                    "company_id": self.company_id.id,
+                    "mimetype": variant["mimetype"],
+                    "datas": base64.b64encode(variant["data"]),
+                }
+            )
             _internal(variant_asset).write({"attachment_id": variant_attachment.id})
             result["ocr_variant"] = variant_asset.public_payload()
         return result
@@ -407,69 +472,86 @@ class InventoryCapture(models.Model):
         if not raw_value or len(raw_value) > 512:
             raise ValidationError(_("The decoded value must contain between 1 and 512 characters."))
         operation_key = f"local-barcode:{self.capture_uuid}:{uuid.uuid4()}"
-        attempt = _internal(self.env["mb.inventory.capture.attempt"]).create({
-            "capture_id": self.id,
-            "company_id": self.company_id.id,
-            "attempt_uuid": str(uuid.uuid4()),
-            "operation_key": operation_key,
-            "kind": "barcode",
-            "provider": "browser",
-            "model": symbology or "unknown",
-            "state": "succeeded",
-            "started_at": fields.Datetime.now(),
-            "ended_at": fields.Datetime.now(),
-            "normalized_response": {"raw_value": raw_value, "symbology": symbology},
-        })
+        attempt = _internal(self.env["mb.inventory.capture.attempt"]).create(
+            {
+                "capture_id": self.id,
+                "company_id": self.company_id.id,
+                "attempt_uuid": str(uuid.uuid4()),
+                "operation_key": operation_key,
+                "kind": "barcode",
+                "provider": "browser",
+                "model": symbology or "unknown",
+                "state": "succeeded",
+                "started_at": fields.Datetime.now(),
+                "ended_at": fields.Datetime.now(),
+                "normalized_response": {"raw_value": raw_value, "symbology": symbology},
+            }
+        )
         looks_like_gs1 = (
             raw_value.startswith(("]d2", "("))
             or "\x1d" in raw_value
             or (raw_value.startswith("01") and len(raw_value) > 14)
         )
-        parsed = parse_gs1_element_string(raw_value) if looks_like_gs1 else {
-            "gtin": None, "lot": None, "expiry": None, "quantity": None, "warnings": [],
-        }
+        parsed = (
+            parse_gs1_element_string(raw_value)
+            if looks_like_gs1
+            else {
+                "gtin": None,
+                "lot": None,
+                "expiry": None,
+                "quantity": None,
+                "warnings": [],
+            }
+        )
         gtin_input = expand_upc_e(raw_value) if symbology == "upc_e" else raw_value
         normalized = parsed.get("gtin") or normalize_any_gtin(gtin_input)
         products = self.env["product.product"]
         if normalized:
-            identifiers = self.env["mb.product.identifier"].search([
-                ("comparison_scheme", "=", "gtin"),
-                ("normalized_value", "=", normalized),
-            ])
+            identifiers = self.env["mb.product.identifier"].search(
+                [
+                    ("comparison_scheme", "=", "gtin"),
+                    ("normalized_value", "=", normalized),
+                ]
+            )
             products |= identifiers.product_id
         if not products:
             try:
                 lookup_candidates = self._append_lookup_candidates(
-                    barcode=normalized, query=raw_value,
+                    barcode=normalized,
+                    query=raw_value,
                 )
                 products |= lookup_candidates.product_id
             except UserError as error:
                 parsed["warnings"].append(str(error))
         for product in products:
-            _internal(self.env["mb.inventory.capture.candidate"]).create({
-                "capture_id": self.id,
-                "company_id": self.company_id.id,
-                "attempt_id": attempt.id,
-                "kind": "product",
-                "raw_value": raw_value,
-                "normalized_value": normalized,
-                "source": "local_barcode",
-                "confidence": 1.0,
-                "grounding_state": "grounded",
-                "product_id": product.id,
-            })
+            _internal(self.env["mb.inventory.capture.candidate"]).create(
+                {
+                    "capture_id": self.id,
+                    "company_id": self.company_id.id,
+                    "attempt_id": attempt.id,
+                    "kind": "product",
+                    "raw_value": raw_value,
+                    "normalized_value": normalized,
+                    "source": "local_barcode",
+                    "confidence": 1.0,
+                    "grounding_state": "grounded",
+                    "product_id": product.id,
+                }
+            )
         if parsed.get("lot"):
-            _internal(self.env["mb.inventory.capture.candidate"]).create({
-                "capture_id": self.id,
-                "company_id": self.company_id.id,
-                "attempt_id": attempt.id,
-                "kind": "lot",
-                "raw_value": parsed["lot"],
-                "normalized_value": parsed["lot"],
-                "source": "gs1_ai_10",
-                "confidence": 1.0,
-                "grounding_state": "grounded",
-            })
+            _internal(self.env["mb.inventory.capture.candidate"]).create(
+                {
+                    "capture_id": self.id,
+                    "company_id": self.company_id.id,
+                    "attempt_id": attempt.id,
+                    "kind": "lot",
+                    "raw_value": parsed["lot"],
+                    "normalized_value": parsed["lot"],
+                    "source": "gs1_ai_10",
+                    "confidence": 1.0,
+                    "grounding_state": "grounded",
+                }
+            )
         values = {"state": "review"}
         if len(products) == 1 and not self.env.context.get("mb_defer_product_selection"):
             values["product_id"] = products.id
@@ -506,7 +588,8 @@ class InventoryCapture(models.Model):
                 continue
             seen.add(identity)
             result = self.with_context(mb_defer_product_selection=True).action_record_scan(
-                raw_value, symbology,
+                raw_value,
+                symbology,
             )
             results.append(result)
             product_ids.update(result.get("product_ids") or [])
@@ -526,7 +609,9 @@ class InventoryCapture(models.Model):
     def _append_lookup_candidates(self, barcode=None, query=None):
         self.ensure_one()
         results = self.env["mb.inventory.capture.lookup.provider"].lookup(
-            barcode=barcode, query=query, limit=10,
+            barcode=barcode,
+            query=query,
+            limit=10,
         )
         return self._store_lookup_candidates(results, provider="provider-chain")
 
@@ -543,41 +628,49 @@ class InventoryCapture(models.Model):
             task="inventory_product_lookup",
             payload={"gtin14": normalized},
         )
-        if (response.get("provider") != "upcitemdb"
-                or response.get("schema_version") != 1
-                or response.get("gtin14") != normalized
-                or not isinstance(response.get("candidates"), list)):
+        if (
+            response.get("provider") != "upcitemdb"
+            or response.get("schema_version") != 1
+            or response.get("gtin14") != normalized
+            or not isinstance(response.get("candidates"), list)
+        ):
             raise UserError(_("The product lookup returned an invalid response."))
         candidates = self._store_lookup_candidates(
-            response["candidates"], provider="upcitemdb",
+            response["candidates"],
+            provider="upcitemdb",
         )
         return {
             "gtin": normalized,
             "candidate_count": len(candidates),
             "cache": str(response.get("cache") or "unknown")[:32],
-            "lot_guidance": _lot_guidance([
-                item.get("brand") or item.get("name") or item.get("label")
-                for item in response["candidates"] if isinstance(item, dict)
-            ]),
+            "lot_guidance": _lot_guidance(
+                [
+                    item.get("brand") or item.get("name") or item.get("label")
+                    for item in response["candidates"]
+                    if isinstance(item, dict)
+                ]
+            ),
         }
 
     def _store_lookup_candidates(self, results, provider):
         self.ensure_one()
         if not isinstance(results, list) or not results:
             return self.env["mb.inventory.capture.candidate"]
-        attempt = _internal(self.env["mb.inventory.capture.attempt"]).create({
-            "capture_id": self.id,
-            "company_id": self.company_id.id,
-            "attempt_uuid": str(uuid.uuid4()),
-            "operation_key": f"lookup:{self.capture_uuid}:{uuid.uuid4()}",
-            "kind": "lookup",
-            "provider": str(provider or "provider-chain")[:128],
-            "model": "exact-barcode-or-text",
-            "state": "succeeded",
-            "started_at": fields.Datetime.now(),
-            "ended_at": fields.Datetime.now(),
-            "normalized_response": {"result_count": len(results)},
-        })
+        attempt = _internal(self.env["mb.inventory.capture.attempt"]).create(
+            {
+                "capture_id": self.id,
+                "company_id": self.company_id.id,
+                "attempt_uuid": str(uuid.uuid4()),
+                "operation_key": f"lookup:{self.capture_uuid}:{uuid.uuid4()}",
+                "kind": "lookup",
+                "provider": str(provider or "provider-chain")[:128],
+                "model": "exact-barcode-or-text",
+                "state": "succeeded",
+                "started_at": fields.Datetime.now(),
+                "ended_at": fields.Datetime.now(),
+                "normalized_response": {"result_count": len(results)},
+            }
+        )
         candidates = self.env["mb.inventory.capture.candidate"]
         for result in results[:10]:
             if not isinstance(result, dict):
@@ -589,22 +682,24 @@ class InventoryCapture(models.Model):
             if not raw_value or not normalized_value:
                 continue
             product = self.env["product.product"].browse(result.get("product_id") or 0).exists()
-            candidates |= _internal(candidates).create({
-                "capture_id": self.id,
-                "company_id": self.company_id.id,
-                "attempt_id": attempt.id,
-                "kind": "product",
-                "raw_value": raw_value,
-                "normalized_value": normalized_value,
-                "source": str(result.get("source") or "lookup")[:100],
-                "confidence": max(0.0, min(float(result.get("confidence") or 0.0), 1.0)),
-                "explanation": str(result.get("explanation") or "")[:2000],
-                "brand": str(result.get("brand") or "")[:120],
-                "manufacturer_sku": str(result.get("manufacturer_sku") or "")[:120],
-                "pack_identity": str(result.get("pack") or "")[:120],
-                "grounding_state": "grounded" if result.get("grounded") else "unverified",
-                "product_id": product.id,
-            })
+            candidates |= _internal(candidates).create(
+                {
+                    "capture_id": self.id,
+                    "company_id": self.company_id.id,
+                    "attempt_id": attempt.id,
+                    "kind": "product",
+                    "raw_value": raw_value,
+                    "normalized_value": normalized_value,
+                    "source": str(result.get("source") or "lookup")[:100],
+                    "confidence": max(0.0, min(float(result.get("confidence") or 0.0), 1.0)),
+                    "explanation": str(result.get("explanation") or "")[:2000],
+                    "brand": str(result.get("brand") or "")[:120],
+                    "manufacturer_sku": str(result.get("manufacturer_sku") or "")[:120],
+                    "pack_identity": str(result.get("pack") or "")[:120],
+                    "grounding_state": "grounded" if result.get("grounded") else "unverified",
+                    "product_id": product.id,
+                }
+            )
         return candidates
 
     def action_prepare_extraction(self):
@@ -612,14 +707,15 @@ class InventoryCapture(models.Model):
         self.check_access("write")
         if self.state not in {"draft", "processing", "failed", "review"}:
             raise UserError(_("This capture cannot be queued for extraction."))
-        crops = self.asset_ids.filtered(
-            lambda asset: asset.role == "crop" and asset.is_current
-        )
+        crops = self.asset_ids.filtered(lambda asset: asset.role == "crop" and asset.is_current)
         if crops:
             selected_crop = crops[-1:]
             variant = self.asset_ids.filtered(
-                lambda asset: asset.role == "ocr_variant"
-                and asset.parent_asset_id == selected_crop and asset.is_current
+                lambda asset: (
+                    asset.role == "ocr_variant"
+                    and asset.parent_asset_id == selected_crop
+                    and asset.is_current
+                )
             )[-1:]
             front = self.asset_ids.filtered(
                 lambda asset: asset.role == "front" and asset.is_current
@@ -634,17 +730,25 @@ class InventoryCapture(models.Model):
             )
         if not source_assets:
             raise UserError(_("Add at least one image before requesting extraction."))
-        provider_order = list(filter(None, [
-            self.company_id.mb_inventory_vision_primary,
-            self.company_id.mb_inventory_vision_secondary,
-        ]))
+        provider_order = list(
+            filter(
+                None,
+                [
+                    self.company_id.mb_inventory_vision_primary,
+                    self.company_id.mb_inventory_vision_secondary,
+                ],
+            )
+        )
         payload = {
             "capture_id": self.capture_uuid,
-            "assets": [{
-                "asset_id": asset.asset_uuid,
-                "role": asset.role,
-                "content_sha256": asset.sanitized_sha256,
-            } for asset in source_assets],
+            "assets": [
+                {
+                    "asset_id": asset.asset_uuid,
+                    "role": asset.role,
+                    "content_sha256": asset.sanitized_sha256,
+                }
+                for asset in source_assets
+            ],
             "task": "inventory_label",
             "hints": {
                 "allow_ai": bool(self.company_id.mb_inventory_ai_enabled),
@@ -653,11 +757,13 @@ class InventoryCapture(models.Model):
         }
         workshop_id = self.company_id.mb_control_workshop_id
         if not workshop_id:
-            _internal(self).write({"state": "review", "failure_code": False,
-                                   "failure_detail": False})
+            _internal(self).write(
+                {"state": "review", "failure_code": False, "failure_detail": False}
+            )
             return {**payload, "outcome": "manual_only", "queued": False}
-        _internal(self).write({"state": "processing", "failure_code": False,
-                               "failure_detail": False})
+        _internal(self).write(
+            {"state": "processing", "failure_code": False, "failure_detail": False}
+        )
         operation_key = "inventory:%s:%s" % (
             self.capture_uuid,
             hashlib.sha256(json.dumps(payload["assets"], sort_keys=True).encode()).hexdigest(),
@@ -671,8 +777,13 @@ class InventoryCapture(models.Model):
             )
             return {**payload, **result}
         except UserError:
-            _internal(self).write({"state": "failed", "failure_code": "enqueue_failed",
-                                   "failure_detail": "Extraction could not be queued."})
+            _internal(self).write(
+                {
+                    "state": "failed",
+                    "failure_code": "enqueue_failed",
+                    "failure_detail": "Extraction could not be queued.",
+                }
+            )
             raise
 
     def ingest_result(self, payload):
@@ -684,12 +795,15 @@ class InventoryCapture(models.Model):
         if self.state not in {"processing", "review", "failed"}:
             raise ValidationError(_("The capture is not waiting for extraction results."))
         metadata = self.env["mb.ai.gateway"].validate_callback_envelope(
-            payload, kinds={"ocr", "multimodal"},
+            payload,
+            kinds={"ocr", "multimodal"},
         )
         attempt_uuid = metadata["attempt_id"]
         operation_key = str(payload.get("operation_key") or "").strip()
         if not operation_key or len(operation_key) > 255:
-            raise ValidationError(_("operation_key is required and must be at most 255 characters."))
+            raise ValidationError(
+                _("operation_key is required and must be at most 255 characters.")
+            )
         state = payload.get("state")
         if state not in {"succeeded", "failed", "cancelled"}:
             raise ValidationError(_("The extraction result state is invalid."))
@@ -697,54 +811,69 @@ class InventoryCapture(models.Model):
         if not isinstance(input_digests, list) or not input_digests:
             raise ValidationError(_("input_digests must be a non-empty array."))
         known = set(self.asset_ids.mapped("sanitized_sha256"))
-        if any(not isinstance(digest, str) or not SHA256_RE.fullmatch(digest)
-               or digest not in known for digest in input_digests):
+        if any(
+            not isinstance(digest, str) or not SHA256_RE.fullmatch(digest) or digest not in known
+            for digest in input_digests
+        ):
             raise ValidationError(_("The result references an unknown input digest."))
-        normalized = _bounded_json(payload.get("normalized_response") or {},
-                                   "normalized_response")
+        normalized = _bounded_json(payload.get("normalized_response") or {}, "normalized_response")
         raw_response = metadata["diagnostic"]
         parent = self.attempt_ids.filtered(
             lambda item: item.attempt_uuid == str(payload.get("parent_attempt_id") or "").lower()
         )[:1]
         if payload.get("parent_attempt_id") and not parent:
             raise ValidationError(_("parent_attempt_id does not belong to this capture."))
-        attempt = _internal(self.env["mb.inventory.capture.attempt"]).create({
-            "capture_id": self.id,
-            "company_id": self.company_id.id,
-            "attempt_uuid": attempt_uuid,
-            "parent_attempt_id": parent.id,
-            "operation_key": operation_key,
-            "kind": metadata["kind"],
-            "provider": metadata["provider"],
-            "model": metadata["model"],
-            "model_version": str(
-                payload.get("model_version") or payload.get("version") or ""
-            )[:128],
-            "input_asset_ids": [(6, 0, self.asset_ids.filtered(
-                lambda asset: asset.sanitized_sha256 in input_digests
-            ).ids)],
-            "input_digests": input_digests,
-            "request_id": metadata["request_id"],
-            "state": state,
-            "started_at": payload.get("started_at") or fields.Datetime.now(),
-            "ended_at": payload.get("ended_at") or fields.Datetime.now(),
-            "raw_response": raw_response,
-            "normalized_response": normalized,
-            "failure_code": str(payload.get("failure_code") or "")[:128],
-            "usage": _bounded_json(payload.get("usage") or {}, "usage", 4096),
-        })
+        attempt = _internal(self.env["mb.inventory.capture.attempt"]).create(
+            {
+                "capture_id": self.id,
+                "company_id": self.company_id.id,
+                "attempt_uuid": attempt_uuid,
+                "parent_attempt_id": parent.id,
+                "operation_key": operation_key,
+                "kind": metadata["kind"],
+                "provider": metadata["provider"],
+                "model": metadata["model"],
+                "model_version": str(payload.get("model_version") or payload.get("version") or "")[
+                    :128
+                ],
+                "input_asset_ids": [
+                    (
+                        6,
+                        0,
+                        self.asset_ids.filtered(
+                            lambda asset: asset.sanitized_sha256 in input_digests
+                        ).ids,
+                    )
+                ],
+                "input_digests": input_digests,
+                "request_id": metadata["request_id"],
+                "state": state,
+                "started_at": payload.get("started_at") or fields.Datetime.now(),
+                "ended_at": payload.get("ended_at") or fields.Datetime.now(),
+                "raw_response": raw_response,
+                "normalized_response": normalized,
+                "failure_code": str(payload.get("failure_code") or "")[:128],
+                "usage": _bounded_json(payload.get("usage") or {}, "usage", 4096),
+            }
+        )
         if state == "succeeded":
             self._ingest_candidates(attempt, normalized.get("candidates") or [])
             self._ingest_detected_codes(attempt, normalized.get("codes") or [])
             _internal(self).write({"state": "review"})
         elif state == "failed":
-            _internal(self).write({
-                "state": "failed",
-                "failure_code": attempt.failure_code or "provider_failed",
-                "failure_detail": str(payload.get("failure_detail") or "")[:2000],
-            })
-        return {"applied": True, "capture_id": self.capture_uuid,
-                "attempt_id": attempt.attempt_uuid, "state": self.state}
+            _internal(self).write(
+                {
+                    "state": "failed",
+                    "failure_code": attempt.failure_code or "provider_failed",
+                    "failure_detail": str(payload.get("failure_detail") or "")[:2000],
+                }
+            )
+        return {
+            "applied": True,
+            "capture_id": self.capture_uuid,
+            "attempt_id": attempt.attempt_uuid,
+            "state": self.state,
+        }
 
     def _ingest_candidates(self, attempt, candidates):
         if not isinstance(candidates, list) or len(candidates) > 30:
@@ -761,39 +890,60 @@ class InventoryCapture(models.Model):
             if not raw_value or not normalized_value:
                 raise ValidationError(_("Candidate values cannot be empty."))
             confidence = candidate.get("confidence", 0)
-            if isinstance(confidence, bool) or not isinstance(confidence, (int, float)) \
-                    or not 0 <= confidence <= 1:
+            if (
+                isinstance(confidence, bool)
+                or not isinstance(confidence, (int, float))
+                or not 0 <= confidence <= 1
+            ):
                 raise ValidationError(_("Candidate confidence must be between zero and one."))
             region = candidate.get("reported_region") or []
-            if region and (not isinstance(region, list) or len(region) != 4
-                           or any(isinstance(value, bool) or not isinstance(value, (int, float))
-                                  or not 0 <= value <= 1 for value in region)):
-                raise ValidationError(_("Candidate reported_region must be four normalized numbers."))
+            if region and (
+                not isinstance(region, list)
+                or len(region) != 4
+                or any(
+                    isinstance(value, bool)
+                    or not isinstance(value, (int, float))
+                    or not 0 <= value <= 1
+                    for value in region
+                )
+            ):
+                raise ValidationError(
+                    _("Candidate reported_region must be four normalized numbers.")
+                )
             grounding_state = candidate.get("grounding_state", "unverified")
             if grounding_state not in {"grounded", "user_confirmed_crop", "unverified"}:
                 raise ValidationError(_("Candidate grounding_state is invalid."))
             asset_uuid = str(candidate.get("asset_id") or "").lower()
-            evidence_asset = self.asset_ids.filtered(
-                lambda asset, expected=asset_uuid: asset.asset_uuid == expected
-            )[:1] if asset_uuid else self.env["mb.inventory.capture.asset"]
+            evidence_asset = (
+                self.asset_ids.filtered(
+                    lambda asset, expected=asset_uuid: asset.asset_uuid == expected
+                )[:1]
+                if asset_uuid
+                else self.env["mb.inventory.capture.asset"]
+            )
             if asset_uuid and not evidence_asset:
                 raise ValidationError(_("Candidate asset_id does not belong to this capture."))
-            _internal(self.env["mb.inventory.capture.candidate"]).create({
-                "capture_id": self.id,
-                "company_id": self.company_id.id,
-                "attempt_id": attempt.id,
-                "kind": kind,
-                "raw_value": raw_value,
-                "normalized_value": normalized_value,
-                "source": str(candidate.get("source") or attempt.kind)[:128],
-                "confidence": confidence,
-                "explanation": str(candidate.get("explanation") or "")[:2000],
-                "reported_region": region,
-                "grounding_state": grounding_state,
-                "evidence_asset_ids": [(6, 0, evidence_asset.ids)],
-            })
-            if kind == "product" and grounding_state == "unverified" \
-                    and normalized_value not in suggested_queries:
+            _internal(self.env["mb.inventory.capture.candidate"]).create(
+                {
+                    "capture_id": self.id,
+                    "company_id": self.company_id.id,
+                    "attempt_id": attempt.id,
+                    "kind": kind,
+                    "raw_value": raw_value,
+                    "normalized_value": normalized_value,
+                    "source": str(candidate.get("source") or attempt.kind)[:128],
+                    "confidence": confidence,
+                    "explanation": str(candidate.get("explanation") or "")[:2000],
+                    "reported_region": region,
+                    "grounding_state": grounding_state,
+                    "evidence_asset_ids": [(6, 0, evidence_asset.ids)],
+                }
+            )
+            if (
+                kind == "product"
+                and grounding_state == "unverified"
+                and normalized_value not in suggested_queries
+            ):
                 suggested_queries.append(normalized_value)
         # Model output can suggest a query; only a configured provider can
         # append a separately-audited, grounded product candidate.
@@ -820,17 +970,24 @@ class InventoryCapture(models.Model):
             if not raw_value or len(raw_value) > 512:
                 raise ValidationError(_("A detected code must contain 1 to 512 characters."))
             confidence = code.get("confidence", 0)
-            if isinstance(confidence, bool) or not isinstance(confidence, (int, float)) \
-                    or not 0 <= confidence <= 1:
+            if (
+                isinstance(confidence, bool)
+                or not isinstance(confidence, (int, float))
+                or not 0 <= confidence <= 1
+            ):
                 raise ValidationError(_("Detected-code confidence must be between zero and one."))
             region = code.get("polygon") or []
-            if region and (not isinstance(region, list) or len(region) != 4
-                           or any(isinstance(value, bool)
-                                  or not isinstance(value, (int, float))
-                                  or not 0 <= value <= 1 for value in region)):
-                raise ValidationError(_(
-                    "A detected-code polygon must be four normalized numbers."
-                ))
+            if region and (
+                not isinstance(region, list)
+                or len(region) != 4
+                or any(
+                    isinstance(value, bool)
+                    or not isinstance(value, (int, float))
+                    or not 0 <= value <= 1
+                    for value in region
+                )
+            ):
+                raise ValidationError(_("A detected-code polygon must be four normalized numbers."))
 
             looks_like_gs1 = (
                 raw_value.startswith(("]d2", "("))
@@ -842,44 +999,57 @@ class InventoryCapture(models.Model):
             if not normalized:
                 continue
 
-            products = self.env["mb.product.identifier"].search([
-                ("comparison_scheme", "=", "gtin"),
-                ("normalized_value", "=", normalized),
-            ]).product_id
+            products = (
+                self.env["mb.product.identifier"]
+                .search(
+                    [
+                        ("comparison_scheme", "=", "gtin"),
+                        ("normalized_value", "=", normalized),
+                    ]
+                )
+                .product_id
+            )
             if not products:
                 try:
                     products |= self._append_lookup_candidates(
-                        barcode=normalized, query=raw_value,
+                        barcode=normalized,
+                        query=raw_value,
                     ).product_id
                 except UserError:
                     # Catalogue availability must not discard valid OCR evidence.
                     pass
             for product in products:
                 duplicate = self.candidate_ids.filtered(
-                    lambda item, product=product, normalized=normalized:
-                    item.attempt_id == attempt
-                    and item.kind == "product" and item.product_id == product
-                    and item.normalized_value == normalized
+                    lambda item, product=product, normalized=normalized: (
+                        item.attempt_id == attempt
+                        and item.kind == "product"
+                        and item.product_id == product
+                        and item.normalized_value == normalized
+                    )
                 )
                 if duplicate:
                     continue
-                _internal(candidate_model).create({
-                    "capture_id": self.id,
-                    "company_id": self.company_id.id,
-                    "attempt_id": attempt.id,
-                    "kind": "product",
-                    "raw_value": raw_value,
-                    "normalized_value": normalized,
-                    "source": "ocr_barcode",
-                    "confidence": confidence,
-                    "reported_region": region,
-                    "grounding_state": "grounded",
-                    "product_id": product.id,
-                })
+                _internal(candidate_model).create(
+                    {
+                        "capture_id": self.id,
+                        "company_id": self.company_id.id,
+                        "attempt_id": attempt.id,
+                        "kind": "product",
+                        "raw_value": raw_value,
+                        "normalized_value": normalized,
+                        "source": "ocr_barcode",
+                        "confidence": confidence,
+                        "reported_region": region,
+                        "grounding_state": "grounded",
+                        "product_id": product.id,
+                    }
+                )
 
     def action_apply(self):
         self.ensure_one()
-        self.env.cr.execute("SELECT id FROM mb_inventory_capture WHERE id = %s FOR UPDATE", [self.id])
+        self.env.cr.execute(
+            "SELECT id FROM mb_inventory_capture WHERE id = %s FOR UPDATE", [self.id]
+        )
         self.invalidate_recordset()
         if self.state != "review":
             raise UserError(_("Only a reviewed capture can be applied."))
@@ -893,32 +1063,39 @@ class InventoryCapture(models.Model):
                 lambda item: item.state != "cancel" and item.product_id == self.product_id
             )
             if len(matches) != 1:
-                raise UserError(_(
-                    "Select exactly one receipt move for the confirmed product before applying."
-                ))
+                raise UserError(
+                    _("Select exactly one receipt move for the confirmed product before applying.")
+                )
             move = matches
             _internal(self).write({"move_id": move.id})
         if move.product_id != self.product_id:
-            raise UserError(_(
-                "The confirmed product differs from the receipt line. Reconcile the line explicitly first."
-            ))
+            raise UserError(
+                _(
+                    "The confirmed product differs from the receipt line. Reconcile the line explicitly first."
+                )
+            )
         if self.product_id.tracking != "none" and not (self.proposed_lot or self.lot_id):
             raise UserError(_("A supplier lot is required for this tracked product."))
         lot = self.lot_id
         if self.product_id.tracking != "none" and not lot:
             lot_name = self.proposed_lot.strip()
-            domain = [("company_id", "=", self.company_id.id),
-                      ("product_id", "=", self.product_id.id), ("name", "=", lot_name)]
+            domain = [
+                ("company_id", "=", self.company_id.id),
+                ("product_id", "=", self.product_id.id),
+                ("name", "=", lot_name),
+            ]
             lot = self.env["stock.lot"].search(domain, limit=1)
             if not lot:
                 try:
                     with self.env.cr.savepoint():
-                        lot = self.env["stock.lot"].create({
-                            "name": lot_name,
-                            "company_id": self.company_id.id,
-                            "product_id": self.product_id.id,
-                            "mb_supplier_lot_origin": "supplier",
-                        })
+                        lot = self.env["stock.lot"].create(
+                            {
+                                "name": lot_name,
+                                "company_id": self.company_id.id,
+                                "product_id": self.product_id.id,
+                                "mb_supplier_lot_origin": "supplier",
+                            }
+                        )
                 except IntegrityError:
                     lot = self.env["stock.lot"].search(domain, limit=1)
                     if not lot:
@@ -933,19 +1110,21 @@ class InventoryCapture(models.Model):
             if len(matching_lines) == 1:
                 move_line = matching_lines
             elif not matching_lines:
-                move_line = self.env["stock.move.line"].create({
-                    "move_id": move.id,
-                    "picking_id": self.picking_id.id,
-                    "product_id": self.product_id.id,
-                    "product_uom_id": move.product_uom.id,
-                    "location_id": move.location_id.id,
-                    "location_dest_id": move.location_dest_id.id,
-                    "quantity": self.proposed_quantity if self.proposed_quantity > 0 else 0,
-                })
+                move_line = self.env["stock.move.line"].create(
+                    {
+                        "move_id": move.id,
+                        "picking_id": self.picking_id.id,
+                        "product_id": self.product_id.id,
+                        "product_uom_id": move.product_uom.id,
+                        "location_id": move.location_id.id,
+                        "location_dest_id": move.location_dest_id.id,
+                        "quantity": self.proposed_quantity if self.proposed_quantity > 0 else 0,
+                    }
+                )
             else:
-                raise UserError(_(
-                    "Select exactly one receipt move line before applying this capture."
-                ))
+                raise UserError(
+                    _("Select exactly one receipt move line before applying this capture.")
+                )
             _internal(self).write({"move_line_id": move_line.id})
         if move_line.move_id != move or move_line.product_id != self.product_id:
             raise UserError(_("The receipt line changed while this capture was being reviewed."))
@@ -953,12 +1132,14 @@ class InventoryCapture(models.Model):
             move_line.lot_id = lot
         if self.proposed_quantity > 0:
             move_line.quantity = self.proposed_quantity
-        _internal(self).write({
-            "lot_id": lot.id if lot else False,
-            "state": "applied",
-            "applied_by": self.env.user.id,
-            "applied_at": fields.Datetime.now(),
-        })
+        _internal(self).write(
+            {
+                "lot_id": lot.id if lot else False,
+                "state": "applied",
+                "applied_by": self.env.user.id,
+                "applied_at": fields.Datetime.now(),
+            }
+        )
         return {"type": "ir.actions.act_window_close"}
 
     def action_cancel(self):
@@ -970,19 +1151,25 @@ class InventoryCapture(models.Model):
 
     @api.model
     def _cron_purge_unapplied_evidence(self, batch_size=100):
-        parameter = self.env["ir.config_parameter"].sudo().get_param(
-            "mb_inventory_capture.unapplied_image_retention_days", "30"
+        parameter = (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("mb_inventory_capture.unapplied_image_retention_days", "30")
         )
         try:
             retention_days = max(1, min(int(parameter), 3650))
         except (TypeError, ValueError):
             retention_days = 30
         cutoff = fields.Datetime.subtract(fields.Datetime.now(), days=retention_days)
-        captures = self.sudo().search([
-            ("state", "in", ["draft", "review", "failed", "cancelled"]),
-            ("write_date", "<", cutoff),
-            ("asset_ids", "!=", False),
-        ], limit=max(1, min(int(batch_size), 1000)), order="write_date, id")
+        captures = self.sudo().search(
+            [
+                ("state", "in", ["draft", "review", "failed", "cancelled"]),
+                ("write_date", "<", cutoff),
+                ("asset_ids", "!=", False),
+            ],
+            limit=max(1, min(int(batch_size), 1000)),
+            order="write_date, id",
+        )
         purged = 0
         for capture in captures:
             assets = capture.asset_ids
@@ -990,10 +1177,13 @@ class InventoryCapture(models.Model):
             _internal(assets).write({"attachment_id": False})
             attachments.sudo().unlink()
             _internal(assets).unlink()
-            capture.message_post(body=_(
-                "Sanitized unapplied image evidence was purged after %(days)s days; "
-                "structured capture audit data was retained.", days=retention_days,
-            ))
+            capture.message_post(
+                body=_(
+                    "Sanitized unapplied image evidence was purged after %(days)s days; "
+                    "structured capture audit data was retained.",
+                    days=retention_days,
+                )
+            )
             purged += len(assets)
         return purged
 
@@ -1005,14 +1195,23 @@ class InventoryCaptureAsset(models.Model):
     _check_company_auto = True
 
     capture_id = fields.Many2one(
-        "mb.inventory.capture", required=True, ondelete="cascade", check_company=True, index=True,
+        "mb.inventory.capture",
+        required=True,
+        ondelete="cascade",
+        check_company=True,
+        index=True,
     )
     company_id = fields.Many2one("res.company", required=True, readonly=True, index=True)
     asset_uuid = fields.Char(required=True, readonly=True, index=True)
     role = fields.Selection(
-        [("front", "Product/front"), ("lot_detail", "Lot detail"),
-         ("crop", "Confirmed crop"), ("ocr_variant", "OCR enhancement")],
-        required=True, readonly=True,
+        [
+            ("front", "Product/front"),
+            ("lot_detail", "Lot detail"),
+            ("crop", "Confirmed crop"),
+            ("ocr_variant", "OCR enhancement"),
+        ],
+        required=True,
+        readonly=True,
     )
     attachment_id = fields.Many2one("ir.attachment", readonly=True, ondelete="restrict")
     mimetype = fields.Char(required=True, readonly=True)
@@ -1023,7 +1222,10 @@ class InventoryCaptureAsset(models.Model):
     sanitized_sha256 = fields.Char(required=True, readonly=True, index=True)
     sanitizer_version = fields.Char(required=True, readonly=True)
     parent_asset_id = fields.Many2one(
-        "mb.inventory.capture.asset", ondelete="restrict", check_company=True, readonly=True,
+        "mb.inventory.capture.asset",
+        ondelete="restrict",
+        check_company=True,
+        readonly=True,
     )
     crop_rectangle = fields.Json(readonly=True)
     is_current = fields.Boolean(required=True, default=True, readonly=True, index=True)
@@ -1056,10 +1258,17 @@ class InventoryCaptureAsset(models.Model):
 
     def public_payload(self):
         self.ensure_one()
-        return {"id": self.id, "asset_uuid": self.asset_uuid, "role": self.role,
-                "mimetype": self.mimetype, "width": self.pixel_width,
-                "height": self.pixel_height, "byte_length": self.byte_length,
-                "content_sha256": self.sanitized_sha256, "is_current": self.is_current}
+        return {
+            "id": self.id,
+            "asset_uuid": self.asset_uuid,
+            "role": self.role,
+            "mimetype": self.mimetype,
+            "width": self.pixel_width,
+            "height": self.pixel_height,
+            "byte_length": self.byte_length,
+            "content_sha256": self.sanitized_sha256,
+            "is_current": self.is_current,
+        }
 
 
 class InventoryCaptureAttempt(models.Model):
@@ -1069,31 +1278,54 @@ class InventoryCaptureAttempt(models.Model):
     _check_company_auto = True
 
     capture_id = fields.Many2one(
-        "mb.inventory.capture", required=True, ondelete="cascade", check_company=True, index=True,
+        "mb.inventory.capture",
+        required=True,
+        ondelete="cascade",
+        check_company=True,
+        index=True,
     )
     company_id = fields.Many2one("res.company", required=True, readonly=True, index=True)
     attempt_uuid = fields.Char(required=True, readonly=True, index=True)
     parent_attempt_id = fields.Many2one(
-        "mb.inventory.capture.attempt", readonly=True, ondelete="restrict", check_company=True,
+        "mb.inventory.capture.attempt",
+        readonly=True,
+        ondelete="restrict",
+        check_company=True,
     )
     operation_key = fields.Char(required=True, readonly=True, index=True)
     kind = fields.Selection(
-        [("barcode", "Barcode"), ("ocr", "OCR"), ("multimodal", "Multimodal AI"),
-         ("lookup", "Product lookup")], required=True, readonly=True,
+        [
+            ("barcode", "Barcode"),
+            ("ocr", "OCR"),
+            ("multimodal", "Multimodal AI"),
+            ("lookup", "Product lookup"),
+        ],
+        required=True,
+        readonly=True,
     )
     provider = fields.Char(required=True, readonly=True)
     model = fields.Char(readonly=True)
     model_version = fields.Char(readonly=True)
     input_asset_ids = fields.Many2many(
-        "mb.inventory.capture.asset", "mb_capture_attempt_asset_rel", "attempt_id", "asset_id",
+        "mb.inventory.capture.asset",
+        "mb_capture_attempt_asset_rel",
+        "attempt_id",
+        "asset_id",
         readonly=True,
     )
     input_digests = fields.Json(readonly=True)
     request_id = fields.Char(readonly=True)
     state = fields.Selection(
-        [("queued", "Queued"), ("processing", "Processing"),
-         ("succeeded", "Succeeded"), ("failed", "Failed"), ("cancelled", "Cancelled")],
-        required=True, readonly=True, index=True,
+        [
+            ("queued", "Queued"),
+            ("processing", "Processing"),
+            ("succeeded", "Succeeded"),
+            ("failed", "Failed"),
+            ("cancelled", "Cancelled"),
+        ],
+        required=True,
+        readonly=True,
+        index=True,
     )
     started_at = fields.Datetime(readonly=True)
     ended_at = fields.Datetime(readonly=True)
@@ -1126,15 +1358,23 @@ class InventoryCaptureCandidate(models.Model):
     _check_company_auto = True
 
     capture_id = fields.Many2one(
-        "mb.inventory.capture", required=True, ondelete="cascade", check_company=True, index=True,
+        "mb.inventory.capture",
+        required=True,
+        ondelete="cascade",
+        check_company=True,
+        index=True,
     )
     company_id = fields.Many2one("res.company", required=True, readonly=True, index=True)
     attempt_id = fields.Many2one(
-        "mb.inventory.capture.attempt", required=True, ondelete="cascade", check_company=True,
+        "mb.inventory.capture.attempt",
+        required=True,
+        ondelete="cascade",
+        check_company=True,
     )
     kind = fields.Selection(
-        [("product", "Product"), ("lot", "Lot"), ("expiry", "Expiry"),
-         ("quantity", "Quantity")], required=True, readonly=True,
+        [("product", "Product"), ("lot", "Lot"), ("expiry", "Expiry"), ("quantity", "Quantity")],
+        required=True,
+        readonly=True,
     )
     raw_value = fields.Char(required=True, readonly=True)
     normalized_value = fields.Char(required=True, readonly=True)
@@ -1146,21 +1386,38 @@ class InventoryCaptureCandidate(models.Model):
     pack_identity = fields.Char(readonly=True)
     product_id = fields.Many2one("product.product", readonly=True, check_company=True)
     mapped_product_id = fields.Many2one(
-        "product.product", string="Map to product", check_company=True,
+        "product.product",
+        string="Map to product",
+        check_company=True,
         domain="[('is_storable', '=', True)]",
     )
     evidence_asset_ids = fields.Many2many(
-        "mb.inventory.capture.asset", "mb_capture_candidate_asset_rel", "candidate_id", "asset_id",
+        "mb.inventory.capture.asset",
+        "mb_capture_candidate_asset_rel",
+        "candidate_id",
+        "asset_id",
         readonly=True,
     )
     reported_region = fields.Json(readonly=True)
     grounding_state = fields.Selection(
-        [("grounded", "Grounded"), ("user_confirmed_crop", "User-confirmed crop"),
-         ("unverified", "Unverified")], required=True, default="unverified", readonly=True,
+        [
+            ("grounded", "Grounded"),
+            ("user_confirmed_crop", "User-confirmed crop"),
+            ("unverified", "Unverified"),
+        ],
+        required=True,
+        default="unverified",
+        readonly=True,
     )
     decision = fields.Selection(
-        [("pending", "Pending"), ("accepted", "Accepted"),
-         ("rejected", "Rejected"), ("edited", "Edited")], default="pending", required=True,
+        [
+            ("pending", "Pending"),
+            ("accepted", "Accepted"),
+            ("rejected", "Rejected"),
+            ("edited", "Edited"),
+        ],
+        default="pending",
+        required=True,
     )
     reviewed_value = fields.Char()
     reviewed_by = fields.Many2one("res.users", readonly=True)
@@ -1183,16 +1440,27 @@ class InventoryCaptureCandidate(models.Model):
                 with Image.open(io.BytesIO(base64.b64decode(source))) as opened:
                     image = opened.convert("RGB")
                     left, top, right, bottom = region
-                    box = [int(left * image.width), int(top * image.height),
-                           int(right * image.width), int(bottom * image.height)]
+                    box = [
+                        int(left * image.width),
+                        int(top * image.height),
+                        int(right * image.width),
+                        int(bottom * image.height),
+                    ]
                     pad_x = max(8, int((box[2] - box[0]) * 0.3))
                     pad_y = max(8, int((box[3] - box[1]) * 0.6))
-                    crop_box = (max(0, box[0] - pad_x), max(0, box[1] - pad_y),
-                                min(image.width, box[2] + pad_x),
-                                min(image.height, box[3] + pad_y))
+                    crop_box = (
+                        max(0, box[0] - pad_x),
+                        max(0, box[1] - pad_y),
+                        min(image.width, box[2] + pad_x),
+                        min(image.height, box[3] + pad_y),
+                    )
                     preview = image.crop(crop_box)
-                    highlight = [box[0] - crop_box[0], box[1] - crop_box[1],
-                                 box[2] - crop_box[0], box[3] - crop_box[1]]
+                    highlight = [
+                        box[0] - crop_box[0],
+                        box[1] - crop_box[1],
+                        box[2] - crop_box[0],
+                        box[3] - crop_box[1],
+                    ]
                     ImageDraw.Draw(preview).rectangle(highlight, outline=(220, 30, 30), width=3)
                     preview.thumbnail((480, 320), Image.Resampling.LANCZOS)
                     output = io.BytesIO()
@@ -1213,8 +1481,9 @@ class InventoryCaptureCandidate(models.Model):
             raise AccessError(_("Provider candidate evidence is immutable."))
         result = super().write(values)
         if not _is_internal(self) and allowed.intersection(values):
-            _internal(self).write({"reviewed_by": self.env.user.id,
-                                   "reviewed_at": fields.Datetime.now()})
+            _internal(self).write(
+                {"reviewed_by": self.env.user.id, "reviewed_at": fields.Datetime.now()}
+            )
             if values.get("decision") == "accepted":
                 for candidate in self:
                     reviewed = candidate.reviewed_value or candidate.raw_value
@@ -1229,9 +1498,9 @@ class InventoryCaptureCandidate(models.Model):
                         try:
                             capture_values["proposed_quantity"] = float(reviewed)
                         except (TypeError, ValueError) as error:
-                            raise ValidationError(_(
-                                "The reviewed quantity is not numeric."
-                            )) from error
+                            raise ValidationError(
+                                _("The reviewed quantity is not numeric.")
+                            ) from error
                     if capture_values:
                         candidate.capture_id.write(capture_values)
         return result
@@ -1242,12 +1511,14 @@ class InventoryCaptureCandidate(models.Model):
             raise UserError(_("Choose an inventory product to map this candidate."))
         if self.capture_id.state != "review":
             raise UserError(_("The capture must be in review before mapping a product."))
-        _internal(self).write({
-            "product_id": self.mapped_product_id.id,
-            "decision": "accepted",
-            "reviewed_by": self.env.user.id,
-            "reviewed_at": fields.Datetime.now(),
-        })
+        _internal(self).write(
+            {
+                "product_id": self.mapped_product_id.id,
+                "decision": "accepted",
+                "reviewed_by": self.env.user.id,
+                "reviewed_at": fields.Datetime.now(),
+            }
+        )
         self.capture_id.write({"product_id": self.mapped_product_id.id})
         return True
 
@@ -1275,9 +1546,16 @@ class InventoryCaptureCandidate(models.Model):
                 "is_storable": True,
                 "purchase_ok": True,
             }
-            details = " · ".join(filter(None, [
-                self.brand, self.manufacturer_sku, self.pack_identity,
-            ]))
+            details = " · ".join(
+                filter(
+                    None,
+                    [
+                        self.brand,
+                        self.manufacturer_sku,
+                        self.pack_identity,
+                    ],
+                )
+            )
             if details:
                 values["description_purchase"] = details
             exact_provider_gtin = (
@@ -1292,13 +1570,15 @@ class InventoryCaptureCandidate(models.Model):
                 values["barcode"] = re.sub(r"[\s-]", "", self.raw_value)
             product = self.env["product.product"].create(values)
             _internal(self).write({"product_id": product.id})
-            self.capture_id.message_post(body=_(
-                "Inventory manager %(user)s created product %(product)s from reviewed "
-                "candidate %(candidate)s. No stock or lot was created.",
-                user=self.env.user.display_name,
-                product=product.display_name,
-                candidate=self.raw_value,
-            ))
+            self.capture_id.message_post(
+                body=_(
+                    "Inventory manager %(user)s created product %(product)s from reviewed "
+                    "candidate %(candidate)s. No stock or lot was created.",
+                    user=self.env.user.display_name,
+                    product=product.display_name,
+                    candidate=self.raw_value,
+                )
+            )
         self.capture_id.write({"product_id": product.id})
         return {
             "type": "ir.actions.act_window",

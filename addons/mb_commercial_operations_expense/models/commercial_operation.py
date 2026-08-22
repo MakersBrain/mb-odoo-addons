@@ -6,7 +6,9 @@ class MbCommercialOperation(models.Model):
     _inherit = "mb.commercial.operation"
 
     expense_ids = fields.One2many(
-        "hr.expense", "mb_commercial_operation_id", string="Expenses",
+        "hr.expense",
+        "mb_commercial_operation_id",
+        string="Expenses",
     )
     expenses_expected = fields.Boolean()
     expenses_complete = fields.Boolean(compute="_compute_expenses_complete")
@@ -17,11 +19,16 @@ class MbCommercialOperation(models.Model):
         for expense in self.expense_ids.filtered(
             lambda record: record.state not in ("draft", "submitted", "refused")
         ):
-            items.append({
-                "model": expense._name, "res_id": expense.id, "component": "cost",
-                "date": expense.date, "amount": expense.total_amount_currency,
-                "currency": expense.currency_id,
-            })
+            items.append(
+                {
+                    "model": expense._name,
+                    "res_id": expense.id,
+                    "component": "cost",
+                    "date": expense.date,
+                    "amount": expense.total_amount_currency,
+                    "currency": expense.currency_id,
+                }
+            )
         return items
 
     @api.depends("expenses_expected", "expense_ids.state")
@@ -30,7 +37,10 @@ class MbCommercialOperation(models.Model):
             expenses = operation.expense_ids
             operation.expenses_complete = (
                 not operation.expenses_expected
-                or bool(expenses) and all(expense.state not in ("draft", "submitted", "refused") for expense in expenses)
+                or bool(expenses)
+                and all(
+                    expense.state not in ("draft", "submitted", "refused") for expense in expenses
+                )
             )
 
     def action_view_expenses(self):

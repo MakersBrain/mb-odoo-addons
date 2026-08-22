@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 import os
-from pathlib import Path
 import uuid
+from pathlib import Path
 
 import requests
 
@@ -10,7 +8,6 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 from ..provider import PickupQuery, ProviderError, provider_class
-
 
 LABEL_FORMATS = [
     ("A4", "A4 PDF"),
@@ -31,8 +28,7 @@ class DeliveryCarrier(models.Model):
         string="Provider return service code", copy=False, groups="base.group_system"
     )
     mb_credential_state = fields.Selection(
-        [("unconfigured", "Unconfigured"), ("test", "Test"),
-         ("production", "Production")],
+        [("unconfigured", "Unconfigured"), ("test", "Test"), ("production", "Production")],
         default="unconfigured",
         required=True,
         copy=False,
@@ -51,9 +47,14 @@ class DeliveryCarrier(models.Model):
 
     def _mb_restricted_configuration_fields(self):
         return {
-            "delivery_type", "prod_environment", "mb_provider_code",
-            "mb_provider_service_code", "mb_provider_return_service_code",
-            "mb_label_format", "mb_secret_ref", "mb_provider_enabled",
+            "delivery_type",
+            "prod_environment",
+            "mb_provider_code",
+            "mb_provider_service_code",
+            "mb_provider_return_service_code",
+            "mb_label_format",
+            "mb_secret_ref",
+            "mb_provider_enabled",
         }
 
     def _mb_prepare_secret_rotation(self, credentials):
@@ -68,9 +69,9 @@ class DeliveryCarrier(models.Model):
             and not self.env.context.get("mb_carrier_lifecycle_write")
             and any(self.mapped("mb_provider_restricted"))
         ):
-            raise UserError(_(
-                "Carrier configuration cannot be changed while its capability is restricted."
-            ))
+            raise UserError(
+                _("Carrier configuration cannot be changed while its capability is restricted.")
+            )
         return super().write(values)
 
     def _match(self, partner, source):
@@ -90,8 +91,7 @@ class DeliveryCarrier(models.Model):
             raise UserError(_("This workshop is not linked to the control plane."))
 
         base_url = (
-            os.environ.get("MB_CARRIER_CONTROL_URL")
-            or os.environ.get("MB_CONTROL_API_URL", "")
+            os.environ.get("MB_CARRIER_CONTROL_URL") or os.environ.get("MB_CONTROL_API_URL", "")
         ).rstrip("/")
         token_path = os.environ.get("MB_CARRIER_CONTROL_TOKEN_FILE")
         if not token_path:
@@ -137,9 +137,9 @@ class DeliveryCarrier(models.Model):
 
     def _mb_webhook_secret(self, purpose="provider_operation"):
         self.ensure_one()
-        secret = self._mb_resolve_credentials(
-            timeout=(0.35, 0.9), purpose=purpose
-        ).get("webhook_secret", "")
+        secret = self._mb_resolve_credentials(timeout=(0.35, 0.9), purpose=purpose).get(
+            "webhook_secret", ""
+        )
         if not isinstance(secret, str) or len(secret) < 24:
             raise UserError(_("The webhook validation secret is unavailable."))
         return secret
@@ -175,37 +175,48 @@ class DeliveryCarrier(models.Model):
                 if not status.valid:
                     raise UserError(status.message or _("The provider rejected the credentials."))
             except (ProviderError, UserError) as error:
-                carrier.sudo().write({
-                    "mb_credential_state": "unconfigured",
-                    "mb_last_error": str(error)[:512],
-                })
+                carrier.sudo().write(
+                    {
+                        "mb_credential_state": "unconfigured",
+                        "mb_last_error": str(error)[:512],
+                    }
+                )
                 raise UserError(_("Connection failed: %s", error)) from error
-            carrier.sudo().write({
-                "mb_credential_state": status.environment,
-                "mb_last_error": False,
-            })
+            carrier.sudo().write(
+                {
+                    "mb_credential_state": status.environment,
+                    "mb_last_error": False,
+                }
+            )
         return True
 
     def _mb_suspend_webhooks(self):
         carriers = self.filtered(lambda record: record.mb_secret_ref and record.mb_subscription_id)
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url", "").rstrip("/")
         if carriers and not base_url.startswith("https://"):
-            raise UserError(_("A public HTTPS web base URL is required to suspend carrier webhooks."))
+            raise UserError(
+                _("A public HTTPS web base URL is required to suspend carrier webhooks.")
+            )
         for carrier in carriers:
             provider = carrier._mb_provider(purpose="webhook_suspension")
             suspend = getattr(provider, "suspend_subscriptions", None)
             if suspend:
-                suspend(f"{base_url}/mb_carrier/webhook/{carrier.mb_provider_code}/{carrier.mb_subscription_id}")
+                suspend(
+                    f"{base_url}/mb_carrier/webhook/{carrier.mb_provider_code}/{carrier.mb_subscription_id}"
+                )
         return True
 
     @api.model
     def _mb_cron_check_webhooks(self, limit=20):
-        carriers = self.sudo().search([
-            ("mb_provider_code", "!=", False),
-            ("mb_provider_enabled", "=", True),
-            ("mb_secret_ref", "!=", False),
-            ("mb_subscription_id", "!=", False),
-        ], limit=limit)
+        carriers = self.sudo().search(
+            [
+                ("mb_provider_code", "!=", False),
+                ("mb_provider_enabled", "=", True),
+                ("mb_secret_ref", "!=", False),
+                ("mb_subscription_id", "!=", False),
+            ],
+            limit=limit,
+        )
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url", "").rstrip("/")
         for carrier in carriers:
             try:
@@ -213,7 +224,9 @@ class DeliveryCarrier(models.Model):
                 check = getattr(provider, "check_subscriptions", None)
                 if check and base_url.startswith("https://"):
                     callback = f"{base_url}/mb_carrier/webhook/{carrier.mb_provider_code}/{carrier.mb_subscription_id}"
-                    carrier.mb_last_error = False if check(callback) else "webhook_subscription_inactive"
+                    carrier.mb_last_error = (
+                        False if check(callback) else "webhook_subscription_inactive"
+                    )
             except (ProviderError, UserError):
                 carrier.mb_last_error = "webhook_health_unavailable"
         return len(carriers)
@@ -241,34 +254,46 @@ class DeliveryCarrier(models.Model):
             raise ValidationError(_("The provider and service code must be configured."))
         results = []
         for picking in pickings:
-            key = str(uuid.uuid5(
-                uuid.NAMESPACE_URL,
-                f"mb-carrier:{self.env.cr.dbname}:{self.id}:{picking.id}:outbound:0",
-            ))
-            self.env["mb.carrier.shipment"].sudo().create_or_get({
-                "company_id": picking.company_id.id,
-                "carrier_id": self.id,
-                "picking_id": picking.id,
-                "direction": "outbound",
-                "parcel_index": 0,
-                "idempotency_key": key,
-            })
-            results.append({
-                "exact_price": self._mb_estimated_price(picking),
-                "tracking_number": False,
-            })
+            key = str(
+                uuid.uuid5(
+                    uuid.NAMESPACE_URL,
+                    f"mb-carrier:{self.env.cr.dbname}:{self.id}:{picking.id}:outbound:0",
+                )
+            )
+            self.env["mb.carrier.shipment"].sudo().create_or_get(
+                {
+                    "company_id": picking.company_id.id,
+                    "carrier_id": self.id,
+                    "picking_id": picking.id,
+                    "direction": "outbound",
+                    "parcel_index": 0,
+                    "idempotency_key": key,
+                }
+            )
+            results.append(
+                {
+                    "exact_price": self._mb_estimated_price(picking),
+                    "tracking_number": False,
+                }
+            )
         return results
 
     def _mb_cancel_shipment(self, pickings):
         self.ensure_one()
         if not self.mb_provider_enabled:
             raise UserError(_("This shipping provider is disabled."))
-        shipments = self.env["mb.carrier.shipment"].sudo().search([
-            ("picking_id", "in", pickings.ids),
-            ("carrier_id", "=", self.id),
-            ("direction", "=", "outbound"),
-            ("state", "not in", ("cancelled", "failed")),
-        ])
+        shipments = (
+            self.env["mb.carrier.shipment"]
+            .sudo()
+            .search(
+                [
+                    ("picking_id", "in", pickings.ids),
+                    ("carrier_id", "=", self.id),
+                    ("direction", "=", "outbound"),
+                    ("state", "not in", ("cancelled", "failed")),
+                ]
+            )
+        )
         if not shipments:
             raise UserError(_("No provider shipment exists for this transfer."))
         shipments.action_queue_cancellation()
@@ -276,20 +301,26 @@ class DeliveryCarrier(models.Model):
 
     def _mb_get_tracking_link(self, picking):
         self.ensure_one()
-        shipment = self.env["mb.carrier.shipment"].sudo().search([
-            ("picking_id", "=", picking.id),
-            ("carrier_id", "=", self.id),
-            ("tracking_url", "!=", False),
-        ], order="parcel_index", limit=1)
+        shipment = (
+            self.env["mb.carrier.shipment"]
+            .sudo()
+            .search(
+                [
+                    ("picking_id", "=", picking.id),
+                    ("carrier_id", "=", self.id),
+                    ("tracking_url", "!=", False),
+                ],
+                order="parcel_index",
+                limit=1,
+            )
+        )
         return shipment.tracking_url or None
 
     def _mb_get_close_locations(self, partner_address):
         self.ensure_one()
         if not self._mb_uses_pickup_locations():
             return []
-        return self.env["mb.carrier.pickup.point"].sudo().for_checkout(
-            self, partner_address
-        )
+        return self.env["mb.carrier.pickup.point"].sudo().for_checkout(self, partner_address)
 
     def _mb_uses_pickup_locations(self):
         self.ensure_one()
@@ -324,17 +355,21 @@ class DeliveryCarrier(models.Model):
         if self.mb_provider_restricted:
             raise UserError(_("This shipping provider is restricted for new returns."))
         for picking in pickings:
-            key = str(uuid.uuid5(
-                uuid.NAMESPACE_URL,
-                f"mb-carrier:{self.env.cr.dbname}:{self.id}:{picking.id}:return:0",
-            ))
-            self.env["mb.carrier.shipment"].sudo().create_or_get({
-                "company_id": picking.company_id.id,
-                "carrier_id": self.id,
-                "picking_id": picking.id,
-                "direction": "return",
-                "parcel_index": 0,
-                "idempotency_key": key,
-            })
+            key = str(
+                uuid.uuid5(
+                    uuid.NAMESPACE_URL,
+                    f"mb-carrier:{self.env.cr.dbname}:{self.id}:{picking.id}:return:0",
+                )
+            )
+            self.env["mb.carrier.shipment"].sudo().create_or_get(
+                {
+                    "company_id": picking.company_id.id,
+                    "carrier_id": self.id,
+                    "picking_id": picking.id,
+                    "direction": "return",
+                    "parcel_index": 0,
+                    "idempotency_key": key,
+                }
+            )
             picking.message_post(body=_("Return-label purchase queued."))
         return True

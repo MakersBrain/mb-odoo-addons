@@ -7,18 +7,28 @@ class ShopImportBatch(models.Model):
 
     @api.constrains("target_location_id")
     def _reject_depot_snapshot_target(self):
-        depot_roots = self.env["stock.warehouse"].search([
-            ("is_depot", "=", True),
-        ]).mapped("view_location_id")
+        depot_roots = (
+            self.env["stock.warehouse"]
+            .search(
+                [
+                    ("is_depot", "=", True),
+                ]
+            )
+            .mapped("view_location_id")
+        )
         for batch in self.filtered("target_location_id"):
-            if depot_roots and self.env["stock.location"].search_count([
-                ("id", "=", batch.target_location_id.id),
-                ("id", "child_of", depot_roots.ids),
-            ]):
-                raise ValidationError(_(
-                    "A scraper stock snapshot cannot target a depot warehouse. "
-                    "Import into atelier stock, then use a placement transfer."
-                ))
+            if depot_roots and self.env["stock.location"].search_count(
+                [
+                    ("id", "=", batch.target_location_id.id),
+                    ("id", "child_of", depot_roots.ids),
+                ]
+            ):
+                raise ValidationError(
+                    _(
+                        "A scraper stock snapshot cannot target a depot warehouse. "
+                        "Import into atelier stock, then use a placement transfer."
+                    )
+                )
 
     def _create_or_update_product(self, line):
         product = super()._create_or_update_product(line)
@@ -28,8 +38,10 @@ class ShopImportBatch(models.Model):
             or product.purchase_ok
             or product.invoice_policy != "delivery"
         ):
-            raise ValidationError(_(
-                "Imported physical products must remain storable, saleable, "
-                "not purchasable, and invoiceable on delivery for depot sales."
-            ))
+            raise ValidationError(
+                _(
+                    "Imported physical products must remain storable, saleable, "
+                    "not purchasable, and invoiceable on delivery for depot sales."
+                )
+            )
         return product

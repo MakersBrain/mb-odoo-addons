@@ -17,8 +17,8 @@ class MbFiring(models.Model):
 
     name = fields.Char(required=True, copy=False, default=lambda self: _("New"))
     kiln_id = fields.Many2one(
-        comodel_name="mb.kiln", required=True, tracking=True,
-        check_company=True)
+        comodel_name="mb.kiln", required=True, tracking=True, check_company=True
+    )
     kind = fields.Selection(
         selection=[
             ("bisque", "Bisque"),
@@ -43,15 +43,15 @@ class MbFiring(models.Model):
         tracking=True,
     )
     company_id = fields.Many2one(
-        comodel_name="res.company", required=True, index=True,
-        default=lambda self: self.env.company)
+        comodel_name="res.company", required=True, index=True, default=lambda self: self.env.company
+    )
 
     workorder_ids = fields.One2many(
         comodel_name="mrp.workorder",
         inverse_name="mb_firing_id",
         string="Work orders",
         help="Work orders from any number of manufacturing orders. A kiln is "
-             "filled because firing is expensive, so a load mixes them.",
+        "filled because firing is expensive, so a load mixes them.",
     )
     planned_workorder_ids = fields.One2many(
         comodel_name="mrp.workorder",
@@ -70,17 +70,23 @@ class MbFiring(models.Model):
         domain="[('package_type_id.package_use', '=', 'reusable')]",
         check_company=True,
         help="Ware boards and shelves. Scanned instead of the pieces, which "
-             "cannot hold a label before firing.",
+        "cannot hold a label before firing.",
     )
 
     date_planned_start = fields.Datetime(
-        string="Planned start", tracking=True, default=fields.Datetime.now,
+        string="Planned start",
+        tracking=True,
+        default=fields.Datetime.now,
     )
     date_planned_end = fields.Datetime(
-        string="Planned firing end", compute="_compute_planned_dates", store=True,
+        string="Planned firing end",
+        compute="_compute_planned_dates",
+        store=True,
     )
     date_planned_unload = fields.Datetime(
-        string="Earliest planned unload", compute="_compute_planned_dates", store=True,
+        string="Earliest planned unload",
+        compute="_compute_planned_dates",
+        store=True,
     )
     missed_load_note = fields.Text(copy=False, readonly=True)
     date_start = fields.Datetime(tracking=True)
@@ -88,22 +94,23 @@ class MbFiring(models.Model):
     cooling_end = fields.Datetime(
         tracking=True,
         help="Earliest moment the load may be unloaded and labelled. Not the "
-             "same moment the manufacturing order is marked done.",
+        "same moment the manufacturing order is marked done.",
     )
     cooling_interrupted = fields.Boolean(
-        help="Set when the load was opened before cooling finished.")
+        help="Set when the load was opened before cooling finished."
+    )
     interruption_reason = fields.Text()
 
     peak_temperature = fields.Float(
         tracking=True,
         help="Queried and reportable. An under-fired glaze is a less mature "
-             "glaze, so this is a compliance figure and not only a schedule one.",
+        "glaze, so this is a compliance figure and not only a schedule one.",
     )
     hold_minutes = fields.Float(string="Hold (minutes)")
     program_name = fields.Char(
         string="Programme",
-        help="The controller programme this load was fired on, as the provider "
-             "labels it.")
+        help="The controller programme this load was fired on, as the provider labels it.",
+    )
     program_id = fields.Many2one(
         comodel_name="mb.kiln.program",
         string="Programme mapping",
@@ -111,28 +118,28 @@ class MbFiring(models.Model):
         index=True,
         check_company=True,
         help="The mapping `program_name` was matched to. Kept as a link and not "
-             "only as the label, because it is what lets a programme say how "
-             "long its own firings actually take.",
+        "only as the label, because it is what lets a programme say how "
+        "long its own firings actually take.",
     )
     duration_hours = fields.Float(
         compute="_compute_duration_hours",
         store=True,
         help="Heating only, end minus start. Cooling is held separately, "
-             "because a programme's cooling hold is declared rather than "
-             "observed - the kiln stops reporting long before the load is cool.",
+        "because a programme's cooling hold is declared rather than "
+        "observed - the kiln stops reporting long before the load is cool.",
     )
     energy_kwh = fields.Float(
-        string="Energy (kWh)",
-        help="Consumed by this firing, where the controller reports it.")
+        string="Energy (kWh)", help="Consumed by this firing, where the controller reports it."
+    )
     raw_attachment_id = fields.Many2one(
         comodel_name="ir.attachment",
         string="Provider payload",
         copy=False,
         check_company=True,
         help="Exactly what the provider returned, kept for diagnostics and "
-             "for fields this model does not model yet. Measured at about "
-             "82 KB per firing. Never contains a credential: the client sends "
-             "the token in a header and the body carries none.",
+        "for fields this model does not model yet. Measured at about "
+        "82 KB per firing. Never contains a credential: the client sends "
+        "the token in a header and the body carries none.",
     )
     curve_attachment_id = fields.Many2one(
         comodel_name="ir.attachment",
@@ -140,8 +147,8 @@ class MbFiring(models.Model):
         copy=False,
         check_company=True,
         help="The full trace, as evidence. Roughly 1,400 points for a twelve "
-             "hour firing, and never read point by point, so it is a file "
-             "rather than a table.",
+        "hour firing, and never read point by point, so it is a file "
+        "rather than a table.",
     )
 
     provider = fields.Selection(
@@ -155,7 +162,7 @@ class MbFiring(models.Model):
     external_id = fields.Char(
         copy=False,
         help="The provider's identifier for this firing. The key that makes "
-             "import idempotent, so replaying a sync window converges.",
+        "import idempotent, so replaying a sync window converges.",
     )
 
     _provider_firing_uniq = models.Constraint(
@@ -164,7 +171,9 @@ class MbFiring(models.Model):
     )
 
     @api.depends(
-        "date_planned_start", "program_id.firing_hours", "program_id.cooling_hours",
+        "date_planned_start",
+        "program_id.firing_hours",
+        "program_id.cooling_hours",
     )
     def _compute_planned_dates(self):
         for firing in self:
@@ -180,70 +189,88 @@ class MbFiring(models.Model):
             )
 
     @api.constrains(
-        "state", "kiln_id", "program_id", "kind", "date_planned_start",
+        "state",
+        "kiln_id",
+        "program_id",
+        "kind",
+        "date_planned_start",
         "workorder_ids",
     )
     def _check_planned_slot(self):
         for firing in self.filtered(lambda item: item.state == "planned"):
             if not firing.kiln_id or not firing.program_id or not firing.date_planned_start:
-                raise ValidationError(_(
-                    "A planned firing needs a kiln, programme, firing kind and start date."
-                ))
+                raise ValidationError(
+                    _("A planned firing needs a kiln, programme, firing kind and start date.")
+                )
             if firing.workorder_ids:
-                raise ValidationError(_(
-                    "A planned firing cannot contain physically loaded work orders."
-                ))
-            overlap = self.search([
-                ("id", "!=", firing.id),
-                ("kiln_id", "=", firing.kiln_id.id),
-                ("state", "in", ("planned", "draft", "firing", "cooling")),
-                ("date_planned_start", "<", firing.date_planned_unload),
-                ("date_planned_unload", ">", firing.date_planned_start),
-            ], limit=1)
+                raise ValidationError(
+                    _("A planned firing cannot contain physically loaded work orders.")
+                )
+            overlap = self.search(
+                [
+                    ("id", "!=", firing.id),
+                    ("kiln_id", "=", firing.kiln_id.id),
+                    ("state", "in", ("planned", "draft", "firing", "cooling")),
+                    ("date_planned_start", "<", firing.date_planned_unload),
+                    ("date_planned_unload", ">", firing.date_planned_start),
+                ],
+                limit=1,
+            )
             if overlap:
-                raise ValidationError(_(
-                    "Kiln %(kiln)s is already occupied by %(firing)s during this "
-                    "planned firing and cooling window.",
-                    kiln=firing.kiln_id.display_name,
-                    firing=overlap.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "Kiln %(kiln)s is already occupied by %(firing)s during this "
+                        "planned firing and cooling window.",
+                        kiln=firing.kiln_id.display_name,
+                        firing=overlap.display_name,
+                    )
+                )
 
     @api.constrains("kiln_id", "program_id", "kind", "company_id", "workorder_ids")
     def _check_load_compatibility(self):
         for firing in self:
             if firing.kiln_id.company_id != firing.company_id:
-                raise ValidationError(_(
-                    "%(firing)s and kiln %(kiln)s must belong to the same company.",
-                    firing=firing.display_name,
-                    kiln=firing.kiln_id.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "%(firing)s and kiln %(kiln)s must belong to the same company.",
+                        firing=firing.display_name,
+                        kiln=firing.kiln_id.display_name,
+                    )
+                )
             if firing.program_id:
                 if firing.program_id.kiln_id != firing.kiln_id:
-                    raise ValidationError(_(
-                        "Programme %(program)s belongs to %(program_kiln)s, not %(kiln)s.",
-                        program=firing.program_id.display_name,
-                        program_kiln=firing.program_id.kiln_id.display_name,
-                        kiln=firing.kiln_id.display_name,
-                    ))
+                    raise ValidationError(
+                        _(
+                            "Programme %(program)s belongs to %(program_kiln)s, not %(kiln)s.",
+                            program=firing.program_id.display_name,
+                            program_kiln=firing.program_id.kiln_id.display_name,
+                            kiln=firing.kiln_id.display_name,
+                        )
+                    )
                 if firing.program_id.kind != firing.kind:
-                    raise ValidationError(_(
-                        "Programme %(program)s is for %(program_kind)s firing, not %(kind)s.",
-                        program=firing.program_id.display_name,
-                        program_kind=firing.program_id.kind,
-                        kind=firing.kind,
-                    ))
-                if (firing.kiln_id.max_temperature
-                        and firing.program_id.peak_temperature
-                        and firing.program_id.peak_temperature
-                        > firing.kiln_id.max_temperature):
-                    raise ValidationError(_(
-                        "Programme %(program)s peaks at %(peak)s C, above %(kiln)s's "
-                        "maximum of %(maximum)s C.",
-                        program=firing.program_id.display_name,
-                        peak=firing.program_id.peak_temperature,
-                        kiln=firing.kiln_id.display_name,
-                        maximum=firing.kiln_id.max_temperature,
-                    ))
+                    raise ValidationError(
+                        _(
+                            "Programme %(program)s is for %(program_kind)s firing, not %(kind)s.",
+                            program=firing.program_id.display_name,
+                            program_kind=firing.program_id.kind,
+                            kind=firing.kind,
+                        )
+                    )
+                if (
+                    firing.kiln_id.max_temperature
+                    and firing.program_id.peak_temperature
+                    and firing.program_id.peak_temperature > firing.kiln_id.max_temperature
+                ):
+                    raise ValidationError(
+                        _(
+                            "Programme %(program)s peaks at %(peak)s C, above %(kiln)s's "
+                            "maximum of %(maximum)s C.",
+                            program=firing.program_id.display_name,
+                            peak=firing.program_id.peak_temperature,
+                            kiln=firing.kiln_id.display_name,
+                            maximum=firing.kiln_id.max_temperature,
+                        )
+                    )
             for workorder in firing.workorder_ids:
                 workorder._mb_validate_firing(firing)
 
@@ -259,13 +286,15 @@ class MbFiring(models.Model):
         if not document:
             return self.env["ir.attachment"]
         body = json.dumps(document, separators=(",", ":"), default=str)
-        attachment = self.env["ir.attachment"].create({
-            "name": filename,
-            "res_model": self._name,
-            "res_id": self.id,
-            "mimetype": "application/json",
-            "raw": body.encode("utf-8"),
-        })
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": filename,
+                "res_model": self._name,
+                "res_id": self.id,
+                "mimetype": "application/json",
+                "raw": body.encode("utf-8"),
+            }
+        )
         previous = self[field_name]
         self._mb_internal().write({field_name: attachment.id})
         if previous:
@@ -279,12 +308,14 @@ class MbFiring(models.Model):
         because this one is provider-neutral and is what any reader should use.
         """
         return self._replace_attachment(
-            "curve_attachment_id", "firing-%s-curve.json" % external_id, curve)
+            "curve_attachment_id", "firing-%s-curve.json" % external_id, curve
+        )
 
     def _attach_raw(self, raw, external_id):
         """The provider's own response, unaltered."""
         return self._replace_attachment(
-            "raw_attachment_id", "firing-%s-raw.json" % external_id, raw)
+            "raw_attachment_id", "firing-%s-raw.json" % external_id, raw
+        )
 
     @api.depends("date_start", "date_end")
     def _compute_duration_hours(self):
@@ -304,38 +335,37 @@ class MbFiring(models.Model):
     def create(self, vals_list):
         for values in vals_list:
             if values.get("name", _("New")) == _("New"):
-                values["name"] = self.env["ir.sequence"].next_by_code(
-                    "mb.firing") or _("New")
+                values["name"] = self.env["ir.sequence"].next_by_code("mb.firing") or _("New")
         firings = super().create(vals_list)
         firings.filtered(lambda firing: firing.state == "planned")._mb_replan_slot()
         return firings
 
     def _mb_internal(self):
         """Return a recordset whose write authority cannot be forged by RPC."""
-        return self.with_context(
-            mb_firing_write_token=self._INTERNAL_WRITE_TOKEN)
+        return self.with_context(mb_firing_write_token=self._INTERNAL_WRITE_TOKEN)
 
     def _mb_apply_provider_values(self, values):
         """Apply provider evidence, including refreshes of terminal firings."""
         return self._mb_internal().write(values)
 
     def write(self, values):
-        internal = (
-            self.env.context.get("mb_firing_write_token")
-            is self._INTERNAL_WRITE_TOKEN
-        )
-        if not internal and any(
-            firing.state in self._TERMINAL_STATES for firing in self
-        ):
-            raise UserError(_(
-                "A completed or cancelled firing is immutable. Record a new "
-                "firing or use the provider synchronisation path."
-            ))
+        internal = self.env.context.get("mb_firing_write_token") is self._INTERNAL_WRITE_TOKEN
+        if not internal and any(firing.state in self._TERMINAL_STATES for firing in self):
+            raise UserError(
+                _(
+                    "A completed or cancelled firing is immutable. Record a new "
+                    "firing or use the provider synchronisation path."
+                )
+            )
         planning_changed = bool(
             {
-                "kiln_id", "program_id", "kind", "date_planned_start",
+                "kiln_id",
+                "program_id",
+                "kind",
+                "date_planned_start",
                 "planned_workorder_ids",
-            } & set(values)
+            }
+            & set(values)
         )
         result = super().write(values)
         if "workorder_ids" in values:
@@ -343,16 +373,14 @@ class MbFiring(models.Model):
         if planning_changed:
             self.filtered(lambda firing: firing.state == "planned")._mb_replan_slot()
         if values.get("state") in self._TERMINAL_STATES:
-            self.planned_workorder_ids.with_context(
-                mb_firing_terminal_cleanup=True
-            ).write({"mb_firing_planned_id": False})
+            self.planned_workorder_ids.with_context(mb_firing_terminal_cleanup=True).write(
+                {"mb_firing_planned_id": False}
+            )
         return result
 
     def unlink(self):
         if any(firing.state in self._TERMINAL_STATES for firing in self):
-            raise UserError(_(
-                "A completed or cancelled firing cannot be deleted."
-            ))
+            raise UserError(_("A completed or cancelled firing cannot be deleted."))
         return super().unlink()
 
     def _mb_sync_group_duration(self):
@@ -375,21 +403,24 @@ class MbFiring(models.Model):
                 continue
             lead = workorders[:1]
             minutes = firing.program_id._occupied_minutes(
-                lead.operation_id.mb_kiln_occupies_cooling)
+                lead.operation_id.mb_kiln_occupies_cooling
+            )
             for workorder in workorders:
                 expected = minutes if workorder == lead else 0.0
                 if workorder.duration_expected != expected:
-                    workorder.with_context(
-                        bypass_duration_calculation=True
-                    ).write({"duration_expected": expected})
+                    workorder.with_context(bypass_duration_calculation=True).write(
+                        {"duration_expected": expected}
+                    )
             # If Odoo had already planned every MO separately, keep the lead
             # reservation and remove the duplicates. The remaining WOs still
             # belong to the firing, but they are contents of its physical slot
             # rather than extra uses of the kiln.
             if lead.leave_id:
-                lead.leave_id.write({
-                    "date_to": lead.leave_id.date_from + timedelta(minutes=minutes),
-                })
+                lead.leave_id.write(
+                    {
+                        "date_to": lead.leave_id.date_from + timedelta(minutes=minutes),
+                    }
+                )
                 (workorders - lead).mapped("leave_id").unlink()
 
     def _mb_replan_slot(self):
@@ -401,51 +432,56 @@ class MbFiring(models.Model):
             for production in orders.production_id:
                 production_id = production.id
                 firing_orders = orders.filtered(
-                    lambda wo, production_id=production_id:
-                    wo.production_id.id == production_id
+                    lambda wo, production_id=production_id: wo.production_id.id == production_id
                 )
                 firing_sequence = min(firing_orders.mapped("sequence"))
                 predecessor_minutes = sum(
-                    (production.workorder_ids - firing_orders).filtered(
-                        lambda wo, firing_sequence=firing_sequence:
-                        wo.sequence < firing_sequence
-                        and wo.state in ("blocked", "ready")
-                    ).mapped("duration_expected")
+                    (production.workorder_ids - firing_orders)
+                    .filtered(
+                        lambda wo, firing_sequence=firing_sequence: (
+                            wo.sequence < firing_sequence and wo.state in ("blocked", "ready")
+                        )
+                    )
+                    .mapped("duration_expected")
                 )
-                production.with_context(force_date=True).write({
-                    "date_start": firing.date_planned_start
-                    - timedelta(minutes=predecessor_minutes),
-                })
+                production.with_context(force_date=True).write(
+                    {
+                        "date_start": firing.date_planned_start
+                        - timedelta(minutes=predecessor_minutes),
+                    }
+                )
                 production._plan_workorders(replan=True)
                 firing_order_ids = set(firing_orders.ids)
                 planned_start = firing.date_planned_start
                 late_predecessors = production.workorder_ids.filtered(
-                    lambda wo,
-                    firing_order_ids=firing_order_ids,
-                    firing_sequence=firing_sequence,
-                    planned_start=planned_start:
-                    wo.id not in firing_order_ids
-                    and wo.sequence < firing_sequence
-                    and wo.state in ("blocked", "ready")
-                    and wo.date_finished
-                    and wo.date_finished > planned_start
+                    lambda wo, firing_order_ids=firing_order_ids, firing_sequence=firing_sequence, planned_start=planned_start: (
+                        wo.id not in firing_order_ids
+                        and wo.sequence < firing_sequence
+                        and wo.state in ("blocked", "ready")
+                        and wo.date_finished
+                        and wo.date_finished > planned_start
+                    )
                 )
                 if late_predecessors:
-                    raise ValidationError(_(
-                        "The predecessors of %(orders)s cannot finish before kiln "
-                        "slot %(slot)s: %(predecessors)s",
-                        orders=", ".join(firing_orders.mapped("display_name")),
-                        slot=firing.display_name,
-                        predecessors=", ".join(late_predecessors.mapped("display_name")),
-                    ))
+                    raise ValidationError(
+                        _(
+                            "The predecessors of %(orders)s cannot finish before kiln "
+                            "slot %(slot)s: %(predecessors)s",
+                            orders=", ".join(firing_orders.mapped("display_name")),
+                            slot=firing.display_name,
+                            predecessors=", ".join(late_predecessors.mapped("display_name")),
+                        )
+                    )
             firing._mb_reserve_slot()
 
     def _mb_reserve_slot(self):
         """One native work-order leave represents one physical kiln occupation."""
         for firing in self:
-            orders = (firing.workorder_ids | firing.planned_workorder_ids).filtered(
-                lambda wo: wo.state in ("blocked", "ready")
-            ).sorted("id")
+            orders = (
+                (firing.workorder_ids | firing.planned_workorder_ids)
+                .filtered(lambda wo: wo.state in ("blocked", "ready"))
+                .sorted("id")
+            )
             if not orders or not firing.program_id or not firing.date_planned_start:
                 continue
             lead = orders[:1]
@@ -453,21 +489,27 @@ class MbFiring(models.Model):
                 firing.program_id.firing_hours + firing.program_id.cooling_hours
             ) * 60.0
             for order in orders:
-                order.with_context(bypass_duration_calculation=True).write({
-                    "duration_expected": occupied_minutes if order == lead else 0.0,
-                })
+                order.with_context(bypass_duration_calculation=True).write(
+                    {
+                        "duration_expected": occupied_minutes if order == lead else 0.0,
+                    }
+                )
             (orders - lead).mapped("leave_id").unlink()
-            lead.write({
-                "date_start": firing.date_planned_start,
-                "date_finished": firing.date_planned_unload,
-            })
+            lead.write(
+                {
+                    "date_start": firing.date_planned_start,
+                    "date_finished": firing.date_planned_unload,
+                }
+            )
             conflicts = lead._get_conflicted_workorder_ids().get(lead.id, [])
             external = self.env["mrp.workorder"].browse(conflicts) - orders
             if external:
-                raise ValidationError(_(
-                    "The kiln slot conflicts with: %s",
-                    ", ".join(external.mapped("display_name")),
-                ))
+                raise ValidationError(
+                    _(
+                        "The kiln slot conflicts with: %s",
+                        ", ".join(external.mapped("display_name")),
+                    )
+                )
 
     def action_load(self):
         """Turn ready earmarks into physical contents and record missed work."""
@@ -481,20 +523,24 @@ class MbFiring(models.Model):
             # still sees a valid state.
             firing._mb_internal().write({"state": "draft"})
             if ready:
-                ready.write({
-                    "mb_firing_planned_id": False,
-                    "mb_firing_id": firing.id,
-                })
+                ready.write(
+                    {
+                        "mb_firing_planned_id": False,
+                        "mb_firing_id": firing.id,
+                    }
+                )
             if missed:
                 reason = _(
                     "Missed %(firing)s because these operations were not ready: %(orders)s",
                     firing=firing.display_name,
                     orders=", ".join(missed.mapped("display_name")),
                 )
-                missed.write({
-                    "mb_firing_planned_id": False,
-                    "mb_firing_missed_reason": reason,
-                })
+                missed.write(
+                    {
+                        "mb_firing_planned_id": False,
+                        "mb_firing_missed_reason": reason,
+                    }
+                )
                 firing._mb_internal().write({"missed_load_note": reason})
                 firing.message_post(body=reason)
                 for production in missed.production_id:
@@ -519,8 +565,7 @@ class MbFiring(models.Model):
             if firing.state != "draft":
                 raise UserError(_("Only a loading firing can be started."))
             firing._check_load_compatibility()
-            firing._mb_internal().write({
-                "state": "firing", "date_start": fields.Datetime.now()})
+            firing._mb_internal().write({"state": "firing", "date_start": fields.Datetime.now()})
         return True
 
     def action_finish(self):
@@ -531,18 +576,21 @@ class MbFiring(models.Model):
             cooling_end = False
             if firing.program_id:
                 cooling_end = ended + timedelta(hours=firing.program_id.cooling_hours)
-            firing._mb_internal().write({
-                "state": "cooling",
-                "date_end": ended,
-                "cooling_end": cooling_end,
-            })
+            firing._mb_internal().write(
+                {
+                    "state": "cooling",
+                    "date_end": ended,
+                    "cooling_end": cooling_end,
+                }
+            )
         return True
 
     def _finish_loaded_workorders(self):
         """Finish this load once; never advance an unrelated later operation."""
         for firing in self:
             open_orders = firing.workorder_ids.filtered(
-                lambda order: order.state not in ("done", "cancel"))
+                lambda order: order.state not in ("done", "cancel")
+            )
             if open_orders:
                 open_orders.button_finish()
 
@@ -554,13 +602,15 @@ class MbFiring(models.Model):
             if firing.state != "cooling":
                 raise UserError(_("Only a cooling firing can be unloaded."))
             if firing.cooling_end and firing.cooling_end > fields.Datetime.now():
-                raise UserError(_(
-                    "%(name)s is cooling until %(until)s. Unloading now needs the "
-                    "interruption recorded, because opening a kiln early changes "
-                    "what came out of it.",
-                    name=firing.name,
-                    until=firing.cooling_end,
-                ))
+                raise UserError(
+                    _(
+                        "%(name)s is cooling until %(until)s. Unloading now needs the "
+                        "interruption recorded, because opening a kiln early changes "
+                        "what came out of it.",
+                        name=firing.name,
+                        until=firing.cooling_end,
+                    )
+                )
             firing._finish_loaded_workorders()
             firing._mb_internal().write({"state": "done"})
         return self.mapped("carrier_ids")
@@ -573,11 +623,12 @@ class MbFiring(models.Model):
             if firing.state != "cooling":
                 raise UserError(_("Only a cooling firing can be force-unloaded."))
             if not firing.interruption_reason:
-                raise UserError(_(
-                    "Record why %s was opened early before forcing it.",
-                    firing.name,
-                ))
+                raise UserError(
+                    _(
+                        "Record why %s was opened early before forcing it.",
+                        firing.name,
+                    )
+                )
             firing._finish_loaded_workorders()
-            firing._mb_internal().write({
-                "cooling_interrupted": True, "state": "done"})
+            firing._mb_internal().write({"cooling_interrupted": True, "state": "done"})
         return self.mapped("carrier_ids")

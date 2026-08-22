@@ -24,15 +24,19 @@ class ResCompany(models.Model):
         provider_code = self._mb_shipping_provider_code(module_key)
         if not provider_code:
             return evidence
-        carriers = self.env["delivery.carrier"].sudo().search([
-            ("company_id", "=", self.id), ("mb_provider_code", "=", provider_code)
-        ])
+        carriers = (
+            self.env["delivery.carrier"]
+            .sudo()
+            .search([("company_id", "=", self.id), ("mb_provider_code", "=", provider_code)])
+        )
         # Restriction blocks new purchases but intentionally retains the
         # credential path for cleanup and read-only repair of existing objects.
         # Deleting credentials remains a separate, explicit lifecycle action.
-        carriers.with_context(mb_carrier_lifecycle_write=True).write({
-            "mb_provider_restricted": True,
-        })
+        carriers.with_context(mb_carrier_lifecycle_write=True).write(
+            {
+                "mb_provider_restricted": True,
+            }
+        )
         return {
             **evidence,
             "adapter": "odoo_carrier_mutation_gate",
@@ -45,10 +49,15 @@ class ResCompany(models.Model):
         result = super()._mb_remove_capability_restriction(module_key)
         provider_code = self._mb_shipping_provider_code(module_key)
         if provider_code:
-            carriers = self.env["delivery.carrier"].sudo().search([
-                ("company_id", "=", self.id), ("mb_provider_code", "=", provider_code)
-            ])
-            carriers.with_context(mb_carrier_lifecycle_write=True).write({
-                "mb_provider_restricted": False, "mb_provider_enabled": True,
-            })
+            carriers = (
+                self.env["delivery.carrier"]
+                .sudo()
+                .search([("company_id", "=", self.id), ("mb_provider_code", "=", provider_code)])
+            )
+            carriers.with_context(mb_carrier_lifecycle_write=True).write(
+                {
+                    "mb_provider_restricted": False,
+                    "mb_provider_enabled": True,
+                }
+            )
         return result

@@ -30,26 +30,26 @@ past schemas, retired formats, or upgrade paths.
 
 | Addon | Version | Addon | Version |
 | --- | --- | --- | --- |
-| `l10n_fr_micro_enterprise` | 19.0.4.0.1 | `l10n_fr_micro_urssaf` | 19.0.2.0.1 |
-| `mb_account_payment_sumup` | 19.0.1.1.1 | `mb_ai_bridge` | 19.0.1.0.1 |
+| `l10n_fr_micro_enterprise` | 19.0.4.0.2 | `l10n_fr_micro_urssaf` | 19.0.2.0.1 |
+| `mb_account_payment_sumup` | 19.0.1.1.2 | `mb_ai_bridge` | 19.0.1.0.1 |
 | `mb_brand` | 19.0.1.0.1 | `mb_catalogue_sync` | 19.0.1.5.1 |
 | `mb_ceramics_base` | 19.0.1.0.0 | `mb_ceramics_compliance` | 19.0.1.0.1 |
-| `mb_ceramics_firing` | 19.0.3.0.1 | `mb_ceramics_workflow` | 19.0.3.0.0 |
-| `mb_commercial_operations` | 19.0.2.2.0 | `mb_commercial_operations_depot` | 19.0.2.1.0 |
+| `mb_ceramics_firing` | 19.0.3.0.1 | `mb_ceramics_workflow` | 19.0.3.0.2 |
+| `mb_commercial_operations` | 19.0.2.3.0 | `mb_commercial_operations_depot` | 19.0.2.1.0 |
 | `mb_commercial_operations_expense` | 19.0.2.0.1 | `mb_commercial_operations_fleet` | 19.0.2.0.1 |
 | `mb_commercial_operations_mrp` | 19.0.2.0.1 | `mb_commercial_operations_pos` | 19.0.2.0.1 |
 | `mb_commercial_operations_purchase` | 19.0.2.0.1 | `mb_commercial_operations_sale` | 19.0.2.0.1 |
-| `mb_commercial_operations_stock` | 19.0.2.0.1 | `mb_commercial_operations_urssaf` | 19.0.2.0.1 |
-| `mb_control_bridge` | 19.0.1.14.0 | `mb_dbfilter_gateway` | 19.0.1.0.1 |
-| `mb_depot` | 19.0.4.0.8 | `mb_email_bridge` | 19.0.1.1.1 |
-| `mb_inventory_capture` | 19.0.1.1.0 | `mb_inventory_capture_catalogue` | 19.0.1.0.3 |
-| `mb_invoice_capture` | 19.0.1.5.3 | `mb_kiln_bridge` | 19.0.1.3.0 |
-| `mb_label` | 19.0.1.2.1 | `mb_label_pos` | 19.0.1.1.2 |
+| `mb_commercial_operations_stock` | 19.0.2.0.1 | `mb_commercial_operations_urssaf` | 19.0.2.2.0 |
+| `mb_control_bridge` | 19.0.2.0.0 | `mb_dbfilter_gateway` | 19.0.1.0.2 |
+| `mb_depot` | 19.0.4.0.9 | `mb_email_bridge` | 19.0.1.1.1 |
+| `mb_inventory_capture` | 19.0.1.1.1 | `mb_inventory_capture_catalogue` | 19.0.1.0.3 |
+| `mb_invoice_capture` | 19.0.1.5.3 | `mb_kiln_bridge` | 19.0.1.3.1 |
+| `mb_label` | 19.0.1.2.2 | `mb_label_pos` | 19.0.1.1.2 |
 | `mb_payment_sumup` | 19.0.1.1.1 | `mb_pos_sumup` | 19.0.1.1.2 |
-| `mb_shop_import` | 19.0.1.0.0 | `mb_shop_import_ceramics` | 19.0.1.0.0 |
-| `mb_shop_import_depot` | 19.0.1.0.0 | `mb_webshop` | 19.0.1.5.1 |
-| `mb_webshop_carrier_base` | 19.0.1.1.1 | `mb_webshop_carrier_boxtal` | 19.0.1.1.0 |
-| `mb_webshop_carrier_sendcloud` | 19.0.1.0.0 | `mb_workshop_base` | 19.0.2.0.0 |
+| `mb_shop_import` | 19.0.1.0.1 | `mb_shop_import_ceramics` | 19.0.1.0.0 |
+| `mb_shop_import_depot` | 19.0.1.0.0 | `mb_webshop` | 19.0.1.5.2 |
+| `mb_webshop_carrier_base` | 19.0.1.1.3 | `mb_webshop_carrier_boxtal` | 19.0.1.1.1 |
+| `mb_webshop_carrier_sendcloud` | 19.0.1.0.1 | `mb_workshop_base` | 19.0.2.0.0 |
 | `mb_workshop_pos` | 19.0.1.0.0 |  |  |
 
 ## Supported invariants

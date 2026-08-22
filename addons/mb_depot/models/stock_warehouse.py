@@ -18,13 +18,14 @@ class StockWarehouse(models.Model):
     unsold pieces stay on our balance sheet and no revenue is recognised until
     the depositary reports a sale, which is the legal situation of consignment selling.
     """
+
     _inherit = "stock.warehouse"
 
     is_depot = fields.Boolean(
         string="Consignment depot",
         help="Stock we own, physically held by someone else. Internal like any "
-             "warehouse, so unsold pieces stay on our balance sheet until the "
-             "depositary reports a sale.",
+        "warehouse, so unsold pieces stay on our balance sheet until the "
+        "depositary reports a sale.",
     )
     mb_depot_legal_structure = fields.Selection(
         selection=[
@@ -34,13 +35,13 @@ class StockWarehouse(models.Model):
         string="Legal structure",
         copy=False,
         help="The signed contract controls who sells to the final customer and "
-             "therefore which gross turnover must be declared.",
+        "therefore which gross turnover must be declared.",
     )
     mb_depot_mandate_reviewed_through = fields.Date(
         string="Mandate accounting reviewed through",
         copy=False,
         help="Accounting Administrator attestation that retail customer invoices "
-             "and gallery commission bills have been reviewed through this date.",
+        "and gallery commission bills have been reviewed through this date.",
     )
     mb_depot_mandate_review_note = fields.Text(
         string="Mandate accounting review note",
@@ -55,7 +56,7 @@ class StockWarehouse(models.Model):
         string="Commission (%)",
         digits="Discount",
         help="Recorded here for the statement. The figure that actually prices a "
-             "sale is the depositary's pricelist.",
+        "sale is the depositary's pricelist.",
     )
     depot_pricelist_id = fields.Many2one(
         comodel_name="product.pricelist",
@@ -93,23 +94,26 @@ class StockWarehouse(models.Model):
         learn to ignore. One step keeps the paper and the stock agreeing.
         """
         for warehouse in self.filtered("is_depot"):
-            if warehouse.reception_steps != "one_step" or \
-                    warehouse.delivery_steps != "ship_only":
-                raise ValidationError(_(
-                    "A depot receives and delivers in one step. %(name)s is set "
-                    "to more, which would put a receiving bay and a packing "
-                    "table inside the depositary's shop.",
-                    name=warehouse.display_name,
-                ))
+            if warehouse.reception_steps != "one_step" or warehouse.delivery_steps != "ship_only":
+                raise ValidationError(
+                    _(
+                        "A depot receives and delivers in one step. %(name)s is set "
+                        "to more, which would put a receiving bay and a packing "
+                        "table inside the depositary's shop.",
+                        name=warehouse.display_name,
+                    )
+                )
 
     @api.constrains("is_depot", "mb_depot_legal_structure")
     def _check_depot_legal_structure(self):
         for warehouse in self.filtered("is_depot"):
             if not warehouse.mb_depot_legal_structure:
-                raise ValidationError(_(
-                    "Choose the signed legal structure for depot %(name)s.",
-                    name=warehouse.display_name,
-                ))
+                raise ValidationError(
+                    _(
+                        "Choose the signed legal structure for depot %(name)s.",
+                        name=warehouse.display_name,
+                    )
+                )
 
     @api.constrains(
         "mb_depot_legal_structure",
@@ -122,18 +126,21 @@ class StockWarehouse(models.Model):
                 warehouse.mb_depot_legal_structure == "mandate"
                 and warehouse.mb_depot_mandate_review_note
             ):
-                raise ValidationError(_(
-                    "A mandate review date requires a mandate depot and a review note."
-                ))
+                raise ValidationError(
+                    _("A mandate review date requires a mandate depot and a review note.")
+                )
 
     def write(self, values):
         review_fields = {
             "mb_depot_mandate_reviewed_through",
             "mb_depot_mandate_review_note",
         }
-        if review_fields.intersection(values) and not self.env.is_superuser() \
-                and not self.env.user.has_group("account.group_account_manager"):
-            raise ValidationError(_(
-                "Only an Accounting Administrator can attest mandate accounting reviews."
-            ))
+        if (
+            review_fields.intersection(values)
+            and not self.env.is_superuser()
+            and not self.env.user.has_group("account.group_account_manager")
+        ):
+            raise ValidationError(
+                _("Only an Accounting Administrator can attest mandate accounting reviews.")
+            )
         return super().write(values)

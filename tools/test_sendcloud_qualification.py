@@ -1,7 +1,7 @@
-import tempfile
-from pathlib import Path
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import sendcloud_qualification as qualification
@@ -37,11 +37,14 @@ class SendcloudQualificationTest(unittest.TestCase):
 
     def test_qualification_is_read_only_and_returns_sanitized_summary(self):
         client = FakeClient()
-        result = qualification.qualify({
-            "SENDCLOUD_QUALIFICATION_COUNTRY": "FR",
-            "SENDCLOUD_QUALIFICATION_POSTAL_CODE": "75011",
-            "SENDCLOUD_QUALIFICATION_CITY": "Paris",
-        }, client)
+        result = qualification.qualify(
+            {
+                "SENDCLOUD_QUALIFICATION_COUNTRY": "FR",
+                "SENDCLOUD_QUALIFICATION_POSTAL_CODE": "75011",
+                "SENDCLOUD_QUALIFICATION_CITY": "Paris",
+            },
+            client,
+        )
         self.assertEqual(result["sender_address_ids"], ["41", "42"])
         self.assertEqual(result["service_point_count"], 1)
         self.assertEqual(result["mutations_performed"], 0)

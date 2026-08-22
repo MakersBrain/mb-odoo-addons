@@ -46,36 +46,32 @@ class WebshopReturn(models.Model):
         tracking=True,
     )
     decision_note = fields.Text(tracking=True)
-    line_ids = fields.One2many(
-        "mb.webshop.return.line", "return_id", required=True, copy=False
-    )
+    line_ids = fields.One2many("mb.webshop.return.line", "return_id", required=True, copy=False)
     return_picking_ids = fields.Many2many(
         "stock.picking", "mb_webshop_return_picking_rel", readonly=True, copy=False
     )
     replacement_order_id = fields.Many2one(
         "sale.order", readonly=True, copy=False, ondelete="restrict"
     )
-    refund_move_ids = fields.Many2many(
-        "account.move", compute="_compute_refund_move_ids"
-    )
+    refund_move_ids = fields.Many2many("account.move", compute="_compute_refund_move_ids")
 
     @api.depends("order_id.invoice_ids", "order_id.invoice_ids.state")
     def _compute_refund_move_ids(self):
         for request_record in self:
             invoices = request_record.order_id.invoice_ids
             request_record.refund_move_ids = invoices.filtered(
-                lambda move, invoices=invoices: move.move_type == "out_refund"
-                and move.state == "posted"
-                and move.reversed_entry_id in invoices
+                lambda move, invoices=invoices: (
+                    move.move_type == "out_refund"
+                    and move.state == "posted"
+                    and move.reversed_entry_id in invoices
+                )
             )
 
     @api.model_create_multi
     def create(self, vals_list):
         for values in vals_list:
             if values.get("name", "New") == "New":
-                values["name"] = self.env["ir.sequence"].next_by_code(
-                    "mb.webshop.return"
-                ) or "New"
+                values["name"] = self.env["ir.sequence"].next_by_code("mb.webshop.return") or "New"
         return super().create(vals_list)
 
     @api.model
@@ -93,57 +89,62 @@ class WebshopReturn(models.Model):
         returnable = order._mb_returnable_lines()
         for line_id, quantity in quantities.items():
             line_id = int(line_id)
-            line = returnable.filtered(
-                lambda candidate, line_id=line_id: candidate.id == line_id
-            )
+            line = returnable.filtered(lambda candidate, line_id=line_id: candidate.id == line_id)
             if not line or quantity <= 0:
                 raise ValidationError(_("A return quantity is invalid."))
             available = order._mb_returnable_quantity(line)
             if line.product_uom_id.compare(quantity, available) > 0:
-                raise ValidationError(_(
-                    "Only %(quantity)s of %(product)s can be returned.",
-                    quantity=available,
-                    product=line.product_id.display_name,
-                ))
-            commands.append(fields.Command.create({
-                "order_line_id": line.id,
-                "quantity": quantity,
-            }))
+                raise ValidationError(
+                    _(
+                        "Only %(quantity)s of %(product)s can be returned.",
+                        quantity=available,
+                        product=line.product_id.display_name,
+                    )
+                )
+            commands.append(
+                fields.Command.create(
+                    {
+                        "order_line_id": line.id,
+                        "quantity": quantity,
+                    }
+                )
+            )
         if not commands:
             raise ValidationError(_("Select at least one item to return."))
-        request_record = self.create({
-            "order_id": order.id,
-            "reason": reason.strip(),
-            "line_ids": commands,
-        })
+        request_record = self.create(
+            {
+                "order_id": order.id,
+                "reason": reason.strip(),
+                "line_ids": commands,
+            }
+        )
         request_record._mb_queue_customer_update()
         return request_record
 
     def _mb_queue_customer_update(self):
         template = self.env.ref("mb_webshop.mail_template_return_status")
         for request_record in self.filtered("partner_id.email"):
-            template.send_mail(
-                request_record.id, force_send=False, raise_exception=False
-            )
+            template.send_mail(request_record.id, force_send=False, raise_exception=False)
 
     def action_approve(self):
         for request_record in self:
             if request_record.state != "requested":
                 raise ValidationError(_("Only a requested return can be approved."))
-            remaining = {
-                line.order_line_id.id: line.quantity for line in request_record.line_ids
-            }
+            remaining = {line.order_line_id.id: line.quantity for line in request_record.line_ids}
             pickings = self.env["stock.picking"]
             outbound = request_record.order_id.picking_ids.filtered(
-                lambda picking: picking.state == "done"
-                and picking.picking_type_code == "outgoing"
+                lambda picking: picking.state == "done" and picking.picking_type_code == "outgoing"
             ).sorted("date_done")
             for picking in outbound:
-                wizard = self.env["stock.return.picking"].with_context(
-                    active_model="stock.picking",
-                    active_id=picking.id,
-                    active_ids=[picking.id],
-                ).create({"picking_id": picking.id})
+                wizard = (
+                    self.env["stock.return.picking"]
+                    .with_context(
+                        active_model="stock.picking",
+                        active_id=picking.id,
+                        active_ids=[picking.id],
+                    )
+                    .create({"picking_id": picking.id})
+                )
                 selected = False
                 for wizard_line in wizard.product_return_moves:
                     sale_line = wizard_line.move_id.sale_line_id
@@ -179,18 +180,21 @@ class WebshopReturn(models.Model):
                     pickings |= return_picking
 
             missing = request_record.line_ids.filtered(
-                lambda line, remaining=remaining: line.order_line_id.product_uom_id.compare(
-                    remaining[line.order_line_id.id], 0
-                ) > 0
+                lambda line, remaining=remaining: (
+                    line.order_line_id.product_uom_id.compare(remaining[line.order_line_id.id], 0)
+                    > 0
+                )
             )
             if missing:
-                raise ValidationError(_(
-                    "The delivered quantity is no longer available for this return."
-                ))
-            request_record.write({
-                "state": "approved",
-                "return_picking_ids": [fields.Command.set(pickings.ids)],
-            })
+                raise ValidationError(
+                    _("The delivered quantity is no longer available for this return.")
+                )
+            request_record.write(
+                {
+                    "state": "approved",
+                    "return_picking_ids": [fields.Command.set(pickings.ids)],
+                }
+            )
             request_record._mb_queue_customer_update()
         return True
 
@@ -209,7 +213,9 @@ class WebshopReturn(models.Model):
             if request_record.state != "approved" or not request_record.return_picking_ids:
                 raise ValidationError(_("Approve the return before receiving it."))
             if any(picking.state != "done" for picking in request_record.return_picking_ids):
-                raise ValidationError(_("Validate every return transfer before marking it received."))
+                raise ValidationError(
+                    _("Validate every return transfer before marking it received.")
+                )
             request_record.state = "received"
             request_record._mb_queue_customer_update()
         return True
@@ -237,16 +243,20 @@ class WebshopReturn(models.Model):
             raise ValidationError(_("Receive the return and select replacement first."))
         if self.replacement_order_id:
             return self.replacement_order_id.get_formview_action()
-        replacement = self.order_id.copy({
-            "website_id": False,
-            "origin": _("Replacement for %(return_name)s", return_name=self.name),
-            "order_line": [fields.Command.clear()],
-        })
+        replacement = self.order_id.copy(
+            {
+                "website_id": False,
+                "origin": _("Replacement for %(return_name)s", return_name=self.name),
+                "order_line": [fields.Command.clear()],
+            }
+        )
         for line in self.line_ids:
-            line.order_line_id.copy({
-                "order_id": replacement.id,
-                "product_uom_qty": line.quantity,
-            })
+            line.order_line_id.copy(
+                {
+                    "order_id": replacement.id,
+                    "product_uom_qty": line.quantity,
+                }
+            )
         self.replacement_order_id = replacement
         return replacement.get_formview_action()
 
@@ -256,8 +266,13 @@ class WebshopReturn(models.Model):
                 raise ValidationError(_("Receive the return and choose a resolution first."))
             if request_record.resolution == "refund" and not request_record.refund_move_ids:
                 raise ValidationError(_("Post the native credit note before resolving the refund."))
-            if request_record.resolution == "replacement" and not request_record.replacement_order_id:
-                raise ValidationError(_("Create the replacement order before resolving the return."))
+            if (
+                request_record.resolution == "replacement"
+                and not request_record.replacement_order_id
+            ):
+                raise ValidationError(
+                    _("Create the replacement order before resolving the return.")
+                )
             if request_record.resolution == "no_refund" and not request_record.decision_note:
                 raise ValidationError(_("Document why no refund is due."))
             request_record.state = "resolved"
@@ -270,15 +285,11 @@ class WebshopReturnLine(models.Model):
     _description = "Webshop customer return line"
     _order = "id"
 
-    return_id = fields.Many2one(
-        "mb.webshop.return", required=True, ondelete="cascade", index=True
-    )
+    return_id = fields.Many2one("mb.webshop.return", required=True, ondelete="cascade", index=True)
     order_line_id = fields.Many2one(
         "sale.order.line", required=True, readonly=True, ondelete="restrict"
     )
-    product_id = fields.Many2one(
-        related="order_line_id.product_id", store=True, readonly=True
-    )
+    product_id = fields.Many2one(related="order_line_id.product_id", store=True, readonly=True)
     quantity = fields.Float(required=True, readonly=True)
     product_uom_id = fields.Many2one(
         related="order_line_id.product_uom_id", store=True, readonly=True
@@ -299,6 +310,6 @@ class WebshopReturnLine(models.Model):
     def _check_order_line_matches_return(self):
         for line in self:
             if line.order_line_id.order_id != line.return_id.order_id:
-                raise ValidationError(_(
-                    "Every return line must belong to the return's sales order."
-                ))
+                raise ValidationError(
+                    _("Every return line must belong to the return's sales order.")
+                )

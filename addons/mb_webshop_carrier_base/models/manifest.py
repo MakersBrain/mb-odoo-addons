@@ -16,16 +16,22 @@ class CarrierManifest(models.Model):
     shipment_ids = fields.Many2many("mb.carrier.shipment", string="Shipments")
     provider_ref = fields.Char(copy=False)
     document_id = fields.Many2one("ir.attachment", copy=False, ondelete="set null")
-    state = fields.Selection([
-        ("draft", "Draft"), ("ready", "Ready"), ("failed", "Failed")
-    ], default="draft", required=True, copy=False)
+    state = fields.Selection(
+        [("draft", "Draft"), ("ready", "Ready"), ("failed", "Failed")],
+        default="draft",
+        required=True,
+        copy=False,
+    )
     last_error = fields.Char(copy=False)
 
     @api.model_create_multi
     def create(self, values_list):
         for values in values_list:
             if not values.get("name") or values.get("name") == "New":
-                values["name"] = _("Local handover worksheet %(date)s", date=values.get("date") or fields.Date.today())
+                values["name"] = _(
+                    "Local handover worksheet %(date)s",
+                    date=values.get("date") or fields.Date.today(),
+                )
         return super().create(values_list)
 
     @api.constrains("shipment_ids", "carrier_id", "company_id")
@@ -34,14 +40,18 @@ class CarrierManifest(models.Model):
             company = manifest.company_id
             carrier = manifest.carrier_id
             invalid = manifest.shipment_ids.filtered(
-                lambda shipment, company=company, carrier=carrier: shipment.company_id != company
-                or shipment.carrier_id != carrier
-                or shipment.direction != "outbound"
-                or shipment.state != "label_ready"
+                lambda shipment, company=company, carrier=carrier: (
+                    shipment.company_id != company
+                    or shipment.carrier_id != carrier
+                    or shipment.direction != "outbound"
+                    or shipment.state != "label_ready"
+                )
             )
             if invalid:
                 raise ValidationError(
-                    _("A handover worksheet may include only label-ready outbound shipments for its carrier and company.")
+                    _(
+                        "A handover worksheet may include only label-ready outbound shipments for its carrier and company."
+                    )
                 )
 
     def action_ready(self):
@@ -64,7 +74,5 @@ class CarrierManifest(models.Model):
             if manifest.document_id:
                 manifest.document_id.sudo().write(attachment_values)
             else:
-                manifest.document_id = self.env["ir.attachment"].sudo().create(
-                    attachment_values
-                )
+                manifest.document_id = self.env["ir.attachment"].sudo().create(attachment_values)
         return report.report_action(self)

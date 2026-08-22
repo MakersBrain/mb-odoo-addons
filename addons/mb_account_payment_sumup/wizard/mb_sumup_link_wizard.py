@@ -18,8 +18,7 @@ class MbSumupLinkWizard(models.TransientModel):
     amount = fields.Monetary(
         currency_field="currency_id",
         required=True,
-        help="What the customer is asked to pay now. Defaults to what is left "
-             "on the invoice.",
+        help="What the customer is asked to pay now. Defaults to what is left on the invoice.",
     )
     amount_max = fields.Monetary(currency_field="currency_id", readonly=True)
     destination = fields.Selection(
@@ -31,8 +30,8 @@ class MbSumupLinkWizard(models.TransientModel):
         default="sumup",
         required=True,
         help="SumUp: the customer pays on SumUp's own page, and never has to "
-             "reach this server. Customer portal: they land on the invoice "
-             "here and choose how to pay.",
+        "reach this server. Customer portal: they land on the invoice "
+        "here and choose how to pay.",
     )
     link = fields.Char(string="Payment link", readonly=True)
     qr_code = fields.Binary(string="QR code", compute="_compute_qr_code")
@@ -93,13 +92,13 @@ class MbSumupLinkWizard(models.TransientModel):
 
         if self.destination == "sumup":
             self.move_id.invalidate_recordset(["amount_residual"])
-            if self.currency_id.compare_amounts(
-                self.amount, self.move_id.amount_residual
-            ) > 0:
-                raise UserError(_(
-                    "The amount cannot exceed the %s still due on the invoice.",
-                    self.currency_id.format(self.move_id.amount_residual),
-                ))
+            if self.currency_id.compare_amounts(self.amount, self.move_id.amount_residual) > 0:
+                raise UserError(
+                    _(
+                        "The amount cannot exceed the %s still due on the invoice.",
+                        self.currency_id.format(self.move_id.amount_residual),
+                    )
+                )
             tx_sudo = self.move_id._mb_sumup_get_or_create_transaction(self.amount)
             self.link = tx_sudo.sumup_checkout_url
         else:
@@ -128,7 +127,9 @@ class MbSumupLinkWizard(models.TransientModel):
         """
         self.ensure_one()
 
-        link_wizard = self.env["payment.link.wizard"].with_context(
-            active_model="account.move", active_id=self.move_id.id
-        ).create({"amount": self.amount})
+        link_wizard = (
+            self.env["payment.link.wizard"]
+            .with_context(active_model="account.move", active_id=self.move_id.id)
+            .create({"amount": self.amount})
+        )
         return link_wizard.link

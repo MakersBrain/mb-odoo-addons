@@ -15,10 +15,13 @@ class MbCatalogueSupplier(models.Model):
     _description = "Catalogue source mapped to a vendor"
 
     source_id = fields.Char(
-        required=True, string="Catalogue source",
-        help="The source id in the catalogue, e.g. 'ceradel' or 'les-cousins'.")
+        required=True,
+        string="Catalogue source",
+        help="The source id in the catalogue, e.g. 'ceradel' or 'les-cousins'.",
+    )
     partner_id = fields.Many2one(
-        "res.partner", required=True, string="Vendor", domain=[("is_company", "=", True)])
+        "res.partner", required=True, string="Vendor", domain=[("is_company", "=", True)]
+    )
     active = fields.Boolean(default=True)
     # A supplier's own currency, when it differs from the company's. The catalogue
     # publishes prices in EUR, PLN, SEK, USD and GBP; Odoo needs to be told which
@@ -40,11 +43,13 @@ class MbCatalogueSupplier(models.Model):
     vat_status = fields.Selection(
         [("inclusive", "Prices include VAT"), ("exclusive", "Prices exclude VAT")],
         string="Published prices",
-        help="What this vendor's listed prices mean, when the listing does not say.")
+        help="What this vendor's listed prices mean, when the listing does not say.",
+    )
     vat_rate = fields.Float(
         string="VAT rate (%)",
         help="Used to convert this vendor's VAT-inclusive prices to the net price "
-             "Odoo stores. Leave empty to refuse inclusive prices rather than guess.")
+        "Odoo stores. Leave empty to refuse inclusive prices rather than guess.",
+    )
 
     _source_unique = models.Constraint(
         "unique(source_id)",

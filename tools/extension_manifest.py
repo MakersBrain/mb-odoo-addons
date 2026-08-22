@@ -44,12 +44,14 @@ def tree_inventory(roots):
                 raise ValueError(f"unsupported payload entry: {relative}")
             if stat.S_ISDIR(metadata.st_mode):
                 continue
-            entries.append({
-                "path": str(relative),
-                "size": metadata.st_size,
-                "mode": stat.S_IMODE(metadata.st_mode),
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-            })
+            entries.append(
+                {
+                    "path": str(relative),
+                    "size": metadata.st_size,
+                    "mode": stat.S_IMODE(metadata.st_mode),
+                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                }
+            )
     canonical = json.dumps(entries, sort_keys=True, separators=(",", ":")).encode()
     return entries, f"sha256:{hashlib.sha256(canonical).hexdigest()}"
 
@@ -60,7 +62,9 @@ def main():
     parser.add_argument("--runtime-source-ref", required=True)
     parser.add_argument("--runtime-deployment-ref", required=True)
     parser.add_argument("--runtime-subject-digest", required=True)
-    parser.add_argument("--runtime-subject-kind", choices=("image_index", "image_manifest"), required=True)
+    parser.add_argument(
+        "--runtime-subject-kind", choices=("image_index", "image_manifest"), required=True
+    )
     parser.add_argument("--runtime-manifest-digest", required=True)
     parser.add_argument("--runtime-config-digest", required=True)
     parser.add_argument("--os", default="linux")
@@ -95,10 +99,11 @@ def main():
             "platform": platform,
         },
         "lock_sha256": hashlib.sha256(lock.read_bytes()).hexdigest(),
-        "dependency_inventory_sha256": hashlib.sha256(dependency_inventory.read_bytes()).hexdigest(),
+        "dependency_inventory_sha256": hashlib.sha256(
+            dependency_inventory.read_bytes()
+        ).hexdigest(),
         "locked_dependencies": [
-            {"name": item["distribution"], "version": item["version"]}
-            for item in locked
+            {"name": item["distribution"], "version": item["version"]} for item in locked
         ],
         "bridge_contract_sha256": hashlib.sha256(bridge.read_bytes()).hexdigest(),
         "addon_versions": addon_versions(addons),

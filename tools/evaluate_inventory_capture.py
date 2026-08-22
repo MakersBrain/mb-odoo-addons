@@ -14,6 +14,7 @@ import json
 import sys
 import zipfile
 from pathlib import Path, PurePosixPath
+from typing import Any
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 
@@ -75,10 +76,7 @@ def score(expected: dict, actual: dict) -> dict:
             totals[field] += 1
             if str(found.get(field, "")).casefold() == str(wanted[field]).casefold():
                 correct[field] += 1
-    return {
-        field: {"correct": correct[field], "total": totals[field]}
-        for field in fields
-    }
+    return {field: {"correct": correct[field], "total": totals[field]} for field in fields}
 
 
 def main() -> int:
@@ -87,12 +85,13 @@ def main() -> int:
     parser.add_argument("--results", type=Path)
     args = parser.parse_args()
     expected = json.loads(EXPECTED.read_text())
-    report = {"images": {}, "missing": [], "unexpected": []}
+    report: dict[str, Any] = {"images": {}, "missing": [], "unexpected": []}
     with zipfile.ZipFile(args.zip_path) as archive:
         members = {
             PurePosixPath(info.filename).name: info
             for info in archive.infolist()
-            if not info.is_dir() and PurePosixPath(info.filename).suffix.lower() in {".jpg", ".jpeg", ".png"}
+            if not info.is_dir()
+            and PurePosixPath(info.filename).suffix.lower() in {".jpg", ".jpeg", ".png"}
         }
         report["missing"] = sorted(set(expected) - set(members))
         report["unexpected"] = sorted(set(members) - set(expected))

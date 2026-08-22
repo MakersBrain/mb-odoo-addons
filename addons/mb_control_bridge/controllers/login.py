@@ -10,21 +10,25 @@ import requests
 import werkzeug.urls
 
 from odoo import SUPERUSER_ID, http
-from odoo.addons.auth_oauth.controllers.main import (
-    OAuthController as OAuthControllerBase,
-    OAuthLogin as OAuthLoginBase,
-)
-from odoo.addons.web.controllers.utils import _get_login_redirect_url, ensure_db
 from odoo.exceptions import AccessDenied
 from odoo.http import request
 
+from odoo.addons.auth_oauth.controllers.main import (
+    OAuthController as OAuthControllerBase,
+)
+from odoo.addons.auth_oauth.controllers.main import (
+    OAuthLogin as OAuthLoginBase,
+)
+from odoo.addons.web.controllers.utils import _get_login_redirect_url, ensure_db
+
 from .auth import bootstrap_credential
 
-
-ATTEMPT_SESSION_KEY = "mb_oidc_login_attempt"
+ATTEMPT_SESSION_KEY = "mb_oidc_login_attempts"
 ATTEMPT_LIFETIME_SECONDS = 300
 HTTP_TIMEOUT = (3.05, 10)
 MAX_RESPONSE_BYTES = 64 * 1024
+RESPONSE_CHUNK_BYTES = 8 * 1024
+MAX_PENDING_ATTEMPTS = 4
 
 
 def _base64url(value):
@@ -34,18 +38,31 @@ def _base64url(value):
 def _safe_return_target(target):
     target = target or "/odoo"
     parsed = urlparse(target)
-    if parsed.scheme or parsed.netloc or not target.startswith("/") or target.startswith("//"):
+    # `/\evil.test` parses entirely into `path`, so scheme and netloc are both
+    # empty and `local=True` leaves it untouched -- but browsers normalise the
+    # backslash to a slash and follow `//evil.test`. Anything whose second
+    # character opens an authority, by either separator, is not local.
+    if parsed.scheme or parsed.netloc or not target.startswith("/") or target[1:2] in ("/", "\\"):
         return "/odoo"
     return target
 
 
 def _bounded_json(response):
+    """Decode a bounded JSON object from a streamed response.
+
+    Callers request with `stream=True`: at this point only the headers have
+    been read, so a peer that omits (or lies about) `Content-Length` is cut off
+    while the body is still arriving instead of after requests has already
+    buffered all of it into memory.
+    """
     content_length = response.headers.get("Content-Length")
     if content_length and int(content_length) > MAX_RESPONSE_BYTES:
         raise AccessDenied()
-    body = response.content
-    if len(body) > MAX_RESPONSE_BYTES:
-        raise AccessDenied()
+    body = b""
+    for chunk in response.iter_content(RESPONSE_CHUNK_BYTES):
+        body += chunk
+        if len(body) > MAX_RESPONSE_BYTES:
+            raise AccessDenied()
     try:
         decoded = json.loads(body)
     except (UnicodeError, ValueError, TypeError) as exc:
@@ -53,6 +70,13 @@ def _bounded_json(response):
     if not isinstance(decoded, dict):
         raise AccessDenied()
     return decoded
+
+
+def _pending_attempts():
+    stored = request.session.get(ATTEMPT_SESSION_KEY)
+    if not isinstance(stored, list):
+        return []
+    return [attempt for attempt in stored if isinstance(attempt, dict)]
 
 
 def should_redirect_to_mb_sso(method, authenticated, params):
@@ -77,7 +101,18 @@ class MBLogin(OAuthLoginBase):
             "provider_id": provider["id"],
             "return_target": _safe_return_target(request.params.get("redirect")),
         }
-        request.session[ATTEMPT_SESSION_KEY] = attempt
+        # A session holds several attempts at once: `list_providers` mints one
+        # per code-flow provider on every render, so a second provider -- or
+        # the same login page open in another tab -- would otherwise overwrite
+        # the only slot and strand every attempt but the last as oauth_error=2.
+        pending = [
+            candidate
+            for candidate in _pending_attempts()
+            if attempt["created_at"] - int(candidate.get("created_at", 0))
+            <= ATTEMPT_LIFETIME_SECONDS
+        ]
+        pending.append(attempt)
+        request.session[ATTEMPT_SESSION_KEY] = pending[-MAX_PENDING_ATTEMPTS:]
         callback = urljoin(request.httprequest.url_root, "auth_oauth/signin")
         params = {
             "response_type": "code",
@@ -113,7 +148,11 @@ class MBLogin(OAuthLoginBase):
                 or 0
             )
             provider = next(
-                (candidate for candidate in self.list_providers() if candidate["id"] == provider_id),
+                (
+                    candidate
+                    for candidate in self.list_providers()
+                    if candidate["id"] == provider_id
+                ),
                 None,
             )
             if provider:
@@ -123,20 +162,30 @@ class MBLogin(OAuthLoginBase):
 
 class MBCodeFlowController(OAuthControllerBase):
     def _consume_attempt(self, state):
-        attempt = request.session.pop(ATTEMPT_SESSION_KEY, None)
+        matched = None
+        remaining = []
+        for attempt in _pending_attempts():
+            if matched is None and secrets.compare_digest(
+                str(attempt.get("state", "")), str(state or "")
+            ):
+                matched = attempt
+            else:
+                remaining.append(attempt)
+        # Removed before anything is verified, and before any upstream request,
+        # so a replayed callback finds nothing left to redeem.
+        request.session[ATTEMPT_SESSION_KEY] = remaining
         now = int(time.time())
         if (
-            not isinstance(attempt, dict)
-            or not secrets.compare_digest(str(attempt.get("state", "")), str(state or ""))
-            or now - int(attempt.get("created_at", 0)) > ATTEMPT_LIFETIME_SECONDS
-            or int(attempt.get("created_at", 0)) > now + 5
+            matched is None
+            or now - int(matched.get("created_at", 0)) > ATTEMPT_LIFETIME_SECONDS
+            or int(matched.get("created_at", 0)) > now + 5
         ):
             raise AccessDenied()
-        return attempt
+        return matched
 
     def _redeem_code(self, provider, attempt, code):
         callback = urljoin(request.httprequest.url_root, "auth_oauth/signin")
-        response = requests.post(
+        with requests.post(
             provider.mb_token_endpoint,
             data={
                 "grant_type": "authorization_code",
@@ -146,10 +195,11 @@ class MBCodeFlowController(OAuthControllerBase):
                 "code_verifier": attempt["verifier"],
             },
             timeout=HTTP_TIMEOUT,
-        )
-        if not response.ok:
-            raise AccessDenied()
-        tokens = _bounded_json(response)
+            stream=True,
+        ) as response:
+            if not response.ok:
+                raise AccessDenied()
+            tokens = _bounded_json(response)
         if not all(
             isinstance(tokens.get(name), str) and tokens[name]
             for name in ("id_token", "access_token")
@@ -161,9 +211,7 @@ class MBCodeFlowController(OAuthControllerBase):
         company = request.env.company.sudo()
         workshop_id = company.mb_control_workshop_id or ""
         control_api = os.environ.get("MB_CONTROL_API_URL", "").rstrip("/")
-        if not workshop_id or not control_api.startswith(
-            ("https://", "http://control.localhost:")
-        ):
+        if not workshop_id or not control_api.startswith(("https://", "http://control.localhost:")):
             raise AccessDenied()
         endpoint = f"{control_api}/internal/v1/workshops/{workshop_id}/oidc/verify"
         try:
@@ -172,7 +220,7 @@ class MBCodeFlowController(OAuthControllerBase):
             raise AccessDenied() from exc
         if not credential:
             raise AccessDenied()
-        response = requests.post(
+        with requests.post(
             endpoint,
             headers={"Authorization": f"Bearer {credential}"},
             json={
@@ -181,39 +229,49 @@ class MBCodeFlowController(OAuthControllerBase):
                 "nonce": attempt["nonce"],
             },
             timeout=HTTP_TIMEOUT,
-        )
-        if not response.ok:
-            raise AccessDenied()
-        identity = _bounded_json(response)
+            stream=True,
+        ) as response:
+            if not response.ok:
+                raise AccessDenied()
+            identity = _bounded_json(response)
         subject = identity.get("subject")
         if not isinstance(subject, str) or not subject or set(identity) - {"subject"}:
             raise AccessDenied()
         return subject
 
     def _login_existing_user(self, provider, subject, return_target):
-        user = request.env["res.users"].with_user(SUPERUSER_ID).search([
-            ("active", "=", True),
-            ("mb_rauthy_subject", "=", subject),
-            ("oauth_provider_id", "=", provider.id),
-            ("oauth_uid", "=", subject),
-        ])
+        user = (
+            request.env["res.users"]
+            .with_user(SUPERUSER_ID)
+            .search(
+                [
+                    ("active", "=", True),
+                    ("mb_rauthy_subject", "=", subject),
+                    ("oauth_provider_id", "=", provider.id),
+                    ("oauth_uid", "=", subject),
+                ]
+            )
+        )
         if len(user) != 1:
             raise AccessDenied()
         request.session.uid = None
         request.session["pre_login"] = user.login
         request.session["pre_uid"] = user.id
-        request.session.finalize(request.env)
-        response = request.redirect(
-            _get_login_redirect_url(user.id, return_target), 303
-        )
+        # Same shape as `Session.authenticate`: finalize only when the user has
+        # no second factor pending. Otherwise the session stays partial and
+        # `_get_login_redirect_url` sends them to `_mfa_url()` carrying the
+        # return target -- an external identity provider vouches for who they
+        # are, not for the factor this database asks for on top.
+        if not user._mfa_url():
+            request.session.finalize(request.env)
+        response = request.redirect(_get_login_redirect_url(user.id, return_target), 303)
         response.autocorrect_location_header = False
         return response
 
     @http.route()
     def signin(self, **params):
         ensure_db()
-        attempt = request.session.get(ATTEMPT_SESSION_KEY)
-        if not isinstance(attempt, dict):
+        if not _pending_attempts():
             configured = int(
                 request.env["ir.config_parameter"]
                 .sudo()
@@ -236,16 +294,17 @@ class MBCodeFlowController(OAuthControllerBase):
             attempt = self._consume_attempt(params.get("state"))
             if params.get("error") or not isinstance(params.get("code"), str):
                 raise AccessDenied()
-            provider = request.env["auth.oauth.provider"].sudo().browse(
-                int(attempt["provider_id"])
-            ).exists()
+            provider = (
+                request.env["auth.oauth.provider"]
+                .sudo()
+                .browse(int(attempt["provider_id"]))
+                .exists()
+            )
             if not provider or not provider.enabled or not provider.mb_code_flow:
                 raise AccessDenied()
             tokens = self._redeem_code(provider, attempt, params["code"])
             subject = self._validate_tokens(attempt, tokens)
-            return self._login_existing_user(
-                provider, subject, attempt["return_target"]
-            )
+            return self._login_existing_user(provider, subject, attempt["return_target"])
         except (AccessDenied, KeyError, TypeError, ValueError, requests.RequestException):
             response = request.redirect("/web/login?oauth_error=2", 303)
             response.autocorrect_location_header = False

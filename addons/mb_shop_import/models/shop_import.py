@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import base64
 import binascii
 import hashlib
@@ -15,7 +13,6 @@ from odoo.tools.float_utils import float_compare
 
 from .adapters import MAX_SOURCE_BYTES, AdapterError, parse
 from .image_fetch import ImageFetchError, fetch_image
-
 
 _logger = logging.getLogger(__name__)
 _INTERNAL_TOKEN = object()
@@ -64,12 +61,17 @@ class ShopSource(models.Model):
 
     name = fields.Char(required=True)
     company_id = fields.Many2one(
-        "res.company", required=True, index=True, default=lambda self: self.env.company,
+        "res.company",
+        required=True,
+        index=True,
+        default=lambda self: self.env.company,
         ondelete="cascade",
     )
     provider_key = fields.Char(required=True, readonly=True, index=True)
     source_key = fields.Char(required=True, readonly=True, index=True)
-    sku_prefix = fields.Char(required=True, help="Short prefix used for generated internal references.")
+    sku_prefix = fields.Char(
+        required=True, help="Short prefix used for generated internal references."
+    )
     homepage_url = fields.Char()
     active = fields.Boolean(default=True)
     last_seen_at = fields.Datetime(readonly=True, copy=False)
@@ -96,7 +98,9 @@ class ShopSource(models.Model):
             if not key_re.fullmatch(source.provider_key or ""):
                 raise ValidationError(_("The provider key is not valid."))
             if not re.fullmatch(r"[A-Z0-9][A-Z0-9-]{0,15}", source.sku_prefix or ""):
-                raise ValidationError(_("The SKU prefix must contain 1–16 uppercase letters, digits, or hyphens."))
+                raise ValidationError(
+                    _("The SKU prefix must contain 1–16 uppercase letters, digits, or hyphens.")
+                )
 
     def write(self, values):
         if {"company_id", "provider_key", "source_key"}.intersection(values):
@@ -127,14 +131,25 @@ class ShopProductBinding(models.Model):
     _check_company_auto = True
 
     company_id = fields.Many2one(
-        related="source_id.company_id", store=True, readonly=True, index=True,
+        related="source_id.company_id",
+        store=True,
+        readonly=True,
+        index=True,
     )
     source_id = fields.Many2one(
-        "mb.shop.source", required=True, index=True, ondelete="cascade", check_company=True,
+        "mb.shop.source",
+        required=True,
+        index=True,
+        ondelete="cascade",
+        check_company=True,
     )
     external_id = fields.Char(required=True, readonly=True, index=True)
     product_id = fields.Many2one(
-        "product.product", required=True, index=True, ondelete="restrict", check_company=True,
+        "product.product",
+        required=True,
+        index=True,
+        ondelete="restrict",
+        check_company=True,
     )
     source_url = fields.Char(readonly=True)
     adapter_key = fields.Char(readonly=True)
@@ -168,7 +183,10 @@ class ShopImportBatch(models.Model):
 
     name = fields.Char(required=True, readonly=True, copy=False, default=lambda self: _("New"))
     company_id = fields.Many2one(
-        "res.company", required=True, readonly=True, index=True,
+        "res.company",
+        required=True,
+        readonly=True,
+        index=True,
         default=lambda self: self.env.company,
     )
     source_file = fields.Binary(attachment=True, copy=False)
@@ -176,37 +194,66 @@ class ShopImportBatch(models.Model):
     file_size = fields.Integer(readonly=True, copy=False)
     file_sha256 = fields.Char(readonly=True, copy=False, index=True)
     adapter_key = fields.Selection(
-        [("auto", "Detect automatically"), ("catalogue_v2", "Catalogue v2 NDJSON"),
-         ("catalogue_csv", "Catalogue scraper CSV")],
-        required=True, default="auto", tracking=True,
+        [
+            ("auto", "Detect automatically"),
+            ("catalogue_v2", "Catalogue v2 NDJSON"),
+            ("catalogue_csv", "Catalogue scraper CSV"),
+        ],
+        required=True,
+        default="auto",
+        tracking=True,
     )
     parsed_adapter_key = fields.Char(readonly=True, copy=False)
     adapter_version = fields.Integer(readonly=True, default=1, copy=False)
     source_id = fields.Many2one(
-        "mb.shop.source", required=True, check_company=True, tracking=True,
+        "mb.shop.source",
+        required=True,
+        check_company=True,
+        tracking=True,
     )
     source_snapshot_at = fields.Datetime(readonly=True, copy=False)
     source_snapshot_from = fields.Datetime(readonly=True, copy=False)
     state = fields.Selection(
-        [("uploaded", "Uploaded"), ("review", "Review"), ("ready", "Ready"),
-         ("importing", "Importing"), ("done", "Done"), ("failed", "Failed"),
-         ("cancelled", "Cancelled")],
-        required=True, readonly=True, default="uploaded", tracking=True, index=True,
+        [
+            ("uploaded", "Uploaded"),
+            ("review", "Review"),
+            ("ready", "Ready"),
+            ("importing", "Importing"),
+            ("done", "Done"),
+            ("failed", "Failed"),
+            ("cancelled", "Cancelled"),
+        ],
+        required=True,
+        readonly=True,
+        default="uploaded",
+        tracking=True,
+        index=True,
     )
     target_location_id = fields.Many2one(
-        "stock.location", check_company=True, tracking=True,
+        "stock.location",
+        check_company=True,
+        tracking=True,
         domain="[('usage', '=', 'internal'), ('company_id', '=', company_id)]",
     )
     product_category_id = fields.Many2one("product.category", tracking=True)
     currency_id = fields.Many2one("res.currency", readonly=True, copy=False)
     price_tax_basis = fields.Selection(
-        [("no_sales_tax", "No sales tax"), ("tax_included", "Published price includes tax"),
-         ("tax_excluded", "Published price excludes tax")],
-        required=True, default="no_sales_tax", tracking=True,
+        [
+            ("no_sales_tax", "No sales tax"),
+            ("tax_included", "Published price includes tax"),
+            ("tax_excluded", "Published price excludes tax"),
+        ],
+        required=True,
+        default="no_sales_tax",
+        tracking=True,
     )
     sales_tax_ids = fields.Many2many(
-        "account.tax", "mb_shop_import_batch_tax_rel", "batch_id", "tax_id",
-        string="Sales taxes", check_company=True,
+        "account.tax",
+        "mb_shop_import_batch_tax_rel",
+        "batch_id",
+        "tax_id",
+        string="Sales taxes",
+        check_company=True,
         domain="[('type_tax_use', '=', 'sale'), ('company_id', '=', company_id)]",
     )
     update_existing_prices = fields.Boolean(tracking=True)
@@ -221,8 +268,12 @@ class ShopImportBatch(models.Model):
     )
     line_ids = fields.One2many("mb.shop.import.line", "batch_id", copy=False)
     affected_product_tmpl_ids = fields.Many2many(
-        "product.template", "mb_shop_import_batch_product_rel", "batch_id", "template_id",
-        readonly=True, copy=False,
+        "product.template",
+        "mb_shop_import_batch_product_rel",
+        "batch_id",
+        "template_id",
+        readonly=True,
+        copy=False,
     )
     total_count = fields.Integer(compute="_compute_counts")
     selected_count = fields.Integer(compute="_compute_counts")
@@ -249,9 +300,9 @@ class ShopImportBatch(models.Model):
             if values.get("source_file"):
                 _decode_upload(values["source_file"])
             if values.get("name", _("New")) == _("New"):
-                values["name"] = self.env["ir.sequence"].next_by_code(
-                    "mb.shop.import.batch"
-                ) or _("New")
+                values["name"] = self.env["ir.sequence"].next_by_code("mb.shop.import.batch") or _(
+                    "New"
+                )
             prepared.append(values)
         return super().create(prepared)
 
@@ -264,76 +315,111 @@ class ShopImportBatch(models.Model):
             batch.create_count = len(lines.filtered(lambda line: line.proposed_action == "create"))
             batch.update_count = len(lines.filtered(lambda line: line.proposed_action == "update"))
             batch.skip_count = len(lines.filtered(lambda line: line.proposed_action == "skip"))
-            batch.warning_count = len(lines.filtered(lambda line: line.validation_status == "warning"))
+            batch.warning_count = len(
+                lines.filtered(lambda line: line.validation_status == "warning")
+            )
             batch.error_count = len(lines.filtered(lambda line: line.validation_status == "error"))
 
     def write(self, values):
         if values.get("source_file"):
             _decode_upload(values["source_file"])
         lifecycle = {
-            "company_id", "file_size", "file_sha256", "parsed_adapter_key",
-            "adapter_version", "source_snapshot_at", "source_snapshot_from", "state",
-            "currency_id", "affected_product_tmpl_ids", "parsed_at", "validated_at",
+            "company_id",
+            "file_size",
+            "file_sha256",
+            "parsed_adapter_key",
+            "adapter_version",
+            "source_snapshot_at",
+            "source_snapshot_from",
+            "state",
+            "currency_id",
+            "affected_product_tmpl_ids",
+            "parsed_at",
+            "validated_at",
             "validated_snapshot_stale",
-            "warnings_acknowledged_at", "warnings_acknowledged_by_id", "imported_at",
-            "imported_by_id", "result_summary", "failure_detail",
+            "warnings_acknowledged_at",
+            "warnings_acknowledged_by_id",
+            "imported_at",
+            "imported_by_id",
+            "result_summary",
+            "failure_detail",
         }
         if lifecycle.intersection(values) and not _is_internal(self):
             raise UserError(_("Import evidence and lifecycle fields cannot be edited directly."))
-        if self.filtered(lambda batch: batch.state in {"done", "cancelled"}) and not _is_internal(self):
+        if self.filtered(lambda batch: batch.state in {"done", "cancelled"}) and not _is_internal(
+            self
+        ):
             raise UserError(_("A completed or cancelled import is immutable."))
         source_fields = {"source_file", "file_name", "adapter_key", "source_id"}
         policies = {
             "target_location_id",
-            "product_category_id", "price_tax_basis", "sales_tax_ids",
-            "update_existing_prices", "import_images", "overwrite_images",
-            "snapshot_max_age_hours", "snapshot_stale_policy",
+            "product_category_id",
+            "price_tax_basis",
+            "sales_tax_ids",
+            "update_existing_prices",
+            "import_images",
+            "overwrite_images",
+            "snapshot_max_age_hours",
+            "snapshot_stale_policy",
         }
         result = super().write(values)
         if source_fields.intersection(values) and not _is_internal(self):
             _internal(self.mapped("line_ids")).unlink()
-            _internal(self).write({
-                "state": "uploaded",
-                "file_size": 0,
-                "file_sha256": False,
-                "parsed_adapter_key": False,
-                "currency_id": False,
-                "source_snapshot_from": False,
-                "source_snapshot_at": False,
-                "parsed_at": False,
-                "validated_at": False,
-                "validated_snapshot_stale": False,
-                "warnings_acknowledged_at": False,
-                "warnings_acknowledged_by_id": False,
-                "failure_detail": False,
-                "result_summary": False,
-            })
+            _internal(self).write(
+                {
+                    "state": "uploaded",
+                    "file_size": 0,
+                    "file_sha256": False,
+                    "parsed_adapter_key": False,
+                    "currency_id": False,
+                    "source_snapshot_from": False,
+                    "source_snapshot_at": False,
+                    "parsed_at": False,
+                    "validated_at": False,
+                    "validated_snapshot_stale": False,
+                    "warnings_acknowledged_at": False,
+                    "warnings_acknowledged_by_id": False,
+                    "failure_detail": False,
+                    "result_summary": False,
+                }
+            )
         if policies.intersection(values) and not _is_internal(self):
-            _internal(self.filtered(lambda batch: batch.state in {"review", "ready", "failed"})).write({
-                "state": "review",
-                "validated_at": False,
-                "validated_snapshot_stale": False,
-                "warnings_acknowledged_at": False,
-                "warnings_acknowledged_by_id": False,
-            })
+            _internal(
+                self.filtered(lambda batch: batch.state in {"review", "ready", "failed"})
+            ).write(
+                {
+                    "state": "review",
+                    "validated_at": False,
+                    "validated_snapshot_stale": False,
+                    "warnings_acknowledged_at": False,
+                    "warnings_acknowledged_by_id": False,
+                }
+            )
         return result
 
     @api.constrains("target_location_id", "company_id")
     def _check_target_location(self):
         for batch in self.filtered("target_location_id"):
-            if batch.target_location_id.usage != "internal" \
-                    or batch.target_location_id.company_id != batch.company_id:
-                raise ValidationError(_("The stock target must be an internal location of the batch company."))
+            if (
+                batch.target_location_id.usage != "internal"
+                or batch.target_location_id.company_id != batch.company_id
+            ):
+                raise ValidationError(
+                    _("The stock target must be an internal location of the batch company.")
+                )
 
     @api.constrains("sales_tax_ids", "company_id")
     def _check_sales_taxes(self):
         for batch in self:
             invalid = batch.sales_tax_ids.filtered(
-                lambda tax, company=batch.company_id:
+                lambda tax, company=batch.company_id: (
                     tax.company_id != company or tax.type_tax_use != "sale"
+                )
             )
             if invalid:
-                raise ValidationError(_("Every selected tax must be a sales tax of the batch company."))
+                raise ValidationError(
+                    _("Every selected tax must be a sales tax of the batch company.")
+                )
 
     @api.constrains("snapshot_max_age_hours")
     def _check_snapshot_age(self):
@@ -356,17 +442,28 @@ class ShopImportBatch(models.Model):
         data = self._decode_source()
         try:
             artifact = parse(
-                data, self.file_name, self.source_id.source_key,
+                data,
+                self.file_name,
+                self.source_id.source_key,
                 None if self.adapter_key == "auto" else self.adapter_key,
             )
         except AdapterError as error:
             raise ValidationError(str(error)) from error
         if artifact.currency:
-            currency = self.env["res.currency"].with_context(active_test=False).search([
-                ("name", "=", artifact.currency),
-            ], limit=1)
+            currency = (
+                self.env["res.currency"]
+                .with_context(active_test=False)
+                .search(
+                    [
+                        ("name", "=", artifact.currency),
+                    ],
+                    limit=1,
+                )
+            )
             if not currency:
-                raise ValidationError(_("Currency %(currency)s is not available in Odoo.", currency=artifact.currency))
+                raise ValidationError(
+                    _("Currency %(currency)s is not available in Odoo.", currency=artifact.currency)
+                )
         else:
             raise ValidationError(_("Every catalogue artifact must declare one currency."))
         _internal(self.line_ids).unlink()
@@ -375,29 +472,33 @@ class ShopImportBatch(models.Model):
         for sequence, record in enumerate(artifact.rows, start=1):
             code = _default_code(record, self.source_id.sku_prefix)
             codes.append(code)
-            commands.append(Command.create({
-                "sequence": sequence,
-                "external_id": record["external_id"],
-                "parent_external_id": record.get("parent_external_id"),
-                "identity_is_fallback": record["identity_is_fallback"],
-                "name": record["name"],
-                "variant_title": record.get("variant_title"),
-                "default_code": code,
-                "product_url": record.get("product_url"),
-                "description": record.get("description"),
-                "category_path": record.get("category_path"),
-                "source_category": (record.get("category_path") or [False])[0],
-                "source_price": record["price"],
-                "currency_id": currency.id,
-                "published_vat_status": record.get("vat_status"),
-                "stock_quantity": record.get("stock_quantity") or 0.0,
-                "stock_is_tracked": record["stock_is_tracked"],
-                "availability": record.get("availability"),
-                "image_url": record.get("image_url"),
-                "is_service": self._category_is_service(record.get("category_path")),
-                "raw_record": record["raw_record"],
-                "fetched_at": record.get("fetched_at"),
-            }))
+            commands.append(
+                Command.create(
+                    {
+                        "sequence": sequence,
+                        "external_id": record["external_id"],
+                        "parent_external_id": record.get("parent_external_id"),
+                        "identity_is_fallback": record["identity_is_fallback"],
+                        "name": record["name"],
+                        "variant_title": record.get("variant_title"),
+                        "default_code": code,
+                        "product_url": record.get("product_url"),
+                        "description": record.get("description"),
+                        "category_path": record.get("category_path"),
+                        "source_category": (record.get("category_path") or [False])[0],
+                        "source_price": record["price"],
+                        "currency_id": currency.id,
+                        "published_vat_status": record.get("vat_status"),
+                        "stock_quantity": record.get("stock_quantity") or 0.0,
+                        "stock_is_tracked": record["stock_is_tracked"],
+                        "availability": record.get("availability"),
+                        "image_url": record.get("image_url"),
+                        "is_service": self._category_is_service(record.get("category_path")),
+                        "raw_record": record["raw_record"],
+                        "fetched_at": record.get("fetched_at"),
+                    }
+                )
+            )
         duplicate_codes = {code for code, count in Counter(codes).items() if count > 1}
         now = fields.Datetime.now()
         values = {
@@ -406,8 +507,12 @@ class ShopImportBatch(models.Model):
             "file_sha256": hashlib.sha256(data).hexdigest(),
             "parsed_adapter_key": artifact.adapter_key,
             "currency_id": currency.id,
-            "source_snapshot_from": fields.Datetime.to_string(artifact.fetched_at_min) if artifact.fetched_at_min else False,
-            "source_snapshot_at": fields.Datetime.to_string(artifact.fetched_at_max) if artifact.fetched_at_max else False,
+            "source_snapshot_from": fields.Datetime.to_string(artifact.fetched_at_min)
+            if artifact.fetched_at_min
+            else False,
+            "source_snapshot_at": fields.Datetime.to_string(artifact.fetched_at_max)
+            if artifact.fetched_at_max
+            else False,
             "parsed_at": now,
             "validated_at": False,
             "validated_snapshot_stale": False,
@@ -419,12 +524,18 @@ class ShopImportBatch(models.Model):
         }
         _internal(self).write(values)
         if duplicate_codes:
-            _internal(self.line_ids.filtered(lambda line: line.default_code in duplicate_codes)).write({
-                "validation_status": "error",
-                "validation_messages": _("Generated internal reference collides inside this file."),
-                "selected": False,
-                "duplicate_code": True,
-            })
+            _internal(
+                self.line_ids.filtered(lambda line: line.default_code in duplicate_codes)
+            ).write(
+                {
+                    "validation_status": "error",
+                    "validation_messages": _(
+                        "Generated internal reference collides inside this file."
+                    ),
+                    "selected": False,
+                    "duplicate_code": True,
+                }
+            )
         _internal(self.source_id).write({"last_seen_at": now})
         return self._reopen()
 
@@ -439,8 +550,9 @@ class ShopImportBatch(models.Model):
             raise ValidationError(_("Select at least one Odoo sales tax for a taxable import."))
         currency = self.currency_id
         if self.price_tax_basis == "tax_excluded":
-            result = taxes.compute_all(source_price, currency=currency, quantity=1.0,
-                                       handle_price_include=False)
+            result = taxes.compute_all(
+                source_price, currency=currency, quantity=1.0, handle_price_include=False
+            )
             return source_price, result["total_included"]
         # Reverse Odoo's own tax calculation rather than duplicating percentage,
         # group, fixed-tax, or rounding semantics in importer code.
@@ -448,7 +560,10 @@ class ShopImportBatch(models.Model):
         for _iteration in range(80):
             middle = (low + high) / 2
             total = taxes.compute_all(
-                middle, currency=currency, quantity=1.0, handle_price_include=False,
+                middle,
+                currency=currency,
+                quantity=1.0,
+                handle_price_include=False,
             )["total_included"]
             if total < source_price:
                 low = middle
@@ -456,13 +571,18 @@ class ShopImportBatch(models.Model):
                 high = middle
         net = currency.round((low + high) / 2)
         displayed = taxes.compute_all(
-            net, currency=currency, quantity=1.0, handle_price_include=False,
+            net,
+            currency=currency,
+            quantity=1.0,
+            handle_price_include=False,
         )["total_included"]
         if float_compare(displayed, source_price, precision_rounding=currency.rounding):
-            raise ValidationError(_(
-                "The selected taxes cannot reproduce published price %(price)s.",
-                price=source_price,
-            ))
+            raise ValidationError(
+                _(
+                    "The selected taxes cannot reproduce published price %(price)s.",
+                    price=source_price,
+                )
+            )
         return net, displayed
 
     def _validate_policy(self):
@@ -472,29 +592,38 @@ class ShopImportBatch(models.Model):
         if not self.product_category_id:
             raise ValidationError(_("Choose the Odoo category for physical products."))
         if self.currency_id != self.company_id.currency_id:
-            raise ValidationError(_(
-                "The artifact currency %(source)s differs from company currency %(company)s.",
-                source=self.currency_id.name, company=self.company_id.currency_id.name,
-            ))
+            raise ValidationError(
+                _(
+                    "The artifact currency %(source)s differs from company currency %(company)s.",
+                    source=self.currency_id.name,
+                    company=self.company_id.currency_id.name,
+                )
+            )
         if self.overwrite_images and not self.import_images:
             raise ValidationError(_("Overwriting images requires image import."))
         if self.import_images and not self.source_id.image_hosts():
-            raise ValidationError(_(
-                "Configure at least one allowed image hostname before enabling image import."
-            ))
+            raise ValidationError(
+                _("Configure at least one allowed image hostname before enabling image import.")
+            )
         self._tax_price(1.0)
 
     def _match_product(self, line):
-        binding = self.env["mb.shop.product.binding"].search([
-            ("source_id", "=", self.source_id.id),
-            ("external_id", "=", line.external_id),
-        ], limit=1)
+        binding = self.env["mb.shop.product.binding"].search(
+            [
+                ("source_id", "=", self.source_id.id),
+                ("external_id", "=", line.external_id),
+            ],
+            limit=1,
+        )
         if binding:
             return binding.product_id, "binding"
-        product = self.env["product.product"].search([
-            ("default_code", "=", line.default_code),
-            ("company_id", "=", self.company_id.id),
-        ], limit=2)
+        product = self.env["product.product"].search(
+            [
+                ("default_code", "=", line.default_code),
+                ("company_id", "=", self.company_id.id),
+            ],
+            limit=2,
+        )
         if len(product) == 1:
             return product, "default_code"
         if len(product) > 1:
@@ -506,10 +635,12 @@ class ShopImportBatch(models.Model):
     def _quant_values(self, product):
         if not product:
             return 0.0, 0.0
-        quants = self.env["stock.quant"].search([
-            ("product_id", "=", product.id),
-            ("location_id", "=", self.target_location_id.id),
-        ])
+        quants = self.env["stock.quant"].search(
+            [
+                ("product_id", "=", product.id),
+                ("location_id", "=", self.target_location_id.id),
+            ]
+        )
         return sum(quants.mapped("quantity")), sum(quants.mapped("reserved_quantity"))
 
     def action_validate(self):
@@ -519,7 +650,8 @@ class ShopImportBatch(models.Model):
             raise UserError(_("Parse an uploaded catalogue before validating it."))
         self._validate_policy()
         duplicate_codes = {
-            code for code, count in Counter(self.line_ids.mapped("default_code")).items()
+            code
+            for code, count in Counter(self.line_ids.mapped("default_code")).items()
             if count > 1
         }
         snapshot_stale = False
@@ -538,9 +670,13 @@ class ShopImportBatch(models.Model):
             if product and product.company_id != self.company_id:
                 errors.append(_("The matched product belongs to another company."))
             if product and line.stock_is_tracked and product.tracking != "none":
-                errors.append(_("Stock cannot be adjusted without lots or serials for this tracked product."))
+                errors.append(
+                    _("Stock cannot be adjusted without lots or serials for this tracked product.")
+                )
             if line.identity_is_fallback:
-                warnings.append(_("The scraper CSV lacks an exact variant ID; review its fallback identity."))
+                warnings.append(
+                    _("The scraper CSV lacks an exact variant ID; review its fallback identity.")
+                )
             if snapshot_stale and line.stock_is_tracked and not line.is_service:
                 message = _("The scraper stock snapshot is older than the configured maximum age.")
                 if self.snapshot_stale_policy == "block":
@@ -556,12 +692,22 @@ class ShopImportBatch(models.Model):
                 list_price = customer_price = 0.0
             quantity, reserved = self._quant_values(product)
             current_list_price = product.list_price if product else 0.0
-            price_changed = bool(product) and bool(float_compare(
-                current_list_price, list_price, precision_rounding=self.currency_id.rounding,
-            ))
-            stock_changed = bool(line.stock_is_tracked and not line.is_service and float_compare(
-                quantity, line.stock_quantity, precision_rounding=product.uom_id.rounding if product else 0.01,
-            ))
+            price_changed = bool(product) and bool(
+                float_compare(
+                    current_list_price,
+                    list_price,
+                    precision_rounding=self.currency_id.rounding,
+                )
+            )
+            stock_changed = bool(
+                line.stock_is_tracked
+                and not line.is_service
+                and float_compare(
+                    quantity,
+                    line.stock_quantity,
+                    precision_rounding=product.uom_id.rounding if product else 0.01,
+                )
+            )
             if product:
                 action = "update"
             else:
@@ -572,33 +718,37 @@ class ShopImportBatch(models.Model):
             if errors:
                 selected = False
             status = "error" if errors else "warning" if warnings else "valid"
-            _internal(line).write({
-                "matched_product_id": product.id if product else False,
-                "match_method": match_method,
-                "proposed_action": action if selected else "skip",
-                "proposed_list_price": list_price,
-                "proposed_customer_price": customer_price,
-                "current_name": product.display_name if product else False,
-                "current_list_price": current_list_price,
-                "price_changed": price_changed,
-                "stock_changed": stock_changed,
-                "reviewed_quantity": quantity,
-                "reviewed_reserved_quantity": reserved,
-                "has_reviewed_baseline": True,
-                "validation_status": status,
-                "validation_messages": "\n".join([*errors, *warnings]),
-                "selected": selected,
-                "duplicate_code": line.default_code in duplicate_codes,
-            })
+            _internal(line).write(
+                {
+                    "matched_product_id": product.id if product else False,
+                    "match_method": match_method,
+                    "proposed_action": action if selected else "skip",
+                    "proposed_list_price": list_price,
+                    "proposed_customer_price": customer_price,
+                    "current_name": product.display_name if product else False,
+                    "current_list_price": current_list_price,
+                    "price_changed": price_changed,
+                    "stock_changed": stock_changed,
+                    "reviewed_quantity": quantity,
+                    "reviewed_reserved_quantity": reserved,
+                    "has_reviewed_baseline": True,
+                    "validation_status": status,
+                    "validation_messages": "\n".join([*errors, *warnings]),
+                    "selected": selected,
+                    "duplicate_code": line.default_code in duplicate_codes,
+                }
+            )
         now = fields.Datetime.now()
-        _internal(self).write({
-            "state": "ready",
-            "validated_at": now,
-            "validated_snapshot_stale": snapshot_stale,
-            "warnings_acknowledged_at": False,
-            "warnings_acknowledged_by_id": False,
-            "failure_detail": False,
-        })
+        _internal(self).write(
+            {
+                "state": "ready",
+                "validated_at": now,
+                "validated_snapshot_stale": snapshot_stale,
+                "warnings_acknowledged_at": False,
+                "warnings_acknowledged_by_id": False,
+                "failure_detail": False,
+            }
+        )
         return self._reopen()
 
     def action_acknowledge_warnings(self):
@@ -606,10 +756,12 @@ class ShopImportBatch(models.Model):
         self.check_access("write")
         if self.state != "ready":
             raise UserError(_("Validate the import before acknowledging warnings."))
-        _internal(self).write({
-            "warnings_acknowledged_at": fields.Datetime.now(),
-            "warnings_acknowledged_by_id": self.env.user.id,
-        })
+        _internal(self).write(
+            {
+                "warnings_acknowledged_at": fields.Datetime.now(),
+                "warnings_acknowledged_by_id": self.env.user.id,
+            }
+        )
         return self._reopen()
 
     def action_select_valid(self):
@@ -617,8 +769,12 @@ class ShopImportBatch(models.Model):
         self.check_access("write")
         if self.state not in {"review", "ready"}:
             raise UserError(_("Only a reviewed import can be selected."))
-        self.line_ids.filtered(lambda line: line.validation_status == "valid").write({"selected": True})
-        self.line_ids.filtered(lambda line: line.validation_status != "valid").write({"selected": False})
+        self.line_ids.filtered(lambda line: line.validation_status == "valid").write(
+            {"selected": True}
+        )
+        self.line_ids.filtered(lambda line: line.validation_status != "valid").write(
+            {"selected": False}
+        )
         return self._reopen()
 
     def _lock_and_check_stock(self, lines):
@@ -638,12 +794,17 @@ class ShopImportBatch(models.Model):
         for line in lines.filtered(lambda item: item.stock_is_tracked and not item.is_service):
             quantity, reserved = self._quant_values(line.matched_product_id)
             rounding = line.matched_product_id.uom_id.rounding if line.matched_product_id else 0.01
-            if float_compare(quantity, line.reviewed_quantity, precision_rounding=rounding) \
-                    or float_compare(reserved, line.reviewed_reserved_quantity, precision_rounding=rounding):
-                raise ValidationError(_(
-                    "Stock for %(product)s changed after review. Validate the batch again.",
-                    product=line.name,
-                ))
+            if float_compare(
+                quantity, line.reviewed_quantity, precision_rounding=rounding
+            ) or float_compare(
+                reserved, line.reviewed_reserved_quantity, precision_rounding=rounding
+            ):
+                raise ValidationError(
+                    _(
+                        "Stock for %(product)s changed after review. Validate the batch again.",
+                        product=line.name,
+                    )
+                )
 
     def _create_or_update_product(self, line):
         product = line.matched_product_id
@@ -671,7 +832,8 @@ class ShopImportBatch(models.Model):
             product = template.product_variant_id
         else:
             values = {
-                key: value for key, value in policy_values.items()
+                key: value
+                for key, value in policy_values.items()
                 if getattr(product.product_tmpl_id, key) != value
             }
             template = product.product_tmpl_id
@@ -694,10 +856,13 @@ class ShopImportBatch(models.Model):
                 tag = self.env["product.tag"].create({"name": line.source_category})
             if tag not in template.product_tag_ids:
                 template.product_tag_ids = [Command.link(tag.id)]
-        binding = self.env["mb.shop.product.binding"].search([
-            ("source_id", "=", self.source_id.id),
-            ("external_id", "=", line.external_id),
-        ], limit=1)
+        binding = self.env["mb.shop.product.binding"].search(
+            [
+                ("source_id", "=", self.source_id.id),
+                ("external_id", "=", line.external_id),
+            ],
+            limit=1,
+        )
         values = {
             "source_url": line.product_url or False,
             "adapter_key": self.parsed_adapter_key,
@@ -709,39 +874,56 @@ class ShopImportBatch(models.Model):
                 raise ValidationError(_("The source binding now points at another product."))
             _internal(binding).write(values)
         else:
-            binding = _internal(self.env["mb.shop.product.binding"]).create({
-                **values,
-                "source_id": self.source_id.id,
-                "external_id": line.external_id,
-                "product_id": product.id,
-            })
+            binding = _internal(self.env["mb.shop.product.binding"]).create(
+                {
+                    **values,
+                    "source_id": self.source_id.id,
+                    "external_id": line.external_id,
+                    "product_id": product.id,
+                }
+            )
         return product
 
     def _set_stock(self, line, product):
         if line.is_service or not line.stock_is_tracked:
             return False
-        quants = self.env["stock.quant"].search([
-            ("product_id", "=", product.id),
-            ("location_id", "=", self.target_location_id.id),
-            ("lot_id", "=", False),
-            ("package_id", "=", False),
-            ("owner_id", "=", False),
-        ])
+        quants = self.env["stock.quant"].search(
+            [
+                ("product_id", "=", product.id),
+                ("location_id", "=", self.target_location_id.id),
+                ("lot_id", "=", False),
+                ("package_id", "=", False),
+                ("owner_id", "=", False),
+            ]
+        )
         if len(quants) > 1:
-            raise ValidationError(_("More than one untracked quant exists for %(product)s.", product=product.display_name))
+            raise ValidationError(
+                _(
+                    "More than one untracked quant exists for %(product)s.",
+                    product=product.display_name,
+                )
+            )
         quant = quants[:1]
         before = quant.quantity if quant else 0.0
-        if not float_compare(before, line.stock_quantity, precision_rounding=product.uom_id.rounding):
+        if not float_compare(
+            before, line.stock_quantity, precision_rounding=product.uom_id.rounding
+        ):
             return False
         if quant:
             inventory_quant = quant.with_context(inventory_mode=True)
             inventory_quant.inventory_quantity = line.stock_quantity
         else:
-            inventory_quant = self.env["stock.quant"].with_context(inventory_mode=True).create({
-                "product_id": product.id,
-                "location_id": self.target_location_id.id,
-                "inventory_quantity": line.stock_quantity,
-            })
+            inventory_quant = (
+                self.env["stock.quant"]
+                .with_context(inventory_mode=True)
+                .create(
+                    {
+                        "product_id": product.id,
+                        "location_id": self.target_location_id.id,
+                        "inventory_quantity": line.stock_quantity,
+                    }
+                )
+            )
         inventory_quant.action_apply_inventory()
         return {"before": before, "after": line.stock_quantity}
 
@@ -758,8 +940,10 @@ class ShopImportBatch(models.Model):
         errors = selected.filtered(lambda line: line.validation_status == "error")
         if errors:
             raise UserError(_("Selected lines with errors cannot be imported."))
-        if selected.filtered(lambda line: line.validation_status == "warning") \
-                and not self.warnings_acknowledged_at:
+        if (
+            selected.filtered(lambda line: line.validation_status == "warning")
+            and not self.warnings_acknowledged_at
+        ):
             raise UserError(_("Acknowledge selected warnings before importing."))
         selected_stock = selected.filtered(
             lambda line: line.stock_is_tracked and not line.is_service
@@ -772,9 +956,11 @@ class ShopImportBatch(models.Model):
             > timedelta(hours=self.snapshot_max_age_hours)
         )
         if snapshot_is_now_stale and not self.validated_snapshot_stale:
-            raise UserError(_(
-                "The source stock snapshot became stale after validation. Validate the batch again."
-            ))
+            raise UserError(
+                _(
+                    "The source stock snapshot became stale after validation. Validate the batch again."
+                )
+            )
         _internal(self).write({"state": "importing", "failure_detail": False})
         try:
             with self.env.cr.savepoint():
@@ -791,17 +977,21 @@ class ShopImportBatch(models.Model):
                     stock_change = self._set_stock(line, product)
                     if stock_change:
                         stock_written += 1
-                        stock_changes.append({
-                            "external_id": line.external_id,
-                            "product_id": product.id,
-                            **stock_change,
-                        })
-                    _internal(line).write({
-                        "matched_product_id": product.id,
-                        "proposed_action": "update",
-                        "validation_status": "ingested",
-                        "ingested_product_id": product.id,
-                    })
+                        stock_changes.append(
+                            {
+                                "external_id": line.external_id,
+                                "product_id": product.id,
+                                **stock_change,
+                            }
+                        )
+                    _internal(line).write(
+                        {
+                            "matched_product_id": product.id,
+                            "proposed_action": "update",
+                            "validation_status": "ingested",
+                            "ingested_product_id": product.id,
+                        }
+                    )
                 summary = {
                     "selected": len(selected),
                     "created": created,
@@ -811,13 +1001,15 @@ class ShopImportBatch(models.Model):
                     "adapter": self.parsed_adapter_key,
                     "file_sha256": self.file_sha256,
                 }
-                _internal(self).write({
-                    "state": "done",
-                    "affected_product_tmpl_ids": [Command.set(affected.ids)],
-                    "imported_at": fields.Datetime.now(),
-                    "imported_by_id": self.env.user.id,
-                    "result_summary": summary,
-                })
+                _internal(self).write(
+                    {
+                        "state": "done",
+                        "affected_product_tmpl_ids": [Command.set(affected.ids)],
+                        "imported_at": fields.Datetime.now(),
+                        "imported_by_id": self.env.user.id,
+                        "result_summary": summary,
+                    }
+                )
         except Exception as error:  # the savepoint keeps every business write atomic
             self.env.invalidate_all()
             if isinstance(error, (UserError, ValidationError, AccessError)):
@@ -829,11 +1021,13 @@ class ShopImportBatch(models.Model):
                     batch=self.name,
                 )
             _logger.exception("shop import %s rolled back", self.id)
-            _internal(self).write({
-                "state": "failed",
-                "failure_detail": detail,
-                "result_summary": {"error": detail},
-            })
+            _internal(self).write(
+                {
+                    "state": "failed",
+                    "failure_detail": detail,
+                    "result_summary": {"error": detail},
+                }
+            )
         if self.state == "done" and self.import_images:
             self.action_import_images()
         return self._reopen()
@@ -872,10 +1066,12 @@ class ShopImportBatch(models.Model):
                 else:
                     _logger.exception("shop import image failed for line %s", line.id)
                     detail = _("An unexpected image import error occurred.")
-                _internal(line).write({
-                    "image_status": "failed",
-                    "image_failure": detail,
-                })
+                _internal(line).write(
+                    {
+                        "image_status": "failed",
+                        "image_failure": detail,
+                    }
+                )
         return self._reopen()
 
     def action_cancel(self):
@@ -934,9 +1130,15 @@ class ShopImportLine(models.Model):
     _check_company_auto = True
 
     batch_id = fields.Many2one(
-        "mb.shop.import.batch", required=True, ondelete="cascade", index=True, check_company=True,
+        "mb.shop.import.batch",
+        required=True,
+        ondelete="cascade",
+        index=True,
+        check_company=True,
     )
-    company_id = fields.Many2one(related="batch_id.company_id", store=True, readonly=True, index=True)
+    company_id = fields.Many2one(
+        related="batch_id.company_id", store=True, readonly=True, index=True
+    )
     sequence = fields.Integer(required=True, readonly=True)
     raw_record = fields.Json(readonly=True, copy=False)
     external_id = fields.Char(required=True, readonly=True, index=True)
@@ -966,14 +1168,22 @@ class ShopImportLine(models.Model):
     availability = fields.Char(readonly=True)
     image_url = fields.Char(readonly=True)
     image_status = fields.Selection(
-        [("pending", "Pending"), ("imported", "Imported"), ("skipped", "Skipped"),
-         ("failed", "Failed")], readonly=True,
+        [
+            ("pending", "Pending"),
+            ("imported", "Imported"),
+            ("skipped", "Skipped"),
+            ("failed", "Failed"),
+        ],
+        readonly=True,
     )
     image_failure = fields.Char(readonly=True)
     fetched_at = fields.Datetime(readonly=True)
     is_service = fields.Boolean()
     matched_product_id = fields.Many2one(
-        "product.product", readonly=True, ondelete="restrict", check_company=True,
+        "product.product",
+        readonly=True,
+        ondelete="restrict",
+        check_company=True,
     )
     manual_product_id = fields.Many2one(
         "product.product",
@@ -983,11 +1193,19 @@ class ShopImportLine(models.Model):
         domain="[('company_id', '=', company_id)]",
     )
     ingested_product_id = fields.Many2one(
-        "product.product", readonly=True, ondelete="restrict", check_company=True,
+        "product.product",
+        readonly=True,
+        ondelete="restrict",
+        check_company=True,
     )
     match_method = fields.Selection(
-        [("new", "New"), ("manual", "Explicit review match"), ("binding", "Source binding"),
-         ("default_code", "Internal reference"), ("ambiguous_code", "Ambiguous reference")],
+        [
+            ("new", "New"),
+            ("manual", "Explicit review match"),
+            ("binding", "Source binding"),
+            ("default_code", "Internal reference"),
+            ("ambiguous_code", "Ambiguous reference"),
+        ],
         readonly=True,
     )
     proposed_action = fields.Selection(
@@ -996,9 +1214,17 @@ class ShopImportLine(models.Model):
     )
     selected = fields.Boolean()
     validation_status = fields.Selection(
-        [("new", "Not validated"), ("valid", "Valid"), ("warning", "Warning"),
-         ("error", "Error"), ("ingested", "Ingested")],
-        required=True, default="new", readonly=True, index=True,
+        [
+            ("new", "Not validated"),
+            ("valid", "Valid"),
+            ("warning", "Warning"),
+            ("error", "Error"),
+            ("ingested", "Ingested"),
+        ],
+        required=True,
+        default="new",
+        readonly=True,
+        index=True,
     )
     validation_messages = fields.Text(readonly=True)
     duplicate_code = fields.Boolean(readonly=True, index=True)
@@ -1020,48 +1246,86 @@ class ShopImportLine(models.Model):
 
     def write(self, values):
         immutable = {
-            "batch_id", "company_id", "sequence", "raw_record", "external_id",
-            "parent_external_id", "identity_is_fallback", "product_url", "category_path",
-            "source_category", "currency_id", "published_vat_status", "stock_is_tracked",
-            "availability", "image_url", "fetched_at", "matched_product_id",
-            "ingested_product_id", "match_method", "proposed_action", "proposed_list_price",
-            "proposed_customer_price", "current_name", "current_list_price", "price_changed",
-            "reviewed_quantity", "reviewed_reserved_quantity", "stock_changed", "duplicate_code",
-            "has_reviewed_baseline", "validation_status", "validation_messages",
-            "image_status", "image_failure",
+            "batch_id",
+            "company_id",
+            "sequence",
+            "raw_record",
+            "external_id",
+            "parent_external_id",
+            "identity_is_fallback",
+            "product_url",
+            "category_path",
+            "source_category",
+            "currency_id",
+            "published_vat_status",
+            "stock_is_tracked",
+            "availability",
+            "image_url",
+            "fetched_at",
+            "matched_product_id",
+            "ingested_product_id",
+            "match_method",
+            "proposed_action",
+            "proposed_list_price",
+            "proposed_customer_price",
+            "current_name",
+            "current_list_price",
+            "price_changed",
+            "reviewed_quantity",
+            "reviewed_reserved_quantity",
+            "stock_changed",
+            "duplicate_code",
+            "has_reviewed_baseline",
+            "validation_status",
+            "validation_messages",
+            "image_status",
+            "image_failure",
         }
         if immutable.intersection(values) and not _is_internal(self):
             raise UserError(_("Source evidence and computed review fields cannot be edited."))
-        if self.filtered(lambda line: line.batch_id.state not in {"review", "ready"}) \
-                and not _is_internal(self):
+        if self.filtered(
+            lambda line: line.batch_id.state not in {"review", "ready"}
+        ) and not _is_internal(self):
             raise UserError(_("Lines can be edited only while their batch is under review."))
         result = super().write(values)
         editable = {
-            "name", "variant_title", "default_code", "description", "source_price",
-            "stock_quantity", "is_service", "manual_product_id",
+            "name",
+            "variant_title",
+            "default_code",
+            "description",
+            "source_price",
+            "stock_quantity",
+            "is_service",
+            "manual_product_id",
         }
         if editable.intersection(values) and not _is_internal(self):
             batches = self.mapped("batch_id")
-            _internal(self).write({
-                "validation_status": "new",
-                "validation_messages": False,
-                "has_reviewed_baseline": False,
-            })
-            _internal(batches).write({
-                "state": "review",
-                "validated_at": False,
-                "validated_snapshot_stale": False,
-                "warnings_acknowledged_at": False,
-                "warnings_acknowledged_by_id": False,
-            })
+            _internal(self).write(
+                {
+                    "validation_status": "new",
+                    "validation_messages": False,
+                    "has_reviewed_baseline": False,
+                }
+            )
+            _internal(batches).write(
+                {
+                    "state": "review",
+                    "validated_at": False,
+                    "validated_snapshot_stale": False,
+                    "warnings_acknowledged_at": False,
+                    "warnings_acknowledged_by_id": False,
+                }
+            )
         elif "selected" in values and not _is_internal(self):
             for line in self:
                 action = "skip"
                 if line.selected:
                     action = "update" if line.matched_product_id else "create"
                 _internal(line).write({"proposed_action": action})
-            _internal(self.mapped("batch_id")).write({
-                "warnings_acknowledged_at": False,
-                "warnings_acknowledged_by_id": False,
-            })
+            _internal(self.mapped("batch_id")).write(
+                {
+                    "warnings_acknowledged_at": False,
+                    "warnings_acknowledged_by_id": False,
+                }
+            )
         return result

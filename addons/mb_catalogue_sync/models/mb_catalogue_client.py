@@ -41,9 +41,7 @@ class MbCatalogueClient(models.AbstractModel):
         except requests.exceptions.Timeout as error:
             raise UserError(_("The catalogue service did not answer in time.")) from error
         except requests.exceptions.RequestException as error:
-            _logger.warning(
-                "catalogue GET %s failed: %s", url, error
-            )
+            _logger.warning("catalogue GET %s failed: %s", url, error)
             raise UserError(_("The catalogue service is unreachable.")) from error
         except ValueError as error:
             raise UserError(_("The catalogue service returned a malformed response.")) from error

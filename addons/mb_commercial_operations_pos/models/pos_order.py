@@ -6,7 +6,10 @@ class PosOrder(models.Model):
     _inherit = "pos.order"
 
     mb_commercial_operation_id = fields.Many2one(
-        "mb.commercial.operation", check_company=True, copy=False, index=True,
+        "mb.commercial.operation",
+        check_company=True,
+        copy=False,
+        index=True,
     )
 
     @api.model_create_multi
@@ -15,7 +18,8 @@ class PosOrder(models.Model):
             session = self.env["pos.session"].browse(values.get("session_id"))
             if session.mb_commercial_operation_id:
                 values.setdefault(
-                    "mb_commercial_operation_id", session.mb_commercial_operation_id.id,
+                    "mb_commercial_operation_id",
+                    session.mb_commercial_operation_id.id,
                 )
         return super().create(vals_list)
 
@@ -25,7 +29,9 @@ class PosOrder(models.Model):
                 "mb.commercial.operation"
             ].browse(values.get("mb_commercial_operation_id"))
             if operations.filtered(lambda operation: operation.state == "financially_closed"):
-                raise UserError(_("Reopen the financially closed operation before changing POS links."))
+                raise UserError(
+                    _("Reopen the financially closed operation before changing POS links.")
+                )
             if self.filtered(lambda order: order.state not in ("draft", "cancel")):
                 raise UserError(_("A processed POS order cannot be moved to another operation."))
         return super().write(values)
@@ -34,9 +40,11 @@ class PosOrder(models.Model):
         values = super()._prepare_refund_values(current_session)
         if self.mb_commercial_operation_id:
             if current_session.mb_commercial_operation_id != self.mb_commercial_operation_id:
-                raise ValidationError(_(
-                    "Refund this sale from a POS session configured for the original market operation."
-                ))
+                raise ValidationError(
+                    _(
+                        "Refund this sale from a POS session configured for the original market operation."
+                    )
+                )
             values["mb_commercial_operation_id"] = self.mb_commercial_operation_id.id
         return values
 
@@ -59,7 +67,10 @@ class PosOrder(models.Model):
 
     def _prepare_product_aml_dict(self, base_line_vals, update_base_line_vals, rate, sign):
         values = super()._prepare_product_aml_dict(
-            base_line_vals, update_base_line_vals, rate, sign,
+            base_line_vals,
+            update_base_line_vals,
+            rate,
+            sign,
         )
         operation = base_line_vals["record"].order_id.mb_commercial_operation_id
         if operation:
@@ -72,17 +83,20 @@ class PosOrder(models.Model):
         result = super()._create_order_picking()
         for order in self.filtered("mb_commercial_operation_id"):
             stockable = order.lines.filtered(
-                lambda line: line.product_id.is_storable
-                and not line.product_uom_id.is_zero(line.qty)
+                lambda line: (
+                    line.product_id.is_storable and not line.product_uom_id.is_zero(line.qty)
+                )
             )
             if stockable and (
                 not order.picking_ids
                 or order.picking_ids.filtered(lambda picking: picking.state != "done")
             ):
-                raise ValidationError(_(
-                    "The market sale could not consume its exact event stock. "
-                    "Resolve the stock shortage before validating the order."
-                ))
+                raise ValidationError(
+                    _(
+                        "The market sale could not consume its exact event stock. "
+                        "Resolve the stock shortage before validating the order."
+                    )
+                )
         return result
 
 
@@ -90,5 +104,6 @@ class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
     mb_commercial_operation_id = fields.Many2one(
-        related="order_id.mb_commercial_operation_id", store=True,
+        related="order_id.mb_commercial_operation_id",
+        store=True,
     )

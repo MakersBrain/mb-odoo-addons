@@ -6,7 +6,10 @@ class HrExpense(models.Model):
     _inherit = "hr.expense"
 
     mb_commercial_operation_id = fields.Many2one(
-        "mb.commercial.operation", check_company=True, copy=False, index=True,
+        "mb.commercial.operation",
+        check_company=True,
+        copy=False,
+        index=True,
     )
 
     @api.model_create_multi
@@ -24,12 +27,16 @@ class HrExpense(models.Model):
 
     def write(self, vals):
         if "mb_commercial_operation_id" in vals:
-            operations = self.mb_commercial_operation_id | self.env["mb.commercial.operation"].browse(
+            operations = self.mb_commercial_operation_id | self.env[
+                "mb.commercial.operation"
+            ].browse(vals.get("mb_commercial_operation_id"))
+            if operations.filtered(lambda operation: operation.state == "financially_closed"):
+                raise UserError(
+                    _("Reopen the financially closed operation before changing expense links.")
+                )
+            operation = self.env["mb.commercial.operation"].browse(
                 vals.get("mb_commercial_operation_id")
             )
-            if operations.filtered(lambda operation: operation.state == "financially_closed"):
-                raise UserError(_("Reopen the financially closed operation before changing expense links."))
-            operation = self.env["mb.commercial.operation"].browse(vals.get("mb_commercial_operation_id"))
             if operation:
                 vals.setdefault(
                     "analytic_distribution",

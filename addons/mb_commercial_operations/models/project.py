@@ -14,10 +14,14 @@ class ProjectProject(models.Model):
         index=True,
     )
     mb_commercial_contract_ids = fields.One2many(
-        "mb.commercial.contract", "project_id", string="Commercial contracts",
+        "mb.commercial.contract",
+        "project_id",
+        string="Commercial contracts",
     )
     mb_commercial_operation_ids = fields.One2many(
-        "mb.commercial.operation", "project_id", string="Commercial operations",
+        "mb.commercial.operation",
+        "project_id",
+        string="Commercial operations",
     )
 
 
@@ -34,4 +38,3 @@ class ProjectTask(models.Model):
     )
     mb_travel_hours = fields.Float(string="Travel hours", copy=False)
     mb_on_site_hours = fields.Float(string="On-site hours", copy=False)
-

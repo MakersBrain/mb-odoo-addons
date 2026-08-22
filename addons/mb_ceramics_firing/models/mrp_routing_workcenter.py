@@ -38,22 +38,23 @@ class MrpRoutingWorkcenter(models.Model):
         check_company=True,
         domain="[('kiln_id.workcenter_id', '=', workcenter_id)]",
         help="The controller schedule this operation fires. Choosing one takes "
-             "the duration out of your hands and puts it on the programme, "
-             "where a change reaches every routing that fires it.",
+        "the duration out of your hands and puts it on the programme, "
+        "where a change reaches every routing that fires it.",
     )
     mb_kiln_occupies_cooling = fields.Boolean(
         string="Kiln held while cooling",
         default=True,
         help="A kiln cannot take the next load while it is still hot, so the "
-             "cooling hold is time the work centre is occupied even though "
-             "nobody is working. Turn this off only if the load is drawn hot.",
+        "cooling hold is time the work centre is occupied even though "
+        "nobody is working. Turn this off only if the load is drawn hot.",
     )
 
     def _apply_kiln_program(self):
         """Push the programme's length onto the operation's duration."""
         for operation in self:
             minutes = operation.mb_kiln_program_id._occupied_minutes(
-                operation.mb_kiln_occupies_cooling)
+                operation.mb_kiln_occupies_cooling
+            )
             if minutes:
                 operation.time_cycle_manual = minutes
 

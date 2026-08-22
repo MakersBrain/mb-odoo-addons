@@ -13,7 +13,11 @@ class SumUpController(http.Controller):
     _webhook_url = "/payment/sumup/webhook"
 
     @http.route(
-        _return_url, type="http", auth="public", methods=["GET", "POST"], csrf=False,
+        _return_url,
+        type="http",
+        auth="public",
+        methods=["GET", "POST"],
+        csrf=False,
         save_session=False,
     )
     def sumup_return_from_checkout(self, **data):

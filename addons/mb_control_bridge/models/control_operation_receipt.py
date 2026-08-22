@@ -22,15 +22,17 @@ class ControlOperationReceipt(models.Model):
         if not receipt:
             return self.browse()
         if receipt.command != command or receipt.payload_digest != digest:
-            raise ValidationError(_(
-                "The operation key was already used with a different command or payload."
-            ))
+            raise ValidationError(
+                _("The operation key was already used with a different command or payload.")
+            )
         return receipt
 
     def record(self, operation_key, command, digest, response):
-        return self.create({
-            "operation_key": operation_key,
-            "command": command,
-            "payload_digest": digest,
-            "response": response,
-        })
+        return self.create(
+            {
+                "operation_key": operation_key,
+                "command": command,
+                "payload_digest": digest,
+                "response": response,
+            }
+        )

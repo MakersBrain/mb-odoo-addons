@@ -69,16 +69,18 @@ def read_archive(path):
             handle = archive.extractfile(member)
             if handle is None:
                 sys.exit(f"{path} has no {member} - is this a MakersBrain archive?")
-            tables[key] = [json.loads(line) for line in
-                           handle.read().decode().splitlines() if line.strip()]
+            tables[key] = [
+                json.loads(line) for line in handle.read().decode().splitlines() if line.strip()
+            ]
 
     products = {p["id"]: p for p in tables["products"]}
     sku_by_product = {}
     for variant in tables["variants"]:
         # One default variant per product in this archive. Prefer it explicitly
         # rather than trusting iteration order.
-        if variant["sku"] and (variant["is_default"]
-                               or variant["product_id"] not in sku_by_product):
+        if variant["sku"] and (
+            variant["is_default"] or variant["product_id"] not in sku_by_product
+        ):
             sku_by_product[variant["product_id"]] = variant["sku"]
 
     on_hand = collections.Counter()
@@ -96,8 +98,9 @@ def read_archive(path):
             continue
         on_hand[sku] += movement["quantity"]
 
-    titles = {sku_by_product[pid]: p["title"]
-              for pid, p in products.items() if pid in sku_by_product}
+    titles = {
+        sku_by_product[pid]: p["title"] for pid, p in products.items() if pid in sku_by_product
+    }
     return {
         "on_hand": dict(on_hand),
         "titles": titles,
@@ -107,7 +110,7 @@ def read_archive(path):
     }
 
 
-IMPORT_TEMPLATE = '''
+IMPORT_TEMPLATE = """
 import json
 
 PAYLOAD = json.loads({payload!r})
@@ -192,15 +195,29 @@ if not DRY_RUN:
 total = sum(Quant.search([("location_id", "=", target.id)]).mapped("quantity"))
 print("TOTAL", written, "products,", total, "units in", TARGET)
 print("TOTAL unmatched", len(missing))
-'''
+"""
 
 
 def run_in_odoo(script, database, prefixes):
     """Pipe a script into `odoo shell` and echo the lines it meant to report."""
     result = subprocess.run(
-        ["docker", "exec", "-i", ODOO_CONTAINER, "odoo", "shell",
-         "-d", database, "--log-level=error", "--http-port=8199", "--no-http"],
-        input=script, capture_output=True, text=True)
+        [
+            "docker",
+            "exec",
+            "-i",
+            ODOO_CONTAINER,
+            "odoo",
+            "shell",
+            "-d",
+            database,
+            "--log-level=error",
+            "--http-port=8199",
+            "--no-http",
+        ],
+        input=script,
+        capture_output=True,
+        text=True,
+    )
     for line in result.stdout.splitlines():
         if line.startswith(prefixes):
             print("  " + line)
@@ -210,30 +227,39 @@ def run_in_odoo(script, database, prefixes):
 
 def main():
     parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("archive", help="path to a cmarteau-ceramics-*.tar.gz")
     parser.add_argument("--database", default="odoo")
     parser.add_argument("--location", default=TARGET_LOCATION)
-    parser.add_argument("--dry-run", action="store_true",
-                        help="report what would change, write nothing")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="report what would change, write nothing"
+    )
     options = parser.parse_args()
 
     data = read_archive(options.archive)
     on_hand = data["on_hand"]
     positive = {sku: qty for sku, qty in on_hand.items() if qty}
-    print(f"{data['movements_live']} live movements of {data['movements_total']} "
-          f"-> {len(positive)} products, {sum(positive.values())} units")
+    print(
+        f"{data['movements_live']} live movements of {data['movements_total']} "
+        f"-> {len(positive)} products, {sum(positive.values())} units"
+    )
     for sku, qty in sorted(data["skipped_raw"].items()):
         print(f"  skipped raw material {sku}: {qty}")
 
     script = IMPORT_TEMPLATE.format(
         payload=json.dumps({"on_hand": on_hand, "titles": data["titles"]}),
-        dry_run=options.dry_run, target=options.location,
-        owned=json.dumps(OWNED_ROOTS))
-    print(f"{'checking' if options.dry_run else 'writing'} stock into "
-          f"'{options.database}' at {options.location} ...")
-    run_in_odoo(script, options.database,
-                prefixes=("UNMATCHED", "OUTSIDE", "CLEARED", "SET", "TOTAL"))
+        dry_run=options.dry_run,
+        target=options.location,
+        owned=json.dumps(OWNED_ROOTS),
+    )
+    print(
+        f"{'checking' if options.dry_run else 'writing'} stock into "
+        f"'{options.database}' at {options.location} ..."
+    )
+    run_in_odoo(
+        script, options.database, prefixes=("UNMATCHED", "OUTSIDE", "CLEARED", "SET", "TOTAL")
+    )
 
 
 if __name__ == "__main__":

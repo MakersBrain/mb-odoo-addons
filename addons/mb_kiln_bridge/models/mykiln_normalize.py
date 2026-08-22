@@ -39,8 +39,10 @@ def index_kiln_types(kiln_types):
     """
     index = {}
     for row in kiln_types or []:
-        key = (as_str(row.get("manufacturer")).strip().lower(),
-               as_str(row.get("model_number")).strip().lower())
+        key = (
+            as_str(row.get("manufacturer")).strip().lower(),
+            as_str(row.get("model_number")).strip().lower(),
+        )
         if key != ("", "") and key not in index:
             index[key] = row
     return index
@@ -71,17 +73,15 @@ def kiln_specification(kiln, kiln_types_index=None):
         "phases": None,
     }
     row = (kiln_types_index or {}).get(
-        ((values["manufacturer"] or "").lower(),
-         (values["model_number"] or "").lower()))
+        ((values["manufacturer"] or "").lower(), (values["model_number"] or "").lower())
+    )
     if row:
         values["series"] = as_str(row.get("series")).strip() or None
-        values["configuration"] = _mapped(
-            row.get("configuration"), CONFIGURATIONS)
+        values["configuration"] = _mapped(row.get("configuration"), CONFIGURATIONS)
         values["voltage"] = as_number(row.get("voltage"))
         values["phases"] = as_number(row.get("phases"))
         if not values["heating_method"]:
-            values["heating_method"] = _mapped(
-                row.get("heating_method"), HEATING_METHODS)
+            values["heating_method"] = _mapped(row.get("heating_method"), HEATING_METHODS)
     return values
 
 
@@ -104,17 +104,18 @@ def normalize_program(detail):
     for index, segment in enumerate(raw_segments or [], start=1):
         if not isinstance(segment, dict):
             continue
-        segments.append({
-            "number": int(as_number(segment.get("number")) or index),
-            # Rates and targets are in the controller's own units, which for
-            # segments is always Celsius on this API - the Fahrenheit setting
-            # is a display preference on live readings, and the programme
-            # endpoints do not honour it.
-            "ramp_rate": as_number(segment.get("ramp_rate")) or 0.0,
-            "target_temperature": as_number(
-                segment.get("target_temperature")) or 0.0,
-            "soak_time": as_number(segment.get("soak_time")) or 0.0,
-        })
+        segments.append(
+            {
+                "number": int(as_number(segment.get("number")) or index),
+                # Rates and targets are in the controller's own units, which for
+                # segments is always Celsius on this API - the Fahrenheit setting
+                # is a display preference on live readings, and the programme
+                # endpoints do not honour it.
+                "ramp_rate": as_number(segment.get("ramp_rate")) or 0.0,
+                "target_temperature": as_number(segment.get("target_temperature")) or 0.0,
+                "soak_time": as_number(segment.get("soak_time")) or 0.0,
+            }
+        )
     segments.sort(key=lambda row: row["number"])
     name = as_str(detail.get("library_program_name")).strip()
     return {
@@ -124,8 +125,10 @@ def normalize_program(detail):
         # match each other rather than needing a translation table.
         "name": name or "Programme %d" % int(number),
         "provider_program_id": (
-            str(int(as_number(program.get("id")))) if as_number(program.get("id"))
-            is not None else None),
+            str(int(as_number(program.get("id"))))
+            if as_number(program.get("id")) is not None
+            else None
+        ),
         "segments": segments,
         "fired_at": parse_instant(detail.get("start_date_time")),
     }
@@ -162,20 +165,21 @@ def normalize_kilns(kilns, controllers, kiln_types=None):
         controller = by_id.get(nested_id(kiln, "controller")) or {}
         units = temperature_units(controller.get("temperature_units"))
         state = as_str(controller.get("controller_state")).lower()
-        normalized.append({
-            "external_id": str(int(kiln_id)),
-            "name": as_str(kiln.get("name")) or "MyKiln %d" % int(kiln_id),
-            "specification": kiln_specification(kiln, index),
-            "units": units,
-            "connected": bool(controller.get("is_communicating")),
-            "state": state,
-            "is_firing": state in FIRING_STATES,
-            "is_cooling": state == "cooling",
-            "current_temperature": to_celsius(controller.get("temperature_1"), units),
-            "target_temperature": to_celsius(
-                controller.get("temperature_set_point"), units),
-            "segment": as_number(controller.get("current_segment_number")),
-        })
+        normalized.append(
+            {
+                "external_id": str(int(kiln_id)),
+                "name": as_str(kiln.get("name")) or "MyKiln %d" % int(kiln_id),
+                "specification": kiln_specification(kiln, index),
+                "units": units,
+                "connected": bool(controller.get("is_communicating")),
+                "state": state,
+                "is_firing": state in FIRING_STATES,
+                "is_cooling": state == "cooling",
+                "current_temperature": to_celsius(controller.get("temperature_1"), units),
+                "target_temperature": to_celsius(controller.get("temperature_set_point"), units),
+                "segment": as_number(controller.get("current_segment_number")),
+            }
+        )
     return normalized
 
 
@@ -222,17 +226,19 @@ def normalize_firing(detail, samples, units="Celsius", kiln_state=None):
         offset = as_number(seconds)
         if offset is None:
             continue
-        temperature = to_celsius(
-            temperatures[index] if index < len(temperatures) else None, units)
+        temperature = to_celsius(temperatures[index] if index < len(temperatures) else None, units)
         if temperature is not None and (peak is None or temperature > peak):
             peak = temperature
-        points.append({
-            "elapsed_seconds": offset,
-            "temperature_c": temperature,
-            "setpoint_c": to_celsius(
-                setpoints[index] if index < len(setpoints) else None, units),
-            "segment": as_number(segments[index] if index < len(segments) else None),
-        })
+        points.append(
+            {
+                "elapsed_seconds": offset,
+                "temperature_c": temperature,
+                "setpoint_c": to_celsius(
+                    setpoints[index] if index < len(setpoints) else None, units
+                ),
+                "segment": as_number(segments[index] if index < len(segments) else None),
+            }
+        )
 
     program_number = as_number(detail.get("program_number"))
     program = as_str(detail.get("library_program_name")).strip()
@@ -262,8 +268,8 @@ def normalize_firing(detail, samples, units="Celsius", kiln_state=None):
         # When heating actually stopped, for a firing the provider has not
         # closed yet. The cooling hold is measured from here.
         "last_sample_at": (
-            started_at + timedelta(seconds=points[-1]["elapsed_seconds"])
-            if points else None),
+            started_at + timedelta(seconds=points[-1]["elapsed_seconds"]) if points else None
+        ),
         "curve": {"units": "Celsius", "points": points},
         # Verbatim, for diagnostics and for fields this model does not carry
         # yet. The client sends its token in a header, so nothing credential

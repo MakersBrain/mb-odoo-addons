@@ -7,14 +7,11 @@ from odoo.tools import mute_logger
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
-_SEND_REQUEST = (
-    "odoo.addons.payment.models.payment_provider.PaymentProvider._send_api_request"
-)
+_SEND_REQUEST = "odoo.addons.payment.models.payment_provider.PaymentProvider._send_api_request"
 
 
 @tagged("post_install", "-at_install")
 class TestPosSumUp(AccountTestInvoicingCommon):
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -23,21 +20,25 @@ class TestPosSumUp(AccountTestInvoicingCommon):
         cls.provider = cls.env["payment.provider"].search(
             [("code", "=", "sumup"), ("company_id", "=", cls.env.company.id)], limit=1
         )
-        cls.provider.write({
-            "state": "test",
-            "sumup_api_key": "sup_sk_dummy",
-            "sumup_merchant_code": "MCTEST01",
-        })
-        cls.payment_method = cls.env["pos.payment.method"].create({
-            "name": "SumUp",
-            "journal_id": cls.company_data["default_journal_bank"].id,
-            "receivable_account_id": cls.company_data["default_account_receivable"].id,
-            "payment_method_type": "terminal",
-            "use_payment_terminal": "sumup_mobile",
-            "sumup_affiliate_key": "aff-key",
-            "sumup_app_id": "com.example.pos",
-            "sumup_payment_provider_id": cls.provider.id,
-        })
+        cls.provider.write(
+            {
+                "state": "test",
+                "sumup_api_key": "sup_sk_dummy",
+                "sumup_merchant_code": "MCTEST01",
+            }
+        )
+        cls.payment_method = cls.env["pos.payment.method"].create(
+            {
+                "name": "SumUp",
+                "journal_id": cls.company_data["default_journal_bank"].id,
+                "receivable_account_id": cls.company_data["default_account_receivable"].id,
+                "payment_method_type": "terminal",
+                "use_payment_terminal": "sumup_mobile",
+                "sumup_affiliate_key": "aff-key",
+                "sumup_app_id": "com.example.pos",
+                "sumup_payment_provider_id": cls.provider.id,
+            }
+        )
         cls.base_url = cls.payment_method.get_base_url()
         cls.callback_url = f"{cls.base_url}/pos/ui/1/payment/order-uuid"
         cls.line_uuid = "0dc4c5f8-1c00-4c00-9c00-000000000001"
@@ -57,7 +58,9 @@ class TestPosSumUp(AccountTestInvoicingCommon):
 
         parsed = urlparse(url)
         params = {key: value[0] for key, value in parse_qs(parsed.query).items()}
-        self.assertEqual(f"{parsed.scheme}://{parsed.netloc}{parsed.path}", "sumupmerchant://pay/1.0")
+        self.assertEqual(
+            f"{parsed.scheme}://{parsed.netloc}{parsed.path}", "sumupmerchant://pay/1.0"
+        )
         self.assertEqual(params["affiliate-key"], "aff-key")
         self.assertEqual(params["app-id"], "com.example.pos")
         # Android reads `total`, iOS reads `amount`.
@@ -84,16 +87,19 @@ class TestPosSumUp(AccountTestInvoicingCommon):
     # === Confirming the callback === #
 
     def test_success_is_verified_against_sumup(self):
-        with patch(_SEND_REQUEST, return_value={
-            "id": "tx_0001",
-            "transaction_code": "TEEPUC2VLF",
-            "status": "SUCCESSFUL",
-            "amount": 12.34,
-            "currency": self.env.company.currency_id.name,
-            "merchant_code": "MCTEST01",
-            "foreign_transaction_id": self.line_uuid,
-            "card": {"last_4_digits": "4242", "type": "VISA"},
-        }) as send_request:
+        with patch(
+            _SEND_REQUEST,
+            return_value={
+                "id": "tx_0001",
+                "transaction_code": "TEEPUC2VLF",
+                "status": "SUCCESSFUL",
+                "amount": 12.34,
+                "currency": self.env.company.currency_id.name,
+                "merchant_code": "MCTEST01",
+                "foreign_transaction_id": self.line_uuid,
+                "card": {"last_4_digits": "4242", "type": "VISA"},
+            },
+        ) as send_request:
             result = self.payment_method.sumup_confirm_payment(
                 self.line_uuid, 12.34, {"smp-status": "success", "smp-tx-code": "TEEPUC2VLF"}
             )
@@ -121,14 +127,17 @@ class TestPosSumUp(AccountTestInvoicingCommon):
         self.assertTrue(result["verified"])
 
     def test_a_different_amount_is_refused(self):
-        with patch(_SEND_REQUEST, return_value={
-            "id": "tx_0001",
-            "status": "SUCCESSFUL",
-            "amount": 1.0,
-            "currency": self.env.company.currency_id.name,
-            "merchant_code": "MCTEST01",
-            "foreign_transaction_id": self.line_uuid,
-        }):
+        with patch(
+            _SEND_REQUEST,
+            return_value={
+                "id": "tx_0001",
+                "status": "SUCCESSFUL",
+                "amount": 1.0,
+                "currency": self.env.company.currency_id.name,
+                "merchant_code": "MCTEST01",
+                "foreign_transaction_id": self.line_uuid,
+            },
+        ):
             result = self.payment_method.sumup_confirm_payment(
                 self.line_uuid, 12.34, {"smp-status": "success"}
             )
@@ -141,7 +150,8 @@ class TestPosSumUp(AccountTestInvoicingCommon):
         with patch(_SEND_REQUEST) as send_request:
             with self.assertRaises(UserError):
                 self.payment_method.sumup_confirm_payment(
-                    self.line_uuid, 12.34,
+                    self.line_uuid,
+                    12.34,
                     {"smp-status": "success", "smp-tx-code": "TEEPUC2VLF"},
                 )
 
@@ -168,16 +178,15 @@ class TestPosSumUp(AccountTestInvoicingCommon):
             "merchant_code": "MCTEST01",
             "foreign_transaction_id": self.line_uuid,
         }
-        other_currency = (
-            "USD" if self.env.company.currency_id.name != "USD" else "EUR"
-        )
+        other_currency = "USD" if self.env.company.currency_id.name != "USD" else "EUR"
         for mismatch in (
             {"currency": other_currency},
             {"merchant_code": "OTHER"},
             {"foreign_transaction_id": "another-payment"},
         ):
-            with self.subTest(mismatch=mismatch), patch(
-                _SEND_REQUEST, return_value=dict(valid, **mismatch)
+            with (
+                self.subTest(mismatch=mismatch),
+                patch(_SEND_REQUEST, return_value=dict(valid, **mismatch)),
             ):
                 result = self.payment_method.sumup_confirm_payment(
                     self.line_uuid, 12.34, {"smp-status": "success"}
@@ -193,10 +202,13 @@ class TestPosSumUp(AccountTestInvoicingCommon):
             self.payment_method.sumup_refund_payment("TEEPUC2VLF", 12.34)
 
     def test_refund_addresses_the_original_transaction(self):
-        with patch(_SEND_REQUEST, side_effect=[
-            {"id": "tx_0001", "transaction_code": "TEEPUC2VLF", "status": "SUCCESSFUL"},
-            {},
-        ]) as send_request:
+        with patch(
+            _SEND_REQUEST,
+            side_effect=[
+                {"id": "tx_0001", "transaction_code": "TEEPUC2VLF", "status": "SUCCESSFUL"},
+                {},
+            ],
+        ) as send_request:
             result = self.payment_method.sumup_refund_payment("TEEPUC2VLF", 12.34)
 
         self.assertTrue(result["successful"])

@@ -42,28 +42,30 @@ log = []
 # That silently wiped the commission pricelist once already. Implied groups are
 # the surgical equivalent with no side effects.
 FEATURES = [
-    "stock.group_stock_multi_locations",    # locations inside the depot at all
-    "stock.group_stock_multi_warehouses",   # ...and the Warehouse field that picks one
-    "stock.group_production_lot",           # a piece is individually identified
-    "product.group_product_pricelist",      # the commission
-    "sale.group_discount_per_so_line",      # ...shown as a discount, not a lower price
+    "stock.group_stock_multi_locations",  # locations inside the depot at all
+    "stock.group_stock_multi_warehouses",  # ...and the Warehouse field that picks one
+    "stock.group_production_lot",  # a piece is individually identified
+    "product.group_product_pricelist",  # the commission
+    "sale.group_discount_per_so_line",  # ...shown as a discount, not a lower price
 ]
 group_user = env.ref("base.group_user")
-group_user.write({
-    "implied_ids": [(4, env.ref(x).id) for x in FEATURES if env.ref(x, raise_if_not_found=False)]
-})
+group_user.write(
+    {"implied_ids": [(4, env.ref(x).id) for x in FEATURES if env.ref(x, raise_if_not_found=False)]}
+)
 log.append("features: " + ", ".join(f.split(".")[1] for f in FEATURES))
 
 
 # --- 2. The gallery ---------------------------------------------------------
 partner = env["res.partner"].search([("name", "=", GALLERY)], limit=1)
 if not partner:
-    partner = env["res.partner"].create({
-        "name": GALLERY,
-        "is_company": True,
-        "city": "Nantes",
-        "country_id": ref("base.fr").id,
-    })
+    partner = env["res.partner"].create(
+        {
+            "name": GALLERY,
+            "is_company": True,
+            "city": "Nantes",
+            "country_id": ref("base.fr").id,
+        }
+    )
 log.append(f"partner: {partner.display_name} (id={partner.id})")
 
 # --- 3. The depot ------------------------------------------------------------
@@ -75,16 +77,18 @@ log.append(f"partner: {partner.display_name} (id={partner.id})")
 # Built through the wizard rather than by hand. It is idempotent, it creates the
 # commission pricelist alongside the warehouse so the two agree, and doing it
 # here by hand would be a second implementation to keep in step.
-wizard = env["mb.depot.create"].create({
-    "partner_id": partner.id,
-    "commission": COMMISSION,
-})
+wizard = env["mb.depot.create"].create(
+    {
+        "partner_id": partner.id,
+        "commission": COMMISSION,
+    }
+)
 wizard.action_create()
 depot = env["stock.warehouse"].search(
-    [("is_depot", "=", True), ("depot_partner_id", "=", partner.id)], limit=1)
+    [("is_depot", "=", True), ("depot_partner_id", "=", partner.id)], limit=1
+)
 pl = depot.depot_pricelist_id
-log.append(f"depot: {depot.name} ({depot.code}) — stock at "
-           f"{depot.lot_stock_id.complete_name}")
+log.append(f"depot: {depot.name} ({depot.code}) — stock at {depot.lot_stock_id.complete_name}")
 log.append(f"pricelist: {pl.name} (id={pl.id}) assigned to {partner.name}")
 
 # --- 7. Invoicing rhythm ----------------------------------------------------

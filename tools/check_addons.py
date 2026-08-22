@@ -55,8 +55,14 @@ REQUIRED_KEYS = {
 VERSION_RE = re.compile(r"^19\.0\.\d+\.\d+\.\d+$")
 
 ACCESS_HEADER = [
-    "id", "name", "model_id:id", "group_id:id",
-    "perm_read", "perm_write", "perm_create", "perm_unlink",
+    "id",
+    "name",
+    "model_id:id",
+    "group_id:id",
+    "perm_read",
+    "perm_write",
+    "perm_create",
+    "perm_unlink",
 ]
 
 # Core Odoo 19 Community addons this repository depends on, plus the OCA modules
@@ -64,17 +70,54 @@ ACCESS_HEADER = [
 # actually depended on, so an unexpected new dependency is worth a look rather
 # than waved through.
 KNOWN_EXTERNAL = {
-    "account", "account_edi_ubl_cii", "account_payment", "auth_oauth", "base", "l10n_fr_account",
-    "fleet", "hr_expense", "hr_timesheet", "maintenance", "mail", "mrp", "mrp_account",
-    "payment", "point_of_sale", "product", "product_expiry", "project", "project_hr_expense", "project_mrp",
-    "project_purchase", "project_stock_account", "purchase", "purchase_stock", "resource",
-    "sale_management", "sale_project", "sale_timesheet", "stock_account",
-    "sale", "sale_stock", "stock", "uom", "web", "website_sale_stock",
-    "website_sale_collect", "delivery", "website_sale", "stock_delivery",
-    "delivery_mondialrelay", "website_sale_mondialrelay",
+    "account",
+    "account_edi_ubl_cii",
+    "account_payment",
+    "auth_oauth",
+    "base",
+    "l10n_fr_account",
+    "fleet",
+    "hr_expense",
+    "hr_timesheet",
+    "maintenance",
+    "mail",
+    "mrp",
+    "mrp_account",
+    "payment",
+    "point_of_sale",
+    "product",
+    "product_expiry",
+    "project",
+    "project_hr_expense",
+    "project_mrp",
+    "project_purchase",
+    "project_stock_account",
+    "purchase",
+    "purchase_stock",
+    "resource",
+    "sale_management",
+    "sale_project",
+    "sale_timesheet",
+    "stock_account",
+    "sale",
+    "sale_stock",
+    "stock",
+    "uom",
+    "web",
+    "website_sale_stock",
+    "website_sale_collect",
+    "delivery",
+    "website_sale",
+    "stock_delivery",
+    "delivery_mondialrelay",
+    "website_sale_mondialrelay",
     # OCA, vendored and optional.
-    "sale_order_global_stock_route", "stock_restrict_lot", "stock_picking_filter_lot",
-    "stock_inventory", "stock_picking_report_valued", "sale_invoice_frequency",
+    "sale_order_global_stock_route",
+    "stock_restrict_lot",
+    "stock_picking_filter_lot",
+    "stock_inventory",
+    "stock_picking_report_valued",
+    "sale_invoice_frequency",
 }
 
 failures: list[str] = []
@@ -99,7 +142,10 @@ def check_manifest(path: Path) -> dict | None:
         if key not in manifest:
             fail(addon, f"manifest has no {key!r}")
         elif not isinstance(manifest[key], kind):
-            fail(addon, f"manifest {key!r} is {type(manifest[key]).__name__}, expected {kind.__name__}")
+            fail(
+                addon,
+                f"manifest {key!r} is {type(manifest[key]).__name__}, expected {kind.__name__}",
+            )
 
     version = manifest.get("version")
     if isinstance(version, str) and not VERSION_RE.match(version):
@@ -124,7 +170,7 @@ def check_declared_paths(addon_dir: Path, manifest: dict) -> None:
                 prefix = f"{addon}/"
                 if not spec.startswith(prefix):
                     continue  # another addon's file; its own check covers it
-                if not (addon_dir / spec[len(prefix):]).is_file():
+                if not (addon_dir / spec[len(prefix) :]).is_file():
                     fail(addon, f"asset {spec} in bundle {bundle} does not exist")
 
 
@@ -150,16 +196,21 @@ def check_access_csv(addon_dir: Path) -> None:
         return
     for number, row in enumerate(rows[1:], start=2):
         if len(row) != len(ACCESS_HEADER):
-            fail(addon_dir.name,
-                 f"ir.model.access.csv line {number} has {len(row)} columns, expected {len(ACCESS_HEADER)}")
+            fail(
+                addon_dir.name,
+                f"ir.model.access.csv line {number} has {len(row)} columns, expected {len(ACCESS_HEADER)}",
+            )
 
 
 def check_graph(manifests: dict[str, dict]) -> None:
     for addon, manifest in manifests.items():
         for dep in manifest.get("depends", []):
             if dep not in manifests and dep not in KNOWN_EXTERNAL:
-                fail(addon, f"depends on {dep!r}, which is neither in this repository "
-                            f"nor on the known-external list in tools/check_addons.py")
+                fail(
+                    addon,
+                    f"depends on {dep!r}, which is neither in this repository "
+                    f"nor on the known-external list in tools/check_addons.py",
+                )
 
     # Depth-first cycle detection. Odoo finds these too, by exhausting the stack.
     state: dict[str, int] = {}
@@ -180,6 +231,30 @@ def check_graph(manifests: dict[str, dict]) -> None:
         visit(addon, [])
 
 
+def check_spec_versions(manifests: dict[str, dict]) -> None:
+    """SPEC.md publishes a version table. Keep it honest.
+
+    It drifted once already -- one row sat two minor versions behind its
+    manifest -- and nothing noticed, because a stale documentation table
+    breaks no test. Cheap to check, so check it.
+    """
+    spec = ADDONS.parent / "SPEC.md"
+    if not spec.is_file():
+        return
+    published = dict(re.findall(r"`(\w+)` \| (\d[\d.]*)", spec.read_text(encoding="utf-8")))
+    for addon, manifest in sorted(manifests.items()):
+        version = manifest.get("version")
+        if addon not in published:
+            fail(addon, "is absent from the version table in SPEC.md")
+        elif published[addon] != version:
+            fail(
+                addon,
+                f"SPEC.md lists version {published[addon]}, but the manifest declares {version}",
+            )
+    for addon in sorted(set(published) - set(manifests)):
+        fail(addon, "appears in the SPEC.md version table but has no manifest")
+
+
 def main() -> int:
     if not ADDONS.is_dir():
         print(f"no addons directory at {ADDONS}", file=sys.stderr)
@@ -198,6 +273,7 @@ def main() -> int:
         check_access_csv(addon_dir)
 
     check_graph(manifests)
+    check_spec_versions(manifests)
 
     if failures:
         for line in failures:
@@ -205,8 +281,10 @@ def main() -> int:
         print(f"\n{len(failures)} problem(s) in {len(addon_dirs)} addon(s)", file=sys.stderr)
         return 1
 
-    print(f"OK  {len(addon_dirs)} addons: manifests, data paths, assets, XML, "
-          f"access rules and dependency graph")
+    print(
+        f"OK  {len(addon_dirs)} addons: manifests, data paths, assets, XML, "
+        f"access rules, dependency graph and SPEC.md versions"
+    )
     return 0
 
 

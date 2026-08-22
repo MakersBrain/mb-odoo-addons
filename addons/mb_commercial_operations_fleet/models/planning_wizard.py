@@ -18,8 +18,10 @@ class MbCommercialOperationPlanWizard(models.TransientModel):
 
     def _operation_values(self):
         values = super()._operation_values()
-        values.update({
-            "vehicle_id": self.vehicle_id.id,
-            "vehicle_conflict_acknowledged": self.vehicle_conflict_acknowledged,
-        })
+        values.update(
+            {
+                "vehicle_id": self.vehicle_id.id,
+                "vehicle_conflict_acknowledged": self.vehicle_conflict_acknowledged,
+            }
+        )
         return values

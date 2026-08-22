@@ -7,14 +7,18 @@ class TestFoodContact(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.mug = cls.env["product.template"].create({
-            "name": "Mug Poulpe",
-            "is_storable": True,
-        })
-        cls.plate = cls.env["product.template"].create({
-            "name": "Plat decoratif Poulpe",
-            "is_storable": True,
-        })
+        cls.mug = cls.env["product.template"].create(
+            {
+                "name": "Mug Poulpe",
+                "is_storable": True,
+            }
+        )
+        cls.plate = cls.env["product.template"].create(
+            {
+                "name": "Plat decoratif Poulpe",
+                "is_storable": True,
+            }
+        )
 
     def test_food_contact_requires_tracking(self):
         """The constraint holds where the onchange never runs."""
@@ -28,12 +32,14 @@ class TestFoodContact(TransactionCase):
         self.assertEqual(self.mug.tracking, "serial")
 
     def test_supplier_lot_requirement_is_distinct_and_requires_tracking(self):
-        material = self.env["product.template"].create({
-            "name": "Supplier glaze",
-            "is_storable": True,
-            "tracking": "lot",
-            "mb_supplier_lot_required": True,
-        })
+        material = self.env["product.template"].create(
+            {
+                "name": "Supplier glaze",
+                "is_storable": True,
+                "tracking": "lot",
+                "mb_supplier_lot_required": True,
+            }
+        )
         self.assertFalse(material.mb_food_contact)
         with self.assertRaises(ValidationError):
             material.tracking = "none"
@@ -48,9 +54,11 @@ class TestFoodContact(TransactionCase):
         self.assertTrue(self.plate.mb_label_food_warning)
 
     def test_food_contact_ware_gets_no_warning(self):
-        self.mug.write({
-            "mb_food_contact": True,
-            "tracking": "lot",
-            "mb_tableware_form": True,
-        })
+        self.mug.write(
+            {
+                "mb_food_contact": True,
+                "tracking": "lot",
+                "mb_tableware_form": True,
+            }
+        )
         self.assertFalse(self.mug.mb_label_food_warning)

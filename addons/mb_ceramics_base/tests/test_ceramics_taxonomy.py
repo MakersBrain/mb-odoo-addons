@@ -28,8 +28,13 @@ class TestCeramicsTaxonomy(TransactionCase):
         families = [
             self.env.ref(f"mb_ceramics_base.categ_{name}")
             for name in (
-                "glaze", "underglaze", "engobe", "clay_body",
-                "stain", "oxide", "raw_material",
+                "glaze",
+                "underglaze",
+                "engobe",
+                "clay_body",
+                "stain",
+                "oxide",
+                "raw_material",
             )
         ]
 
@@ -45,8 +50,13 @@ class TestCeramicsTaxonomy(TransactionCase):
         continuous calendar for the same reason a kiln is: leather-hard is days.
         """
         for name in (
-            "throwing", "handbuilding", "trimming", "assembly",
-            "glazing", "decorating", "drying",
+            "throwing",
+            "handbuilding",
+            "trimming",
+            "assembly",
+            "glazing",
+            "decorating",
+            "drying",
         ):
             self.assertTrue(self.env.ref(f"mb_ceramics_base.mb_workcenter_{name}"))
 
@@ -59,5 +69,4 @@ class TestCeramicsTaxonomy(TransactionCase):
 
     def test_the_root_menu_stays_neutral(self):
         """Installing a vertical must not make shared data order-dependent."""
-        self.assertEqual(
-            self.env.ref("mb_workshop_base.menu_mb_workshop_root").name, "Workshop")
+        self.assertEqual(self.env.ref("mb_workshop_base.menu_mb_workshop_root").name, "Workshop")

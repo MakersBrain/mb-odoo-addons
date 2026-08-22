@@ -46,6 +46,7 @@ msgstr "Cumul"
 
 #. module: mb_commercial_operations_urssaf
 #: model:ir.model,name:mb_commercial_operations_urssaf.model_mb_commercial_operation
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_l10n_fr_micro_urssaf_declaration_source__mb_commercial_operation_id
 msgid "Commercial Operation"
 msgstr "Opération commerciale"
 
@@ -65,6 +66,7 @@ msgid "Date"
 msgstr "Date"
 
 #. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_l10n_fr_micro_urssaf_declaration_source__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation_plan_wizard_line__display_name
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__display_name
@@ -77,6 +79,7 @@ msgid "Filed"
 msgstr "Déposé"
 
 #. module: mb_commercial_operations_urssaf
+#: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_l10n_fr_micro_urssaf_declaration_source__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_operation_plan_wizard_line__id
 #: model:ir.model.fields,field_description:mb_commercial_operations_urssaf.field_mb_commercial_profitability_scenario_line__id
@@ -102,6 +105,13 @@ msgstr "Reconnaissance en attente"
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf
 msgid "Product / basket"
 msgstr "Produit / panier"
+
+#. module: mb_commercial_operations_urssaf
+#: model:ir.model,name:mb_commercial_operations_urssaf.model_l10n_fr_micro_urssaf_declaration_source
+msgid "Recognised turnover event claimed by an URSSAF declaration"
+msgstr ""
+"Événement de chiffre d'affaires constaté revendiqué par une déclaration "
+"URSSAF"
 
 #. module: mb_commercial_operations_urssaf
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations_urssaf.report_commercial_operation_urssaf

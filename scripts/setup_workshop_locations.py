@@ -212,9 +212,23 @@ for category in unused:
 def run_in_odoo(script, database, prefixes):
     """Pipe a script into `odoo shell` and echo the lines it meant to report."""
     result = subprocess.run(
-        ["docker", "exec", "-i", ODOO_CONTAINER, "odoo", "shell",
-         "-d", database, "--log-level=error", "--http-port=8199", "--no-http"],
-        input=script, capture_output=True, text=True)
+        [
+            "docker",
+            "exec",
+            "-i",
+            ODOO_CONTAINER,
+            "odoo",
+            "shell",
+            "-d",
+            database,
+            "--log-level=error",
+            "--http-port=8199",
+            "--no-http",
+        ],
+        input=script,
+        capture_output=True,
+        text=True,
+    )
     for line in result.stdout.splitlines():
         if line.startswith(prefixes):
             print("  " + line)
@@ -224,12 +238,15 @@ def run_in_odoo(script, database, prefixes):
 
 def main():
     parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--database", default="odoo")
-    parser.add_argument("--wip-root", default="AT-WIP",
-                        help="name of the root-level view holding the racks")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="report what would change, write nothing")
+    parser.add_argument(
+        "--wip-root", default="AT-WIP", help="name of the root-level view holding the racks"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="report what would change, write nothing"
+    )
     options = parser.parse_args()
 
     config = {
@@ -239,13 +256,16 @@ def main():
         "stock_children": STOCK_CHILDREN,
         "depots": ["Galerie Démo", "La Méduse Électrique Sète"],
     }
-    script = SETUP_TEMPLATE.format(
-        config=json.dumps(config), dry_run=options.dry_run)
-    print(f"{'checking' if options.dry_run else 'building'} the location tree "
-          f"in '{options.database}' ...")
-    run_in_odoo(script, options.database,
-                prefixes=("INFO", "SETTING", "CATEGORY", "LOCATION",
-                          "DEPOT", "TREE"))
+    script = SETUP_TEMPLATE.format(config=json.dumps(config), dry_run=options.dry_run)
+    print(
+        f"{'checking' if options.dry_run else 'building'} the location tree "
+        f"in '{options.database}' ..."
+    )
+    run_in_odoo(
+        script,
+        options.database,
+        prefixes=("INFO", "SETTING", "CATEGORY", "LOCATION", "DEPOT", "TREE"),
+    )
 
 
 if __name__ == "__main__":

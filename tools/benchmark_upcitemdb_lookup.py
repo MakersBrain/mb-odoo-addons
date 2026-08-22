@@ -19,6 +19,7 @@ import urllib.parse
 import urllib.request
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 ENDPOINT = "https://api.upcitemdb.com/prod/trial/lookup"
 MAX_BATCH_SIZE = 2
@@ -194,7 +195,9 @@ def lookup_batch(barcodes: list[str]) -> tuple[list[dict], dict]:
             }
     except urllib.error.HTTPError as error:
         if error.code == 429:
-            raise RuntimeError("UPCitemDB rate limit reached; retry after its reset window") from None
+            raise RuntimeError(
+                "UPCitemDB rate limit reached; retry after its reset window"
+            ) from None
         raise RuntimeError(f"UPCitemDB returned HTTP {error.code}") from None
     if len(payload) > MAX_RESPONSE_BYTES:
         raise RuntimeError("UPCitemDB response exceeded the 1 MB bound")
@@ -239,10 +242,7 @@ def normalize_item(item: dict, requested_barcode: str, retrieved_at: str) -> dic
 def candidate_matches(candidate: dict, expected: dict) -> dict:
     expected_terms = [compact(term) for term in re.split(r"\s+", expected["product"]) if term]
     candidate_text = compact(
-        " ".join(
-            str(candidate[field])
-            for field in ("brand", "manufacturer_sku", "name", "pack")
-        )
+        " ".join(str(candidate[field]) for field in ("brand", "manufacturer_sku", "name", "pack"))
     )
     return {
         "exact_identifier": comparison_gtin(candidate["identifier"])
@@ -285,7 +285,7 @@ def main() -> int:
         if not gs1_check_digit_valid(barcode):
             raise SystemExit(f"invalid expected barcode: {barcode}")
 
-    report = {
+    report: dict[str, Any] = {
         "provider": "upcitemdb",
         "endpoint_tier": "trial",
         "images": {},
@@ -332,9 +332,7 @@ def main() -> int:
                 item = items_by_identifier.get(comparison_gtin(barcode))
                 candidate = normalize_item(item, barcode, retrieved_at) if item else None
                 ttl = (
-                    args.positive_ttl_days * 86400
-                    if candidate
-                    else args.negative_ttl_hours * 3600
+                    args.positive_ttl_days * 86400 if candidate else args.negative_ttl_hours * 3600
                 )
                 cache.put(barcode, candidate, ttl)
                 report["images"][filename] = {
