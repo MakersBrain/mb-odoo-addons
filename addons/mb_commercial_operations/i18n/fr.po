@@ -52,7 +52,7 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
 msgid "%(operation)s — %(kind)s r%(revision)s"
 msgstr "%(operation)s — %(kind)s rév.%(revision)s"
 
@@ -127,14 +127,14 @@ msgstr "Une occurrence terminée ne peut pas être annulée."
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/ir_attachment.py:0
 msgid "A frozen commercial report attachment cannot be changed."
 msgstr ""
 "La pièce jointe d'un rapport commercial figé ne peut pas être modifiée."
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/ir_attachment.py:0
 msgid "A frozen commercial report attachment cannot be deleted."
 msgstr ""
 "La pièce jointe d'un rapport commercial figé ne peut pas être supprimée."
@@ -194,7 +194,7 @@ msgstr "Accepté"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Accepted TollQuote travel total"
 msgstr "Total de déplacement TollQuote accepté"
 
@@ -247,7 +247,7 @@ msgstr "Comptabilité rapprochée"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Acknowledge incomplete TollQuote pricing before accepting it."
 msgstr "Acquittez la tarification TollQuote incomplète avant de l'accepter."
 
@@ -523,7 +523,7 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
 msgid ""
 "Approved planning inputs changed; reopen and approve a new revision instead."
 msgstr ""
@@ -629,7 +629,7 @@ msgstr "Panier moyen"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "BLOCKING — %s"
 msgstr "BLOQUANT — %s"
 
@@ -841,7 +841,7 @@ msgstr "Points de contrôle et avertissements"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Choose a TollQuote connector."
 msgstr "Choisissez un connecteur TollQuote."
 
@@ -988,7 +988,7 @@ msgstr "Scénario de rentabilité commerciale"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Commercial application deadline"
 msgstr "Date limite de candidature commerciale"
 
@@ -1009,7 +1009,7 @@ msgstr "Opérations commerciales"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Commercial payment deadline"
 msgstr "Date limite de paiement commerciale"
 
@@ -1062,7 +1062,8 @@ msgstr "Compléter la planification de l'opération commerciale"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_operation_form_planning_report
 #: model_terms:ir.ui.view,arch_db:mb_commercial_operations.view_commercial_planning_wizard_form
 msgid "Complete Planning"
@@ -1088,7 +1089,7 @@ msgstr "Terminez l'opération avant la clôture financière."
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
 msgid "Complete the operation before printing its outcome report."
 msgstr "Terminez l'opération avant d'imprimer son rapport de résultat."
 
@@ -1594,13 +1595,13 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_report_snapshot.py:0
 msgid "Enter a void reason before voiding this frozen report."
 msgstr "Saisissez un motif d'annulation avant d'annuler ce rapport figé."
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Enter usable origin and destination coordinates."
 msgstr "Saisissez des coordonnées d'origine et de destination exploitables."
 
@@ -1837,19 +1838,19 @@ msgstr "Référence figée"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
 msgid "Frozen planning evidence created:"
 msgstr "Justificatif figé de planification créé :"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_report_snapshot.py:0
 msgid "Frozen report snapshots are immutable."
 msgstr "Les instantanés de rapport figés sont immuables."
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_report_snapshot.py:0
 msgid "Frozen report snapshots cannot be deleted; void them instead."
 msgstr ""
 "Les instantanés de rapport figés ne peuvent pas être supprimés ; annulez-les"
@@ -1857,7 +1858,7 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_report_snapshot.py:0
 msgid "Frozen report voided: %(reason)s"
 msgstr "Rapport figé annulé : %(reason)s"
 
@@ -2356,7 +2357,7 @@ msgstr "Nouvelle opération planifiée"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "New planned operation"
 msgstr "Nouvelle opération planifiée"
 
@@ -2383,7 +2384,7 @@ msgstr "Type d'activités à venir"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
 msgid "No current planning snapshot exists."
 msgstr "Aucun instantané de planification en vigueur n'existe."
 
@@ -2565,7 +2566,7 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
 msgid "Only a Commercial Operations Manager can freeze a replacement copy."
 msgstr ""
 "Seul un gestionnaire des opérations commerciales peut figer une copie de "
@@ -2589,7 +2590,7 @@ msgstr ""
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_report_snapshot.py:0
 msgid "Only a Commercial Operations Manager can void a snapshot."
 msgstr ""
 "Seul un gestionnaire des opérations commerciales peut annuler un instantané."
@@ -2781,7 +2782,7 @@ msgstr "Autre coût unitaire variable"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
 msgid "Outcome"
 msgstr "Résultat"
 
@@ -3023,7 +3024,7 @@ msgstr "Coût prévu"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Planned labour"
 msgstr "Main-d'oeuvre prévue"
 
@@ -3070,7 +3071,7 @@ msgstr "Heures de travail prévues"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
 msgid "Planning"
 msgstr "Planification"
 
@@ -3125,7 +3126,7 @@ msgstr "Synthèse des avertissements de planification"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Planning scenario"
 msgstr "Scénario de planification"
 
@@ -3568,7 +3569,7 @@ msgstr "Rouvrez l'opération avant de modifier sa cible de stock approuvée."
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Reopen the operation before changing its planning baseline."
 msgstr "Rouvrez l'opération avant de modifier sa référence de planification."
 
@@ -3673,7 +3674,7 @@ msgstr "Révision %(revision)s de %(name)s"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/wizard/commercial_operation_plan_wizard.py:0
 msgid "Revision of %s"
 msgstr "Révision de %s"
 
@@ -3885,7 +3886,7 @@ msgstr "Visite sur site"
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_report_snapshot.py:0
 msgid "Snapshots can only be created by the controlled approval workflow."
 msgstr ""
 "Les instantanés ne peuvent être créés que par le flux d'approbation "
@@ -4102,7 +4103,7 @@ msgstr "La date de fin du contrat ne peut pas précéder sa date de début."
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_report_snapshot.py:0
 msgid "The frozen scenario must belong to the operation."
 msgstr "Le scénario figé doit appartenir à l'opération."
 
@@ -4149,7 +4150,7 @@ msgstr "Le scénario principal est incomplet."
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_operation_planning.py:0
 msgid "The primary scenario must belong to this operation."
 msgstr "Le scénario principal doit appartenir à cette opération."
 
@@ -4177,7 +4178,7 @@ msgstr "Cette opération n'est pas dans un état permettant sa réouverture."
 
 #. module: mb_commercial_operations
 #. odoo-python
-#: code:addons/mb_commercial_operations/models/planning_report.py:0
+#: code:addons/mb_commercial_operations/models/commercial_report_snapshot.py:0
 msgid "This snapshot has no PDF attachment."
 msgstr "Cet instantané n'a aucune pièce jointe PDF."
 
