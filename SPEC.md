@@ -34,7 +34,7 @@ past schemas, retired formats, or upgrade paths.
 | `mb_account_payment_sumup` | 19.0.1.1.2 | `mb_ai_bridge` | 19.0.1.0.1 |
 | `mb_brand` | 19.0.1.0.1 | `mb_catalogue_sync` | 19.0.1.5.1 |
 | `mb_ceramics_base` | 19.0.1.0.0 | `mb_ceramics_compliance` | 19.0.1.0.1 |
-| `mb_ceramics_firing` | 19.0.3.0.1 | `mb_ceramics_workflow` | 19.0.3.0.1 |
+| `mb_ceramics_firing` | 19.0.3.0.1 | `mb_ceramics_workflow` | 19.0.3.0.2 |
 | `mb_commercial_operations` | 19.0.2.3.0 | `mb_commercial_operations_depot` | 19.0.2.1.0 |
 | `mb_commercial_operations_expense` | 19.0.2.0.1 | `mb_commercial_operations_fleet` | 19.0.2.0.1 |
 | `mb_commercial_operations_mrp` | 19.0.2.0.1 | `mb_commercial_operations_pos` | 19.0.2.0.1 |

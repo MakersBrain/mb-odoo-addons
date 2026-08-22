@@ -38,6 +38,26 @@ class MbCeramicsSessionLineMixin(models.AbstractModel):
                 )
             )
 
+    def _mb_available_quantity(self, product_field, lot_field):
+        """Strict on-hand quantity of one line's tracked input at the session source.
+
+        Bisque and glazing lines carried byte-identical copies of this, differing
+        only in which field names their stage uses. Throwing has no counterpart:
+        it consumes clay by weight, not tracked pieces.
+        """
+        for line in self:
+            product = line[product_field]
+            lot = line[lot_field]
+            if not (product and lot and line.session_id.source_location_id):
+                line.available_quantity = 0
+                continue
+            line.available_quantity = self.env["stock.quant"]._get_available_quantity(
+                product,
+                line.session_id.source_location_id,
+                lot_id=lot,
+                strict=True,
+            )
+
     @api.model_create_multi
     def create(self, vals_list):
         session_ids = [values.get("session_id") for values in vals_list]

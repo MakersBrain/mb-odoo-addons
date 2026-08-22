@@ -149,18 +149,7 @@ class MbGlazingSessionLine(models.Model):
 
     @api.depends("bisque_product_id", "bisque_lot_id", "session_id.source_location_id")
     def _compute_available_quantity(self):
-        for line in self:
-            if not (
-                line.bisque_product_id and line.bisque_lot_id and line.session_id.source_location_id
-            ):
-                line.available_quantity = 0
-                continue
-            line.available_quantity = self.env["stock.quant"]._get_available_quantity(
-                line.bisque_product_id,
-                line.session_id.source_location_id,
-                lot_id=line.bisque_lot_id,
-                strict=True,
-            )
+        self._mb_available_quantity("bisque_product_id", "bisque_lot_id")
 
     @api.constrains("bisque_product_id", "bisque_lot_id", "finished_product_id", "bom_id")
     def _check_selection(self):
