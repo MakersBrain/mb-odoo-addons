@@ -4,15 +4,11 @@
 // assignment here wins against core's `!default` further down the bundle.
 // Nothing in this addon may use a selector where a variable exists.
 //
-// Values come from tokens.css in @makersbrain/brand. Keep them in step by hand:
-// SCSS cannot read CSS custom properties at compile time, so there is no way to
-// make this file derive from the tokens rather than mirror them.
-//
-// `make brand-check` fails if any colour here no longer exists anywhere in that
-// package's palette, which catches the case where a token moved upstream and
-// nobody carried it into this bundle. It cannot catch a value that is still in
-// the palette but is now the wrong token for its slot -- that is what the
-// comment naming each source token, below, is for.
+// The variables below come from the generated @makersbrain/ui Odoo projection.
+// `make brand-check` verifies this checked-in projection byte-for-byte against
+// the published package, so Odoo compilation stays offline and cannot drift.
+
+@import "mb_tokens";
 
 // ---------------------------------------------------------------------------
 // Colour
@@ -21,9 +17,9 @@
 // buttons, and white on clay-500 is 4.25:1 — under AA. clay-600 clears it at
 // 5.88:1. This is the same distinction brand/tokens.css draws between
 // --mb-brand (decorative) and --mb-accent (interactive).
-$o-community-color: #a34a2c;
-$o-brand-odoo: #a34a2c;
-$o-brand-primary: #a34a2c;
+$o-community-color: $mb-clay-600;
+$o-brand-odoo: $mb-clay-600;
+$o-brand-primary: $mb-clay-600;
 
 // Bootstrap's `$primary`, set here rather than left to follow $o-brand-primary.
 // The two bundles disagree about where it comes from: the backend's
@@ -33,7 +29,7 @@ $o-brand-primary: #a34a2c;
 // $o-brand-primary therefore brands the web client and leaves the login page
 // on stock Odoo — which is exactly the page a new user sees first. Setting
 // $primary here, ahead of both, covers them together.
-$primary: #a34a2c;
+$primary: $mb-clay-600;
 
 // The public pages take their primary colour from somewhere else entirely, and
 // this is the seam that reaches it.
@@ -49,11 +45,11 @@ $primary: #a34a2c;
 // wins whichever order the two files end up in.
 $o-color-palettes: (
     'base-1': (
-        'o-color-1': #a34a2c,   // clay-600, the interactive tone
-        'o-color-2': #e9e1db,   // sand-200
-        'o-color-3': #f7f3ee,   // the page ground
-        'o-color-4': #ffffff,   // surface
-        'o-color-5': #1e1915,   // ink
+        'o-color-1': $mb-clay-600,   // the interactive tone
+        'o-color-2': $mb-sand-200,
+        'o-color-3': $mb-page-ground,
+        'o-color-4': $mb-surface,
+        'o-color-5': $mb-sand-900,
     ),
     // Keep Odoo's complete second base palette. This file is prepended before
     // html_editor defines its defaults; omitting base-2 makes Website's later
@@ -85,41 +81,41 @@ $o-color-palettes: (
 // keeps whatever is already in the variable, and these values are literals
 // rather than references, so a later reassignment cannot reach them.
 //
-// The states use the clay ramp from brand/tokens.css rather than SCSS
+// The states use the shared clay ramp rather than SCSS
 // `darken()`, so the button matches the buttons on every other surface instead
 // of landing on a near-miss of them.
 $o-btns-bs-override: (
     "primary": (
-        background: #a34a2c,          // clay-600
-        border: #a34a2c,
-        color: #ffffff,
+        background: $mb-clay-600,
+        border: $mb-clay-600,
+        color: $mb-surface,
 
-        hover-background: #833a23,    // clay-700
-        hover-border: #612b1a,        // clay-800
-        hover-color: #ffffff,
+        hover-background: $mb-clay-700,
+        hover-border: $mb-clay-800,
+        hover-color: $mb-surface,
 
-        active-background: #fdf1ec,   // clay-50
-        active-border: #a34a2c,
-        active-color: #612b1a,
+        active-background: $mb-clay-50,
+        active-border: $mb-clay-600,
+        active-color: $mb-clay-800,
     ),
 );
 
 // The warm neutral. Odoo's default greys are cold, and a cold grey against a
 // clay accent is the single fastest way to make a palette look accidental.
-$o-gray-100: #f4efeb;
-$o-gray-200: #e9e1db;
-$o-gray-300: #d6cac1;
-$o-gray-400: #b2a398;
-$o-gray-500: #877669;
-$o-gray-600: #64564c;
-$o-gray-700: #493e36;
-$o-gray-800: #2f2822;
-$o-gray-900: #1e1915;
+$o-gray-100: $mb-sand-100;
+$o-gray-200: $mb-sand-200;
+$o-gray-300: $mb-sand-300;
+$o-gray-400: $mb-sand-400;
+$o-gray-500: $mb-sand-500;
+$o-gray-600: $mb-sand-600;
+$o-gray-700: $mb-sand-700;
+$o-gray-800: $mb-sand-800;
+$o-gray-900: $mb-sand-900;
 
 // sand-900 rather than near-black: the body copy has to sit on a warm ground
 // without reading as a different temperature from everything around it.
-$o-main-text-color: #1e1915;
-$o-main-color-muted: #64564c;
+$o-main-text-color: $mb-sand-900;
+$o-main-color-muted: $mb-sand-600;
 
 // ---------------------------------------------------------------------------
 // Type

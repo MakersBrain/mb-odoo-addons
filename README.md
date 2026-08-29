@@ -46,7 +46,7 @@ recreates only an allowlisted disposable database (`mb_scratch` by default).
 
 ## Validation
 
-Install the pinned development-only brand package before running the complete
+Install the pinned development-only UI package before running the complete
 static gate:
 
 ```sh
@@ -56,7 +56,7 @@ make test
 git diff --check
 ```
 
-`make check` runs Ruff, translation validation, the brand-token mirror check,
+`make check` runs Ruff, translation validation, the UI-token projection check,
 the addon dependency inventory/hash lock, and addon metadata/source checks.
 `make test` installs all current manifests on
 a fresh disposable database and restricts Odoo's test selection to tests owned
@@ -92,3 +92,7 @@ Releases run the exact digest-pinned official Odoo image. MakersBrain code is a
 separately signed transport image containing `/payload/addons`, an empty-by-
 default `/payload/python`, and a complete digest-bound manifest. The transport
 image is copied by the deployment helper and is never used as the Odoo runtime.
+
+The public homepage, privacy policy, and terms are owned by the separate
+[`MakersBrain/mb-site`](https://github.com/MakersBrain/mb-site) static site.
+This repository intentionally contains no public landing-page implementation.

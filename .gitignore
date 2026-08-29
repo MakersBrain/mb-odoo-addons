@@ -23,13 +23,6 @@ __pycache__/
 .venv/
 .ruff_cache/
 
-# Generated page. tools/build_landing.py inlines ~190 KB of base64 font into
-# it, so committing it would put a quarter-megabyte diff in the history on
-# every rebuild while adding nothing that is not already tracked. Every input
-# is either in the tree (index.src.html) or in @makersbrain/brand, so a clean
-# checkout rebuilds it offline with one command.
-landing/index.html
-
 # Local import run artifacts. These may inline a run's payload, so they are
 # operational output rather than repository input.
 build/imports/
@@ -41,6 +34,6 @@ build/imports/
 .DS_Store
 
 # Development-only npm tree. package.json here exists solely to pin the
-# published @makersbrain/brand version the SCSS mirror and the landing build
-# check against; nothing from it ships in the Odoo image.
+# published @makersbrain/ui version the SCSS projection check uses; nothing
+# from it ships in the Odoo image.
 node_modules/
