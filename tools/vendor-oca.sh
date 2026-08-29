@@ -3,8 +3,8 @@
 #
 # None of them is a dependency. `make install` and `make test` pass with ./oca
 # empty, and that is checked in CI — see SPEC.md, "Licence boundary": every
-# addon here is LGPL-3 and none may depend on an AGPL-3 module. What these are
-# for is the workflow around the addons. `sale_order_global_stock_route` is the
+# MakersBrain addon here is AGPL-3. Vendored OCA modules retain their upstream
+# licenses and are used only for optional workflow integration. `sale_order_global_stock_route` is the
 # one mb_depot names: without it the depot route exists and is set on an order
 # line by hand.
 #

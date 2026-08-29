@@ -4,5 +4,6 @@
   "description": "Development-only manifest pinning the published @makersbrain/ui projection used to verify addons/mb_brand. Nothing here ships in the Odoo image.",
   "devDependencies": {
     "@makersbrain/ui": "0.1.0"
-  }
+  },
+  "license": "AGPL-3.0-only"
 }

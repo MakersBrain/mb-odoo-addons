@@ -2,7 +2,7 @@
 
 - Status: living specification of the current implementation
 - Target: Odoo 19 Community, one PostgreSQL database per artisan
-- Licence: LGPL-3
+- Licence: AGPL-3
 - Installation baseline: fresh installation of the current manifests
 
 This repository contains the Odoo side of the MakersBrain workshop platform.

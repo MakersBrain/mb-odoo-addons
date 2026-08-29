@@ -8,7 +8,7 @@ allowlisted workshop role and records signed entitlement state. It is not a
 general remote-administration API and stores no Rauthy administration secret.
 """,
     "version": "19.0.2.0.0",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Administration",
     "author": "MakersBrain",
     "depends": [

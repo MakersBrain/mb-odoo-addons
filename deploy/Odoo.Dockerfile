@@ -49,4 +49,4 @@ LABEL org.opencontainers.image.source="https://github.com/MakersBrain/mb-odoo-ad
       org.opencontainers.image.version="${SOURCE_REF}" \
       org.opencontainers.image.title="mb-odoo-extension" \
       org.opencontainers.image.description="Immutable MakersBrain addon extension bundle for official Odoo 19" \
-      org.opencontainers.image.licenses="LGPL-3.0-only"
+      org.opencontainers.image.licenses="AGPL-3.0-only"

@@ -4,7 +4,7 @@
     "version": "19.0.2.0.1",
     "category": "Human Resources/Expenses",
     "author": "MakersBrain",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "depends": ["mb_commercial_operations", "hr_expense", "project_hr_expense"],
     "data": [
         "views/commercial_operation_expense_views.xml",

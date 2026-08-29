@@ -40,7 +40,7 @@ is a cost that never stops being paid, and the recolour above already makes the
 product read as MakersBrain.
 """,
     "version": "19.0.1.0.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Technical",
     "author": "MakersBrain",
     "depends": [

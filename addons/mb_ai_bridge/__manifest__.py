@@ -9,7 +9,7 @@ the MakersBrain control plane, and rejects raw provider bodies. Provider keys,
 SDKs, routing, quotas, and retries remain outside Odoo in the extraction broker.
 """,
     "version": "19.0.1.0.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Technical/Technical",
     "author": "MakersBrain",
     "depends": ["mb_control_bridge"],

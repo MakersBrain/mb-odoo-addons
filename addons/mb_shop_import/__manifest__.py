@@ -9,7 +9,7 @@ re-import idempotent and stock baselines prevent stale snapshots from
 overwriting newer Odoo activity.
 """,
     "version": "19.0.1.0.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
     "depends": ["mail", "stock", "sale_stock", "account"],

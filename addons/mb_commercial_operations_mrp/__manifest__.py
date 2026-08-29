@@ -4,7 +4,7 @@
     "version": "19.0.2.0.1",
     "category": "Manufacturing/Manufacturing",
     "author": "MakersBrain",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "depends": ["mb_commercial_operations_stock", "mrp", "project_mrp"],
     "data": [
         "views/commercial_operation_mrp_views.xml",

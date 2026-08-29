@@ -4,7 +4,7 @@
     "version": "19.0.2.0.1",
     "category": "Human Resources/Fleet",
     "author": "MakersBrain",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "depends": ["mb_commercial_operations", "fleet"],
     "data": [
         "views/commercial_operation_fleet_views.xml",

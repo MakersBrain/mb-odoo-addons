@@ -88,7 +88,7 @@ schedule detail - an under-fired glaze is a less mature glaze, and lead release
 rises with immaturity.
 """,
     "version": "19.0.3.0.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "MakersBrain",
     "depends": [

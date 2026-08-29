@@ -34,7 +34,7 @@ conversation for someone quoting from a bench. The active pricelist's price is
 appended to the display name, through context keys so nothing else changes.
 """,
     "version": "19.0.2.0.0",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
     "depends": [

@@ -3,7 +3,7 @@
     "summary": "Design, version, render and print product and piece labels.",
     "description": "Versioned thermal-label design and product/lot printing.",
     "version": "19.0.1.2.2",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
     "depends": ["stock", "web"],

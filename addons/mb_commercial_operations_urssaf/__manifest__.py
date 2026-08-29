@@ -4,7 +4,7 @@
     "version": "19.0.2.3.0",
     "category": "Accounting/Localizations",
     "author": "MakersBrain",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     # Only what the code reaches for: the URSSAF rates and declaration sources,
     # the commercial operation and its planning wizard, and the POS bridge that
     # puts `mb_commercial_operation_id` on `pos.order`. The depot and sale

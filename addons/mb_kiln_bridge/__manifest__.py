@@ -59,7 +59,7 @@ The client implements the read-only API v1 token authentication and the joins
 between kilns, controllers, firings, samples, and kiln types.
 """,
     "version": "19.0.1.3.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "MakersBrain",
     "depends": [

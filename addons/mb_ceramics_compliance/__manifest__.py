@@ -41,7 +41,7 @@ article made from that lot. Recording it per piece would mean copying the same
 figures onto every mug in a firing and having no single place to correct them.
 """,
     "version": "19.0.1.0.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
     "depends": [

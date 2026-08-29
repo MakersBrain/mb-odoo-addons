@@ -52,7 +52,7 @@ material product itself so it joins to the master catalogue, which is the same
 reasoning as the categories: one taxonomy, and it is Odoo's.
 """,
     "version": "19.0.1.0.0",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
     "depends": [

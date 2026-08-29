@@ -10,7 +10,7 @@ the boundary is the selected curated manufacturer identity - Mayco SC74 Hot
 Tamale - plus current offers from suppliers this workshop has mapped.
 """,
     "version": "19.0.1.5.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
     "depends": [
