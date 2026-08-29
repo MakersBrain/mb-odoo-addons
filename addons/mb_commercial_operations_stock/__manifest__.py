@@ -4,7 +4,7 @@
     "version": "19.0.2.0.1",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "depends": ["mb_commercial_operations", "stock"],
     "data": [
         "security/mb_commercial_operations_stock_security.xml",

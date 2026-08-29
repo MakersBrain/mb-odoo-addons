@@ -11,7 +11,7 @@ The control plane can restrict and re-enable the complete storefront without
 uninstalling modules or deleting historical orders.
 """,
     "version": "19.0.1.5.2",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Website/eCommerce",
     "author": "MakersBrain",
     "depends": [

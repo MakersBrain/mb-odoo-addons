@@ -4,7 +4,7 @@
     "version": "19.0.2.0.1",
     "category": "Sales/Sales",
     "author": "MakersBrain",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "depends": [
         "mb_commercial_operations_stock",
         "sale_project",

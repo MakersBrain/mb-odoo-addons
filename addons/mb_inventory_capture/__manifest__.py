@@ -8,7 +8,7 @@ confirmed product and supplier lot to a draft incoming receipt. External OCR
 and multimodal providers remain behind the MakersBrain control plane.
 """,
     "version": "19.0.1.1.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
     "depends": [

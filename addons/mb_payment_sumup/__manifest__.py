@@ -34,7 +34,7 @@ acknowledges before settlement. Odoo keeps the refund pending and polls the
 authoritative transaction events before marking it done.
 """,
     "version": "19.0.1.1.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Accounting/Payment Providers",
     "author": "MakersBrain",
     "website": "https://sumup.com",

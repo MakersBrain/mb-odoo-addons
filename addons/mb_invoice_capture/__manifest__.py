@@ -9,7 +9,7 @@ bills, and reconstructs reviewable purchase orders for normal stock receipts.
 It never stores Paperless or Azure credentials, confirms receipts, posts, or pays.
 """,
     "version": "19.0.1.5.3",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Accounting/Accounting",
     "author": "MakersBrain",
     "depends": ["account", "mail", "mb_control_bridge", "purchase_stock"],

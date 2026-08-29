@@ -44,7 +44,7 @@ This is craft-neutral: a leatherworker and a joiner both sell over a counter,
 and neither is a restaurant.
 """,
     "version": "19.0.1.0.0",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Sales/Point of Sale",
     "author": "MakersBrain",
     "depends": [

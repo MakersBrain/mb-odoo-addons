@@ -8,7 +8,7 @@ position to Factur-X-compatible franchise exemption taxes, while historical
 accounting documents remain unchanged.
 """,
     "version": "19.0.4.0.2",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Accounting/Localizations",
     "author": "MakersBrain",
     "depends": ["l10n_fr_account", "account_edi_ubl_cii"],

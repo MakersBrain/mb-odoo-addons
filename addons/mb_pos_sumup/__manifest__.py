@@ -49,7 +49,7 @@ app and it fails at the reader with a server error, which reads like a
 connectivity fault and is not one.
 """,
     "version": "19.0.1.1.2",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Sales/Point of Sale",
     "author": "MakersBrain",
     "depends": [

@@ -10,7 +10,7 @@ shared kiln firings, records yield loss and seconds, and exposes firing-aware lo
 genealogy without replacing Odoo's stock identity.
 """,
     "version": "19.0.3.0.2",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "MakersBrain",
     "depends": [

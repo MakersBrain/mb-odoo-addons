@@ -7,7 +7,7 @@ tenant-authenticated control-plane outbox. Provider credentials and delivery
 operations remain outside Odoo; unrelated Odoo mail keeps its native behavior.
 """,
     "version": "19.0.1.1.1",
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "category": "Website/eCommerce",
     "author": "MakersBrain",
     "depends": ["mail", "mb_control_bridge", "mb_webshop"],
