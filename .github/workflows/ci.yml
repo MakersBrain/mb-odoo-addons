@@ -113,12 +113,9 @@ jobs:
             -v "$PWD:/src:ro" -w /src "$ODOO_IMAGE" \
             tools/dependency_policy.py --runtime
 
-      # The Odoo SCSS mirror is maintained by hand because SCSS cannot read the
-      # brand package's CSS custom properties at compile time, so nothing but
-      # this check notices when a token moves underneath it. It only ever ran
-      # from the Makefile before the split, which is why it was able to drift
-      # unnoticed. @makersbrain/brand is internal to the organisation, so the
-      # workflow's own token can read it.
+      # The published UI package carries a generated Odoo SCSS projection. The
+      # workflow token reads the private package and CI verifies the addon's
+      # checked-in copy byte-for-byte.
       - name: Authenticate to GitHub Packages
         run: npm config set --location=user //npm.pkg.github.com/:_authToken "$GITHUB_TOKEN"
         env:
@@ -126,7 +123,7 @@ jobs:
 
       - run: npm ci
 
-      - name: Odoo SCSS mirror matches the brand package
+      - name: Odoo SCSS projection matches the UI package
         run: python3 tools/check_brand_scss.py
 
       # This repository is the provider of /mb_control/v1 and mb-control-plane is

@@ -43,7 +43,7 @@ TAGS_ARG := $(subst $(space),$(comma),$(TAGS))
 
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \
-        test check lint format format-check typecheck oca reset-test-db brand-check landing \
+        test check lint format format-check typecheck oca reset-test-db brand-check \
         dependency-check bridge-contract-check po-parse-check
 
 help: ## Show available targets
@@ -126,15 +126,11 @@ po-parse-check: ## Independently parse translation catalogues and validate heade
 dependency-check: ## Validate declared imports and the hash-checked empty lock
 	python3 tools/dependency_policy.py
 
-# The design system is `@makersbrain/brand`, pinned by this repository's
-# development-only package.json. The Odoo SCSS mirror cannot read CSS custom
-# properties at compile time, so this gate compares it explicitly. Run
-# `npm ci` first.
-brand-check: ## Fail if the Odoo SCSS mirror has fallen behind the brand package
+# The design system is `@makersbrain/ui`, pinned by this repository's
+# development-only package.json. Odoo consumes its generated SCSS projection;
+# this gate verifies the checked-in copy byte-for-byte. Run `npm ci` first.
+brand-check: ## Fail if the Odoo token projection has fallen behind mb-ui
 	python3 tools/check_brand_scss.py
-
-landing: ## Rebuild landing/index.html from the brand package
-	python3 tools/build_landing.py
 
 # polib comes through uv rather than a checked-in requirements file: nothing
 # here is a Python package, so there is no install step to hang a dependency on.

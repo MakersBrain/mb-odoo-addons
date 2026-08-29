@@ -29,10 +29,10 @@ interface, both SIL OFL and both self-hosted in `static/src/fonts`. A webfont
 CDN would put a third party in the request path of every backend page load, and
 a workshop with a poor connection would watch the interface reflow.
 
-The source of truth for every value here is `brand/tokens.css` at the root of
-this repository, and `brand/design-chart.html` documents what the values mean.
-This addon is a translation of that system into Odoo's variables, so a change
-belongs upstream in the tokens first.
+The source of truth for every value here is the published `@makersbrain/ui`
+package. Its generated Odoo SCSS projection is checked into this addon for
+offline compilation and verified byte-for-byte in CI, so a change belongs
+upstream in the shared tokens first.
 
 Deliberately not done: the app switcher, the list and form views, and the rest
 of the web client keep Odoo's own layout. Fighting an upstream theme wholesale
