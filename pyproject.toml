@@ -81,7 +81,7 @@ section-order = [
 #
 # Scoped deliberately, because mypy over Odoo addons is mostly theatre: `odoo`
 # ships no stubs and is not importable outside the container, so every ORM
-# symbol resolves to `Any` and 425 addon files "pass" while almost nothing is
+# symbol resolves to `Any` and hundreds of addon files "pass" while almost nothing is
 # actually checked. A gate that green-lights unchecked code is worse than no
 # gate, so the two lanes are enforced differently:
 #
@@ -103,9 +103,15 @@ exclude = [
     "^oca/",
     "^node_modules/",
     "^\\.venv/",
-    # Fed to `odoo shell`, which injects `env` and `self` as globals. Excluded
-    # from ruff's F821 for the same reason.
+    # Odoo discovers migration scripts by version directory and stage-prefixed
+    # filename. Repeated names such as `pre-migrate.py` are valid, but mypy
+    # otherwise maps each script to the same top-level `pre-migrate` module.
+    "^addons/[^/]+/migrations/",
+    # Fed to `odoo shell`, which injects `env` and `self` as globals. This
+    # applies to both repository-level and add-on-local operational scripts;
+    # they are excluded from ruff's F821 for the same reason.
     "^scripts/",
+    "^addons/[^/]+/scripts/",
 ]
 
 [[tool.mypy.overrides]]

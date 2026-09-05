@@ -149,8 +149,20 @@ msgstr ""
 #. module: mb_label
 #. odoo-python
 #: code:addons/mb_label/models/label_template.py:0
+#: model:ir.model.constraint,message:mb_label.constraint_mb_label_template_active_default_unique
+msgid "A company can have only one active default label template."
+msgstr "Une société ne peut avoir qu’un seul modèle d’étiquette actif par défaut."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
 msgid "A company can have only one default label template."
 msgstr "Une société ne peut avoir qu'un seul modèle d'étiquette par défaut."
+
+#. module: mb_label
+#: model:ir.model.constraint,message:mb_label.constraint_mb_label_template_company_seed_unique
+msgid "A company can have only one label template for each seed key."
+msgstr "Une société ne peut avoir qu’un seul modèle d’étiquette par clé d’initialisation."
 
 #. module: mb_label
 #. odoo-python
@@ -209,6 +221,12 @@ msgstr "Alias"
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Already 1-bit; preserve pixels"
 msgstr "Déjà en 1 bit ; préserver les pixels"
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Archive label templates cannot be set as default."
+msgstr "Les modèles d’étiquette archivés ne peuvent pas être définis par défaut."
 
 #. module: mb_label
 #: model_terms:ir.ui.view,arch_db:mb_label.view_mb_label_template_form
@@ -333,6 +351,11 @@ msgstr "Choisir une autre imprimante et imprimer"
 #: code:addons/mb_label/static/src/printer/device_print.xml:0
 msgid "Close"
 msgstr "Fermer"
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
 
 #. module: mb_label
 #: model:ir.model.fields,field_description:mb_label.field_mb_label_print_job__company_id
@@ -485,6 +508,7 @@ msgstr "Abandonner les modifications d'étiquette non enregistrées ?"
 #: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__display_name
 #: model:ir.model.fields,field_description:mb_label.field_product_product__display_name
 #: model:ir.model.fields,field_description:mb_label.field_product_template__display_name
+#: model:ir.model.fields,field_description:mb_label.field_res_company__display_name
 #: model:ir.model.fields,field_description:mb_label.field_stock_lot__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
@@ -662,6 +686,7 @@ msgstr "Valeur lisible"
 #: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__id
 #: model:ir.model.fields,field_description:mb_label.field_product_product__id
 #: model:ir.model.fields,field_description:mb_label.field_product_template__id
+#: model:ir.model.fields,field_description:mb_label.field_res_company__id
 #: model:ir.model.fields,field_description:mb_label.field_stock_lot__id
 msgid "ID"
 msgstr "ID"
@@ -1133,6 +1158,18 @@ msgid "Product only"
 msgstr "Produit seul"
 
 #. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Provisioned label template keys are immutable."
+msgstr "Les clés des modèles d’étiquette provisionnés sont immuables."
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Provisioned label template keys are managed by Label Studio."
+msgstr "Les clés des modèles d’étiquette provisionnés sont gérées par Label Studio."
+
+#. module: mb_label
 #. odoo-javascript
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "QR"
@@ -1311,6 +1348,11 @@ msgstr "Les versions d'étiquette enregistrées ne peuvent pas être supprimées
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Saving…"
 msgstr "Enregistrement…"
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__seed_key
+msgid "Seed Key"
+msgstr "Clé d’initialisation"
 
 #. module: mb_label
 #. odoo-javascript
@@ -1510,7 +1552,9 @@ msgstr "Le document d'étiquette doit comporter une liste d'éléments."
 #. odoo-javascript
 #: code:addons/mb_label/static/src/editor/template_file.js:0
 msgid "The label template dimensions and resolution must be positive."
-msgstr "Les dimensions et la résolution du modèle d’étiquette doivent être positives."
+msgstr ""
+"Les dimensions et la résolution du modèle d’étiquette doivent être "
+"positives."
 
 #. module: mb_label
 #. odoo-javascript

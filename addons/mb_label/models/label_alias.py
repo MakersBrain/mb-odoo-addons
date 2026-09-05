@@ -95,5 +95,6 @@ class MbLabelQrAlias(models.Model):
             raise UserError(_("Only a Label Designer can reactivate printed QR aliases."))
         self.write({"active": True, "retired_by_id": False, "retired_at": False})
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_audit_record(self):
         raise UserError(_("Printed QR aliases are audit records and cannot be deleted."))

@@ -3,8 +3,11 @@ import re
 import unicodedata
 from urllib.parse import quote, urlsplit, urlunsplit
 
+from psycopg2.errors import UniqueViolation
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import SQL
 
 ALLOWED_TYPES = {"text", "qr", "barcode", "image", "rect", "ellipse", "triangle", "line"}
 ALLOWED_BINDINGS = {
@@ -32,6 +35,12 @@ ALLOWED_FILTERS = {
 }
 TOKEN_RE = re.compile(r"\{\{\s*([\w.-]+)\s*((?:\|[^{}]*)?)\}\}")
 FILTER_RE = re.compile(r"^([a-z_]+)(?::(.*))?$", re.IGNORECASE)
+SEED_WRITE_CAPABILITY = object()
+SEED_WRITE_CONTEXT = "_mb_label_seed_write_capability"
+SEED_SPECS = (
+    ("product_40x30", "mb_label.template_product_40x30", "mb_label.template_product_40x30_v1"),
+    ("wip_lot_30x20", "mb_label.template_wip_lot_30x20", "mb_label.template_wip_lot_30x20_v1"),
+)
 
 
 def parse_filters(source):
@@ -191,6 +200,7 @@ class MbLabelTemplate(models.Model):
     )
     active = fields.Boolean(default=True)
     is_default = fields.Boolean(string="Default")
+    seed_key = fields.Char(readonly=True, copy=False, index=True)
     version_ids = fields.One2many("mb.label.template.version", "template_id")
     current_version_id = fields.Many2one(
         "mb.label.template.version",
@@ -200,6 +210,158 @@ class MbLabelTemplate(models.Model):
         check_company=True,
     )
 
+    _active_default_unique = models.UniqueIndex(
+        "(company_id) WHERE active IS TRUE AND is_default IS TRUE",
+        "A company can have only one active default label template.",
+    )
+    _company_seed_unique = models.UniqueIndex(
+        "(company_id, seed_key) WHERE seed_key IS NOT NULL",
+        "A company can have only one label template for each seed key.",
+    )
+
+    @api.model
+    def _lock_default_companies(self, company_ids):
+        """Update parents so concurrent REPEATABLE READ transactions serialize."""
+        for company_id in sorted({item for item in company_ids if item}):
+            self.env.cr.execute(SQL("UPDATE res_company SET id = id WHERE id = %s", company_id))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        if (
+            any(values.get("seed_key") for values in vals_list)
+            and self.env.context.get(SEED_WRITE_CONTEXT) is not SEED_WRITE_CAPABILITY
+        ):
+            raise UserError(_("Provisioned label template keys are managed by Label Studio."))
+        default_company_id = self.env.context.get("default_company_id") or self.env.company.id
+        self._lock_default_companies(
+            values.get("company_id", default_company_id)
+            for values in vals_list
+            if values.get("is_default") and values.get("active", True)
+        )
+        try:
+            with self.env.cr.savepoint():
+                return super().create(vals_list)
+        except UniqueViolation as error:
+            raise ValidationError(
+                _("A company can have only one active default label template.")
+            ) from error
+
+    def write(self, values):
+        if (
+            "seed_key" in values
+            and self.env.context.get(SEED_WRITE_CONTEXT) is not SEED_WRITE_CAPABILITY
+        ):
+            if any(record.seed_key != values["seed_key"] for record in self):
+                raise UserError(_("Provisioned label template keys are immutable."))
+        if {"is_default", "company_id", "active"}.intersection(values):
+            company_ids = set(self.company_id.ids)
+            if values.get("company_id"):
+                company_ids.add(values["company_id"])
+            self._lock_default_companies(company_ids)
+        try:
+            with self.env.cr.savepoint():
+                return super().write(values)
+        except UniqueViolation as error:
+            raise ValidationError(
+                _("A company can have only one active default label template.")
+            ) from error
+
+    @api.model
+    def _ensure_company_seed_templates(self, companies):
+        """Create only missing company seeds; never rewrite an existing seed."""
+        self = self.sudo()
+        companies = companies.sudo().exists().sorted("id")
+        template_fields = (
+            "name",
+            "width_mm",
+            "height_mm",
+            "dpi",
+            "qr_url_prefix",
+            "printer_target",
+            "round_media",
+            "continuous_media",
+            "orientation",
+        )
+        version_fields = (
+            "document_json",
+            "qr_payload_template",
+            "qr_url_prefix",
+            "printer_target",
+            "round_media",
+            "continuous_media",
+            "width_mm",
+            "height_mm",
+            "dpi",
+        )
+        for company in companies:
+            has_default = bool(
+                self.with_context(active_test=False).search_count(
+                    [
+                        ("company_id", "=", company.id),
+                        ("active", "=", True),
+                        ("is_default", "=", True),
+                    ],
+                    limit=1,
+                )
+            )
+            for seed_key, template_xmlid, version_xmlid in SEED_SPECS:
+                suffix = "%s_company_%s" % (seed_key, company.id)
+                existing = self.with_context(active_test=False).search(
+                    [("company_id", "=", company.id), ("seed_key", "=", seed_key)], limit=1
+                )
+                if existing:
+                    continue
+                prototype = self.env.ref(template_xmlid)
+                owned = self.env.ref("mb_label.seed_template_%s" % suffix, raise_if_not_found=False)
+                adopt = owned or (prototype if prototype.company_id == company else self.browse())
+                if adopt and not adopt.seed_key:
+                    adopt.with_context(**{SEED_WRITE_CONTEXT: SEED_WRITE_CAPABILITY}).write(
+                        {"seed_key": seed_key}
+                    )
+                    continue
+                template_values = {field: prototype[field] for field in template_fields}
+                template_values.update(
+                    {
+                        "company_id": company.id,
+                        "seed_key": seed_key,
+                        "is_default": seed_key == "product_40x30" and not has_default,
+                    }
+                )
+                template = (
+                    self.with_company(company)
+                    .with_context(**{SEED_WRITE_CONTEXT: SEED_WRITE_CAPABILITY})
+                    .create(template_values)
+                )
+                for language in self.env["res.lang"].search([("active", "=", True)]):
+                    template.with_context(lang=language.code).name = prototype.with_context(
+                        lang=language.code
+                    ).name
+                prototype_version = self.env.ref(version_xmlid)
+                version_values = {field: prototype_version[field] for field in version_fields}
+                version_values.update({"template_id": template.id, "number": 1})
+                version = self.env["mb.label.template.version"].create(version_values)
+                template.write({"current_version_id": version.id})
+                self.env["ir.model.data"].create(
+                    [
+                        {
+                            "module": "mb_label",
+                            "name": "seed_template_%s" % suffix,
+                            "model": self._name,
+                            "res_id": template.id,
+                            "noupdate": True,
+                        },
+                        {
+                            "module": "mb_label",
+                            "name": "seed_version_%s_v1" % suffix,
+                            "model": "mb.label.template.version",
+                            "res_id": version.id,
+                            "noupdate": True,
+                        },
+                    ]
+                )
+                has_default = has_default or template.is_default
+        return self.search([("company_id", "in", companies.ids), ("seed_key", "!=", False)])
+
     @api.constrains("width_mm", "height_mm", "dpi")
     def _check_media(self):
         for record in self:
@@ -208,9 +370,9 @@ class MbLabelTemplate(models.Model):
             if not 72 <= record.dpi <= 600:
                 raise ValidationError(_("Label DPI must be between 72 and 600."))
 
-    @api.constrains("is_default", "company_id")
+    @api.constrains("is_default", "company_id", "active")
     def _check_default(self):
-        for record in self.filtered("is_default"):
+        for record in self.filtered(lambda item: item.is_default and item.active):
             others = self.search_count(
                 [
                     ("id", "!=", record.id),
@@ -224,14 +386,19 @@ class MbLabelTemplate(models.Model):
 
     def action_set_default(self):
         self.ensure_one()
-        self.search([("company_id", "=", self.company_id.id), ("id", "!=", self.id)]).write(
-            {"is_default": False}
-        )
-        self.is_default = True
+        if not self.active:
+            raise ValidationError(_("Archive label templates cannot be set as default."))
+        with self.env.cr.savepoint():
+            self._lock_default_companies(self.company_id.ids)
+            self.search([("company_id", "=", self.company_id.id), ("id", "!=", self.id)]).write(
+                {"is_default": False}
+            )
+            self.write({"is_default": True})
 
     def save_version(self, document, qr_payload_template="{{qr}}", qr_url_prefix=None):
         self.ensure_one()
         self.check_access("write")
+        self.env.cr.execute(SQL("UPDATE mb_label_template SET id = id WHERE id = %s", self.id))
         document = validate_document(document)
         prefix = normalize_qr_url_prefix(
             self.qr_url_prefix if qr_url_prefix is None else qr_url_prefix
@@ -400,5 +567,6 @@ class MbLabelTemplateVersion(models.Model):
     def write(self, vals):
         raise UserError(_("Saved label versions are immutable; save a new version instead."))
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_saved_version(self):
         raise UserError(_("Saved label versions cannot be deleted."))

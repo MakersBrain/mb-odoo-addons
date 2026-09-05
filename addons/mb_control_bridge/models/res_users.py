@@ -116,6 +116,7 @@ class ResUsers(models.Model):
         return user_id, subject, email, name, role, epoch, active
 
     @api.model
+    @api.private
     def mb_reconcile_membership(self, payload):
         user_id, subject, email, name, role, epoch, active = self._mb_validate_membership_payload(
             payload
@@ -217,6 +218,7 @@ class ResUsers(models.Model):
         return {"applied": True, "stale": False, "epoch": epoch, "user_id": user_id}
 
     @api.model
+    @api.private
     def mb_replay_erasure(self, payload):
         """Idempotently anonymize the control-managed identity after restore.
 
@@ -269,6 +271,7 @@ class ResUsers(models.Model):
         return {"applied": True, "already_erased": False, "subject_key": subject_key}
 
     @api.model
+    @api.private
     def mb_export_personal_data(self, payload):
         """Return an allowlisted, complete tenant-side subject export.
 

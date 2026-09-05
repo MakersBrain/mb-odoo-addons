@@ -38,6 +38,26 @@ msgid "Boxtal content category"
 msgstr "Catégorie de contenu Boxtal"
 
 #. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_height_cm
+msgid "Boxtal default parcel height (cm)"
+msgstr "Hauteur de colis Boxtal par défaut (cm)"
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_length_cm
+msgid "Boxtal default parcel length (cm)"
+msgstr "Longueur de colis Boxtal par défaut (cm)"
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_width_cm
+msgid "Boxtal default parcel width (cm)"
+msgstr "Largeur de colis Boxtal par défaut (cm)"
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_content_description
+msgid "Boxtal parcel content description"
+msgstr "Description du contenu du colis Boxtal"
+
+#. module: mb_webshop_carrier_boxtal
 #. odoo-python
 #: code:addons/mb_webshop_carrier_boxtal/models/delivery_carrier.py:0
 msgid "Boxtal parcel dimensions must be greater than zero."
@@ -79,24 +99,44 @@ msgstr ""
 "d’expédition de Boxtal avant d’activer la production."
 
 #. module: mb_webshop_carrier_boxtal
-#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_height_cm
-msgid "Default parcel height (cm)"
-msgstr "Hauteur du colis par défaut (cm)"
-
-#. module: mb_webshop_carrier_boxtal
-#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_length_cm
-msgid "Default parcel length (cm)"
-msgstr "Longueur du colis par défaut (cm)"
-
-#. module: mb_webshop_carrier_boxtal
-#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_width_cm
-msgid "Default parcel width (cm)"
-msgstr "Largeur du colis par défaut (cm)"
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_content_description
+msgid ""
+"Default goods description sent to Boxtal for customs and carrier documents."
+msgstr ""
+"Description des marchandises envoyée par défaut à Boxtal pour les documents "
+"douaniers et de transport."
 
 #. module: mb_webshop_carrier_boxtal
 #: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_height_cm
+msgid ""
+"Fallback parcel height sent only for Boxtal shipments without package "
+"dimensions."
+msgstr ""
+"Hauteur de colis de repli envoyée uniquement pour les expéditions Boxtal sans "
+"dimensions de colis."
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_length_cm
+msgid ""
+"Fallback parcel length sent only for Boxtal shipments without package "
+"dimensions."
+msgstr ""
+"Longueur de colis de repli envoyée uniquement pour les expéditions Boxtal sans "
+"dimensions de colis."
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_width_cm
+msgid ""
+"Fallback parcel width sent only for Boxtal shipments without package "
+"dimensions."
+msgstr ""
+"Largeur de colis de repli envoyée uniquement pour les expéditions Boxtal sans "
+"dimensions de colis."
 
 #. module: mb_webshop_carrier_boxtal
 #: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__id
@@ -118,11 +158,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_use_locations
 msgid "Offer uses parcel points"
 msgstr "L'offre utilise des points colis"
-
-#. module: mb_webshop_carrier_boxtal
-#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_content_description
-msgid "Parcel content description"
-msgstr "Description du contenu du colis"
 
 #. module: mb_webshop_carrier_boxtal
 #: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__delivery_type

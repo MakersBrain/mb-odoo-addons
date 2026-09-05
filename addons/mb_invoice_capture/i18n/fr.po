@@ -129,9 +129,19 @@ msgid "Confirmed supplier"
 msgstr "Fournisseur confirmé"
 
 #. module: mb_invoice_capture
+#: model:ir.model,name:mb_invoice_capture.model_res_partner
+msgid "Contact"
+msgstr "Interlocuteur"
+
+#. module: mb_invoice_capture
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__content_digest
 msgid "Content Digest"
 msgstr "Empreinte du contenu"
+
+#. module: mb_invoice_capture
+#: model:ir.model,website_form_label:mb_invoice_capture.model_res_partner
+msgid "Create a Customer"
+msgstr "Créer un client"
 
 #. module: mb_invoice_capture
 #: model_terms:ir.ui.view,arch_db:mb_invoice_capture.view_mb_invoice_capture_form
@@ -187,6 +197,7 @@ msgstr "Description"
 #. module: mb_invoice_capture
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__display_name
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__display_name
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
 
@@ -366,6 +377,7 @@ msgstr "A un message"
 #. module: mb_invoice_capture
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__id
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__id
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__id
 msgid "ID"
 msgstr "ID"
 
@@ -541,6 +553,30 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__review_product_id
 msgid "Matched product"
 msgstr "Produit apparié"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__mb_invoice_name_key
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_users__mb_invoice_name_key
+msgid "Mb Invoice Name Key"
+msgstr "Clé de nom de facture MB"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__mb_invoice_registry_key
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_users__mb_invoice_registry_key
+msgid "Mb Invoice Registry Key"
+msgstr "Clé de registre de facture MB"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__mb_invoice_siren_key
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_users__mb_invoice_siren_key
+msgid "Mb Invoice Siren Key"
+msgstr "Clé SIREN de facture MB"
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__mb_invoice_vat_key
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_users__mb_invoice_vat_key
+msgid "Mb Invoice Vat Key"
+msgstr "Clé de TVA de facture MB"
 
 #. module: mb_invoice_capture
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__message_has_error
@@ -793,6 +829,12 @@ msgstr "Séquence"
 #: code:addons/mb_invoice_capture/models/invoice_capture.py:0
 msgid "Several suppliers have the extracted SIREN."
 msgstr "Plusieurs fournisseurs portent le SIREN extrait."
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Several suppliers have the extracted SIRET."
+msgstr "Plusieurs fournisseurs portent le SIRET extrait."
 
 #. module: mb_invoice_capture
 #. odoo-python

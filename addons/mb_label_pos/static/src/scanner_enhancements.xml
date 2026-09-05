@@ -28,7 +28,7 @@
                            t-att-step="state.brightnessStep" t-att-value="state.brightnessValue"
                            t-on-input="changeScanBrightness"/>
                 </label>
-                <small t-if="state.lightError" class="text-warning"><t t-esc="state.lightError"/></small>
+                <small t-if="state.lightError" class="text-warning"><t t-out="state.lightError"/></small>
             </div>
         </xpath>
     </t>

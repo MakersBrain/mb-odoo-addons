@@ -24,12 +24,19 @@ jobs:
   verify-ci:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Exact commit passed CI
         env: {GH_TOKEN: "${{ github.token }}"}
         run: |
-          conclusion=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&status=completed" \
-            --jq '[.workflow_runs[] | select(.name == "CI")] | first | .conclusion // "none"')
-          test "$conclusion" = success
+          set -euo pipefail
+          gh api \
+            "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$GITHUB_SHA&branch=main&status=completed&per_page=100" \
+            > "$RUNNER_TEMP/ci-runs.json"
+          run_id=$(python3 tools/ci_release_admission.py select-run --sha "$GITHUB_SHA" \
+            < "$RUNNER_TEMP/ci-runs.json")
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?filter=all&per_page=100" \
+            > "$RUNNER_TEMP/ci-jobs.json"
+          python3 tools/ci_release_admission.py check-jobs < "$RUNNER_TEMP/ci-jobs.json"
 
   build:
     needs: verify-ci
@@ -60,9 +67,11 @@ jobs:
             }]
           }' > release/runtime-descriptor.base.json
           docker pull "$ODOO_IMAGE"
-          echo "subject=$subject" >> "$GITHUB_OUTPUT"
-          echo "manifest=$manifest" >> "$GITHUB_OUTPUT"
-          echo "config=$config" >> "$GITHUB_OUTPUT"
+          {
+            echo "subject=$subject"
+            echo "manifest=$manifest"
+            echo "config=$config"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Authenticate registry
         run: printf '%s' "$GITHUB_TOKEN" | docker login "$REGISTRY" --username "$GITHUB_ACTOR" --password-stdin
@@ -94,10 +103,12 @@ jobs:
           container=$(docker create "$local_ref")
           docker cp "$container:/payload/manifest.json" release/payload-manifest.json
           docker rm "$container"
-          echo "ref=$ref" >> "$GITHUB_OUTPUT"
-          echo "digest=$digest" >> "$GITHUB_OUTPUT"
-          echo "config=$config" >> "$GITHUB_OUTPUT"
-          echo "scan_ref=$local_ref" >> "$GITHUB_OUTPUT"
+          {
+            echo "ref=$ref"
+            echo "digest=$digest"
+            echo "config=$config"
+            echo "scan_ref=$local_ref"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Qualify runtime capabilities against the exact selected pair
         run: |

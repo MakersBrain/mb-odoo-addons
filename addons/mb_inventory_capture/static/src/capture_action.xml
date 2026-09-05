@@ -44,7 +44,7 @@
                 <div t-if="state.cameraActive" class="alert py-2 mb-3"
                      t-att-class="state.lookupState === 'found' ? 'alert-success' : 'alert-secondary'"
                      role="status" aria-live="polite">
-                    <span t-esc="state.scanHint"/>
+                    <span t-out="state.scanHint"/>
                 </div>
                 <div t-if="state.previewUrl" class="mb-3">
                     <p class="small text-muted mb-1">Drag over the visible lot/batch text, then rotate if needed.</p>
@@ -86,7 +86,7 @@
                 <ul t-if="state.decoded.length" class="list-group mb-3">
                     <li t-foreach="state.decoded" t-as="code" t-key="code_index"
                         class="list-group-item d-flex justify-content-between">
-                        <code t-esc="code.rawValue"/><span t-esc="code.format"/>
+                        <code t-out="code.rawValue"/><span t-out="code.format"/>
                     </li>
                 </ul>
                 <button t-if="state.cameraActive &amp;&amp; state.decoded.length"

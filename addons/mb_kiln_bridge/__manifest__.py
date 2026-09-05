@@ -58,13 +58,15 @@ copy of the trace per run.
 The client implements the read-only API v1 token authentication and the joins
 between kilns, controllers, firings, samples, and kiln types.
 """,
-    "version": "19.0.1.3.1",
+    "version": "19.0.1.3.2",
     "license": "AGPL-3",
     "category": "Manufacturing/Manufacturing",
     "author": "MakersBrain",
     "depends": [
         # mb.kiln and mb.firing, which this addon fills but does not define.
         "mb_ceramics_firing",
+        # Owns the Configuration menu used directly by this add-on's menu XML.
+        "mb_workshop_base",
     ],
     "data": [
         "security/ir.model.access.csv",

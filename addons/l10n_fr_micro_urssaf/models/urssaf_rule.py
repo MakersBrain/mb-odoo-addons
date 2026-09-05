@@ -54,6 +54,15 @@ class L10nFrMicroUrssafRate(models.Model):
     )
     rate = fields.Float(string="Rate (%)", required=True, digits=(8, 4))
 
+    @api.model_create_multi
+    def create(self, values_list):
+        self.env["l10n.fr.micro.urssaf.invariant.lock"].lock(["rate"])
+        return super().create(values_list)
+
+    def write(self, values):
+        self.env["l10n.fr.micro.urssaf.invariant.lock"].lock(["rate"])
+        return super().write(values)
+
     @api.depends("levy", "category", "rate", "date_from")
     def _compute_name(self):
         levies = dict(self._fields["levy"].selection)
@@ -130,6 +139,15 @@ class L10nFrMicroUrssafAcreRule(models.Model):
     creation_date_to = fields.Date(index=True)
     payable_coefficient = fields.Float(required=True, digits=(5, 4))
 
+    @api.model_create_multi
+    def create(self, values_list):
+        self.env["l10n.fr.micro.urssaf.invariant.lock"].lock(["acre"])
+        return super().create(values_list)
+
+    def write(self, values):
+        self.env["l10n.fr.micro.urssaf.invariant.lock"].lock(["acre"])
+        return super().write(values)
+
     @api.depends("creation_date_from", "creation_date_to", "payable_coefficient")
     def _compute_name(self):
         for rule in self:
@@ -183,6 +201,15 @@ class L10nFrMicroUrssafThreshold(models.Model):
         required=True,
         default=lambda self: self.env.ref("base.EUR"),
     )
+
+    @api.model_create_multi
+    def create(self, values_list):
+        self.env["l10n.fr.micro.urssaf.invariant.lock"].lock(["threshold"])
+        return super().create(values_list)
+
+    def write(self, values):
+        self.env["l10n.fr.micro.urssaf.invariant.lock"].lock(["threshold"])
+        return super().write(values)
 
     @api.depends("date_from", "date_to")
     def _compute_name(self):

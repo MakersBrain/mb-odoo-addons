@@ -38,6 +38,7 @@ make upgrade            # upgrade every repository addon in the development DB
 make shell              # open an Odoo shell
 make test               # fresh disposable DB; test every repository addon
 make test TAGS=/mb_label
+make frontend-test      # one fresh install; compile assets and run all Hoot tests
 make down               # stop containers and keep volumes
 ```
 
@@ -57,10 +58,18 @@ git diff --check
 ```
 
 `make check` runs Ruff, translation validation, the UI-token projection check,
-the addon dependency inventory/hash lock, and addon metadata/source checks.
+the addon dependency inventory/hash lock, concurrency discovery inventory, and
+addon metadata/source checks.
 `make test` installs all current manifests on
 a fresh disposable database and restricts Odoo's test selection to tests owned
 by this repository.
+
+Pull-request CI always runs the static gate, then conservatively selects server,
+upgrade, uninstall, frontend, and catalogue-freshness lanes from changed paths.
+Unknown runtime paths fail open. Pushes to `main` and manual workflow dispatches
+always execute every lane. To force a complete pull-request run, use the GitHub
+Actions “Run workflow” control for the branch; branch protection should require
+the stable `Required CI` aggregate check.
 
 ## Translations
 

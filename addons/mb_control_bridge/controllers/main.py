@@ -1,4 +1,3 @@
-import logging
 import uuid
 
 from werkzeug.exceptions import BadRequest, HTTPException
@@ -9,7 +8,6 @@ from odoo.http import request
 
 from .auth import authenticate_control_request, json_body, payload_digest
 
-_logger = logging.getLogger(__name__)
 PROVIDER_BY_DELIVERY_TYPE = {
     "mb_boxtal": "boxtal",
     "mb_sendcloud": "sendcloud",
@@ -23,10 +21,15 @@ def _json_error(error):
     elif isinstance(error, ValidationError):
         status = 422
         message = str(error)
-    else:
-        status = 500
-        message = "internal control-plane bridge error"
     return request.make_json_response({"error": message}, status=status)
+
+
+def _execute_once(operation_key, command, digest, action):
+    return (
+        request.env["mb.control.operation.receipt"]
+        .sudo()
+        ._execute_once(operation_key, command, digest, action)
+    )
 
 
 class ControlPlaneBridge(http.Controller):
@@ -44,9 +47,7 @@ class ControlPlaneBridge(http.Controller):
             return request.make_json_response(
                 request.env.company.sudo().mb_webshop_status(json_body())
             )
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("webshop status observation failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -65,16 +66,14 @@ class ControlPlaneBridge(http.Controller):
             if not operation_key:
                 raise BadRequest("operation_key is required")
             digest = payload_digest(body)
-            receipts = request.env["mb.control.operation.receipt"].sudo()
-            existing = receipts.for_replay(operation_key, "webshop.domain", digest)
-            if existing:
-                return request.make_json_response(existing.response)
-            result = request.env.company.sudo().mb_project_webshop_domain(body)
-            receipts.record(operation_key, "webshop.domain", digest, result)
+            result = _execute_once(
+                operation_key,
+                "webshop.domain",
+                digest,
+                lambda: request.env.company.sudo().mb_project_webshop_domain(body),
+            )
             return request.make_json_response(result)
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("webshop domain projection failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -113,9 +112,7 @@ class ControlPlaneBridge(http.Controller):
                     for carrier in carriers
                 ]
             )
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("carrier target listing failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -160,25 +157,25 @@ class ControlPlaneBridge(http.Controller):
                 or secret_ref != f"{expected_prefix}{secret_id}"
             ):
                 raise BadRequest("carrier secret scope is invalid")
-            values = {
-                "mb_secret_ref": secret_ref,
-                "mb_credential_state": environment,
-                "mb_last_error": False,
-            }
-            if carrier.mb_secret_ref and carrier.mb_secret_ref != secret_ref:
-                prepare_rotation = getattr(carrier, "_mb_prepare_secret_rotation", None)
-                credentials = body.get("credentials")
-                if credentials is not None and not isinstance(credentials, dict):
-                    raise BadRequest("carrier rotation material is invalid")
-                if prepare_rotation:
-                    if not isinstance(credentials, dict):
+            with request.env.cr.savepoint():
+                values = {
+                    "mb_secret_ref": secret_ref,
+                    "mb_credential_state": environment,
+                    "mb_last_error": False,
+                }
+                if carrier.mb_secret_ref and carrier.mb_secret_ref != secret_ref:
+                    prepare_rotation = getattr(carrier, "_mb_prepare_secret_rotation", None)
+                    credentials = body.get("credentials")
+                    if credentials is not None and not isinstance(credentials, dict):
                         raise BadRequest("carrier rotation material is invalid")
-                    values["mb_subscription_id"] = prepare_rotation(credentials)
-            carrier.with_context(mb_carrier_lifecycle_write=True).write(values)
-            return request.make_json_response({"bound": True, "carrier_id": carrier.id})
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("carrier secret binding failed")
+                    if prepare_rotation:
+                        if not isinstance(credentials, dict):
+                            raise BadRequest("carrier rotation material is invalid")
+                        values["mb_subscription_id"] = prepare_rotation(credentials)
+                carrier.with_context(mb_carrier_lifecycle_write=True).write(values)
+                response = request.make_json_response({"bound": True, "carrier_id": carrier.id})
+            return response
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -214,17 +211,17 @@ class ControlPlaneBridge(http.Controller):
                 or carrier.mb_secret_ref != body.get("secret_ref")
             ):
                 raise BadRequest("carrier secret scope is invalid")
-            carrier.with_context(mb_carrier_lifecycle_write=True).write(
-                {
-                    "mb_secret_ref": False,
-                    "mb_credential_state": "unconfigured",
-                    "mb_last_error": False,
-                }
-            )
-            return request.make_json_response({"unbound": True, "carrier_id": carrier.id})
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("carrier secret unbinding failed")
+            with request.env.cr.savepoint():
+                carrier.with_context(mb_carrier_lifecycle_write=True).write(
+                    {
+                        "mb_secret_ref": False,
+                        "mb_credential_state": "unconfigured",
+                        "mb_last_error": False,
+                    }
+                )
+                response = request.make_json_response({"unbound": True, "carrier_id": carrier.id})
+            return response
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -243,16 +240,14 @@ class ControlPlaneBridge(http.Controller):
             if not operation_key:
                 raise BadRequest("operation_key is required")
             digest = payload_digest(body)
-            receipts = request.env["mb.control.operation.receipt"].sudo()
-            existing = receipts.for_replay(operation_key, "tenant.bootstrap", digest)
-            if existing:
-                return request.make_json_response(existing.response)
-            result = request.env.company.sudo().mb_bootstrap_tenant(body)
-            receipts.record(operation_key, "tenant.bootstrap", digest, result)
+            result = _execute_once(
+                operation_key,
+                "tenant.bootstrap",
+                digest,
+                lambda: request.env.company.sudo().mb_bootstrap_tenant(body),
+            )
             return request.make_json_response(result)
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("tenant bootstrap failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -275,7 +270,7 @@ class ControlPlaneBridge(http.Controller):
                     "entitlement_version": company.mb_entitlement_version,
                 }
             )
-        except Exception as error:
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -293,18 +288,15 @@ class ControlPlaneBridge(http.Controller):
             operation_key = body.pop("operation_key", None)
             if not operation_key:
                 raise BadRequest("operation_key is required")
-            receipts = request.env["mb.control.operation.receipt"].sudo()
-            existing = receipts.for_replay(
-                operation_key, "membership.reconcile", payload_digest(body)
+            digest = payload_digest(body)
+            result = _execute_once(
+                operation_key,
+                "membership.reconcile",
+                digest,
+                lambda: request.env["res.users"].sudo().mb_reconcile_membership(body),
             )
-            if existing:
-                return request.make_json_response(existing.response)
-            result = request.env["res.users"].sudo().mb_reconcile_membership(body)
-            receipts.record(operation_key, "membership.reconcile", payload_digest(body), result)
             return request.make_json_response(result)
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("membership reconciliation failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -323,16 +315,14 @@ class ControlPlaneBridge(http.Controller):
             if not operation_key:
                 raise BadRequest("operation_key is required")
             digest = payload_digest(body)
-            receipts = request.env["mb.control.operation.receipt"].sudo()
-            existing = receipts.for_replay(operation_key, "privacy.erasure_replay", digest)
-            if existing:
-                return request.make_json_response(existing.response)
-            result = request.env["res.users"].sudo().mb_replay_erasure(body)
-            receipts.record(operation_key, "privacy.erasure_replay", digest, result)
+            result = _execute_once(
+                operation_key,
+                "privacy.erasure_replay",
+                digest,
+                lambda: request.env["res.users"].sudo().mb_replay_erasure(body),
+            )
             return request.make_json_response(result)
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("erasure replay failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -351,16 +341,14 @@ class ControlPlaneBridge(http.Controller):
             if not operation_key:
                 raise BadRequest("operation_key is required")
             digest = payload_digest(body)
-            receipts = request.env["mb.control.operation.receipt"].sudo()
-            existing = receipts.for_replay(operation_key, "entitlement.apply", digest)
-            if existing:
-                return request.make_json_response(existing.response)
-            result = request.env.company.sudo().mb_apply_entitlement(body)
-            receipts.record(operation_key, "entitlement.apply", digest, result)
+            result = _execute_once(
+                operation_key,
+                "entitlement.apply",
+                digest,
+                lambda: request.env.company.sudo().mb_apply_entitlement(body),
+            )
             return request.make_json_response(result)
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("entitlement application failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -379,16 +367,14 @@ class ControlPlaneBridge(http.Controller):
             if not operation_key:
                 raise BadRequest("operation_key is required")
             digest = payload_digest(body)
-            receipts = request.env["mb.control.operation.receipt"].sudo()
-            existing = receipts.for_replay(operation_key, "module.enable", digest)
-            if existing:
-                return request.make_json_response(existing.response)
-            result = request.env.company.sudo().mb_enable_module_bundle(body)
-            receipts.record(operation_key, "module.enable", digest, result)
+            result = _execute_once(
+                operation_key,
+                "module.enable",
+                digest,
+                lambda: request.env.company.sudo().mb_enable_module_bundle(body),
+            )
             return request.make_json_response(result)
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("module enable failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -407,16 +393,14 @@ class ControlPlaneBridge(http.Controller):
             if not operation_key:
                 raise BadRequest("operation_key is required")
             digest = payload_digest(body)
-            receipts = request.env["mb.control.operation.receipt"].sudo()
-            existing = receipts.for_replay(operation_key, "module.restrict", digest)
-            if existing:
-                return request.make_json_response(existing.response)
-            result = request.env.company.sudo().mb_restrict_module_bundle(body)
-            receipts.record(operation_key, "module.restrict", digest, result)
+            result = _execute_once(
+                operation_key,
+                "module.restrict",
+                digest,
+                lambda: request.env.company.sudo().mb_restrict_module_bundle(body),
+            )
             return request.make_json_response(result)
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("module restriction failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)
 
     @http.route(
@@ -432,7 +416,5 @@ class ControlPlaneBridge(http.Controller):
             authenticate_control_request()
             result = request.env["res.users"].sudo().mb_export_personal_data(json_body())
             return request.make_json_response(result)
-        except Exception as error:
-            if not isinstance(error, (HTTPException, ValidationError)):
-                _logger.exception("privacy export failed")
+        except (HTTPException, ValidationError) as error:
             return _json_error(error)

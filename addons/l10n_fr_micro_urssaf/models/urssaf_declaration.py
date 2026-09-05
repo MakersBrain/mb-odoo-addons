@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo.tools import SQL
 
 from .internal import internal_context, is_internal
 from .urssaf_rule import URSSAF_CATEGORIES
@@ -76,6 +77,26 @@ class L10nFrMicroUrssafDeclaration(models.Model):
         "unique(company_id, date_from, date_to)",
         "A declaration already exists for this company and period.",
     )
+
+    @api.model
+    def _lock_period_companies(self, company_ids):
+        """Update stable parent rows so stale REPEATABLE READ transactions abort."""
+        company_ids = tuple(sorted({company_id for company_id in company_ids if company_id}))
+        for company_id in company_ids:
+            self.env.cr.execute(
+                SQL(
+                    "UPDATE res_company SET id = id WHERE id = %s",
+                    company_id,
+                )
+            )
+
+    @api.model_create_multi
+    def create(self, values_list):
+        default_company_id = self.env.context.get("default_company_id") or self.env.company.id
+        self._lock_period_companies(
+            values.get("company_id", default_company_id) for values in values_list
+        )
+        return super().create(values_list)
 
     @api.model
     def default_get(self, field_names):
@@ -204,6 +225,11 @@ class L10nFrMicroUrssafDeclaration(models.Model):
             )
 
     def write(self, values):
+        if {"company_id", "date_from", "date_to"}.intersection(values):
+            company_ids = set(self.company_id.ids)
+            if values.get("company_id"):
+                company_ids.add(values["company_id"])
+            self._lock_period_companies(company_ids)
         filed = self.filtered(lambda declaration: declaration.state == "filed")
         reset_reason_only = set(values) <= {"reset_reason"}
         if "state" in values and not is_internal(self.env):
@@ -218,10 +244,10 @@ class L10nFrMicroUrssafDeclaration(models.Model):
             self._check_manager()
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_draft(self):
         if self.filtered(lambda declaration: declaration.state == "filed"):
             raise UserError(_("A filed URSSAF declaration cannot be deleted."))
-        return super().unlink()
 
     def _mandate_blockers(self):
         self.ensure_one()
@@ -1364,12 +1390,12 @@ class L10nFrMicroUrssafDeclarationLine(models.Model):
                 line._refresh_amounts()
         return result
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_unfiled_declaration(self):
         if self.filtered(lambda line: line.declaration_state == "filed"):
             raise UserError(_("Filed declaration lines cannot be deleted."))
         if not is_internal(self.env):
             self._check_manager()
-        return super().unlink()
 
     def _refresh_amounts(self):
         for line in self:
@@ -1576,7 +1602,8 @@ class L10nFrMicroUrssafDeclarationSource(models.Model):
             raise AccessError(_("Only an Accounting Administrator can alter declaration evidence."))
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_unfiled_declaration(self):
         if self.filtered(lambda source: source.declaration_state == "filed"):
             raise UserError(_("Filed declaration sources cannot be deleted."))
         if (
@@ -1585,4 +1612,3 @@ class L10nFrMicroUrssafDeclarationSource(models.Model):
             and not self.env.user.has_group("account.group_account_manager")
         ):
             raise AccessError(_("Only an Accounting Administrator can alter declaration evidence."))
-        return super().unlink()

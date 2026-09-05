@@ -5,7 +5,7 @@
       <div class="col" t-if="o.mb_depot_sale_report_ids" name="depot_sale_report_reference">
         <strong t-if="len(o.mb_depot_sale_report_ids) &gt; 1">Depot reports</strong>
         <strong t-else="">Depot report</strong>
-        <div t-esc="', '.join(o.mb_depot_sale_report_ids.mapped('external_reference'))"/>
+        <div t-out="', '.join(o.mb_depot_sale_report_ids.mapped('external_reference'))"/>
       </div>
       <div class="col" t-if="o.mb_depot_delivery_date_from" name="depot_delivery_period">
         <strong>Delivery period</strong>

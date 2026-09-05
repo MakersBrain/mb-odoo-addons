@@ -107,9 +107,9 @@ class MrpBom(models.Model):
             self.filtered("mb_is_glaze_recipe").bom_line_ids._mb_sync_formula_quantity()
         return result
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_mutable_recipe(self):
         self._mb_assert_recipe_mutable()
-        return super().unlink()
 
     def _mb_validate_formula(self):
         for bom in self.filtered("mb_is_glaze_recipe"):
@@ -294,9 +294,9 @@ class MrpBomLine(models.Model):
             self._mb_sync_formula_quantity()
         return result
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_mutable_recipe(self):
         self.mapped("bom_id")._mb_assert_recipe_mutable()
-        return super().unlink()
 
     @api.constrains("mb_formula_percent", "mb_quantity_mode")
     def _check_mb_formula_percent(self):
@@ -319,9 +319,9 @@ class MrpRoutingWorkcenter(models.Model):
         self.mapped("bom_id")._mb_assert_recipe_mutable()
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_mutable_recipe(self):
         self.mapped("bom_id")._mb_assert_recipe_mutable()
-        return super().unlink()
 
 
 class MrpBomByproduct(models.Model):
@@ -338,6 +338,6 @@ class MrpBomByproduct(models.Model):
         self.mapped("bom_id")._mb_assert_recipe_mutable()
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_mutable_recipe(self):
         self.mapped("bom_id")._mb_assert_recipe_mutable()
-        return super().unlink()

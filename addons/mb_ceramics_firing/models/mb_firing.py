@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import SQL
 
 
 class MbFiring(models.Model):
@@ -331,8 +332,26 @@ class MbFiring(models.Model):
         for firing in self:
             firing.production_ids = firing.workorder_ids.production_id
 
+    @api.model
+    def _lock_occupancy_kilns(self, kiln_ids):
+        """Update stable parents so stale REPEATABLE READ transactions abort."""
+        for kiln_id in sorted({kiln_id for kiln_id in kiln_ids if kiln_id}):
+            self.env.cr.execute(
+                SQL(
+                    "UPDATE mb_kiln SET id = id WHERE id = %s",
+                    kiln_id,
+                )
+            )
+
     @api.model_create_multi
     def create(self, vals_list):
+        occupancy_states = {"planned", "draft", "firing", "cooling"}
+        default_state = self.env.context.get("default_state") or "planned"
+        self._lock_occupancy_kilns(
+            values.get("kiln_id") or self.env.context.get("default_kiln_id")
+            for values in vals_list
+            if values.get("state", default_state) in occupancy_states
+        )
         for values in vals_list:
             if values.get("name", _("New")) == _("New"):
                 values["name"] = self.env["ir.sequence"].next_by_code("mb.firing") or _("New")
@@ -359,6 +378,7 @@ class MbFiring(models.Model):
             )
         planning_changed = bool(
             {
+                "state",
                 "kiln_id",
                 "program_id",
                 "kind",
@@ -367,6 +387,11 @@ class MbFiring(models.Model):
             }
             & set(values)
         )
+        if planning_changed:
+            kiln_ids = set(self.kiln_id.ids)
+            if values.get("kiln_id"):
+                kiln_ids.add(values["kiln_id"])
+            self._lock_occupancy_kilns(kiln_ids)
         result = super().write(values)
         if "workorder_ids" in values:
             self._mb_sync_group_duration()
@@ -378,10 +403,10 @@ class MbFiring(models.Model):
             )
         return result
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_nonterminal(self):
         if any(firing.state in self._TERMINAL_STATES for firing in self):
             raise UserError(_("A completed or cancelled firing cannot be deleted."))
-        return super().unlink()
 
     def _mb_sync_group_duration(self):
         """Charge one physical kiln occupation across a shared load.

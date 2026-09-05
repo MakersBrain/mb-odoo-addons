@@ -1,5 +1,4 @@
 import base64
-import logging
 
 from werkzeug.exceptions import BadRequest, Conflict, Gone, HTTPException, NotFound
 
@@ -13,16 +12,13 @@ from odoo.addons.mb_control_bridge.controllers.auth import (
     payload_digest,
 )
 
-_logger = logging.getLogger(__name__)
-
 
 def _error(error):
     if isinstance(error, HTTPException):
         return request.make_json_response({"error": error.description}, status=error.code)
     if isinstance(error, ValidationError):
         return request.make_json_response({"error": str(error)}, status=422)
-    _logger.exception("inventory capture control route failed")
-    return request.make_json_response({"error": "internal inventory-capture error"}, status=500)
+    raise error
 
 
 def _company_capture(capture_uuid):
@@ -81,7 +77,7 @@ class InventoryCaptureController(http.Controller):
                     ("X-Content-Type-Options", "nosniff"),
                 ],
             )
-        except Exception as error:
+        except (HTTPException, ValidationError) as error:
             return _error(error)
 
     @http.route(
@@ -104,19 +100,16 @@ class InventoryCaptureController(http.Controller):
                 raise BadRequest("capture_id is required")
             capture = _company_capture(capture_uuid)
             digest = payload_digest(body)
-            receipts = request.env["mb.control.operation.receipt"].sudo()
-            replay = receipts.for_replay(operation_key, "inventory.capture.result", digest)
-            if replay:
-                return request.make_json_response(replay.response)
-            response = capture.ingest_result(body)
-            try:
-                with request.env.cr.savepoint():
-                    receipts.record(operation_key, "inventory.capture.result", digest, response)
-            except Exception:
-                replay = receipts.for_replay(operation_key, "inventory.capture.result", digest)
-                if not replay:
-                    raise
-                response = replay.response
+            response = (
+                request.env["mb.control.operation.receipt"]
+                .sudo()
+                ._execute_once(
+                    operation_key,
+                    "inventory.capture.result",
+                    digest,
+                    lambda: capture.ingest_result(body),
+                )
+            )
             return request.make_json_response(response)
-        except Exception as error:
+        except (HTTPException, ValidationError) as error:
             return _error(error)

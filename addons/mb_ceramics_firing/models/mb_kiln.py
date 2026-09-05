@@ -60,6 +60,12 @@ class MbKiln(models.Model):
         "kiln that reports nothing still has them - they are simply typed "
         "in rather than imported.",
     )
+    firing_ids = fields.One2many(
+        comodel_name="mb.firing",
+        inverse_name="kiln_id",
+        string="Firings",
+        readonly=True,
+    )
 
     manufacturer = fields.Char(
         help="Who made the kiln. Filled from the provider where one reports it, typed in otherwise."

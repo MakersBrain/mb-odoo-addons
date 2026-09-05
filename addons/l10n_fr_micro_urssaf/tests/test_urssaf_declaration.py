@@ -1,11 +1,195 @@
 from datetime import date, datetime
+from queue import Queue
+from threading import Barrier, BrokenBarrierError, Thread
 from types import SimpleNamespace
 
-from odoo import fields
+from psycopg2.errors import SerializationFailure
+
+from odoo import SUPERUSER_ID, api, fields
 from odoo.exceptions import AccessError, UserError, ValidationError
-from odoo.tests import TransactionCase, tagged
+from odoo.modules.registry import Registry
+from odoo.tests import BaseCase, TransactionCase, get_db_name, tagged
 
 from ..models.internal import internal_context
+
+
+@tagged("post_install", "-at_install")
+class TestUrssafConcurrency(BaseCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # TransactionCase's registry test mode deliberately reuses its cursor.  Real
+        # lock contention needs independent PostgreSQL sessions instead.
+        cls.registry = Registry(get_db_name())
+        with cls.registry.cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, {})
+            cls.company_id = env.ref("base.main_company").id
+            cls.currency_id = env.ref("base.EUR").id
+
+    def _assert_concurrent_create_conflict(
+        self,
+        model_name,
+        holder_values,
+        contender_values,
+        cleanup_domain,
+        message,
+    ):
+        holder_created = Barrier(2)
+        release_holder = Barrier(2)
+        outcomes = Queue()
+        transaction_envs = {
+            role: api.Environment(self.registry.cursor(), SUPERUSER_ID, {})
+            for role in ("holder", "contender")
+        }
+        backend_pids = {}
+        for role, env in transaction_envs.items():
+            env.cr.execute("SET LOCAL lock_timeout = '10s'")
+            env.cr.execute("SELECT pg_backend_pid()")
+            backend_pids[role] = env.cr.fetchone()[0]
+
+        def create_in_transaction(role, values):
+            try:
+                env = transaction_envs[role]
+                try:
+                    record = env[model_name].create(values)
+                    if role == "holder":
+                        holder_created.wait(timeout=10)
+                        release_holder.wait(timeout=10)
+                    env.cr.commit()
+                    outcomes.put((role, "committed", record.id))
+                except ValidationError as error:
+                    env.cr.rollback()
+                    outcomes.put((role, "validation", str(error)))
+                except SerializationFailure as error:
+                    env.cr.rollback()
+                    outcomes.put((role, "serialization", str(error)))
+            except Exception as error:  # pragma: no cover - reported in the main test thread
+                outcomes.put((role, "error", repr(error)))
+
+        holder = Thread(
+            target=create_in_transaction,
+            args=("holder", holder_values),
+            daemon=True,
+        )
+        contender = Thread(
+            target=create_in_transaction,
+            args=("contender", contender_values),
+            daemon=True,
+        )
+        blocked = False
+        try:
+            holder.start()
+            holder_created.wait(timeout=10)
+            self.assertTrue(holder.is_alive(), "holder failed before holding its transaction")
+
+            contender.start()
+
+            for _attempt in range(200):
+                with self.registry.cursor() as cr:
+                    cr.execute("SELECT pg_blocking_pids(%s)", [backend_pids["contender"]])
+                    if backend_pids["holder"] in cr.fetchone()[0]:
+                        blocked = True
+                        break
+                if not contender.is_alive():
+                    break
+        finally:
+            try:
+                release_holder.wait(timeout=10)
+            except BrokenBarrierError:
+                holder_created.abort()
+            holder.join(timeout=10)
+            if contender.ident is not None:
+                contender.join(timeout=10)
+            for env in transaction_envs.values():
+                env.cr.close()
+
+        try:
+            self.assertFalse(holder.is_alive(), "holder transaction did not finish")
+            self.assertFalse(contender.is_alive(), "contender transaction did not finish")
+            self.assertTrue(blocked, "contender never waited on the invariant lock")
+            result = {}
+            while not outcomes.empty():
+                role, status, detail = outcomes.get_nowait()
+                result[role] = (status, detail)
+            self.assertEqual(result.get("holder", (None,))[0], "committed", result)
+            self.assertEqual(result.get("contender", (None,))[0], "serialization", result)
+
+            # Odoo retries serialization failures at the request boundary.  The fresh
+            # transaction must then observe the winner and reject the overlap normally.
+            with self.registry.cursor() as cr:
+                env = api.Environment(cr, SUPERUSER_ID, {})
+                with self.assertRaisesRegex(ValidationError, message):
+                    env[model_name].create(contender_values)
+        finally:
+            with self.registry.cursor() as cr:
+                env = api.Environment(cr, SUPERUSER_ID, {})
+                env[model_name].search(cleanup_domain).unlink()
+                cr.commit()
+
+    def test_concurrent_overlapping_declarations_serialize_on_company(self):
+        base = {
+            "company_id": self.company_id,
+            "periodicity": "monthly",
+        }
+        self._assert_concurrent_create_conflict(
+            "l10n.fr.micro.urssaf.declaration",
+            {**base, "date_from": date(2091, 1, 1), "date_to": date(2091, 1, 31)},
+            {**base, "date_from": date(2091, 1, 15), "date_to": date(2091, 2, 15)},
+            [("date_from", ">=", date(2091, 1, 1)), ("date_to", "<=", date(2091, 2, 15))],
+            "periods cannot overlap",
+        )
+
+    def test_concurrent_overlapping_rates_serialize_on_applicability_key(self):
+        base = {
+            "levy": "cotisation",
+            "category": "bic_goods",
+            "taxpayer_kind": "liberal",
+            "chamber_kind": "cci",
+            "chamber_zone": "moselle",
+            "rate": 1.0,
+        }
+        self._assert_concurrent_create_conflict(
+            "l10n.fr.micro.urssaf.rate",
+            {**base, "date_from": date(2092, 1, 1), "date_to": date(2092, 1, 31)},
+            {**base, "date_from": date(2092, 1, 15), "date_to": False},
+            [("date_from", ">=", date(2092, 1, 1))],
+            "periods overlap",
+        )
+
+    def test_concurrent_overlapping_acre_rules_serialize_globally(self):
+        self._assert_concurrent_create_conflict(
+            "l10n.fr.micro.urssaf.acre.rule",
+            {
+                "creation_date_from": date(1900, 1, 1),
+                "creation_date_to": date(1900, 1, 31),
+                "payable_coefficient": 0.5,
+            },
+            {
+                "creation_date_from": date(1900, 1, 15),
+                "creation_date_to": date(1900, 2, 15),
+                "payable_coefficient": 0.75,
+            },
+            [("creation_date_from", "<", date(1901, 1, 1))],
+            "cannot overlap",
+        )
+
+    def test_concurrent_overlapping_thresholds_serialize_globally(self):
+        base = {
+            "currency_id": self.currency_id,
+            "vat_global_base": 1,
+            "vat_global_major": 2,
+            "vat_service_base": 3,
+            "vat_service_major": 4,
+            "micro_global": 5,
+            "micro_service": 6,
+        }
+        self._assert_concurrent_create_conflict(
+            "l10n.fr.micro.urssaf.threshold",
+            {**base, "date_from": date(2093, 1, 1), "date_to": date(2093, 12, 31)},
+            {**base, "date_from": date(2093, 6, 1), "date_to": False},
+            [("date_from", ">=", date(2093, 1, 1))],
+            "cannot overlap",
+        )
 
 
 @tagged("post_install", "-at_install")

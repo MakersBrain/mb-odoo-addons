@@ -6,7 +6,8 @@ import tempfile
 import uuid
 from unittest.mock import MagicMock, patch
 
-from odoo.exceptions import AccessDenied, ValidationError
+from odoo.exceptions import AccessDenied, AccessError, ValidationError
+from odoo.service.model import get_public_method
 from odoo.tests import TransactionCase, tagged
 
 from odoo.addons.base.models.ir_module import IrModuleModule
@@ -51,6 +52,31 @@ class TestControlBridge(TransactionCase):
         }
         payload.update(changes)
         return payload
+
+    def test_control_plane_services_are_private_to_rpc(self):
+        services = {
+            "mb.control.capability.policy": ("restrict",),
+            "mb.control.operation.receipt": ("for_replay", "record"),
+            "res.company": (
+                "mb_webshop_status",
+                "mb_project_webshop_domain",
+                "mb_bootstrap_tenant",
+                "mb_enable_module_bundle",
+                "mb_restrict_module_bundle",
+                "mb_expected_module_bundle",
+                "mb_apply_entitlement",
+            ),
+            "res.users": (
+                "mb_reconcile_membership",
+                "mb_replay_erasure",
+                "mb_export_personal_data",
+            ),
+        }
+        for model_name, method_names in services.items():
+            for method_name in method_names:
+                with self.subTest(model=model_name, method=method_name):
+                    with self.assertRaises(AccessError):
+                        get_public_method(self.env[model_name], method_name)
 
     def test_webshop_domain_projection_is_workshop_scoped_and_idempotent(self):
         self.company.write({"mb_control_workshop_id": self.workshop_id})
@@ -544,6 +570,40 @@ class TestControlBridge(TransactionCase):
         self.assertTrue(receipts.for_replay("membership:test", "membership.reconcile", "abc"))
         with self.assertRaises(ValidationError):
             receipts.for_replay("membership:test", "membership.reconcile", "def")
+
+    def test_failed_atomic_operation_rolls_back_and_can_be_retried(self):
+        receipts = self.env["mb.control.operation.receipt"].sudo()
+        operation_key = f"atomic:{uuid.uuid4()}"
+        marker_name = f"Atomic marker {uuid.uuid4()}"
+
+        def fail_after_write():
+            self.env["res.partner"].sudo().create({"name": marker_name})
+            raise ValidationError("late failure")
+
+        with self.assertRaisesRegex(ValidationError, "late failure"):
+            receipts._execute_once(
+                operation_key,
+                "test.atomic",
+                "digest",
+                fail_after_write,
+            )
+        self.assertFalse(self.env["res.partner"].sudo().search([("name", "=", marker_name)]))
+        self.assertFalse(receipts.for_replay(operation_key, "test.atomic", "digest"))
+
+        action = MagicMock(
+            side_effect=lambda: {
+                "partner_id": self.env["res.partner"].sudo().create({"name": marker_name}).id
+            }
+        )
+        result = receipts._execute_once(operation_key, "test.atomic", "digest", action)
+        replay = receipts._execute_once(operation_key, "test.atomic", "digest", action)
+
+        self.assertEqual(replay, result)
+        self.assertEqual(action.call_count, 1)
+        self.assertEqual(
+            self.env["res.partner"].sudo().search_count([("name", "=", marker_name)]), 1
+        )
+        self.assertTrue(receipts.for_replay(operation_key, "test.atomic", "digest"))
 
     def test_module_catalog_rejects_arbitrary_odoo_modules(self):
         self.company.mb_control_workshop_id = self.workshop_id

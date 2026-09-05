@@ -17,14 +17,28 @@ class DeliveryCarrier(models.Model):
         string="Offer uses parcel points",
         help="Require the customer to choose a Boxtal parcel point at checkout.",
     )
-    mb_boxtal_length_cm = fields.Float(string="Default parcel length (cm)", default=30)
-    mb_boxtal_width_cm = fields.Float(string="Default parcel width (cm)", default=20)
-    mb_boxtal_height_cm = fields.Float(string="Default parcel height (cm)", default=15)
+    mb_boxtal_length_cm = fields.Float(
+        string="Boxtal default parcel length (cm)",
+        default=30,
+        help="Fallback parcel length sent only for Boxtal shipments without package dimensions.",
+    )
+    mb_boxtal_width_cm = fields.Float(
+        string="Boxtal default parcel width (cm)",
+        default=20,
+        help="Fallback parcel width sent only for Boxtal shipments without package dimensions.",
+    )
+    mb_boxtal_height_cm = fields.Float(
+        string="Boxtal default parcel height (cm)",
+        default=15,
+        help="Fallback parcel height sent only for Boxtal shipments without package dimensions.",
+    )
     mb_boxtal_content_category = fields.Char(
         string="Boxtal content category", default="content:v1:10150"
     )
     mb_boxtal_content_description = fields.Char(
-        string="Parcel content description", default="Handmade ceramic goods"
+        string="Boxtal parcel content description",
+        default="Handmade ceramic goods",
+        help="Default goods description sent to Boxtal for customs and carrier documents.",
     )
     mb_boxtal_commercial_readiness_confirmed = fields.Boolean(
         string="Boxtal commercial readiness confirmed",

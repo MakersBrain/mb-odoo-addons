@@ -51,5 +51,6 @@ class MbProductionLoss(models.Model):
             raise UserError(_("Production loss is immutable; create a correcting entry instead."))
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_immutable(self):
         raise UserError(_("Production loss is immutable and cannot be deleted."))

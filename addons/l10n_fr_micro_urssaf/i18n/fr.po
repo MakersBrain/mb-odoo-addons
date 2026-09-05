@@ -685,6 +685,7 @@ msgstr "Déduire les dates et le coefficient ACRE"
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__display_name
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__display_name
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__display_name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_invariant_lock__display_name
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__display_name
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__display_name
@@ -895,6 +896,7 @@ msgstr "A un message"
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__id
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_line__id
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration_source__id
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_invariant_lock__id
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__id
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_setup_wizard__id
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__id
@@ -923,6 +925,11 @@ msgstr "Si coché, de nouveaux messages demandent votre attention."
 #: model:ir.model.fields,help:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model.constraint,message:l10n_fr_micro_urssaf.constraint_l10n_fr_micro_urssaf_invariant_lock_name_unique
+msgid "Invariant lock names must be unique."
+msgstr "Les noms des verrous d’invariant doivent être uniques."
 
 #. module: l10n_fr_micro_urssaf
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__message_is_follower
@@ -1159,6 +1166,7 @@ msgstr "Échéance de mon activité"
 #. module: l10n_fr_micro_urssaf
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_acre_rule__name
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_declaration__name
+#: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_invariant_lock__name
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_rate__name
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_l10n_fr_micro_urssaf_threshold__name
 msgid "Name"
@@ -1796,6 +1804,11 @@ msgstr "Déclarations URSSAF"
 #: model:ir.actions.report,name:l10n_fr_micro_urssaf.action_report_urssaf_declaration
 msgid "URSSAF filing aid and receipt book"
 msgstr "Aide à la déclaration URSSAF et livre des recettes"
+
+#. module: l10n_fr_micro_urssaf
+#: model:ir.model,name:l10n_fr_micro_urssaf.model_l10n_fr_micro_urssaf_invariant_lock
+msgid "URSSAF invariant transaction mutex"
+msgstr "Verrou transactionnel des invariants URSSAF"
 
 #. module: l10n_fr_micro_urssaf
 #: model:ir.model.fields,field_description:l10n_fr_micro_urssaf.field_res_company__l10n_fr_micro_urssaf_tracking_start_date

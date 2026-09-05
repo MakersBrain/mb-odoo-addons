@@ -1,10 +1,14 @@
 import os
 import tempfile
 import uuid
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from odoo.exceptions import ValidationError
+from odoo.exceptions import AccessError, ValidationError
+from odoo.service.model import get_public_method
 from odoo.tests import TransactionCase, tagged
+
+from ..controllers import main as smtp_controller
 
 
 @tagged("post_install", "-at_install")
@@ -48,6 +52,93 @@ class TestTransactionalMailBridge(TransactionCase):
                 "company_id": cls.company.id,
             }
         )
+
+    def test_smtp_control_services_are_private_to_rpc(self):
+        for method_name in (
+            "mb_webshop_smtp_status",
+            "mb_configure_webshop_smtp",
+            "mb_reset_webshop_smtp",
+        ):
+            with self.subTest(method=method_name):
+                with self.assertRaises(AccessError):
+                    get_public_method(self.env["res.company"], method_name)
+
+    def test_controller_receipt_failure_is_local_and_retryable(self):
+        operation_key = f"smtp:test:{uuid.uuid4()}"
+        payload = {
+            "operation_key": operation_key,
+            "workshop_id": self.workshop_id,
+            "host": "smtp.example.fr",
+            "port": 587,
+            "encryption": "starttls",
+            "username": "orders@example.fr",
+            "password": "application-password",
+            "from_email": "orders@example.fr",
+        }
+        initial_values = (
+            self.company.mb_webshop_mail_transport,
+            self.company.mb_webshop_smtp_server_id,
+            self.company.email,
+        )
+        server_domain = [("mb_webshop_smtp", "=", True)]
+        servers = self.env["ir.mail_server"].sudo()
+        before_servers = servers.search_count(server_domain)
+        unrelated = self.env["res.partner"].create({"name": f"Unrelated {uuid.uuid4()}"})
+        receipts = self.env["mb.control.operation.receipt"].sudo()
+        receipt_payload = dict(payload)
+        receipt_payload.pop("operation_key")
+        digest = smtp_controller.payload_digest(receipt_payload)
+
+        def make_json_response(body, status=200):
+            return SimpleNamespace(body=body, status_code=status, headers={})
+
+        fake_request = SimpleNamespace(env=self.env, make_json_response=make_json_response)
+        controller = smtp_controller.WebshopSmtpBridge()
+
+        def configure(company, body):
+            return company.mb_configure_webshop_smtp(body)
+
+        with (
+            patch.object(smtp_controller, "request", fake_request),
+            patch.object(smtp_controller, "authenticate_control_request"),
+            patch.object(smtp_controller, "json_body", side_effect=lambda: dict(payload)),
+            patch("odoo.addons.base.models.ir_mail_server.IrMail_Server.test_smtp_connection"),
+            patch.object(
+                type(receipts),
+                "record",
+                side_effect=ValidationError("receipt persistence failed"),
+            ),
+        ):
+            response = controller._handle("webshop.smtp.configure", configure)
+
+        self.assertEqual(response.status_code, 422)
+        self.assertTrue(unrelated.exists())
+        self.company.invalidate_recordset()
+        self.assertEqual(
+            (
+                self.company.mb_webshop_mail_transport,
+                self.company.mb_webshop_smtp_server_id,
+                self.company.email,
+            ),
+            initial_values,
+        )
+        self.assertEqual(servers.search_count(server_domain), before_servers)
+        self.assertFalse(receipts.for_replay(operation_key, "webshop.smtp.configure", digest))
+
+        with (
+            patch.object(smtp_controller, "request", fake_request),
+            patch.object(smtp_controller, "authenticate_control_request"),
+            patch.object(smtp_controller, "json_body", side_effect=lambda: dict(payload)),
+            patch(
+                "odoo.addons.base.models.ir_mail_server.IrMail_Server.test_smtp_connection"
+            ) as connection_test,
+        ):
+            success = controller._handle("webshop.smtp.configure", configure)
+            replay = controller._handle("webshop.smtp.configure", configure)
+
+        self.assertEqual(success.status_code, 200)
+        self.assertEqual(replay.body, success.body)
+        self.assertEqual(connection_test.call_count, 1)
 
     def _mail(self):
         return (

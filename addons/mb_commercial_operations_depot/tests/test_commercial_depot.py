@@ -4,8 +4,8 @@ from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
 from odoo import fields
-from odoo.exceptions import UserError, ValidationError
-from odoo.tests import TransactionCase, tagged
+from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo.tests import TransactionCase, new_test_user, tagged
 
 
 @tagged("post_install", "-at_install")
@@ -158,6 +158,60 @@ class TestCommercialDepot(TransactionCase):
         )
         report.action_process()
         return report
+
+    def test_accounting_user_cannot_read_other_company_rent_period(self):
+        own_period = self.env["mb.commercial.rent.period"].create(
+            {
+                "contract_id": self.contract.id,
+                "period_start": fields.Date.today().replace(day=1),
+            }
+        )
+        other_company = self.env["res.company"].create({"name": "Other Rent Workshop"})
+        other_partner = (
+            self.env["res.partner"]
+            .with_company(other_company)
+            .create(
+                {
+                    "name": "Other Gallery",
+                    "company_id": other_company.id,
+                }
+            )
+        )
+        other_contract = (
+            self.env["mb.commercial.contract"]
+            .with_company(other_company)
+            .create(
+                {
+                    "name": "Other Gallery Contract",
+                    "company_id": other_company.id,
+                    "partner_id": other_partner.id,
+                    "date_start": fields.Date.today(),
+                }
+            )
+        )
+        other_period = (
+            self.env["mb.commercial.rent.period"]
+            .with_company(other_company)
+            .create(
+                {
+                    "contract_id": other_contract.id,
+                    "period_start": fields.Date.today().replace(day=1),
+                }
+            )
+        )
+        accountant = new_test_user(
+            self.env,
+            login="single-company-rent-accountant",
+            groups="account.group_account_invoice",
+            company_id=self.env.company.id,
+        )
+        periods = self.env["mb.commercial.rent.period"].with_user(accountant)
+
+        self.assertEqual(
+            periods.search([("id", "in", (own_period.id, other_period.id))]), own_period
+        )
+        with self.assertRaises(AccessError):
+            other_period.with_user(accountant).read(["period_start"])
 
     def test_forecast_uses_processed_sales_and_exposure(self):
         self._place(5, fields.Datetime.now() - timedelta(days=10))
@@ -437,3 +491,80 @@ class TestCommercialDepot(TransactionCase):
                     "rent_billing_method": "information",
                 }
             )
+
+    def test_contract_end_and_next_start_on_same_day_overlap_inclusively(self):
+        self.contract.write(
+            {
+                "date_start": fields.Date.to_date("2094-01-01"),
+                "date_end": fields.Date.to_date("2094-01-31"),
+            }
+        )
+        values = {
+            "partner_id": self.gallery.id,
+            "depot_warehouse_id": self.depot.id,
+            "source_warehouse_id": self.home.id,
+            "rent_billing_method": "information",
+        }
+        with self.assertRaisesRegex(ValidationError, "overlapping active"):
+            with self.env.cr.savepoint():
+                self.env["mb.commercial.contract"].create(
+                    {**values, "date_start": fields.Date.to_date("2094-01-31")}
+                )
+        following = self.env["mb.commercial.contract"].create(
+            {**values, "date_start": fields.Date.to_date("2094-02-01")}
+        )
+        self.assertEqual(following.date_start, fields.Date.to_date("2094-02-01"))
+
+    def test_same_dates_are_allowed_for_distinct_company_owned_depots(self):
+        self.contract.active = False
+        other_company = self.env["res.company"].create({"name": "Other Depot Workshop"})
+        other_partner = (
+            self.env["res.partner"]
+            .with_company(other_company)
+            .create(
+                {
+                    "name": "Other Company Gallery",
+                    "is_company": True,
+                    "company_id": other_company.id,
+                }
+            )
+        )
+        other_depot = (
+            self.env["stock.warehouse"]
+            .with_company(other_company)
+            .create(
+                {
+                    "name": "Other Company Gallery",
+                    "code": f"O{other_company.id:04d}"[-5:],
+                    "company_id": other_company.id,
+                    "reception_steps": "one_step",
+                    "delivery_steps": "ship_only",
+                    "is_depot": True,
+                    "mb_depot_legal_structure": "resale",
+                    "depot_partner_id": other_partner.id,
+                }
+            )
+        )
+        start = fields.Date.to_date("2094-03-01")
+        first = self.env["mb.commercial.contract"].create(
+            {
+                "partner_id": self.gallery.id,
+                "depot_warehouse_id": self.depot.id,
+                "date_start": start,
+                "rent_billing_method": "information",
+            }
+        )
+        other = (
+            self.env["mb.commercial.contract"]
+            .with_company(other_company)
+            .create(
+                {
+                    "company_id": other_company.id,
+                    "partner_id": other_partner.id,
+                    "depot_warehouse_id": other_depot.id,
+                    "date_start": start,
+                    "rent_billing_method": "information",
+                }
+            )
+        )
+        self.assertEqual(first.date_start, other.date_start)

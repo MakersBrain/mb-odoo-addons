@@ -4,10 +4,10 @@
   "prefix": "/mb_control/v1",
   "description": "Private control-plane bridge served by this repository's addons. Surface only: request and response schemas are not yet part of this contract. See tools/bridge_contract.py.",
   "provider_addons": {
-    "mb_control_bridge": "19.0.2.0.0",
-    "mb_email_bridge": "19.0.1.1.1",
-    "mb_inventory_capture": "19.0.1.1.1",
-    "mb_invoice_capture": "19.0.1.5.3"
+    "mb_control_bridge": "19.0.2.0.1",
+    "mb_email_bridge": "19.0.1.1.2",
+    "mb_inventory_capture": "19.0.1.1.2",
+    "mb_invoice_capture": "19.0.1.5.5"
   },
   "duplicate_paths": [],
   "endpoint_count": 19,

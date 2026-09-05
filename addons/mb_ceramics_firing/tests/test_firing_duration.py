@@ -155,6 +155,76 @@ class TestFiringDuration(TransactionCase):
                 }
             )
 
+    def test_adjacent_planned_firings_may_touch_at_the_unload_boundary(self):
+        start = datetime(2094, 1, 1, 6, 0)
+        values = {
+            "kiln_id": self.kiln.id,
+            "program_id": self.program.id,
+            "kind": "glaze",
+        }
+        first = self.env["mb.firing"].create({**values, "date_planned_start": start})
+        second = self.env["mb.firing"].create(
+            {**values, "date_planned_start": start + timedelta(hours=24)}
+        )
+        self.assertEqual(first.date_planned_unload, second.date_planned_start)
+
+    def test_overlapping_plans_on_distinct_kilns_are_allowed(self):
+        other_kiln = self.env["mb.kiln"].create({"name": "Rohde Ecotop 80 B"})
+        other_program = self.env["mb.kiln.program"].create(
+            {
+                "kiln_id": other_kiln.id,
+                "name": "Programme 4",
+                "kind": "glaze",
+                "firing_hours": 11.0,
+                "cooling_hours": 13.0,
+            }
+        )
+        start = datetime(2094, 2, 1, 6, 0)
+        self.env["mb.firing"].create(
+            {
+                "kiln_id": self.kiln.id,
+                "program_id": self.program.id,
+                "kind": "glaze",
+                "date_planned_start": start,
+            }
+        )
+        other = self.env["mb.firing"].create(
+            {
+                "kiln_id": other_kiln.id,
+                "program_id": other_program.id,
+                "kind": "glaze",
+                "date_planned_start": start,
+            }
+        )
+        self.assertEqual(other.date_planned_start, start)
+
+    def test_loading_slots_may_overlap_until_a_plan_claims_the_window(self):
+        start = datetime(2094, 3, 1, 6, 0)
+        values = {
+            "kiln_id": self.kiln.id,
+            "program_id": self.program.id,
+            "kind": "glaze",
+            "date_planned_start": start,
+            "state": "draft",
+        }
+        first = self.env["mb.firing"].create(values)
+        second = self.env["mb.firing"].create(values)
+        self.assertEqual((first | second).mapped("state"), ["draft", "draft"])
+        with self.assertRaisesRegex(ValidationError, "already occupied"):
+            self.env["mb.firing"].create({**values, "state": "planned"})
+
+    def test_loading_after_an_existing_plan_preserves_asymmetric_policy(self):
+        start = datetime(2094, 4, 1, 6, 0)
+        values = {
+            "kiln_id": self.kiln.id,
+            "program_id": self.program.id,
+            "kind": "glaze",
+            "date_planned_start": start,
+        }
+        planned = self.env["mb.firing"].create(values)
+        loading = self.env["mb.firing"].create({**values, "state": "draft"})
+        self.assertEqual((planned.state, loading.state), ("planned", "draft"))
+
 
 @tagged("post_install", "-at_install")
 class TestMeasuredDuration(TransactionCase):

@@ -52,9 +52,16 @@ product read as MakersBrain.
     ],
     "assets": {
         # Prepend: these must be set before core's `!default` declarations, or
-        # they lose to them. Order within the bundle is the whole mechanism.
+        # they lose to them. Declare the generated tokens as their own asset so
+        # Sass does not have to resolve a relative import from Odoo's combined
+        # bundle, then place the variable overrides immediately after them.
         "web._assets_primary_variables": [
-            ("prepend", "mb_brand/static/src/scss/primary_variables.scss"),
+            ("prepend", "mb_brand/static/src/scss/mb_tokens.scss"),
+            (
+                "after",
+                "mb_brand/static/src/scss/mb_tokens.scss",
+                "mb_brand/static/src/scss/primary_variables.scss",
+            ),
         ],
         # The faces themselves have to reach both the web client and the public
         # pages, and neither bundle includes the other.

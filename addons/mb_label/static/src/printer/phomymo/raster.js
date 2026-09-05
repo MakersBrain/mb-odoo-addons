@@ -8,6 +8,8 @@
 // methods are standalone functions here and `this._x(` reads `_x(`. Bodies are
 // byte-for-byte upstream.
 
+import { printerProtocolDebug } from './debug.js';
+
 /**
  * Convert RGBA pixels to perceptual grayscale with gamma correction
  * @param {Uint8ClampedArray} pixels - RGBA pixel data
@@ -352,12 +354,12 @@ function _pixelsToRasterDithered(pixels, width, height, outputWidthBytes, alignm
 function _pixelsToRaster(pixels, width, height, outputWidthBytes, alignment = 'left', ditherMode = 'auto') {
   // Handle explicit modes
   if (ditherMode === 'none' || ditherMode === 'threshold') {
-    console.log('Using threshold method for crisp output');
+    printerProtocolDebug('Using threshold method for crisp output');
     return _pixelsToRasterThreshold(pixels, width, height, outputWidthBytes, alignment);
   }
 
   if (ditherMode === 'floyd-steinberg' || ditherMode === 'atkinson' || ditherMode === 'ordered') {
-    console.log(`Using ${ditherMode} dithering`);
+    printerProtocolDebug(`Using ${ditherMode} dithering`);
     return _pixelsToRasterDithered(pixels, width, height, outputWidthBytes, alignment, ditherMode);
   }
 
@@ -365,10 +367,10 @@ function _pixelsToRaster(pixels, width, height, outputWidthBytes, alignment = 'l
   const useDithering = _shouldUseDithering(pixels, width, height);
 
   if (useDithering) {
-    console.log('Auto: Using Floyd-Steinberg dithering for better image quality');
+    printerProtocolDebug('Auto: Using Floyd-Steinberg dithering for better image quality');
     return _pixelsToRasterDithered(pixels, width, height, outputWidthBytes, alignment, 'floyd-steinberg');
   } else {
-    console.log('Auto: Using threshold method for crisp text/graphics');
+    printerProtocolDebug('Auto: Using threshold method for crisp text/graphics');
     return _pixelsToRasterThreshold(pixels, width, height, outputWidthBytes, alignment);
   }
 }

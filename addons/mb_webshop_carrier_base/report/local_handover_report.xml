@@ -17,7 +17,7 @@
                 <table class="table table-sm"><thead><tr><th>Transfer</th><th>Recipient</th><th>Tracking</th><th>Provider reference</th><th>Handed over</th></tr></thead>
                     <tbody><tr t-foreach="manifest.shipment_ids" t-as="shipment"><td><span t-field="shipment.picking_id"/></td><td><span t-field="shipment.picking_id.partner_id"/></td><td><span t-field="shipment.tracking_number"/></td><td><span t-field="shipment.provider_ref"/></td><td>☐</td></tr></tbody>
                 </table>
-                <p>Parcel count: <strong t-esc="len(manifest.shipment_ids)"/></p>
+                <p>Parcel count: <strong t-out="len(manifest.shipment_ids)"/></p>
                 <p>Handover signature: ____________________________________</p>
             </div>
         </t></t></t>

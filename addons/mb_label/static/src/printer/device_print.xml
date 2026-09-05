@@ -6,19 +6,19 @@
                 <div class="row g-4 justify-content-center">
                     <div class="col-lg-6 text-center">
                         <div class="o_mb_print_preview p-4 rounded border bg-light"><img t-att-src="state.job.png_url" t-att-alt="state.job.name"/></div>
-                        <p class="text-muted mt-2"><t t-esc="jobSummary"/></p>
+                        <p class="text-muted mt-2"><t t-out="jobSummary"/></p>
                     </div>
                     <div class="col-lg-4">
                         <h2 class="h4">Print label</h2>
-                        <p><t t-esc="state.job.name"/></p>
+                        <p><t t-out="state.job.name"/></p>
                         <label class="form-label">Destination</label>
                         <select class="form-select" t-on-change="selectAdapter" t-att-value="state.adapter">
                             <t t-foreach="state.adapters" t-as="adapter" t-key="adapter.id">
-                                <option t-att-value="adapter.id" t-att-disabled="!adapter.available"><t t-esc="adapter.label"/><t t-if="!adapter.available"> — unavailable</t></option>
+                                <option t-att-value="adapter.id" t-att-disabled="!adapter.available"><t t-out="adapter.label"/><t t-if="!adapter.available"> — unavailable</t></option>
                             </t>
                         </select>
                         <t t-if="state.adapter === 'phomemo' || state.adapter === 'niimbot'">
-                            <label class="form-label mt-3">Density: <t t-esc="state.density"/></label>
+                            <label class="form-label mt-3">Density: <t t-out="state.density"/></label>
                             <input class="form-range" type="range" min="1" t-att-max="state.adapter === 'niimbot' ? 5 : 15" t-att-value="state.density" t-on-change="updateDensity"/>
                         </t>
                         <t t-if="state.adapter === 'phomemo'">
@@ -26,10 +26,10 @@
                             <select class="form-select" data-setting="model" t-on-change="updatePhomemoSetting" t-att-value="state.model">
                                 <option value="auto">Automatic from Bluetooth name</option>
                                 <t t-foreach="state.phomemoModels" t-as="model" t-key="model.id">
-                                    <option t-att-value="model.id" t-att-disabled="!model.ble"><t t-esc="phomemoModelLabel(model)"/></option>
+                                    <option t-att-value="model.id" t-att-disabled="!model.ble"><t t-out="phomemoModelLabel(model)"/></option>
                                 </t>
                             </select>
-                            <label class="form-label mt-3">Speed: <t t-esc="state.speed"/></label>
+                            <label class="form-label mt-3">Speed: <t t-out="state.speed"/></label>
                             <input class="form-range" type="range" min="1" max="15" t-model="state.speed" data-setting="speed" t-on-change="updatePhomemoSetting"/>
                             <label class="form-label mt-3">Paper position on print head</label>
                             <select class="form-select" data-setting="align" t-on-change="updatePhomemoSetting" t-att-value="state.align">
@@ -43,7 +43,7 @@
                                     <label class="form-label">Image treatment</label>
                                     <select class="form-select" data-setting="dither" t-on-change="updatePhomemoSetting" t-att-value="state.dither">
                                         <t t-foreach="state.ditherModes" t-as="mode" t-key="mode[0]">
-                                            <option t-att-value="mode[0]"><t t-esc="mode[1]"/></option>
+                                            <option t-att-value="mode[0]"><t t-out="mode[1]"/></option>
                                         </t>
                                     </select>
                                 </div>
@@ -60,7 +60,7 @@
                                 <button class="btn btn-outline-secondary" t-on-click="testConnection" t-att-disabled="state.busy">Test printer connection</button>
                                 <button class="btn btn-outline-secondary" t-on-click="testPhomemoPrint" t-att-disabled="state.busy">Print hardware test pattern</button>
                             </div>
-                            <pre t-if="state.diagnostic" class="small bg-light border rounded p-2 mt-2 text-start" style="white-space: pre-wrap"><t t-esc="state.diagnostic"/></pre>
+                            <pre t-if="state.diagnostic" class="small bg-light border rounded p-2 mt-2 text-start" style="white-space: pre-wrap"><t t-out="state.diagnostic"/></pre>
                         </t>
                         <div class="alert alert-warning mt-3" t-if="(state.adapter === 'phomemo' || state.adapter === 'niimbot') &amp;&amp; !state.bleAvailable">
                             Web Bluetooth requires Chrome or Edge on desktop/Android. Use system print on iPhone/iPad.
@@ -68,7 +68,7 @@
                         <div class="d-grid gap-2 mt-4">
                             <button class="btn btn-primary btn-lg" t-on-click="print" t-att-disabled="state.busy"><t t-if="state.busy">Printing…</t><t t-elif="state.printedCount">Print another</t><t t-else="">Print</t></button>
                             <button t-if="state.adapter === 'phomemo' || state.adapter === 'niimbot'" class="btn btn-outline-primary" t-on-click="chooseAnother" t-att-disabled="state.busy">Choose another printer and print</button>
-                            <p t-if="state.printedCount" class="small text-success text-center mb-0"><t t-esc="sendSummary"/></p>
+                            <p t-if="state.printedCount" class="small text-success text-center mb-0"><t t-out="sendSummary"/></p>
                             <button class="btn btn-outline-secondary" t-on-click="downloadPdf">Download exact-size PDF</button>
                             <button class="btn btn-link" t-on-click="close">Close</button>
                         </div>

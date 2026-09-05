@@ -16,7 +16,9 @@
     <field name="name">Commercial rent periods by company</field>
     <field name="model_id" ref="model_mb_commercial_rent_period"/>
     <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-    <field name="groups" eval="[(4, ref('mb_commercial_operations.group_commercial_operations_user'))]"/>
+    <!-- Clearing the existing M2M is required on upgrade: omitting this field
+         would leave the previously group-scoped rule non-global. -->
+    <field name="groups" eval="[(5, 0, 0)]"/>
   </record>
   <record id="rule_depot_scenario_company" model="ir.rule">
     <field name="name">Depot profitability scenarios by company</field>

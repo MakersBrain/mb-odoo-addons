@@ -7,14 +7,33 @@ class WebshopStockHold(models.Model):
     _name = "mb.webshop.stock.hold"
     _description = "Atomic webshop cart stock hold"
     _order = "expires_at, id"
+    _check_company_auto = True
 
     order_id = fields.Many2one(
-        "sale.order", required=True, index=True, ondelete="cascade", readonly=True
+        "sale.order",
+        required=True,
+        index=True,
+        ondelete="cascade",
+        readonly=True,
+        check_company=True,
+    )
+    company_id = fields.Many2one(
+        related="order_id.company_id",
+        store=True,
+        required=True,
+        index=True,
+        precompute=True,
     )
     product_id = fields.Many2one(
         "product.product", required=True, index=True, ondelete="restrict", readonly=True
     )
-    move_id = fields.Many2one("stock.move", index=True, ondelete="set null", readonly=True)
+    move_id = fields.Many2one(
+        "stock.move",
+        index=True,
+        ondelete="set null",
+        readonly=True,
+        check_company=True,
+    )
     quantity = fields.Float(required=True, readonly=True)
     expires_at = fields.Datetime(required=True, index=True, readonly=True)
     state = fields.Selection(

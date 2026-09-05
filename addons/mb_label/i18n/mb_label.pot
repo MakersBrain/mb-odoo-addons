@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Project-Id-Version: Odoo Server 19.0-20260810\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-21 09:18+0000\n"
-"PO-Revision-Date: 2026-08-21 09:18+0000\n"
+"POT-Creation-Date: 2026-09-05 21:16+0000\n"
+"PO-Revision-Date: 2026-09-05 21:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -142,7 +142,19 @@ msgstr ""
 #. module: mb_label
 #. odoo-python
 #: code:addons/mb_label/models/label_template.py:0
+#: model:ir.model.constraint,message:mb_label.constraint_mb_label_template_active_default_unique
+msgid "A company can have only one active default label template."
+msgstr ""
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
 msgid "A company can have only one default label template."
+msgstr ""
+
+#. module: mb_label
+#: model:ir.model.constraint,message:mb_label.constraint_mb_label_template_company_seed_unique
+msgid "A company can have only one label template for each seed key."
 msgstr ""
 
 #. module: mb_label
@@ -196,6 +208,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Already 1-bit; preserve pixels"
+msgstr ""
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Archive label templates cannot be set as default."
 msgstr ""
 
 #. module: mb_label
@@ -320,6 +338,11 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mb_label/static/src/printer/device_print.xml:0
 msgid "Close"
+msgstr ""
+
+#. module: mb_label
+#: model:ir.model,name:mb_label.model_res_company
+msgid "Companies"
 msgstr ""
 
 #. module: mb_label
@@ -473,6 +496,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__display_name
 #: model:ir.model.fields,field_description:mb_label.field_product_product__display_name
 #: model:ir.model.fields,field_description:mb_label.field_product_template__display_name
+#: model:ir.model.fields,field_description:mb_label.field_res_company__display_name
 #: model:ir.model.fields,field_description:mb_label.field_stock_lot__display_name
 msgid "Display Name"
 msgstr ""
@@ -650,6 +674,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mb_label.field_mb_label_template_version__id
 #: model:ir.model.fields,field_description:mb_label.field_product_product__id
 #: model:ir.model.fields,field_description:mb_label.field_product_template__id
+#: model:ir.model.fields,field_description:mb_label.field_res_company__id
 #: model:ir.model.fields,field_description:mb_label.field_stock_lot__id
 msgid "ID"
 msgstr ""
@@ -1114,6 +1139,18 @@ msgid "Product only"
 msgstr ""
 
 #. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Provisioned label template keys are immutable."
+msgstr ""
+
+#. module: mb_label
+#. odoo-python
+#: code:addons/mb_label/models/label_template.py:0
+msgid "Provisioned label template keys are managed by Label Studio."
+msgstr ""
+
+#. module: mb_label
 #. odoo-javascript
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "QR"
@@ -1282,6 +1319,11 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mb_label/static/src/editor/label_editor.xml:0
 msgid "Saving…"
+msgstr ""
+
+#. module: mb_label
+#: model:ir.model.fields,field_description:mb_label.field_mb_label_template__seed_key
+msgid "Seed Key"
 msgstr ""
 
 #. module: mb_label

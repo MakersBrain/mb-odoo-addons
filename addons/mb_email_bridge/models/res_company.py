@@ -1,7 +1,7 @@
 import ipaddress
 import re
 
-from odoo import _, fields, models, tools
+from odoo import _, api, fields, models, tools
 from odoo.exceptions import ValidationError
 
 HOSTNAME_RE = re.compile(
@@ -35,6 +35,7 @@ class ResCompany(models.Model):
         if workshop_id != self.mb_control_workshop_id:
             raise ValidationError(_("SMTP workshop scope is invalid."))
 
+    @api.private
     def mb_webshop_smtp_status(self, payload):
         self._mb_check_smtp_scope(payload)
         server = self.mb_webshop_smtp_server_id.sudo().exists()
@@ -55,6 +56,7 @@ class ResCompany(models.Model):
             "password_configured": bool(server and server.smtp_pass),
         }
 
+    @api.private
     def mb_configure_webshop_smtp(self, payload):
         self._mb_check_smtp_scope(payload)
         host = str(payload.get("host") or "").strip().rstrip(".").lower()
@@ -124,6 +126,7 @@ class ResCompany(models.Model):
             old_server.unlink()
         return self.mb_webshop_smtp_status(payload)
 
+    @api.private
     def mb_reset_webshop_smtp(self, payload):
         self._mb_check_smtp_scope(payload)
         server = self.mb_webshop_smtp_server_id.sudo().exists()

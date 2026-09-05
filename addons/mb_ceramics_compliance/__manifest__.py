@@ -40,7 +40,7 @@ so the verdict stays auditable.
 article made from that lot. Recording it per piece would mean copying the same
 figures onto every mug in a firing and having no single place to correct them.
 """,
-    "version": "19.0.1.0.1",
+    "version": "19.0.1.0.2",
     "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
@@ -48,11 +48,15 @@ figures onto every mug in a firing and having no single place to correct them.
         # The glaze, underglaze and engobe categories the mark-done gate reads,
         # and the Configuration menu the migration test list hangs under.
         "mb_ceramics_base",
+        # Owns the Configuration menu used directly by this add-on's menu XML.
+        "mb_workshop_base",
         # The gate runs when a manufacturing order is marked done, and the glaze
         # whose migration test is checked is a consumed component.
         "mrp",
         # stock.lot is where a migration test and a food-contact flag land.
         "stock",
+        # Owns product XML IDs referenced directly by compliance views.
+        "product",
     ],
     "data": [
         "security/ir.model.access.csv",
