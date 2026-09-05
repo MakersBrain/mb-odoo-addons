@@ -79,6 +79,71 @@ class TestKilnSync(TransactionCase):
         with patch.object(type(self.connection), "_client", return_value=client):
             self.connection._sync_one()
 
+    def test_connection_counts_invalidate_for_related_record_lifecycle(self):
+        other_connection = self.env["mb.kiln.connection"].create(
+            {
+                "name": "other provider connection",
+                "username": "someone-else",
+                "password": "not-a-real-password",
+            }
+        )
+        kiln = self.env["mb.kiln"].create(
+            {"name": "Counted kiln", "connection_id": self.connection.id}
+        )
+        firing = self.env["mb.firing"].create({"kiln_id": kiln.id, "state": "draft"})
+        program = self.env["mb.kiln.program"].create(
+            {"kiln_id": kiln.id, "name": "Counted programme", "kind": "bisque"}
+        )
+
+        self.assertEqual(
+            (
+                self.connection.kiln_count,
+                self.connection.firing_count,
+                self.connection.program_count,
+            ),
+            (1, 1, 1),
+        )
+
+        kiln.connection_id = other_connection
+        self.assertEqual(
+            (
+                self.connection.kiln_count,
+                self.connection.firing_count,
+                self.connection.program_count,
+            ),
+            (0, 0, 0),
+        )
+        self.assertEqual(
+            (
+                other_connection.kiln_count,
+                other_connection.firing_count,
+                other_connection.program_count,
+            ),
+            (1, 1, 1),
+        )
+
+        kiln.active = False
+        self.assertEqual(
+            (
+                other_connection.kiln_count,
+                other_connection.firing_count,
+                other_connection.program_count,
+            ),
+            (0, 0, 0),
+        )
+        kiln.active = True
+        program.active = False
+        self.assertEqual(other_connection.program_count, 0)
+        program.active = True
+        firing.unlink()
+        self.assertEqual(other_connection.firing_count, 0)
+        program.unlink()
+        kiln.unlink()
+        self.assertEqual(
+            (other_connection.kiln_count, other_connection.program_count),
+            (0, 0),
+        )
+
     def test_routine_sync_cron_is_active(self):
         self.assertTrue(self.env.ref("mb_kiln_bridge.ir_cron_mb_kiln_sync").active)
 

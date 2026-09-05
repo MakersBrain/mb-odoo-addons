@@ -76,9 +76,9 @@ class MbGlazingMaterialAllocation(models.Model):
         self._check_session_open()
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_open_session(self):
         self._check_session_open()
-        return super().unlink()
 
     @api.depends(
         "product_id",

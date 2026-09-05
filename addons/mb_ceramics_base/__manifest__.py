@@ -51,7 +51,7 @@ order deciding the app name.
 material product itself so it joins to the master catalogue, which is the same
 reasoning as the categories: one taxonomy, and it is Odoo's.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
@@ -61,6 +61,9 @@ reasoning as the categories: one taxonomy, and it is Odoo's.
         "mb_workshop_base",
         # mrp.workcenter, its tags and its capacity lines.
         "mrp",
+        # Own the product categories and units referenced directly in XML data.
+        "product",
+        "uom",
     ],
     "data": [
         "data/mb_material_categories.xml",

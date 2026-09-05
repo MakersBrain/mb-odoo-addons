@@ -1,5 +1,6 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import SQL
 from odoo.tools.float_utils import float_compare
 
 
@@ -49,8 +50,20 @@ class MbBoardContent(models.Model):
         "CHECK(quantity > 0)", "A board-content quantity must be positive."
     )
 
+    @api.model
+    def _lock_productions(self, production_ids):
+        """Serialize every aggregate check on its manufacturing order."""
+        for production_id in sorted(set(production_ids)):
+            self.env.cr.execute(
+                SQL(
+                    "UPDATE mrp_production SET id = id WHERE id = %s",
+                    production_id,
+                )
+            )
+
     @api.constrains("board_id", "production_id", "quantity", "state", "current_workorder_id")
     def _check_content(self):
+        self._lock_productions(self.production_id.ids)
         for content in self:
             if content.board_id.package_type_id.package_use != "reusable":
                 raise ValidationError(_("Ware may only be assigned to a reusable package."))
@@ -87,6 +100,9 @@ class MbBoardContent(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        self._lock_productions(
+            values["production_id"] for values in vals_list if values.get("production_id")
+        )
         for values in vals_list:
             if not values.get("current_workorder_id") and values.get("production_id"):
                 production = self.env["mrp.production"].browse(values["production_id"])
@@ -95,6 +111,17 @@ class MbBoardContent(models.Model):
                 )[:1]
                 values["current_workorder_id"] = operation.id or False
         return super().create(vals_list)
+
+    def write(self, vals):
+        production_ids = self.production_id.ids
+        if vals.get("production_id"):
+            production_ids.append(vals["production_id"])
+        self._lock_productions(production_ids)
+        return super().write(vals)
+
+    def unlink(self):
+        self._lock_productions(self.production_id.ids)
+        return super().unlink()
 
     def action_remove(self):
         current = self.filtered(lambda line: line.state == "current")
@@ -124,6 +151,7 @@ class MbBoardContent(models.Model):
         if self.state != "current":
             raise UserError(_("Only current board content can be split."))
         production = self.production_id
+        self._lock_productions(production.ids)
         remaining = production.product_qty - self.quantity
         if float_compare(remaining, 0, precision_rounding=production.product_uom_id.rounding) <= 0:
             raise UserError(_("There is no other quantity to keep on the original order."))

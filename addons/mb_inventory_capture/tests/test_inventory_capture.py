@@ -7,6 +7,7 @@ from PIL import Image
 
 from odoo import fields
 from odoo.exceptions import AccessError, ValidationError
+from odoo.service.model import get_public_method
 from odoo.tests import TransactionCase, tagged
 
 from odoo.addons.mb_inventory_capture.models.identifier import (
@@ -51,6 +52,84 @@ class TestInventoryCapture(TransactionCase):
             ],
             limit=1,
         )
+
+    def test_result_ingress_is_private_but_user_actions_remain_public(self):
+        with self.assertRaises(AccessError):
+            get_public_method(self.env["mb.inventory.capture"], "ingest_result")
+        self.assertTrue(get_public_method(self.env["mb.inventory.capture"], "action_apply"))
+
+    def test_late_result_failure_rolls_back_attempt_and_retry_applies_once(self):
+        capture = self.capture()
+        asset = capture.upload_image(image_data(), "front")
+        capture.action_prepare_extraction()
+        initial_state = capture.state
+        operation_key = f"inventory:test:{uuid.uuid4()}"
+        payload = {
+            "operation_key": operation_key,
+            "capture_id": capture.capture_uuid,
+            "attempt_id": str(uuid.uuid4()),
+            "kind": "multimodal",
+            "provider": "fixture-ai",
+            "model": "fixture-v1",
+            "version": "2026-08-10",
+            "state": "succeeded",
+            "input_digests": [asset["content_sha256"]],
+            "normalized_response": {
+                "candidates": [
+                    {
+                        "kind": "lot",
+                        "raw_value": "LOT-ATOMIC",
+                        "confidence": 0.9,
+                        "grounding_state": "unverified",
+                        "source": "ai_suggestion",
+                        "asset_id": asset["asset_uuid"],
+                    }
+                ]
+            },
+            "raw_response": {"retained": False},
+            "usage": {"images": 1},
+        }
+        receipts = self.env["mb.control.operation.receipt"].sudo()
+
+        with (
+            patch.object(
+                type(capture),
+                "_ingest_candidates",
+                side_effect=ValidationError("late candidate failure"),
+            ),
+            self.assertRaisesRegex(ValidationError, "late candidate failure"),
+        ):
+            receipts._execute_once(
+                operation_key,
+                "inventory.capture.result",
+                "digest",
+                lambda: capture.ingest_result(payload),
+            )
+
+        capture.invalidate_recordset()
+        self.assertFalse(capture.attempt_ids)
+        self.assertFalse(capture.candidate_ids)
+        self.assertEqual(capture.state, initial_state)
+        self.assertFalse(receipts.for_replay(operation_key, "inventory.capture.result", "digest"))
+
+        action = Mock(side_effect=lambda: capture.ingest_result(payload))
+        result = receipts._execute_once(
+            operation_key,
+            "inventory.capture.result",
+            "digest",
+            action,
+        )
+        replay = receipts._execute_once(
+            operation_key,
+            "inventory.capture.result",
+            "digest",
+            action,
+        )
+
+        self.assertEqual(replay, result)
+        self.assertEqual(action.call_count, 1)
+        self.assertEqual(len(capture.attempt_ids), 1)
+        self.assertEqual(len(capture.candidate_ids), 1)
 
     def capture(self, **values):
         return self.env["mb.inventory.capture"].create(

@@ -12,6 +12,7 @@
  */
 
 import { STORAGE_KEYS } from './constants.js';
+import { printerProtocolDebug } from './debug.js';
 // mb: bundled rather than fetched. Upstream serves printers.json next to
 // the page; this app has to print with no network, and the bundler inlines it.
 // Odoo serves static JSON directly but does not transform JSON ESM imports.
@@ -629,9 +630,9 @@ export async function print(transport, rasterData, options = {}) {
   const isM110 = isM110Printer(deviceName, printerModel);
   const isTSPL = isTSPLPrinter(deviceName, printerModel);
   const printerDesc = getPrinterDescription(deviceName, printerModel);
-  console.log(`Printing: ${widthBytes}x${heightLines} (${data.length} bytes)`);
-  console.log(`Device: ${deviceName}, Model: ${printerModel}, Detected: ${printerDesc}`);
-  console.log(`Transport: ${isBLE ? 'BLE' : 'USB'}, Density: ${density}, Feed: ${feed}`);
+  printerProtocolDebug(`Printing: ${widthBytes}x${heightLines} (${data.length} bytes)`);
+  printerProtocolDebug(`Device: ${deviceName}, Model: ${printerModel}, Detected: ${printerDesc}`);
+  printerProtocolDebug(`Transport: ${isBLE ? 'BLE' : 'USB'}, Density: ${density}, Feed: ${feed}`);
 
   if (isTSPL) {
     // TSPL protocol for shipping label printers (PM-241, etc.)
@@ -664,12 +665,12 @@ export async function print(transport, rasterData, options = {}) {
  * Uses rotated printing with D-series protocol
  */
 async function printDSeries(transport, data, widthBytes, heightLines, onProgress, density = 6, continuous = false, feed = 0) {
-  console.log('Using D-series protocol...');
-  console.log(`Input: ${widthBytes} bytes wide x ${heightLines} rows (${data.length} bytes)`);
+  printerProtocolDebug('Using D-series protocol...');
+  printerProtocolDebug(`Input: ${widthBytes} bytes wide x ${heightLines} rows (${data.length} bytes)`);
 
   // Rotate for D-series (they print labels sideways)
   const rotated = rotateRaster90CW(data, widthBytes, heightLines);
-  console.log(`Rotated: ${rotated.widthBytes} bytes wide x ${rotated.heightLines} rows`);
+  printerProtocolDebug(`Rotated: ${rotated.widthBytes} bytes wide x ${rotated.heightLines} rows`);
 
   // For continuous tape, pad raster with blank rows to push content past the cutter
   // ESC J feed is ignored in continuous mode, so we bake the feed into the image data
@@ -686,27 +687,27 @@ async function printDSeries(transport, data, widthBytes, heightLines, onProgress
     // Rest is already zeros (blank rows)
     printData = padded;
     printRows = rotated.heightLines + paddingRows;
-    console.log(`Continuous tape: added ${paddingRows} blank rows (${cutterOffset} cutter offset + ${feed} feed, ${printRows} total rows)`);
+    printerProtocolDebug(`Continuous tape: added ${paddingRows} blank rows (${cutterOffset} cutter offset + ${feed} feed, ${printRows} total rows)`);
   }
 
   // Set heat/density before header
   const heatTime = densityToHeatTime(density);
-  console.log(`Setting density ${density} (heat time: ${heatTime})...`);
+  printerProtocolDebug(`Setting density ${density} (heat time: ${heatTime})...`);
   await transport.send(CMD.HEAT_SETTINGS(7, heatTime, 2));
   await transport.delay(30);
 
   // Set media type: continuous (0x0B) disables gap detection, gaps (0x0A) enables it
   const mediaType = continuous ? 0x0b : 0x0a;
-  console.log(`Setting media type to ${continuous ? 'continuous' : 'gaps'} (1F 11 ${mediaType.toString(16).padStart(2, '0')})...`);
+  printerProtocolDebug(`Setting media type to ${continuous ? 'continuous' : 'gaps'} (1F 11 ${mediaType.toString(16).padStart(2, '0')})...`);
   await transport.send(new Uint8Array([0x1f, 0x11, mediaType]));
   await transport.delay(30);
 
   // Send D-series header (includes ESC @ init)
-  console.log('Sending D-series header...');
+  printerProtocolDebug('Sending D-series header...');
   await transport.send(D_CMD.HEADER(rotated.widthBytes, printRows));
 
   // Send data in chunks
-  console.log('Sending data...');
+  printerProtocolDebug('Sending data...');
   const chunkSize = 128;
 
   for (let i = 0; i < printData.length; i += chunkSize) {
@@ -722,10 +723,10 @@ async function printDSeries(transport, data, widthBytes, heightLines, onProgress
 
   // D-series end command (ESC d 0 - gap detection for die-cut, no-op for continuous)
   await transport.delay(100);
-  console.log('Sending D-series end command...');
+  printerProtocolDebug('Sending D-series end command...');
   await transport.send(D_CMD.END);
 
-  console.log('Print complete!');
+  printerProtocolDebug('Print complete!');
 }
 
 /**
@@ -733,18 +734,18 @@ async function printDSeries(transport, data, widthBytes, heightLines, onProgress
  * Continuous tape printer - uses proprietary init sequence to fix print positioning
  */
 async function printP12(transport, data, widthBytes, heightLines, onProgress) {
-  console.log('Using P12-series protocol...');
-  console.log(`Input: ${widthBytes} bytes wide x ${heightLines} rows (${data.length} bytes)`);
+  printerProtocolDebug('Using P12-series protocol...');
+  printerProtocolDebug(`Input: ${widthBytes} bytes wide x ${heightLines} rows (${data.length} bytes)`);
 
   // Rotate for P12 (prints labels sideways like D30)
   const rotated = rotateRaster90CW(data, widthBytes, heightLines);
-  console.log(`Rotated: ${rotated.widthBytes} bytes wide x ${rotated.heightLines} rows`);
+  printerProtocolDebug(`Rotated: ${rotated.widthBytes} bytes wide x ${rotated.heightLines} rows`);
 
   // Send P12 init sequence with response waiting (as per soburi protocol)
-  console.log('Sending P12 init sequence...');
+  printerProtocolDebug('Sending P12 init sequence...');
   for (let i = 0; i < P12_CMD.INIT_SEQUENCE.length; i++) {
     const cmd = P12_CMD.INIT_SEQUENCE[i];
-    console.log(`  Init packet ${i + 1}/${P12_CMD.INIT_SEQUENCE.length}...`);
+    printerProtocolDebug(`  Init packet ${i + 1}/${P12_CMD.INIT_SEQUENCE.length}...`);
     await transport.send(cmd);
     // Wait for printer response before sending next packet
     if (transport.waitForResponse) {
@@ -755,11 +756,11 @@ async function printP12(transport, data, widthBytes, heightLines, onProgress) {
   }
 
   // Send P12 header (ESC @ + GS v 0 + dimensions)
-  console.log('Sending P12 header...');
+  printerProtocolDebug('Sending P12 header...');
   await transport.send(P12_CMD.HEADER(rotated.widthBytes, rotated.heightLines));
 
   // Send data in chunks
-  console.log('Sending data...');
+  printerProtocolDebug('Sending data...');
   const chunkSize = 128;
 
   for (let i = 0; i < rotated.data.length; i += chunkSize) {
@@ -775,12 +776,12 @@ async function printP12(transport, data, widthBytes, heightLines, onProgress) {
 
   // P12 feed command (ESC d 13, twice as per soburi protocol)
   await transport.delay(100);
-  console.log('Sending P12 feed...');
+  printerProtocolDebug('Sending P12 feed...');
   await transport.send(P12_CMD.FEED);
   await transport.delay(50);
   await transport.send(P12_CMD.FEED);
 
-  console.log('Print complete!');
+  printerProtocolDebug('Print complete!');
 }
 
 /**
@@ -788,30 +789,30 @@ async function printP12(transport, data, widthBytes, heightLines, onProgress) {
  * M02 uses a special prefix and minimal/no feed (continuous paper)
  */
 async function printM02(transport, data, widthBytes, heightLines, density, onProgress) {
-  console.log('Using M02-series protocol...');
+  printerProtocolDebug('Using M02-series protocol...');
 
   // M02 requires a special prefix before commands
-  console.log('Sending M02 prefix...');
+  printerProtocolDebug('Sending M02 prefix...');
   await transport.send(M02_CMD.PREFIX);
   await transport.delay(50);
 
   // Standard init
-  console.log('Sending init...');
+  printerProtocolDebug('Sending init...');
   await transport.send(CMD.INIT);
   await transport.delay(100);
 
   // Set density using ESC 7 heat command
   const heatTime = densityToHeatTime(density);
-  console.log(`Setting density to ${density} (heat time: ${heatTime})...`);
+  printerProtocolDebug(`Setting density to ${density} (heat time: ${heatTime})...`);
   await transport.send(CMD.HEAT_SETTINGS(7, heatTime, 2));
   await transport.delay(30);
 
   // Raster header
-  console.log('Sending header...');
+  printerProtocolDebug('Sending header...');
   await transport.send(CMD.RASTER_HEADER(widthBytes, heightLines));
 
   // Send data in 128-byte chunks
-  console.log('Sending data...');
+  printerProtocolDebug('Sending data...');
   const chunkSize = 128;
 
   for (let i = 0; i < data.length; i += chunkSize) {
@@ -828,11 +829,11 @@ async function printM02(transport, data, widthBytes, heightLines, density, onPro
   // M02 uses continuous paper - minimal feed just to clear print head
   // Too much feed wastes paper on continuous rolls
   await transport.delay(300);
-  console.log('Sending minimal feed (8 dots for continuous paper)...');
+  printerProtocolDebug('Sending minimal feed (8 dots for continuous paper)...');
   await transport.send(CMD.FEED(8));
   await transport.delay(500);
 
-  console.log('Print complete!');
+  printerProtocolDebug('Print complete!');
 }
 
 /**
@@ -841,7 +842,7 @@ async function printM02(transport, data, widthBytes, heightLines, density, onPro
  * Tested on real hardware by @ramiorg
  */
 async function printM04(transport, data, widthBytes, heightLines, density, feed, onProgress) {
-  console.log('Using M04-series protocol (300 DPI)...');
+  printerProtocolDebug('Using M04-series protocol (300 DPI)...');
 
   // Map density 1-8 to M04 range 0x00-0x0F (default 0x04)
   const m04Density = Math.round((density / 8) * 15);
@@ -849,31 +850,31 @@ async function printM04(transport, data, widthBytes, heightLines, density, feed,
   const m04Heat = Math.round(100 + (density - 1) * 50 / 3);
 
   // Step 1: Set density
-  console.log(`Setting density to ${density} (M04 value: 0x${m04Density.toString(16).padStart(2, '0')})...`);
+  printerProtocolDebug(`Setting density to ${density} (M04 value: 0x${m04Density.toString(16).padStart(2, '0')})...`);
   await transport.send(M04_CMD.DENSITY(m04Density));
   await transport.delay(30);
 
   // Step 2: Set heat/speed
-  console.log(`Setting heat/speed (${m04Heat})...`);
+  printerProtocolDebug(`Setting heat/speed (${m04Heat})...`);
   await transport.send(M04_CMD.HEAT(m04Heat));
   await transport.delay(30);
 
   // Step 3: Init
-  console.log('Sending M04 init...');
+  printerProtocolDebug('Sending M04 init...');
   await transport.send(M04_CMD.INIT);
   await transport.delay(30);
 
   // Step 4: Set compression mode to raw (no LZO)
-  console.log('Setting compression mode (raw)...');
+  printerProtocolDebug('Setting compression mode (raw)...');
   await transport.send(M04_CMD.COMPRESSION(0x00));
   await transport.delay(30);
 
   // Step 5: M04-specific raster header (proper 16-bit LE width/height)
-  console.log('Sending raster header...');
+  printerProtocolDebug('Sending raster header...');
   await transport.send(M04_CMD.RASTER_HEADER(widthBytes, heightLines));
 
   // Step 6: Send data in 256-byte chunks
-  console.log('Sending data (256-byte chunks)...');
+  printerProtocolDebug('Sending data (256-byte chunks)...');
   const chunkSize = 256;
 
   for (let i = 0; i < data.length; i += chunkSize) {
@@ -890,14 +891,14 @@ async function printM04(transport, data, widthBytes, heightLines, density, feed,
   // Step 7: Feed - number of feed commands based on feed setting
   await transport.delay(300);
   const feedCount = Math.max(1, Math.round(feed / 16));
-  console.log(`Sending feed (${feedCount} lines)...`);
+  printerProtocolDebug(`Sending feed (${feedCount} lines)...`);
   for (let i = 0; i < feedCount; i++) {
     await transport.send(M04_CMD.FEED);
     await transport.delay(30);
   }
   await transport.delay(500);
 
-  console.log('Print complete!');
+  printerProtocolDebug('Print complete!');
 }
 
 /**
@@ -905,7 +906,7 @@ async function printM04(transport, data, widthBytes, heightLines, density, feed,
  * Uses the phomemo-tools protocol which is tested and working
  */
 async function printM110(transport, data, widthBytes, heightLines, density, onProgress) {
-  console.log('Using M110 protocol (phomemo-tools)...');
+  printerProtocolDebug('Using M110 protocol (phomemo-tools)...');
 
   // Map our density (1-8) to M110 density (~1-15, default 10)
   // Our scale: 1=lightest, 8=darkest
@@ -913,26 +914,26 @@ async function printM110(transport, data, widthBytes, heightLines, density, onPr
   const m110Density = Math.round(5 + density * 1.25); // Maps 1-8 to ~6-15
 
   // Set speed (default 5)
-  console.log('Setting speed...');
+  printerProtocolDebug('Setting speed...');
   await transport.send(M110_CMD.SPEED(5));
   await transport.delay(30);
 
   // Set density
-  console.log(`Setting density to ${density} (M110 value: ${m110Density})...`);
+  printerProtocolDebug(`Setting density to ${density} (M110 value: ${m110Density})...`);
   await transport.send(M110_CMD.DENSITY(m110Density));
   await transport.delay(30);
 
   // Set media type (10 = labels with gaps)
-  console.log('Setting media type...');
+  printerProtocolDebug('Setting media type...');
   await transport.send(M110_CMD.MEDIA_TYPE(10));
   await transport.delay(30);
 
   // Raster header (same format as standard M-series)
-  console.log('Sending header...');
+  printerProtocolDebug('Sending header...');
   await transport.send(CMD.RASTER_HEADER(widthBytes, heightLines));
 
   // Send data in 128-byte chunks
-  console.log('Sending data...');
+  printerProtocolDebug('Sending data...');
   const chunkSize = 128;
 
   for (let i = 0; i < data.length; i += chunkSize) {
@@ -948,11 +949,11 @@ async function printM110(transport, data, widthBytes, heightLines, density, onPr
 
   // Send footer to finalize print
   await transport.delay(300);
-  console.log('Sending footer...');
+  printerProtocolDebug('Sending footer...');
   await transport.send(M110_CMD.FOOTER);
   await transport.delay(500);
 
-  console.log('Print complete!');
+  printerProtocolDebug('Print complete!');
 }
 
 /**
@@ -961,13 +962,13 @@ async function printM110(transport, data, widthBytes, heightLines, density, onPr
  */
 async function printBLE(transport, data, widthBytes, heightLines, density, feed, onProgress) {
   // Init - must be right before data
-  console.log('Sending init...');
+  printerProtocolDebug('Sending init...');
   await transport.send(CMD.INIT);
   await transport.delay(100);
 
   // Set density using ESC 7 heat command (more widely supported)
   const heatTime = densityToHeatTime(density);
-  console.log(`Setting density to ${density} (heat time: ${heatTime})...`);
+  printerProtocolDebug(`Setting density to ${density} (heat time: ${heatTime})...`);
   await transport.send(CMD.HEAT_SETTINGS(7, heatTime, 2));
   await transport.delay(30);
   // Also send standard density command as backup
@@ -975,11 +976,11 @@ async function printBLE(transport, data, widthBytes, heightLines, density, feed,
   await transport.delay(50);
 
   // Raster header
-  console.log('Sending header...');
+  printerProtocolDebug('Sending header...');
   await transport.send(CMD.RASTER_HEADER(widthBytes, heightLines));
 
   // Send data in 128-byte chunks
-  console.log('Sending data...');
+  printerProtocolDebug('Sending data...');
   const chunkSize = 128;
   const totalChunks = Math.ceil(data.length / chunkSize);
 
@@ -996,11 +997,11 @@ async function printBLE(transport, data, widthBytes, heightLines, density, feed,
 
   // Feed after print
   await transport.delay(300);
-  console.log(`Sending feed (${feed} dots)...`);
+  printerProtocolDebug(`Sending feed (${feed} dots)...`);
   await transport.send(CMD.FEED(feed));
   await transport.delay(800);
 
-  console.log('Print complete!');
+  printerProtocolDebug('Print complete!');
 }
 
 /**
@@ -1008,12 +1009,12 @@ async function printBLE(transport, data, widthBytes, heightLines, density, feed,
  */
 async function printUSB(transport, data, widthBytes, heightLines, density, feed, onProgress) {
   // Init
-  console.log('Sending init...');
+  printerProtocolDebug('Sending init...');
   await transport.send(CMD.INIT);
   await transport.delay(100);
 
   // Density and line spacing
-  console.log(`Setting density to ${density}...`);
+  printerProtocolDebug(`Setting density to ${density}...`);
   await transport.send(CMD.DENSITY(density));
   await transport.send(CMD.LINE_SPACING(0)); // Line spacing 0
 
@@ -1022,11 +1023,11 @@ async function printUSB(transport, data, widthBytes, heightLines, density, feed,
   await transport.delay(50);
 
   // Raster header
-  console.log('Sending header...');
+  printerProtocolDebug('Sending header...');
   await transport.send(CMD.RASTER_HEADER(widthBytes, heightLines));
 
   // Send data in 512-byte chunks
-  console.log('Sending data...');
+  printerProtocolDebug('Sending data...');
   const chunkSize = 512;
   const totalChunks = Math.ceil(data.length / chunkSize);
 
@@ -1043,10 +1044,10 @@ async function printUSB(transport, data, widthBytes, heightLines, density, feed,
 
   // Final feed
   await transport.delay(100);
-  console.log(`Sending feed (${feed} dots)...`);
+  printerProtocolDebug(`Sending feed (${feed} dots)...`);
   await transport.send(CMD.FEED(feed));
 
-  console.log('Print complete!');
+  printerProtocolDebug('Print complete!');
 }
 
 /**
@@ -1054,15 +1055,15 @@ async function printUSB(transport, data, widthBytes, heightLines, density, feed,
  * TSPL is a text-based command language used by many Chinese thermal label printers
  */
 async function printTSPL(transport, data, widthBytes, heightLines, labelWidthMm, labelHeightMm, density, onProgress) {
-  console.log('Using TSPL protocol...');
-  console.log(`Label size: ${labelWidthMm}mm x ${labelHeightMm}mm`);
-  console.log(`Raster: ${widthBytes} bytes wide x ${heightLines} rows`);
+  printerProtocolDebug('Using TSPL protocol...');
+  printerProtocolDebug(`Label size: ${labelWidthMm}mm x ${labelHeightMm}mm`);
+  printerProtocolDebug(`Raster: ${widthBytes} bytes wide x ${heightLines} rows`);
 
   // Map density 1-8 to TSPL density 0-15
   const tsplDensity = Math.round((density / 8) * 15);
 
   // Build TSPL command sequence
-  console.log('Sending TSPL setup commands...');
+  printerProtocolDebug('Sending TSPL setup commands...');
 
   // SIZE command - label dimensions
   await transport.send(TSPL.SIZE(labelWidthMm, labelHeightMm));
@@ -1077,7 +1078,7 @@ async function printTSPL(transport, data, widthBytes, heightLines, labelWidthMm,
   await transport.delay(50);
 
   // DENSITY command
-  console.log(`Setting TSPL density to ${tsplDensity}...`);
+  printerProtocolDebug(`Setting TSPL density to ${tsplDensity}...`);
   await transport.send(TSPL.DENSITY(tsplDensity));
   await transport.delay(50);
 
@@ -1094,18 +1095,18 @@ async function printTSPL(transport, data, widthBytes, heightLines, labelWidthMm,
   await transport.delay(50);
 
   // BITMAP command header
-  console.log('Sending BITMAP header...');
+  printerProtocolDebug('Sending BITMAP header...');
   await transport.send(TSPL.BITMAP_HEADER(0, 0, widthBytes, heightLines));
 
   // Invert bitmap data - TSPL expects 0=black, 1=white (opposite of our format)
-  console.log('Inverting bitmap data for TSPL...');
+  printerProtocolDebug('Inverting bitmap data for TSPL...');
   const invertedData = new Uint8Array(data.length);
   for (let i = 0; i < data.length; i++) {
     invertedData[i] = data[i] ^ 0xFF;
   }
 
   // Send binary bitmap data in chunks
-  console.log('Sending bitmap data...');
+  printerProtocolDebug('Sending bitmap data...');
   const chunkSize = 512;
 
   for (let i = 0; i < invertedData.length; i += chunkSize) {
@@ -1124,14 +1125,14 @@ async function printTSPL(transport, data, widthBytes, heightLines, labelWidthMm,
   await transport.delay(50);
 
   // PRINT command
-  console.log('Sending PRINT command...');
+  printerProtocolDebug('Sending PRINT command...');
   await transport.send(TSPL.PRINT(1));
   await transport.delay(50);
 
   // END command
   await transport.send(TSPL.END());
 
-  console.log('TSPL print complete!');
+  printerProtocolDebug('TSPL print complete!');
 }
 
 /**
@@ -1143,7 +1144,7 @@ async function printTSPL(transport, data, widthBytes, heightLines, labelWidthMm,
  * @param {Function} onProgress - Progress callback
  */
 export async function printDensityTest(transport, isBLE = true, onProgress = null) {
-  console.log('Printing density test pattern (using ESC 7 heat command)...');
+  printerProtocolDebug('Printing density test pattern (using ESC 7 heat command)...');
 
   // Create a test pattern: 8 strips, each 30 pixels tall, 320 pixels wide
   const stripHeight = 30;
@@ -1157,7 +1158,7 @@ export async function printDensityTest(transport, isBLE = true, onProgress = nul
     }
 
     const heatTime = densityToHeatTime(density);
-    console.log(`Printing strip at density ${density} (heat time: ${heatTime})...`);
+    printerProtocolDebug(`Printing strip at density ${density} (heat time: ${heatTime})...`);
 
     // Create strip data - solid black rectangle
     const stripData = new Uint8Array(widthBytes * stripHeight);
@@ -1203,5 +1204,5 @@ export async function printDensityTest(transport, isBLE = true, onProgress = nul
     onProgress(100);
   }
 
-  console.log('Density test complete! You should see 8 strips from light (1) to dark (8).');
+  printerProtocolDebug('Density test complete! You should see 8 strips from light (1) to dark (8).');
 }

@@ -935,10 +935,10 @@ class MbDepotSaleReport(models.Model):
             raise AccessError(_("Invoicing access is required to enable draft invoice creation."))
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_draft(self):
         if self.filtered(lambda report: report.state != "draft"):
             raise UserError(_("Processed depot reports cannot be deleted."))
-        return super().unlink()
 
 
 class MbDepotSaleReportLine(models.Model):
@@ -1069,7 +1069,7 @@ class MbDepotSaleReportLine(models.Model):
                 raise UserError(_("Lines can only be moved to a draft depot report."))
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_draft_report(self):
         if self.filtered(lambda line: line.report_id.state != "draft"):
             raise UserError(_("Processed depot report lines cannot be deleted."))
-        return super().unlink()

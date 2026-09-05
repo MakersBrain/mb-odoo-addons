@@ -1,5 +1,6 @@
 from . import account_journal
 from . import account_move_line
+from . import invariant_lock
 from . import res_company
 from . import urssaf_rule
 from . import urssaf_declaration

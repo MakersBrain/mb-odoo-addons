@@ -1,7 +1,7 @@
 import hashlib
 import re
 
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
@@ -70,6 +70,7 @@ class ResCompany(models.Model):
         "A control-plane workshop can be linked to only one company.",
     )
 
+    @api.private
     def mb_webshop_status(self, payload):
         self.ensure_one()
         workshop_id = str(payload.get("workshop_id", "")).lower()
@@ -135,6 +136,7 @@ class ResCompany(models.Model):
             "issues": issues,
         }
 
+    @api.private
     def mb_project_webshop_domain(self, payload):
         self.ensure_one()
         workshop_id = str(payload.get("workshop_id", "")).lower()
@@ -165,6 +167,7 @@ class ResCompany(models.Model):
             website.write({"domain": website_domain})
         return {"projected": changed, "website_id": website.id, "hostname": hostname}
 
+    @api.private
     def mb_bootstrap_tenant(self, payload):
         self.ensure_one()
         new_workshop = not self.mb_control_workshop_id
@@ -270,6 +273,7 @@ class ResCompany(models.Model):
         parameters.set_param("auth_signup.reset_password", False)
         parameters.set_param("auth_signup.invitation_scope", "b2b")
 
+    @api.private
     def mb_enable_module_bundle(self, payload):
         self.ensure_one()
         workshop_id = str(payload.get("workshop_id", "")).lower()
@@ -339,13 +343,16 @@ class ResCompany(models.Model):
         """Undo capability-specific enforcement after its policy is removed."""
         return None
 
+    @api.private
     def mb_restrict_module_bundle(self, payload):
         self.ensure_one()
         return self.env["mb.control.capability.policy"].restrict(self, payload)
 
+    @api.private
     def mb_expected_module_bundle(self, module_key):
         return MODULE_BUNDLES.get(module_key)
 
+    @api.private
     def mb_apply_entitlement(self, payload):
         self.ensure_one()
         workshop_id = str(payload.get("workshop_id", "")).lower()

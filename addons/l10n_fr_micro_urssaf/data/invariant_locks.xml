@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="invariant_lock_rate" model="l10n.fr.micro.urssaf.invariant.lock">
+        <field name="name">rate</field>
+    </record>
+    <record id="invariant_lock_acre" model="l10n.fr.micro.urssaf.invariant.lock">
+        <field name="name">acre</field>
+    </record>
+    <record id="invariant_lock_threshold" model="l10n.fr.micro.urssaf.invariant.lock">
+        <field name="name">threshold</field>
+    </record>
+</odoo>

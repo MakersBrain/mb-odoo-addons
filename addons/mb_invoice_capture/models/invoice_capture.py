@@ -9,6 +9,8 @@ from markupsafe import Markup, escape
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
+from .res_partner import normalized_identifier, normalized_name
+
 HEX_64_RE = re.compile(r"^[0-9a-f]{64}$")
 SAFE_EXTERNAL_ID_RE = re.compile(r"^[A-Za-z0-9._:/-]{1,255}$")
 MAX_SOURCE_BYTES = 20 * 1024 * 1024
@@ -36,14 +38,6 @@ def _decimal(value, field_name):
     if not result.is_finite():
         raise ValidationError(_("%(field)s must be finite.", field=field_name))
     return result
-
-
-def _normalized_identifier(value):
-    return "".join(character for character in (value or "").upper() if character.isalnum())
-
-
-def _normalized_name(value):
-    return " ".join((value or "").casefold().split())
 
 
 class InvoiceCapture(models.Model):
@@ -524,40 +518,48 @@ class InvoiceCapture(models.Model):
 
     @api.model
     def _match_supplier(self, invoice, company):
-        candidates = self.env["res.partner"].search(
-            [
-                ("active", "=", True),
-                "|",
-                ("company_id", "=", False),
-                ("company_id", "=", company.id),
-            ]
-        )
-        vat = _normalized_identifier(invoice.get("supplier_vat"))
-        siren = _normalized_identifier(invoice.get("supplier_siren"))
-        name = _normalized_name(invoice.get("supplier_name"))
-        if vat:
-            matches = candidates.filtered(
-                lambda partner: _normalized_identifier(partner.vat) == vat
+        Partner = self.env["res.partner"]
+        domain = [
+            ("active", "=", True),
+            ("parent_id", "=", False),
+            "|",
+            ("company_id", "=", False),
+            ("company_id", "=", company.id),
+        ]
+
+        def matches_for(field_name, key):
+            return Partner.search(
+                [*domain, (field_name, "=", key)],
+                order="id",
+                limit=2,
             )
+
+        vat = normalized_identifier(invoice.get("supplier_vat"))
+        siret = normalized_identifier(invoice.get("supplier_siret"))
+        siren = normalized_identifier(invoice.get("supplier_siren")) or siret[:9]
+        name = normalized_name(invoice.get("supplier_name"))
+        if vat:
+            matches = matches_for("mb_invoice_vat_key", vat)
             if len(matches) == 1:
                 return matches
             if len(matches) > 1:
                 return self.env["res.partner"], _(
                     "Several suppliers have the extracted VAT identifier."
                 )
+        if siret:
+            matches = matches_for("mb_invoice_registry_key", siret)
+            if len(matches) == 1:
+                return matches
+            if len(matches) > 1:
+                return self.env["res.partner"], _("Several suppliers have the extracted SIRET.")
         if siren:
-
-            def partner_siren(partner):
-                siret = partner["siret"] if "siret" in partner._fields else ""
-                return _normalized_identifier(siret)[:9]
-
-            matches = candidates.filtered(lambda partner: partner_siren(partner) == siren[:9])
+            matches = matches_for("mb_invoice_siren_key", siren[:9])
             if len(matches) == 1:
                 return matches
             if len(matches) > 1:
                 return self.env["res.partner"], _("Several suppliers have the extracted SIREN.")
         if name:
-            matches = candidates.filtered(lambda partner: _normalized_name(partner.name) == name)
+            matches = matches_for("mb_invoice_name_key", name)
             if len(matches) == 1:
                 return matches
             if len(matches) > 1:
@@ -719,6 +721,7 @@ class InvoiceCapture(models.Model):
         return move, None
 
     @api.model
+    @api.private
     def ingest(self, payload):
         (
             company,

@@ -578,7 +578,12 @@ class MbMarketStockAllocation(models.Model):
         ondelete="cascade",
         index=True,
     )
-    operation_id = fields.Many2one(related="plan_line_id.operation_id", store=True, index=True)
+    operation_id = fields.Many2one(
+        related="plan_line_id.operation_id",
+        store=True,
+        precompute=True,
+        index=True,
+    )
     company_id = fields.Many2one(related="plan_line_id.company_id", store=True, index=True)
     product_id = fields.Many2one(
         "product.product",
@@ -597,6 +602,10 @@ class MbMarketStockAllocation(models.Model):
         "CHECK(quantity > 0)",
         "Allocated quantity must be positive.",
     )
+    _unique_operation_lot = models.Constraint(
+        "UNIQUE(operation_id, lot_id)",
+        "A lot or serial number can satisfy only one target in an operation.",
+    )
 
     @api.constrains("plan_line_id", "product_id", "lot_id")
     def _check_allocation(self):
@@ -610,16 +619,6 @@ class MbMarketStockAllocation(models.Model):
                 raise ValidationError(_("Select a lot or serial number for tracked products."))
             if allocation.lot_id and allocation.lot_id.product_id != allocation.product_id:
                 raise ValidationError(_("The lot does not belong to the allocated product."))
-            if allocation.lot_id and self.search_count(
-                [
-                    ("id", "!=", allocation.id),
-                    ("operation_id", "=", allocation.operation_id.id),
-                    ("lot_id", "=", allocation.lot_id.id),
-                ]
-            ):
-                raise ValidationError(
-                    _("A lot or serial number can satisfy only one target in an operation.")
-                )
 
     def write(self, vals):
         if self.operation_id.filtered("stock_closed"):

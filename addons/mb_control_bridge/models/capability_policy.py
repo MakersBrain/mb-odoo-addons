@@ -22,6 +22,7 @@ class CapabilityPolicy(models.Model):
     )
 
     @api.model
+    @api.private
     def restrict(self, company, payload):
         workshop_id = str(payload.get("workshop_id", "")).lower()
         module_key = str(payload.get("module_key", ""))

@@ -6,7 +6,7 @@ name: mb-odoo
 
 services:
   db:
-    image: postgres:17-alpine
+    image: ${POSTGRES_IMAGE:-postgres:17-alpine}
     container_name: mb-odoo-db
     environment:
       POSTGRES_DB: postgres
@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
 
   odoo:
-    image: odoo:${ODOO_VERSION:-19}
+    image: ${ODOO_IMAGE:-odoo:19}
     container_name: mb-odoo-web
     depends_on:
       db:

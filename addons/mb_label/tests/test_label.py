@@ -1,12 +1,21 @@
 import base64
+import importlib.util
 import io
 from datetime import datetime
+from pathlib import Path
+from queue import Queue
+from threading import Barrier, Thread
 
 from PIL import Image
+from psycopg2.errors import SerializationFailure
 from PyPDF2 import PdfReader
 
+from odoo import SUPERUSER_ID, api
 from odoo.exceptions import AccessError, UserError, ValidationError
-from odoo.tests import TransactionCase, tagged
+from odoo.modules.registry import Registry
+from odoo.tests import BaseCase, TransactionCase, get_db_name, tagged
+from odoo.tools import SQL
+from odoo.tools.convert import convert_file
 
 
 def document(*elements):
@@ -25,6 +34,323 @@ def text(element_id, value, **extra):
         "font_size": 2.5,
         **extra,
     }
+
+
+@tagged("post_install", "-at_install")
+class TestLabelTemplateConcurrency(BaseCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.registry = Registry(get_db_name())
+        with cls.registry.cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, {})
+            cls.company_id = env.ref("base.main_company").id
+            cls.seed_default_id = env.ref("mb_label.template_product_40x30").id
+
+    def _run_locked_pair(self, operation):
+        holder_done = Barrier(2)
+        release_holder = Barrier(2)
+        outcomes = Queue()
+        envs = {
+            role: api.Environment(self.registry.cursor(), SUPERUSER_ID, {})
+            for role in ("holder", "contender")
+        }
+        pids = {}
+        for role, env in envs.items():
+            env.cr.execute("SELECT pg_backend_pid()")
+            pids[role] = env.cr.fetchone()[0]
+
+        def run(role):
+            env = envs[role]
+            try:
+                result = operation(env, role)
+                if role == "holder":
+                    holder_done.wait(timeout=10)
+                    release_holder.wait(timeout=10)
+                env.cr.commit()
+                outcomes.put((role, "committed", result))
+            except SerializationFailure as error:
+                env.cr.rollback()
+                outcomes.put((role, "serialization", str(error)))
+            except Exception as error:  # pragma: no cover - reported by the main thread
+                env.cr.rollback()
+                outcomes.put((role, "error", repr(error)))
+
+        holder = Thread(target=run, args=("holder",), daemon=True)
+        contender = Thread(target=run, args=("contender",), daemon=True)
+        blocked = False
+        try:
+            holder.start()
+            holder_done.wait(timeout=10)
+            contender.start()
+            for _attempt in range(200):
+                with self.registry.cursor() as cr:
+                    cr.execute("SELECT pg_blocking_pids(%s)", [pids["contender"]])
+                    if pids["holder"] in cr.fetchone()[0]:
+                        blocked = True
+                        break
+                if not contender.is_alive():
+                    break
+        finally:
+            release_holder.wait(timeout=10)
+            holder.join(timeout=10)
+            contender.join(timeout=10)
+            for env in envs.values():
+                env.cr.close()
+
+        self.assertTrue(blocked, "contender never waited on the invariant mutex")
+        result = {}
+        while not outcomes.empty():
+            role, status, detail = outcomes.get_nowait()
+            result[role] = (status, detail)
+        self.assertEqual(result.get("holder", (None,))[0], "committed", result)
+        self.assertEqual(result.get("contender", (None,))[0], "serialization", result)
+
+    def _clear_main_company_defaults(self, env):
+        env["mb.label.template"].search(
+            [("company_id", "=", self.company_id), ("is_default", "=", True)]
+        ).write({"is_default": False})
+
+    def _restore_seed_default(self):
+        with self.registry.cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, {})
+            env["mb.label.template"].search(
+                [("name", "like", "DATA-02 %"), ("company_id", "=", self.company_id)]
+            ).unlink()
+            seed = env["mb.label.template"].browse(self.seed_default_id).exists()
+            if seed:
+                seed.active = True
+                seed.action_set_default()
+            cr.commit()
+
+    def test_concurrent_active_default_creation_serializes(self):
+        with self.registry.cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, {})
+            self._clear_main_company_defaults(env)
+            cr.commit()
+        try:
+            self._run_locked_pair(
+                lambda env, role: (
+                    env["mb.label.template"]
+                    .create(
+                        {
+                            "name": "DATA-02 concurrent default %s" % role,
+                            "company_id": self.company_id,
+                            "is_default": True,
+                        }
+                    )
+                    .id
+                )
+            )
+            with self.registry.cursor() as cr:
+                env = api.Environment(cr, SUPERUSER_ID, {})
+                with self.assertRaisesRegex(ValidationError, "only one"):
+                    env["mb.label.template"].create(
+                        {
+                            "name": "DATA-02 concurrent default retry",
+                            "company_id": self.company_id,
+                            "is_default": True,
+                        }
+                    )
+        finally:
+            self._restore_seed_default()
+
+    def test_concurrent_set_default_is_atomic(self):
+        with self.registry.cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, {})
+            self._clear_main_company_defaults(env)
+            templates = env["mb.label.template"].create(
+                [
+                    {"name": "DATA-02 choice holder", "company_id": self.company_id},
+                    {"name": "DATA-02 choice contender", "company_id": self.company_id},
+                ]
+            )
+            template_ids = dict(zip(("holder", "contender"), templates.ids, strict=True))
+            cr.commit()
+        try:
+            self._run_locked_pair(
+                lambda env, role: (
+                    env["mb.label.template"].browse(template_ids[role]).action_set_default()
+                )
+            )
+            with self.registry.cursor() as cr:
+                env = api.Environment(cr, SUPERUSER_ID, {})
+                env["mb.label.template"].browse(template_ids["contender"]).action_set_default()
+                defaults = env["mb.label.template"].search(
+                    [
+                        ("company_id", "=", self.company_id),
+                        ("active", "=", True),
+                        ("is_default", "=", True),
+                    ]
+                )
+                self.assertEqual(defaults.ids, [template_ids["contender"]])
+        finally:
+            self._restore_seed_default()
+
+    def test_concurrent_version_saves_serialize_numbering(self):
+        with self.registry.cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, {})
+            template = env["mb.label.template"].create(
+                {"name": "DATA-02 version mutex", "company_id": self.company_id}
+            )
+            template_id = template.id
+            cr.commit()
+        try:
+            self._run_locked_pair(
+                lambda env, role: (
+                    env["mb.label.template"]
+                    .browse(template_id)
+                    .save_version(document(text(role, role)))["number"]
+                )
+            )
+            with self.registry.cursor() as cr:
+                env = api.Environment(cr, SUPERUSER_ID, {})
+                result = env["mb.label.template"].browse(template_id).save_version(document())
+                self.assertEqual(result["number"], 2)
+        finally:
+            with self.registry.cursor() as cr:
+                cr.execute(
+                    "DELETE FROM mb_label_template_version WHERE template_id = %s", [template_id]
+                )
+                cr.execute("DELETE FROM mb_label_template WHERE id = %s", [template_id])
+                cr.commit()
+
+
+@tagged("post_install", "-at_install")
+class TestLabelTemplateDefaultIntegrity(TransactionCase):
+    def test_company_seed_provisioning_is_idempotent_and_non_destructive(self):
+        self.env["res.lang"]._activate_lang("fr_FR")
+        Template = self.env["mb.label.template"]
+        company = self.env["res.company"].create({"name": "DATA-03 seed company"})
+        seeds = Template.with_context(active_test=False).search(
+            [("company_id", "=", company.id), ("seed_key", "!=", False)]
+        )
+        self.assertEqual(set(seeds.mapped("seed_key")), {"product_40x30", "wip_lot_30x20"})
+        product_seed = seeds.filtered(lambda item: item.seed_key == "product_40x30")
+        wip_seed = seeds - product_seed
+        self.assertTrue(product_seed.is_default)
+        self.assertFalse(wip_seed.is_default)
+        self.assertEqual(
+            (product_seed.current_version_id.number, wip_seed.current_version_id.number), (1, 1)
+        )
+
+        original = {
+            seed.id: (seed.current_version_id.id, seed.current_version_id.document_json)
+            for seed in seeds
+        }
+        Template._ensure_company_seed_templates(company)
+        Template._ensure_company_seed_templates(company)
+        rerun = Template.with_context(active_test=False).search(
+            [("company_id", "=", company.id), ("seed_key", "!=", False)]
+        )
+        self.assertEqual(rerun.ids, seeds.ids)
+        self.assertEqual(
+            {
+                seed.id: (seed.current_version_id.id, seed.current_version_id.document_json)
+                for seed in rerun
+            },
+            original,
+        )
+
+        custom = Template.create({"name": "DATA-03 custom default", "company_id": company.id})
+        with self.assertRaisesRegex(UserError, "managed"):
+            Template.create({"name": "Forged seed", "company_id": company.id, "seed_key": "forged"})
+        with self.assertRaisesRegex(UserError, "immutable"):
+            product_seed.seed_key = "forged"
+        custom.action_set_default()
+        self.env.cr.execute(
+            "UPDATE mb_label_template SET seed_key = NULL WHERE id = %s", [product_seed.id]
+        )
+        product_seed.invalidate_recordset(["seed_key"])
+        Template._ensure_company_seed_templates(company)
+        product_seed.invalidate_recordset(["seed_key", "current_version_id", "is_default"])
+        self.assertEqual(product_seed.seed_key, "product_40x30")
+        self.assertEqual(product_seed.current_version_id.id, original[product_seed.id][0])
+        self.assertFalse(product_seed.is_default)
+        self.assertTrue(custom.is_default)
+
+        source = self.env.ref("mb_label.template_product_40x30")
+        self.assertEqual(
+            product_seed.with_context(lang="fr_FR").name,
+            source.with_context(lang="fr_FR").name,
+        )
+        self.assertEqual(
+            self.env["ir.model.data"].search_count(
+                [
+                    ("module", "=", "mb_label"),
+                    ("name", "like", "%%_company_%s" % company.id),
+                ]
+            ),
+            4,
+        )
+        user = self.env["res.users"].create(
+            {
+                "name": "DATA-03 company user",
+                "login": "data03-company-user",
+                "company_id": company.id,
+                "company_ids": [(6, 0, [company.id])],
+                "group_ids": [(6, 0, [self.env.ref("mb_label.group_mb_label_user").id])],
+            }
+        )
+        visible = Template.with_user(user).with_company(company).search([("seed_key", "!=", False)])
+        self.assertEqual(visible.ids, seeds.ids)
+
+    def test_archive_reactivate_and_company_scope(self):
+        seed = self.env.ref("mb_label.template_product_40x30")
+        seed.write({"active": False})
+        self.assertFalse(seed.active)
+        archived_default = self.env["mb.label.template"].create(
+            {"name": "Archived default", "is_default": True, "active": False}
+        )
+        replacement = self.env["mb.label.template"].create(
+            {"name": "Replacement default", "is_default": True}
+        )
+        with self.assertRaisesRegex(ValidationError, "only one"):
+            archived_default.active = True
+        with self.assertRaisesRegex(ValidationError, "Archive"):
+            archived_default.action_set_default()
+        replacement.active = False
+        archived_default.active = True
+
+        other_company = self.env["res.company"].create({"name": "DATA-02 other company"})
+        other_default = self.env["mb.label.template"].search(
+            [
+                ("company_id", "=", other_company.id),
+                ("seed_key", "=", "product_40x30"),
+            ]
+        )
+        self.assertTrue(other_default.is_default)
+
+    def test_clean_and_dirty_migration_preflight(self):
+        path = Path(__file__).parents[1] / "migrations/19.0.1.2.4/pre-migrate.py"
+        spec = importlib.util.spec_from_file_location("mb_label_data_02_pre_migrate", path)
+        migration = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(migration)
+        migration.migrate(self.env.cr, "19.0.1.2.3")
+
+        first, second = self.env["mb.label.template"].create(
+            [{"name": "Dirty one"}, {"name": "Dirty two"}]
+        )
+        index_name = "mb_label_template_active_default_unique"
+        with self.env.cr.savepoint():
+            self.env.cr.execute(SQL("DROP INDEX %s", SQL.identifier(index_name)))
+            self.env.cr.execute(
+                "UPDATE mb_label_template SET is_default = TRUE WHERE id IN %s",
+                [tuple((first | second).ids)],
+            )
+            with self.assertRaisesRegex(RuntimeError, "company .*templates"):
+                migration.migrate(self.env.cr, "19.0.1.2.3")
+            self.env.cr.execute(
+                "UPDATE mb_label_template SET is_default = FALSE WHERE id IN %s",
+                [tuple((first | second).ids)],
+            )
+            self.env.cr.execute(
+                SQL(
+                    "CREATE UNIQUE INDEX %s ON mb_label_template (company_id) "
+                    "WHERE active IS TRUE AND is_default IS TRUE",
+                    SQL.identifier(index_name),
+                )
+            )
 
 
 @tagged("post_install", "-at_install")
@@ -109,6 +435,33 @@ class TestLabelVerticalSlice(TransactionCase):
         self.assertEqual(job.bindings_snapshot["manual.quantity"], "4")
         image = Image.open(io.BytesIO(base64.b64decode(job.preview_png)))
         self.assertEqual(image.size, (240, 160))
+
+    def test_wip_lot_current_version_survives_repeated_module_updates(self):
+        template = self.env.ref("mb_label.template_wip_lot_30x20")
+        seeded_version = self.env.ref("mb_label.template_wip_lot_30x20_v1")
+        self.assertEqual(template.current_version_id, seeded_version)
+
+        version_data = template.save_version(document(text("updated", "Version 2")))
+        current_version = self.env["mb.label.template.version"].browse(version_data["id"])
+        self.assertEqual(current_version.number, 2)
+
+        for _update in range(2):
+            convert_file(
+                self.env,
+                "mb_label",
+                "data/mb_label_data.xml",
+                {},
+                mode="update",
+            )
+            template.invalidate_recordset(["current_version_id", "version_ids"])
+            self.assertEqual(template.current_version_id, current_version)
+
+        self.assertEqual(
+            self.env["mb.label.template.version"].search_count(
+                [("template_id", "=", template.id), ("number", "=", 1)]
+            ),
+            1,
+        )
 
     def test_serial_label_mints_durable_alias(self):
         first = self.env["mb.label.print.job"].create_rendered(

@@ -18,10 +18,10 @@ class MbCeramicsSessionMixin(models.AbstractModel):
             )
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_open_session(self):
         if any(record.state in self._mb_terminal_states for record in self):
             raise UserError(_("A completed or cancelled workshop session cannot be deleted."))
-        return super().unlink()
 
 
 class MbCeramicsSessionLineMixin(models.AbstractModel):
@@ -76,6 +76,6 @@ class MbCeramicsSessionLineMixin(models.AbstractModel):
         self._mb_check_session_open(sessions)
         return super().write(values)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_open_session(self):
         self._mb_check_session_open()
-        return super().unlink()

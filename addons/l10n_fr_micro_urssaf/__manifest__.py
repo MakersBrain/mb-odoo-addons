@@ -1,7 +1,7 @@
 {
     "name": "France - Micro-Entreprise URSSAF Declarations",
     "summary": "Cash-basis turnover declarations, receipt book, and threshold monitoring.",
-    "version": "19.0.2.0.1",
+    "version": "19.0.2.0.2",
     "license": "AGPL-3",
     "category": "Accounting/Localizations",
     "author": "MakersBrain",
@@ -11,10 +11,12 @@
         "mail",
         "mb_depot",
         "point_of_sale",
+        "web",
     ],
     "data": [
         "security/ir.model.access.csv",
         "security/l10n_fr_micro_urssaf_security.xml",
+        "data/invariant_locks.xml",
         "data/urssaf_rules.xml",
         "views/res_company_views.xml",
         "views/account_tax_views.xml",

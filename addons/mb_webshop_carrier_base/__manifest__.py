@@ -6,13 +6,17 @@ Provides the shared shipping journal, secure provider transport, label storage,
 pickup-point checkout flow and asynchronous webhook inbox used by MakersBrain
 carrier integrations. Stock pickings remain authoritative for fulfilment.
 """,
-    "version": "19.0.1.1.3",
+    "version": "19.0.1.1.4",
     "license": "AGPL-3",
     "category": "Website/eCommerce",
     "author": "MakersBrain",
     "depends": [
+        # Owns delivery.view_delivery_carrier_form, inherited directly below.
+        "delivery",
         "mb_webshop",
         "stock_delivery",
+        "stock",
+        "web",
         "website_sale",
     ],
     "data": [

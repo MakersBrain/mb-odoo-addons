@@ -13,6 +13,7 @@ import platform
 import re
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ADDONS = ROOT / "addons"
@@ -22,6 +23,8 @@ INVENTORY = DEPENDENCIES / "inventory.json"
 WHEELHOUSE = DEPENDENCIES / "wheelhouse"
 LOCK_ENTRY = re.compile(r"^[A-Za-z0-9_.-]+==[^\s;]+(?:\s+--hash=sha256:[0-9a-f]{64})+$")
 FORBIDDEN_FILES = {"sitecustomize.py", "usercustomize.py"}
+XML_ID_ATTRIBUTES = {"action", "groups", "parent", "ref", "t-call", "t-inherit"}
+EVAL_REF = re.compile(r"\bref\(\s*['\"]([A-Za-z_][A-Za-z0-9_]*)\.")
 
 
 def addon_manifests():
@@ -39,6 +42,40 @@ def absolute_imports():
             elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
                 found.add(node.module.split(".", 1)[0])
     return found
+
+
+def xml_module_references(addon_dir, known_modules):
+    """Return known modules whose XML IDs/templates are used by an add-on."""
+    found = set()
+    for path in addon_dir.rglob("*.xml"):
+        root = ET.parse(path).getroot()
+        for element in root.iter():
+            for attribute, value in element.attrib.items():
+                if attribute in XML_ID_ATTRIBUTES:
+                    for token in value.split(","):
+                        module, separator, _identifier = token.strip().lstrip("!").partition(".")
+                        if separator and module in known_modules:
+                            found.add(module)
+                found.update(
+                    module for module in EVAL_REF.findall(value) if module in known_modules
+                )
+    return found
+
+
+def check_direct_xml_dependencies(manifests):
+    known_modules = set(manifests)
+    for manifest in manifests.values():
+        known_modules.update(manifest.get("depends", []))
+    violations = []
+    for addon, manifest in manifests.items():
+        allowed = {addon, "base", *manifest.get("depends", [])}
+        missing = xml_module_references(ADDONS / addon, known_modules) - allowed
+        if missing:
+            violations.append(f"{addon}: {sorted(missing)}")
+    if violations:
+        raise ValueError(
+            "XML references modules absent from direct depends: " + "; ".join(violations)
+        )
 
 
 def locked_packages():
@@ -72,8 +109,9 @@ def check(runtime=False):
     if locked != declared_extension:
         raise ValueError("extension package inventory does not exactly match the lock")
 
+    manifests = {path.parent.name: manifest for path, manifest in addon_manifests()}
     declared_manifest_imports = set()
-    for _, manifest in addon_manifests():
+    for manifest in manifests.values():
         declared_manifest_imports.update(
             manifest.get("external_dependencies", {}).get("python", [])
         )
@@ -90,6 +128,8 @@ def check(runtime=False):
     undeclared = absolute_imports() - allowed - providers
     if undeclared:
         raise ValueError(f"undeclared top-level imports: {sorted(undeclared)}")
+
+    check_direct_xml_dependencies(manifests)
 
     for path in WHEELHOUSE.iterdir():
         if path.name == ".gitkeep":

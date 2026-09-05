@@ -6,7 +6,7 @@ Routes approved webshop order, invoice, shipment and return messages through a
 tenant-authenticated control-plane outbox. Provider credentials and delivery
 operations remain outside Odoo; unrelated Odoo mail keeps its native behavior.
 """,
-    "version": "19.0.1.1.1",
+    "version": "19.0.1.1.2",
     "license": "AGPL-3",
     "category": "Website/eCommerce",
     "author": "MakersBrain",

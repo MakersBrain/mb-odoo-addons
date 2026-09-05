@@ -25,11 +25,25 @@ class DeliveryCarrier(models.Model):
         string="Offer uses service points",
         help="Require a compatible Sendcloud service point at webshop checkout.",
     )
-    mb_sendcloud_length_cm = fields.Float(string="Default parcel length (cm)", default=30)
-    mb_sendcloud_width_cm = fields.Float(string="Default parcel width (cm)", default=20)
-    mb_sendcloud_height_cm = fields.Float(string="Default parcel height (cm)", default=15)
+    mb_sendcloud_length_cm = fields.Float(
+        string="Sendcloud default parcel length (cm)",
+        default=30,
+        help="Fallback parcel length sent only for Sendcloud shipments without package dimensions.",
+    )
+    mb_sendcloud_width_cm = fields.Float(
+        string="Sendcloud default parcel width (cm)",
+        default=20,
+        help="Fallback parcel width sent only for Sendcloud shipments without package dimensions.",
+    )
+    mb_sendcloud_height_cm = fields.Float(
+        string="Sendcloud default parcel height (cm)",
+        default=15,
+        help="Fallback parcel height sent only for Sendcloud shipments without package dimensions.",
+    )
     mb_sendcloud_content_description = fields.Char(
-        string="Parcel content description", default="Handmade goods"
+        string="Sendcloud parcel content description",
+        default="Handmade goods",
+        help="Default goods description sent to Sendcloud for customs and carrier documents.",
     )
     mb_sendcloud_webhook_ready = fields.Boolean(
         string="Signed webhook verified",

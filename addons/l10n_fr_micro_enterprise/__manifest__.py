@@ -7,11 +7,11 @@ economic taxes stored on products. Domestic sales are mapped through a fiscal
 position to Factur-X-compatible franchise exemption taxes, while historical
 accounting documents remain unchanged.
 """,
-    "version": "19.0.4.0.2",
+    "version": "19.0.4.0.3",
     "license": "AGPL-3",
     "category": "Accounting/Localizations",
     "author": "MakersBrain",
-    "depends": ["l10n_fr_account", "account_edi_ubl_cii"],
+    "depends": ["l10n_fr_account", "account_edi_ubl_cii", "account"],
     "data": [
         "security/ir.model.access.csv",
         "wizard/l10n_fr_micro_vat_switch_wizard_views.xml",

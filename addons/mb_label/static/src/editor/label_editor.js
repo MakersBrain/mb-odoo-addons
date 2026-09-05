@@ -1,6 +1,8 @@
 /** @odoo-module **/
 
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, onWillUnmount, useState } from "@odoo/owl";
+import { browser } from "@web/core/browser/browser";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
@@ -32,6 +34,7 @@ export class LabelEditor extends Component {
 
     setup() {
         this.orm = useService("orm");
+        this.dialog = useService("dialog");
         this.notification = useService("notification");
         this.state = useState({
             templates: [], selectedTemplateId: null, selectedElementId: null,
@@ -42,7 +45,22 @@ export class LabelEditor extends Component {
             previewLotId: null, previewValues: {}, previewOptionsLoaded: false,
         });
         this.drag = null;
+        this.pointerListenersActive = false;
+        this.templateDialogClose = null;
+        this.onPointerMove = (event) => this.moveDrag(event);
+        this.onPointerEnd = () => this.cleanupPointerInteraction(true);
+        this.pointerListeners = [
+            ["pointermove", this.onPointerMove],
+            ["pointerup", this.onPointerEnd],
+            ["pointercancel", this.onPointerEnd],
+            ["blur", this.onPointerEnd],
+        ];
         onWillStart(() => this.load());
+        onWillUnmount(() => {
+            this.cleanupPointerInteraction();
+            this.templateDialogClose?.();
+            this.templateDialogClose = null;
+        });
     }
 
     async load(selectedId = null) {
@@ -107,10 +125,42 @@ export class LabelEditor extends Component {
         return matchingMediaId(this.template || {}, this.selectedPrinterProfile);
     }
 
-    selectTemplate(id) {
-        if (this.state.dirty && !window.confirm(_t("Discard unsaved label changes?"))) return;
+    selectTemplate(id, onCancel = () => {}) {
         const template = this.state.templates.find((item) => item.id === Number(id));
-        if (!template) return;
+        if (!template) return false;
+        if (template.id === this.state.selectedTemplateId) return true;
+        if (this.state.dirty) {
+            this.templateDialogClose?.();
+            let confirmed = false;
+            let restored = false;
+            const restoreSelection = () => {
+                if (!confirmed && !restored) {
+                    restored = true;
+                    onCancel();
+                }
+            };
+            const close = this.dialog.add(ConfirmationDialog, {
+                body: _t("Discard unsaved label changes?"),
+                confirm: () => {
+                    confirmed = true;
+                    this.applyTemplateSelection(template);
+                },
+                cancel: restoreSelection,
+                dismiss: restoreSelection,
+            }, {
+                onClose: () => {
+                    restoreSelection();
+                    if (this.templateDialogClose === close) this.templateDialogClose = null;
+                },
+            });
+            this.templateDialogClose = close;
+            return false;
+        }
+        this.applyTemplateSelection(template);
+        return true;
+    }
+
+    applyTemplateSelection(template) {
         this.state.selectedTemplateId = template.id;
         this.state.document = clone(template.document);
         this.state.selectedElementId = null;
@@ -121,7 +171,13 @@ export class LabelEditor extends Component {
         if (this.state.previewProductId) this.refreshPreview();
     }
 
-    onTemplateSelect(event) { this.selectTemplate(event.target.value); }
+    onTemplateSelect(event) {
+        const select = event.target;
+        const previousId = this.state.selectedTemplateId;
+        this.selectTemplate(select.value, () => {
+            if (select.isConnected) select.value = String(previousId);
+        });
+    }
 
     async onPreviewProduct(event) {
         this.state.previewProductId = Number(event.target.value) || null;
@@ -297,6 +353,26 @@ export class LabelEditor extends Component {
         this.changed();
     }
 
+    startPointerInteraction() {
+        if (this.pointerListenersActive) this.cleanupPointerInteraction(true);
+        for (const [type, handler] of this.pointerListeners) {
+            browser.addEventListener(type, handler);
+        }
+        this.pointerListenersActive = true;
+    }
+
+    cleanupPointerInteraction(markChanged = false) {
+        const wasDragging = Boolean(this.drag);
+        if (this.pointerListenersActive) {
+            for (const [type, handler] of this.pointerListeners) {
+                browser.removeEventListener(type, handler);
+            }
+            this.pointerListenersActive = false;
+        }
+        this.drag = null;
+        if (markChanged && wasDragging) this.changed();
+    }
+
     beginDrag(event, id) {
         if (event.button !== 0) return;
         event.preventDefault();
@@ -311,15 +387,7 @@ export class LabelEditor extends Component {
             pxPerMm: canvas.getBoundingClientRect().width / this.template.width_mm,
             positions: this.selectedElements.map((item) => ({ id: item.id, x: item.x, y: item.y })),
         };
-        const move = (moveEvent) => this.moveDrag(moveEvent);
-        const up = () => {
-            window.removeEventListener("pointermove", move);
-            window.removeEventListener("pointerup", up);
-            this.drag = null;
-            this.changed();
-        };
-        window.addEventListener("pointermove", move);
-        window.addEventListener("pointerup", up, { once: true });
+        this.startPointerInteraction();
     }
 
     moveDrag(event) {
@@ -362,15 +430,7 @@ export class LabelEditor extends Component {
             size: Math.max(this.selected.width, this.selected.height),
             pxPerMm: canvas.getBoundingClientRect().width / this.template.width_mm,
         };
-        const move = (moveEvent) => this.moveDrag(moveEvent);
-        const up = () => {
-            window.removeEventListener("pointermove", move);
-            window.removeEventListener("pointerup", up);
-            this.drag = null;
-            this.changed();
-        };
-        window.addEventListener("pointermove", move);
-        window.addEventListener("pointerup", up, { once: true });
+        this.startPointerInteraction();
     }
 
     onCanvasKeydown(event) {

@@ -1239,10 +1239,10 @@ class ShopImportLine(models.Model):
             raise UserError(_("Staging lines can be created only by parsing an uploaded artifact."))
         return super().create(vals_list)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_internal(self):
         if not _is_internal(self):
             raise UserError(_("Staging lines cannot be deleted manually."))
-        return super().unlink()
 
     def write(self, values):
         immutable = {

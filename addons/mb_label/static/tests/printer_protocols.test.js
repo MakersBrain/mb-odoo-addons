@@ -1,8 +1,12 @@
 import { expect, test } from "@odoo/hoot";
+import { mockFetch } from "@odoo/hoot-mock";
 import {
     assertRasterFitsDevice, phomymoRasterFor,
 } from "@mb_label/printer/phomemo_adapter";
 import { BLETransport } from "@mb_label/printer/phomymo/ble";
+import {
+    printerProtocolDebug, setPrinterProtocolDebug,
+} from "@mb_label/printer/phomymo/debug";
 import {
     loadPrinterDefinitions, print as printPhomymo,
 } from "@mb_label/printer/phomymo/printer";
@@ -39,6 +43,34 @@ function memoryStorage() {
         removeItem: (key) => values.delete(key),
     };
 }
+
+test("printer protocol diagnostics are opt-in and redact identifiers and bytes", () => {
+    const calls = [];
+    const originalDebug = console.debug;
+    console.debug = (...args) => calls.push(args);
+    try {
+        printerProtocolDebug("Device Workshop-M110 bytes ff00", {
+            device: "Workshop-M110",
+            bytes: [0xff, 0x00],
+            attempt: 2,
+        });
+        expect(calls.length).toBe(0);
+
+        setPrinterProtocolDebug(true);
+        printerProtocolDebug("Device Workshop-M110 bytes ff00", {
+            device: "Workshop-M110",
+            bytes: [0xff, 0x00],
+            attempt: 2,
+        });
+        expect(calls.length).toBe(1);
+        expect(calls[0][0]).toBe("[Phomymo] protocol-event");
+        expect(calls[0][1]).toEqual({ attempt: 2 });
+        expect(JSON.stringify(calls[0])).not.toMatch(/Workshop-M110|ff00|255/);
+    } finally {
+        setPrinterProtocolDebug(false);
+        console.debug = originalDebug;
+    }
+});
 
 test("printer destination and granted BLE device are reused until another is requested", async () => {
     const storage = memoryStorage();
@@ -104,6 +136,22 @@ test("template filters format money, decimals, defaults, and text in the preview
 });
 
 test("MakersBrain phomymo sends the working M110 command stream", async () => {
+    mockFetch((route) => {
+        expect(route).toBe("/mb_label/static/src/printer/phomymo/printers.json");
+        return {
+            printers: [{
+                id: "m110",
+                name: "M110 / M120",
+                protocol: "m110",
+                widthBytes: 48,
+                dpi: 203,
+                alignment: "center",
+                rotated: false,
+                namePatterns: ["M110", "M120"],
+                builtin: true,
+            }],
+        };
+    });
     await loadPrinterDefinitions();
     const image = whiteImage(8, 2);
     blackPixel(image, 0, 0);
@@ -128,9 +176,11 @@ test("MakersBrain phomymo sends the working M110 command stream", async () => {
 test("MakersBrain Phomemo definitions cover every supported protocol family", () => {
     const devices = allDevices();
     expect(devices.length).toBe(18);
-    expect(new Set(devices.map((device) => device.protocol))).toEqual(new Set([
+    const actualProtocols = [...new Set(devices.map((device) => device.protocol))].sort();
+    const supportedProtocols = [
         "m-series", "m02", "m04", "m110", "d-series", "p12", "tspl",
-    ]));
+    ].sort();
+    expect(actualProtocols).toEqual(supportedProtocols);
     expect(detectDevice("M110").id).toBe("m110");
     expect(detectDevice("D110").id).toBe("d-series");
     expect(resolveDevice("auto", "Q199G4130440005").id).toBe("m110");

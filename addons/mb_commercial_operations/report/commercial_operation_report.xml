@@ -11,7 +11,6 @@
     <field name="group_ids" eval="[(4, ref('mb_commercial_operations.group_commercial_operations_user'))]"/>
     <field name="print_report_name">'Commercial planning - %s' % object.name</field>
   </record>
-
   <record id="action_report_commercial_operation_outcome" model="ir.actions.report">
     <field name="name">Commercial Operation Outcome Pack</field>
     <field name="model">mb.commercial.operation</field>
@@ -21,7 +20,6 @@
     <field name="group_ids" eval="[(4, ref('mb_commercial_operations.group_commercial_operations_user'))]"/>
     <field name="print_report_name">'Commercial outcome - %s' % object.name</field>
   </record>
-
   <record id="action_report_commercial_snapshot" model="ir.actions.report">
     <field name="name">Frozen Commercial Planning Evidence</field>
     <field name="model">mb.commercial.report.snapshot</field>
@@ -30,7 +28,6 @@
     <field name="report_file">mb_commercial_operations.report_commercial_snapshot</field>
     <field name="group_ids" eval="[(4, ref('mb_commercial_operations.group_commercial_operations_user'))]"/>
   </record>
-
   <template id="report_commercial_operation">
     <t t-call="web.html_container">
       <t t-foreach="docs" t-as="operation">
@@ -39,26 +36,124 @@
             <div t-if="operation.state in ('draft', 'quoted')" class="alert alert-warning text-center">
               <strong>DRAFT / SIMULATION — NOT AN APPROVED BASELINE</strong>
             </div>
-            <h2><span t-field="operation.name"/></h2>
+            <h2>
+              <span t-field="operation.name"/>
+            </h2>
             <p>
-              <strong>Company:</strong> <span t-field="operation.company_id"/>
-              · <strong>Type / state:</strong> <span t-field="operation.operation_type"/> / <span t-field="operation.state"/>
-              · <strong>Currency:</strong> <span t-field="operation.currency_id"/>
-              · <strong>Venue:</strong> <span t-field="operation.partner_id"/>
-              · <strong>Period:</strong> <span t-field="operation.planned_start"/> – <span t-field="operation.planned_end"/>
-              · <strong>Revision:</strong> <span t-field="operation.planning_revision"/>
+              <strong>Company:</strong>
+              <span t-field="operation.company_id"/>
+              · <strong>Type / state:</strong>
+              <span t-field="operation.operation_type"/> / <span t-field="operation.state"/>
+              · <strong>Currency:</strong>
+              <span t-field="operation.currency_id"/>
+              · <strong>Venue:</strong>
+              <span t-field="operation.partner_id"/>
+              · <strong>Period:</strong>
+              <span t-field="operation.planned_start"/> – <span t-field="operation.planned_end"/>
+              · <strong>Revision:</strong>
+              <span t-field="operation.planning_revision"/>
             </p>
-            <p><strong>Generated:</strong> <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M %Z')"/> · <strong>By:</strong> <span t-field="user.name"/></p>
+            <p>
+              <strong>Generated:</strong>
+              <span t-out="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M %Z')"/> · <strong>By:</strong>
+              <span t-field="user.name"/>
+            </p>
             <h3>Schedule and responsibilities</h3>
-            <table class="table table-sm table-bordered"><tbody>
-              <tr><th>Expected arrival</th><td><span t-field="operation.expected_arrival"/></td><th>Setup</th><td><span t-field="operation.setup_duration_hours"/> h</td></tr>
-              <tr><th>Service / public hours</th><td colspan="3"><span t-field="operation.service_start"/> – <span t-field="operation.service_end"/></td></tr>
-              <tr><th>Teardown</th><td><span t-field="operation.teardown_duration_hours"/> h</td><th>Expected return</th><td><span t-field="operation.expected_return"/></td></tr>
-              <tr><th>Responsible</th><td colspan="3"><span t-field="operation.user_ids"/></td></tr>
-              <tr><th>Application deadline</th><td><span t-field="operation.application_deadline"/></td><th>Payment deadline</th><td><span t-field="operation.payment_deadline"/></td></tr>
-            </tbody></table>
+            <table class="table table-sm table-bordered">
+              <tbody>
+                <tr>
+                  <th>Expected arrival</th>
+                  <td>
+                    <span t-field="operation.expected_arrival"/>
+                  </td>
+                  <th>Setup</th>
+                  <td>
+                    <span t-field="operation.setup_duration_hours"/> h</td>
+                </tr>
+                <tr>
+                  <th>Service / public hours</th>
+                  <td colspan="3">
+                    <span t-field="operation.service_start"/> – <span t-field="operation.service_end"/>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Teardown</th>
+                  <td>
+                    <span t-field="operation.teardown_duration_hours"/> h</td>
+                  <th>Expected return</th>
+                  <td>
+                    <span t-field="operation.expected_return"/>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Responsible</th>
+                  <td colspan="3">
+                    <span t-field="operation.user_ids"/>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Application deadline</th>
+                  <td>
+                    <span t-field="operation.application_deadline"/>
+                  </td>
+                  <th>Payment deadline</th>
+                  <td>
+                    <span t-field="operation.payment_deadline"/>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             <h3>Travel</h3>
-            <t t-if="operation.travel_estimate_id"><table class="table table-sm table-bordered"><tbody><tr><th>Quote / revision</th><td><span t-field="operation.travel_estimate_id"/> / <span t-field="operation.travel_estimate_id.revision"/></td><th>State</th><td><span t-field="operation.travel_estimate_id.state"/></td></tr><tr><th>Route</th><td><span t-field="operation.travel_estimate_id.origin_partner_id"/> → <span t-field="operation.travel_estimate_id.destination_partner_id"/></td><th>Round trip</th><td><span t-field="operation.travel_estimate_id.round_trip"/></td></tr><tr><th>Distance</th><td><span t-field="operation.travel_estimate_id.distance_km"/> km</td><th>Route duration</th><td><span t-field="operation.travel_estimate_id.duration_hours"/> h</td></tr><tr><th>Tolls / fuel / driver</th><td colspan="3"><span t-field="operation.travel_estimate_id.toll_cost"/> / <span t-field="operation.travel_estimate_id.fuel_cost"/> / <span t-field="operation.travel_estimate_id.driver_cost"/></td></tr><tr><th>Operating cost</th><td><span t-field="operation.travel_estimate_id.total_operating_cost"/></td><th>Warning</th><td><span t-field="operation.travel_estimate_id.warning_text"/></td></tr></tbody></table></t>
+            <t t-if="operation.travel_estimate_id">
+              <table class="table table-sm table-bordered">
+                <tbody>
+                  <tr>
+                    <th>Quote / revision</th>
+                    <td>
+                      <span t-field="operation.travel_estimate_id"/> / <span t-field="operation.travel_estimate_id.revision"/>
+                    </td>
+                    <th>State</th>
+                    <td>
+                      <span t-field="operation.travel_estimate_id.state"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Route</th>
+                    <td>
+                      <span t-field="operation.travel_estimate_id.origin_partner_id"/> → <span t-field="operation.travel_estimate_id.destination_partner_id"/>
+                    </td>
+                    <th>Round trip</th>
+                    <td>
+                      <span t-field="operation.travel_estimate_id.round_trip"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Distance</th>
+                    <td>
+                      <span t-field="operation.travel_estimate_id.distance_km"/> km</td>
+                    <th>Route duration</th>
+                    <td>
+                      <span t-field="operation.travel_estimate_id.duration_hours"/> h</td>
+                  </tr>
+                  <tr>
+                    <th>Tolls / fuel / driver</th>
+                    <td colspan="3">
+                      <span t-field="operation.travel_estimate_id.toll_cost"/> / <span t-field="operation.travel_estimate_id.fuel_cost"/> / <span t-field="operation.travel_estimate_id.driver_cost"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Operating cost</th>
+                    <td>
+                      <span t-field="operation.travel_estimate_id.total_operating_cost"/>
+                    </td>
+                    <th>Warning</th>
+                    <td>
+                      <span t-field="operation.travel_estimate_id.warning_text"/>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </t>
             <p t-else="">No travel quote selected; any manual travel assumption is shown in fixed costs.</p>
             <t t-set="scenario" t-value="operation.primary_scenario_id"/>
             <div t-if="not scenario" class="alert alert-info">Cost plan only — no profitability scenario selected.</div>
@@ -66,70 +161,318 @@
               <h3>Profitability summary</h3>
               <table class="table table-sm table-bordered">
                 <tbody>
-                  <tr><th>Planned units / baskets</th><td class="text-end"><span t-field="scenario.planned_units"/></td></tr>
-                  <tr><th>Sales excluding VAT</th><td class="text-end"><span t-field="scenario.sales_revenue_excl_vat"/></td></tr>
-                  <tr><th>Customer receipts including VAT</th><td class="text-end"><span t-field="scenario.customer_receipts_incl_vat"/></td></tr>
-                  <tr><th>Fixed cost</th><td class="text-end"><span t-field="scenario.fixed_event_cost"/></td></tr>
-                  <tr><th>Variable cost</th><td class="text-end"><span t-field="scenario.total_variable_cost"/></td></tr>
-                  <tr><th>Break-even units / baskets</th><td class="text-end"><span t-field="scenario.break_even_units"/></td></tr>
-                  <tr><th>Break-even sales excluding VAT</th><td class="text-end"><span t-field="scenario.break_even_sales_excl_vat"/></td></tr>
-                  <tr><th>Break-even receipts including VAT</th><td class="text-end"><span t-field="scenario.break_even_customer_receipts_incl_vat"/></td></tr>
-                  <tr><th>Projected margin</th><td class="text-end"><span t-field="scenario.projected_margin"/></td></tr>
-                  <tr><th>Work and travel hours</th><td class="text-end"><span t-field="scenario.effort_hours"/></td></tr>
-                  <tr><th>Margin per hour</th><td class="text-end"><span t-field="scenario.margin_per_effort_hour"/></td></tr>
-                  <tr t-if="scenario.travel_distance_known"><th>Margin per kilometre</th><td class="text-end"><span t-field="scenario.margin_per_travel_km"/></td></tr>
-                  <tr><th>Verdict</th><td class="text-end"><span t-field="scenario.recommendation"/> — <span t-field="scenario.recommendation_note"/></td></tr>
+                  <tr>
+                    <th>Planned units / baskets</th>
+                    <td class="text-end">
+                      <span t-field="scenario.planned_units"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Sales excluding VAT</th>
+                    <td class="text-end">
+                      <span t-field="scenario.sales_revenue_excl_vat"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Customer receipts including VAT</th>
+                    <td class="text-end">
+                      <span t-field="scenario.customer_receipts_incl_vat"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Fixed cost</th>
+                    <td class="text-end">
+                      <span t-field="scenario.fixed_event_cost"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Variable cost</th>
+                    <td class="text-end">
+                      <span t-field="scenario.total_variable_cost"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Break-even units / baskets</th>
+                    <td class="text-end">
+                      <span t-field="scenario.break_even_units"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Break-even sales excluding VAT</th>
+                    <td class="text-end">
+                      <span t-field="scenario.break_even_sales_excl_vat"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Break-even receipts including VAT</th>
+                    <td class="text-end">
+                      <span t-field="scenario.break_even_customer_receipts_incl_vat"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Projected margin</th>
+                    <td class="text-end">
+                      <span t-field="scenario.projected_margin"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Work and travel hours</th>
+                    <td class="text-end">
+                      <span t-field="scenario.effort_hours"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Margin per hour</th>
+                    <td class="text-end">
+                      <span t-field="scenario.margin_per_effort_hour"/>
+                    </td>
+                  </tr>
+                  <tr t-if="scenario.travel_distance_known">
+                    <th>Margin per kilometre</th>
+                    <td class="text-end">
+                      <span t-field="scenario.margin_per_travel_km"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Verdict</th>
+                    <td class="text-end">
+                      <span t-field="scenario.recommendation"/> — <span t-field="scenario.recommendation_note"/>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
               <h3>Products / sales assumptions</h3>
               <table class="table table-sm table-bordered">
-                <thead><tr><th>Product / basket</th><th>Qty</th><th>Price excl. VAT</th><th>Price incl. VAT</th><th>Channel fee</th><th>Turnover levies</th><th>Unit contribution</th></tr></thead>
+                <thead>
+                  <tr>
+                    <th>Product / basket</th>
+                    <th>Qty</th>
+                    <th>Price excl. VAT</th>
+                    <th>Price incl. VAT</th>
+                    <th>Channel fee</th>
+                    <th>Turnover levies</th>
+                    <th>Unit contribution</th>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr t-foreach="scenario.line_ids" t-as="line">
-                    <td><span t-field="line.product_id" t-if="line.product_id"/><span t-else="">Average basket</span></td>
-                    <td class="text-end"><span t-field="line.expected_sold_qty"/></td>
-                    <td class="text-end"><span t-field="line.sale_price_excluded_tax"/></td>
-                    <td class="text-end"><span t-field="line.customer_price_incl_vat"/></td>
-                    <td class="text-end"><span t-field="line.channel_fee_amount"/> (<span t-field="line.channel_fee_rate"/>%)</td>
-                    <td class="text-end"><span t-field="line.turnover_levy_amount"/> (<span t-field="line.turnover_levy_rate"/>%)</td>
-                    <td class="text-end"><span t-field="line.unit_contribution"/></td>
+                    <td>
+                      <span t-field="line.product_id" t-if="line.product_id"/>
+                      <span t-else="">Average basket</span>
+                    </td>
+                    <td class="text-end">
+                      <span t-field="line.expected_sold_qty"/>
+                    </td>
+                    <td class="text-end">
+                      <span t-field="line.sale_price_excluded_tax"/>
+                    </td>
+                    <td class="text-end">
+                      <span t-field="line.customer_price_incl_vat"/>
+                    </td>
+                    <td class="text-end">
+                      <span t-field="line.channel_fee_amount"/> (<span t-field="line.channel_fee_rate"/>%)</td>
+                    <td class="text-end">
+                      <span t-field="line.turnover_levy_amount"/> (<span t-field="line.turnover_levy_rate"/>%)</td>
+                    <td class="text-end">
+                      <span t-field="line.unit_contribution"/>
+                    </td>
                   </tr>
                 </tbody>
               </table>
               <h3>Fixed costs</h3>
               <table class="table table-sm table-bordered">
-                <thead><tr><th>Assumption</th><th>Category</th><th>Basis</th><th>Source / date</th><th>Amount</th></tr></thead>
-                <tbody><tr t-foreach="scenario.cost_line_ids" t-as="cost"><td><span t-field="cost.name"/></td><td><span t-field="cost.category"/></td><td><span t-field="cost.calculation"/> · <span t-field="cost.quantity"/> × <span t-field="cost.rate"/></td><td><span t-field="cost.source_kind"/> <span t-field="cost.source_reference"/> · <span t-field="cost.assumption_date"/></td><td class="text-end"><span t-field="cost.planned_amount"/></td></tr></tbody>
+                <thead>
+                  <tr>
+                    <th>Assumption</th>
+                    <th>Category</th>
+                    <th>Basis</th>
+                    <th>Source / date</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr t-foreach="scenario.cost_line_ids" t-as="cost">
+                    <td>
+                      <span t-field="cost.name"/>
+                    </td>
+                    <td>
+                      <span t-field="cost.category"/>
+                    </td>
+                    <td>
+                      <span t-field="cost.calculation"/> · <span t-field="cost.quantity"/> × <span t-field="cost.rate"/>
+                    </td>
+                    <td>
+                      <span t-field="cost.source_kind"/>
+                      <span t-field="cost.source_reference"/> · <span t-field="cost.assumption_date"/>
+                    </td>
+                    <td class="text-end">
+                      <span t-field="cost.planned_amount"/>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </t>
             <h3>Stock and supply</h3>
             <table class="table table-sm table-bordered">
-              <thead><tr><th>Target</th><th>Required</th><th>Expected sold</th><th>Readiness</th><th>Note</th></tr></thead>
-              <tbody><tr t-foreach="operation.stock_plan_line_ids" t-as="target"><td><span t-field="target.product_id" t-if="target.product_id"/><span t-field="target.category_id" t-else=""/></td><td><span t-field="target.required_qty"/></td><td><span t-field="target.expected_sold_qty"/></td><td><span t-field="target.readiness"/></td><td><span t-field="target.blocking_note"/></td></tr></tbody>
+              <thead>
+                <tr>
+                  <th>Target</th>
+                  <th>Required</th>
+                  <th>Expected sold</th>
+                  <th>Readiness</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr t-foreach="operation.stock_plan_line_ids" t-as="target">
+                  <td>
+                    <span t-field="target.product_id" t-if="target.product_id"/>
+                    <span t-field="target.category_id" t-else=""/>
+                  </td>
+                  <td>
+                    <span t-field="target.required_qty"/>
+                  </td>
+                  <td>
+                    <span t-field="target.expected_sold_qty"/>
+                  </td>
+                  <td>
+                    <span t-field="target.readiness"/>
+                  </td>
+                  <td>
+                    <span t-field="target.blocking_note"/>
+                  </td>
+                </tr>
+              </tbody>
             </table>
             <div name="commercial_bridge_report_sections"/>
             <h3>Checklist and warnings</h3>
-            <table class="table table-sm table-bordered" t-if="operation.activity_ids"><thead><tr><th>Activity</th><th>Responsible</th><th>Deadline</th></tr></thead><tbody><tr t-foreach="operation.activity_ids" t-as="activity"><td><span t-field="activity.summary"/></td><td><span t-field="activity.user_id"/></td><td><span t-field="activity.date_deadline"/></td></tr></tbody></table>
-            <pre t-if="operation.planning_warning_summary" t-esc="operation.planning_warning_summary" class="alert alert-warning"/>
+            <table class="table table-sm table-bordered" t-if="operation.activity_ids">
+              <thead>
+                <tr>
+                  <th>Activity</th>
+                  <th>Responsible</th>
+                  <th>Deadline</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr t-foreach="operation.activity_ids" t-as="activity">
+                  <td>
+                    <span t-field="activity.summary"/>
+                  </td>
+                  <td>
+                    <span t-field="activity.user_id"/>
+                  </td>
+                  <td>
+                    <span t-field="activity.date_deadline"/>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <pre t-if="operation.planning_warning_summary" t-out="operation.planning_warning_summary" class="alert alert-warning"/>
             <p t-else="" class="text-success">No planning warning.</p>
             <h3>Approval and audit</h3>
-            <p><strong>Scenario:</strong> <span t-field="scenario.name" t-if="scenario"/> · <strong>Scenario state:</strong> <span t-field="scenario.state" t-if="scenario"/> · <strong>Approved by:</strong> <span t-field="operation.planning_approved_by_id"/> · <strong>Approved at:</strong> <span t-field="operation.planning_approved_at"/></p>
+            <p>
+              <strong>Scenario:</strong>
+              <span t-field="scenario.name" t-if="scenario"/> · <strong>Scenario state:</strong>
+              <span t-field="scenario.state" t-if="scenario"/> · <strong>Approved by:</strong>
+              <span t-field="operation.planning_approved_by_id"/> · <strong>Approved at:</strong>
+              <span t-field="operation.planning_approved_at"/>
+            </p>
             <t t-if="report_kind == 'outcome'">
               <h3>Outcome — operation-linked native evidence only</h3>
-              <table class="table table-sm table-bordered"><tbody>
-                <tr><th>Planned period</th><td><span t-field="operation.planned_start"/> – <span t-field="operation.planned_end"/></td><th>Actual period</th><td><span t-field="operation.actual_start"/> – <span t-field="operation.actual_end"/></td></tr>
-                <tr><th>Planned work hours</th><td class="text-end"><span t-field="operation.planned_work_hours"/></td><th>Actual work hours</th><td class="text-end"><span t-field="operation.actual_work_hours"/></td></tr>
-                <tr><th>Documents complete</th><td><span t-field="operation.documents_complete"/></td><th>Accounting reconciled</th><td><span t-field="operation.accounting_reconciled"/></td></tr>
-                <tr><th>Planned revenue</th><td class="text-end"><span t-field="operation.planning_sales_excl_vat"/></td><th>Actual revenue</th><td class="text-end"><span t-field="operation.actual_revenue"/></td></tr>
-                <tr><th>Planned cost</th><td class="text-end"><span t-field="operation.planned_cost"/></td><th>Actual cost</th><td class="text-end"><span t-field="operation.actual_cost"/></td></tr>
-                <tr><th>Planned margin</th><td class="text-end"><span t-field="operation.planned_margin"/></td><th>Actual margin</th><td class="text-end"><span t-field="operation.actual_margin"/></td></tr>
-                <tr><th>Margin variance</th><td class="text-end" t-esc="operation.actual_margin - operation.planned_margin"/><th>Actual sales versus break-even</th><td class="text-end" t-esc="operation.actual_revenue - operation.planning_break_even_sales"/></tr>
-              </tbody></table>
+              <table class="table table-sm table-bordered">
+                <tbody>
+                  <tr>
+                    <th>Planned period</th>
+                    <td>
+                      <span t-field="operation.planned_start"/> – <span t-field="operation.planned_end"/>
+                    </td>
+                    <th>Actual period</th>
+                    <td>
+                      <span t-field="operation.actual_start"/> – <span t-field="operation.actual_end"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Planned work hours</th>
+                    <td class="text-end">
+                      <span t-field="operation.planned_work_hours"/>
+                    </td>
+                    <th>Actual work hours</th>
+                    <td class="text-end">
+                      <span t-field="operation.actual_work_hours"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Documents complete</th>
+                    <td>
+                      <span t-field="operation.documents_complete"/>
+                    </td>
+                    <th>Accounting reconciled</th>
+                    <td>
+                      <span t-field="operation.accounting_reconciled"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Planned revenue</th>
+                    <td class="text-end">
+                      <span t-field="operation.planning_sales_excl_vat"/>
+                    </td>
+                    <th>Actual revenue</th>
+                    <td class="text-end">
+                      <span t-field="operation.actual_revenue"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Planned cost</th>
+                    <td class="text-end">
+                      <span t-field="operation.planned_cost"/>
+                    </td>
+                    <th>Actual cost</th>
+                    <td class="text-end">
+                      <span t-field="operation.actual_cost"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Planned margin</th>
+                    <td class="text-end">
+                      <span t-field="operation.planned_margin"/>
+                    </td>
+                    <th>Actual margin</th>
+                    <td class="text-end">
+                      <span t-field="operation.actual_margin"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Margin variance</th>
+                    <td class="text-end" t-out="operation.actual_margin - operation.planned_margin"/>
+                    <th>Actual sales versus break-even</th>
+                    <td class="text-end" t-out="operation.actual_revenue - operation.planning_break_even_sales"/>
+                  </tr>
+                </tbody>
+              </table>
               <h4>Native evidence drill-down</h4>
               <t t-set="evidence" t-value="operation._get_operation_profitability_report_items()"/>
               <table class="table table-sm table-bordered" t-if="evidence">
-                <thead><tr><th>Date</th><th>Source</th><th>Model / ID</th><th>Component</th><th>Amount</th></tr></thead>
-                <tbody><tr t-foreach="evidence" t-as="item"><td t-esc="item['date']"/><td t-esc="item['source']"/><td><span t-esc="item['model']"/> / <span t-esc="item['res_id']"/></td><td t-esc="item['component']"/><td class="text-end" t-esc="item['amount']"/></tr></tbody>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Source</th>
+                    <th>Model / ID</th>
+                    <th>Component</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr t-foreach="evidence" t-as="item">
+                    <td t-out="item['date']"/>
+                    <td t-out="item['source']"/>
+                    <td>
+                      <span t-out="item['model']"/> / <span t-out="item['res_id']"/>
+                    </td>
+                    <td t-out="item['component']"/>
+                    <td class="text-end" t-out="item['amount']"/>
+                  </tr>
+                </tbody>
               </table>
               <p t-else="">No posted operation-linked evidence is available yet.</p>
             </t>
@@ -138,35 +481,70 @@
       </t>
     </t>
   </template>
-
   <template id="report_commercial_snapshot">
     <t t-call="web.html_container">
       <t t-foreach="docs" t-as="snapshot">
         <t t-call="web.external_layout">
           <div class="page">
-            <h2><span t-field="snapshot.name"/></h2>
-            <p><strong>Generated:</strong> <span t-field="snapshot.generated_at"/> · <strong>By:</strong> <span t-field="snapshot.generated_by_id"/></p>
-            <p><strong>Input SHA-256:</strong> <code t-esc="snapshot.input_digest"/></p>
+            <h2>
+              <span t-field="snapshot.name"/>
+            </h2>
+            <p>
+              <strong>Generated:</strong>
+              <span t-field="snapshot.generated_at"/> · <strong>By:</strong>
+              <span t-field="snapshot.generated_by_id"/>
+            </p>
+            <p>
+              <strong>Input SHA-256:</strong>
+              <code t-out="snapshot.input_digest"/>
+            </p>
             <h3>Frozen baseline</h3>
-            <p><strong>Operation:</strong> <span t-esc="snapshot.payload['operation']['name']"/> · <strong>Revision:</strong> <span t-esc="snapshot.payload['operation']['revision']"/></p>
+            <p>
+              <strong>Operation:</strong>
+              <span t-out="snapshot.payload['operation']['name']"/> · <strong>Revision:</strong>
+              <span t-out="snapshot.payload['operation']['revision']"/>
+            </p>
             <t t-if="snapshot.payload.get('scenario')">
-              <table class="table table-sm table-bordered"><tbody>
-                <tr><th>Scenario</th><td t-esc="snapshot.payload['scenario']['name']"/></tr>
-                <tr><th>Sales excluding VAT</th><td t-esc="snapshot.payload['scenario']['sales_excl_vat']"/></tr>
-                <tr><th>Customer receipts including VAT</th><td t-esc="snapshot.payload['scenario']['receipts_incl_vat']"/></tr>
-                <tr><th>Fixed cost</th><td t-esc="snapshot.payload['scenario']['fixed_cost']"/></tr>
-                <tr><th>Variable cost</th><td t-esc="snapshot.payload['scenario']['variable_cost']"/></tr>
-                <tr><th>Projected margin</th><td t-esc="snapshot.payload['scenario']['projected_margin']"/></tr>
-              </tbody></table>
+              <table class="table table-sm table-bordered">
+                <tbody>
+                  <tr>
+                    <th>Scenario</th>
+                    <td t-out="snapshot.payload['scenario']['name']"/>
+                  </tr>
+                  <tr>
+                    <th>Sales excluding VAT</th>
+                    <td t-out="snapshot.payload['scenario']['sales_excl_vat']"/>
+                  </tr>
+                  <tr>
+                    <th>Customer receipts including VAT</th>
+                    <td t-out="snapshot.payload['scenario']['receipts_incl_vat']"/>
+                  </tr>
+                  <tr>
+                    <th>Fixed cost</th>
+                    <td t-out="snapshot.payload['scenario']['fixed_cost']"/>
+                  </tr>
+                  <tr>
+                    <th>Variable cost</th>
+                    <td t-out="snapshot.payload['scenario']['variable_cost']"/>
+                  </tr>
+                  <tr>
+                    <th>Projected margin</th>
+                    <td t-out="snapshot.payload['scenario']['projected_margin']"/>
+                  </tr>
+                </tbody>
+              </table>
             </t>
             <h3>Warnings at approval</h3>
-            <ul><li t-foreach="snapshot.payload.get('warnings', [])" t-as="warning"><strong t-esc="warning['severity'].upper()"/> — <span t-esc="warning['message']"/></li></ul>
+            <ul>
+              <li t-foreach="snapshot.payload.get('warnings', [])" t-as="warning">
+                <strong t-out="warning['severity'].upper()"/> — <span t-out="warning['message']"/>
+              </li>
+            </ul>
           </div>
         </t>
       </t>
     </t>
   </template>
-
   <template id="operation_outcome">
     <t t-call="mb_commercial_operations.report_commercial_operation"/>
   </template>

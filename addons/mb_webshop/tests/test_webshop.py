@@ -4,7 +4,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 from odoo import fields
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tests import HttpCase, TransactionCase, new_test_user, tagged
 
 from odoo.addons.account_payment.tests.common import AccountPaymentCommon
@@ -362,6 +362,68 @@ class TestWebshopPack(TransactionCase):
         competing_move._action_assign()
         self.assertNotEqual(competing_move.state, "assigned")
         self.assertEqual(competing_move.quantity, 0)
+
+    def test_stock_manager_cannot_read_other_company_cart_hold(self):
+        product = self.env["product.product"].create(
+            {
+                "name": "Company-scoped hold product",
+                "type": "consu",
+                "is_storable": True,
+            }
+        )
+        own_partner = self.env["res.partner"].create({"name": "Own cart customer"})
+        own_order = self.env["sale.order"].create({"partner_id": own_partner.id})
+        own_hold = (
+            self.env["mb.webshop.stock.hold"]
+            .sudo()
+            .create(
+                {
+                    "order_id": own_order.id,
+                    "product_id": product.id,
+                    "quantity": 1,
+                    "expires_at": fields.Datetime.now() + timedelta(minutes=15),
+                }
+            )
+        )
+        other_company = self.env["res.company"].create({"name": "Other Webshop Workshop"})
+        other_partner = (
+            self.env["res.partner"]
+            .with_company(other_company)
+            .create(
+                {
+                    "name": "Other cart customer",
+                    "company_id": other_company.id,
+                }
+            )
+        )
+        other_order = (
+            self.env["sale.order"]
+            .with_company(other_company)
+            .create({"partner_id": other_partner.id, "company_id": other_company.id})
+        )
+        other_hold = (
+            self.env["mb.webshop.stock.hold"]
+            .sudo()
+            .create(
+                {
+                    "order_id": other_order.id,
+                    "product_id": product.id,
+                    "quantity": 1,
+                    "expires_at": fields.Datetime.now() + timedelta(minutes=15),
+                }
+            )
+        )
+        manager = new_test_user(
+            self.env,
+            login="single-company-stock-hold-manager",
+            groups="stock.group_stock_manager",
+            company_id=self.company.id,
+        )
+        holds = self.env["mb.webshop.stock.hold"].with_user(manager)
+
+        self.assertEqual(holds.search([("id", "in", (own_hold.id, other_hold.id))]), own_hold)
+        with self.assertRaises(AccessError):
+            other_hold.with_user(manager).read(["state"])
 
     def test_second_cart_cannot_hold_the_last_piece_and_release_makes_it_available(self):
         product, warehouse = self._one_piece_product()

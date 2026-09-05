@@ -11,6 +11,7 @@ access_urssaf_acre_rule_user,URSSAF ACRE rule user,model_l10n_fr_micro_urssaf_ac
 access_urssaf_acre_rule_manager,URSSAF ACRE rule manager,model_l10n_fr_micro_urssaf_acre_rule,account.group_account_manager,1,1,1,1
 access_urssaf_threshold_user,URSSAF threshold user,model_l10n_fr_micro_urssaf_threshold,account.group_account_user,1,0,0,0
 access_urssaf_threshold_manager,URSSAF threshold manager,model_l10n_fr_micro_urssaf_threshold,account.group_account_manager,1,1,1,1
+access_urssaf_invariant_lock_system,URSSAF invariant lock system,model_l10n_fr_micro_urssaf_invariant_lock,base.group_system,1,0,0,0
 access_urssaf_annual_user,URSSAF annual user,model_l10n_fr_micro_urssaf_annual,account.group_account_user,1,1,0,0
 access_urssaf_annual_manager,URSSAF annual manager,model_l10n_fr_micro_urssaf_annual,account.group_account_manager,1,1,1,1
 access_urssaf_setup_manager,URSSAF setup wizard manager,model_l10n_fr_micro_urssaf_setup_wizard,account.group_account_manager,1,1,1,1

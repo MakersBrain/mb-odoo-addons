@@ -1,50 +1,140 @@
 .o_mb_label_editor {
-	min-width: 0;
-	overflow: hidden;
-	.o_mb_label_toolbar { width: 100%; overflow-x: auto; flex: 0 0 auto; }
-	.o_mb_label_workspace { background: #e9ecef; }
-	.o_mb_label_canvas {
-		position: relative;
-		background-color: #fff;
-		background-image: linear-gradient(#0001 1px, transparent 1px), linear-gradient(90deg, #0001 1px, transparent 1px);
-		background-size: .5mm .5mm;
-		box-shadow: 0 4px 24px #0004;
-		transform-origin: top left;
-		/* Element geometry is authored in mm; scale the complete physical canvas. */
-		zoom: var(--mb-zoom);
-		&.round { border-radius: 50%; overflow: hidden; }
-	}
-	.o_mb_label_element {
-		position: absolute;
-		overflow: hidden;
-		white-space: pre-wrap;
-		font-size: 2.5mm;
-		line-height: 1.05;
-		cursor: move;
-		user-select: none;
-		&.selected { outline: .35mm solid #714bff; outline-offset: .25mm; }
-		img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(1) contrast(2); }
-	}
-	.o_mb_resize_handle {
-		position: absolute; right: -.6mm; bottom: -.6mm; width: 1.2mm; height: 1.2mm;
-		background: #714bff; border: .2mm solid white; cursor: nwse-resize;
-	}
-	.o_mb_type_qr, .o_mb_type_barcode { border: .2mm solid #111; display: grid; place-items: center; font-size: 6mm; small { font-size: 1.2mm; } }
-	.o_mb_type_rect, .o_mb_type_ellipse, .o_mb_type_triangle { border: .25mm solid currentColor; }
-	.o_mb_type_ellipse { border-radius: 50%; }
-	.o_mb_type_triangle { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-	.o_mb_type_line { border-top: .25mm solid currentColor; }
-	.o_mb_type_rect.filled, .o_mb_type_ellipse.filled, .o_mb_type_triangle.filled { background-color: currentColor !important; }
-	.tint-75 { background-image: radial-gradient(currentColor 65%, transparent 70%); background-size: .25mm .25mm; }
-	.tint-50 { background-image: repeating-conic-gradient(currentColor 0 25%, transparent 0 50%); background-size: .25mm .25mm; }
-	.tint-25 { background-image: radial-gradient(currentColor 30%, transparent 35%); background-size: .25mm .25mm; }
-	.o_mb_label_properties { width: 340px; min-width: 340px; }
-	@media (max-width: 767.98px) {
-		.o_mb_label_body { flex-direction: column; overflow: auto !important; }
-		.o_mb_label_workspace { min-width: 0; min-height: 55vh; flex: 0 0 55vh; }
-		.o_mb_label_properties {
-			width: 100%; min-width: 0; min-height: 35vh;
-			border-left: 0 !important; border-top: 1px solid #dee2e6;
-		}
-	}
+    min-width: 0;
+    overflow: hidden;
+
+    .o_mb_label_toolbar {
+        width: 100%;
+        overflow-x: auto;
+        flex: 0 0 auto;
+    }
+
+    .o_mb_label_workspace {
+        background: #e9ecef;
+    }
+
+    .o_mb_label_canvas {
+        position: relative;
+        background-color: #fff;
+        background-image: linear-gradient(#0001 1px, transparent 1px), linear-gradient(90deg, #0001 1px, transparent 1px);
+        background-size: .5mm .5mm;
+        box-shadow: 0 4px 24px #0004;
+        transform-origin: top left;
+        /* Element geometry is authored in mm; scale the complete physical canvas. */
+        zoom: var(--mb-zoom);
+
+        &.round {
+            border-radius: 50%;
+            overflow: hidden;
+        }
+    }
+
+    .o_mb_label_element {
+        position: absolute;
+        overflow: hidden;
+        white-space: pre-wrap;
+        font-size: 2.5mm;
+        line-height: 1.05;
+        cursor: move;
+        user-select: none;
+
+        &.selected {
+            outline: .35mm solid #714bff;
+            outline-offset: .25mm;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: grayscale(1) contrast(2);
+        }
+    }
+
+    .o_mb_resize_handle {
+        position: absolute;
+        right: -.6mm;
+        bottom: -.6mm;
+        width: 1.2mm;
+        height: 1.2mm;
+        background: #714bff;
+        border: .2mm solid white;
+        cursor: nwse-resize;
+    }
+
+    .o_mb_type_qr,
+    .o_mb_type_barcode {
+        border: .2mm solid #111;
+        display: grid;
+        place-items: center;
+        font-size: 6mm;
+
+        small {
+            font-size: 1.2mm;
+        }
+    }
+
+    .o_mb_type_rect,
+    .o_mb_type_ellipse,
+    .o_mb_type_triangle {
+        border: .25mm solid currentColor;
+    }
+
+    .o_mb_type_ellipse {
+        border-radius: 50%;
+    }
+
+    .o_mb_type_triangle {
+        clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+
+    .o_mb_type_line {
+        border-top: .25mm solid currentColor;
+    }
+
+    .o_mb_type_rect.filled,
+    .o_mb_type_ellipse.filled,
+    .o_mb_type_triangle.filled {
+        background-color: currentColor !important;
+    }
+
+    .tint-75 {
+        background-image: radial-gradient(currentColor 65%, transparent 70%);
+        background-size: .25mm .25mm;
+    }
+
+    .tint-50 {
+        background-image: repeating-conic-gradient(currentColor 0 25%, transparent 0 50%);
+        background-size: .25mm .25mm;
+    }
+
+    .tint-25 {
+        background-image: radial-gradient(currentColor 30%, transparent 35%);
+        background-size: .25mm .25mm;
+    }
+
+    .o_mb_label_properties {
+        width: 340px;
+        min-width: 340px;
+    }
+
+    @media (max-width: 767.98px) {
+        .o_mb_label_body {
+            flex-direction: column;
+            overflow: auto !important;
+        }
+
+        .o_mb_label_workspace {
+            min-width: 0;
+            min-height: 55vh;
+            flex: 0 0 55vh;
+        }
+
+        .o_mb_label_properties {
+            width: 100%;
+            min-width: 0;
+            min-height: 35vh;
+            border-left: 0 !important;
+            border-top: 1px solid #dee2e6;
+        }
+    }
 }

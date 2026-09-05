@@ -19,6 +19,15 @@ RUFF_VERSION := 0.16.4
 MYPY_VERSION := 2.3.1
 RUFF := uvx ruff@$(RUFF_VERSION)
 MYPY := uvx mypy@$(MYPY_VERSION)
+PYTHON_ROOTS := addons tools scripts
+
+# The browser image contains Chromium revision 1187 (Chrome 140) and Node 22.
+# The digest and the path asserted by tools/run_hoot.mjs make a browser upgrade
+# explicit and reproducible. Bump both together.
+BROWSER_IMAGE := mcr.microsoft.com/playwright:v1.55.0-noble@sha256:b27e719ecbfef153e13fd24e8341736733bf2658b229677eb21ff57ff5d7fb29
+HOOT_BASE_URL ?= http://127.0.0.1:$${ODOO_PORT:-8169}
+HOOT_ARTIFACTS ?= /tmp/mb-odoo-hoot-artifacts
+FRONTEND_ARTIFACTS ?= /tmp/mb-odoo-frontend-artifacts
 
 # Discover every addon from its manifest so local and CI coverage cannot drift
 # when a module is added. Odoo resolves dependency order itself.
@@ -43,8 +52,10 @@ TAGS_ARG := $(subst $(space),$(comma),$(TAGS))
 
 .DEFAULT_GOAL := help
 .PHONY: help bootstrap up dev mail down clean logs ps shell psql install upgrade configure-ui \
-        test check lint format format-check typecheck oca reset-test-db brand-check \
-        dependency-check bridge-contract-check po-parse-check
+        test upgrade-test uninstall-test concurrency-test check lint format format-check \
+        typecheck oca reset-test-db brand-check dependency-check bridge-contract-check \
+        po-parse-check policy-test migration-check concurrency-inventory-check \
+        prepare-frontend-test assets-check browser-check frontend-test assets-test browser-test
 
 help: ## Show available targets
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  %-12s %s\n", $$1, $$2}'
@@ -108,14 +119,99 @@ configure-ui: ## Apply the streamlined artisan app-switcher layout
 		< scripts/configure_app_visibility.py
 
 test: ## Install MODULES on a fresh disposable database and run their tests
+	@mkdir -p oca
+	@$(COMPOSE) up -d db odoo
 	@$(MAKE) --no-print-directory reset-test-db
 	$(ODOO) -d $(DISPOSABLE_DB) -i $(MODULES_ARG) \
 		--test-tags "$(TAGS_ARG)" \
 		--stop-after-init --http-port=0 --gevent-port=0 --log-level=test
 
+upgrade-test: ## Upgrade a predecessor fixture twice and assert migrations/data
+	DISPOSABLE_DB=$(DISPOSABLE_DB) tools/upgrade-test.sh
+
+uninstall-test: ## Fresh-install then uninstall every addon and assert clean state
+	@mkdir -p oca
+	@$(COMPOSE) up -d db odoo
+	@$(MAKE) --no-print-directory reset-test-db
+	$(ODOO) -d $(DISPOSABLE_DB) -i $(MODULES_ARG) --without-demo \
+		--stop-after-init --http-port=0 --gevent-port=0 --log-level=warn
+	$(ODOO) module uninstall -d $(DISPOSABLE_DB) $(ADDONS)
+	$(COMPOSE) exec -T -e MB_UNINSTALL_MODULES="$(ADDONS)" odoo \
+		odoo shell -d $(DISPOSABLE_DB) --no-http --log-level=warn \
+		< tools/uninstall_assertions.py
+
+CONCURRENCY_TAGS := /l10n_fr_micro_urssaf:TestUrssafConcurrency \
+                    /mb_ceramics_firing:TestFiringConcurrency \
+                    /mb_ceramics_workflow:TestBoardContentConcurrency \
+                    /mb_commercial_operations_depot:TestDepotContractConcurrency \
+                    /mb_commercial_operations_stock:TestCommercialStockConcurrency \
+                    /mb_control_bridge:TestOperationReceiptConcurrency \
+                    /mb_label:TestLabelTemplateConcurrency
+
+concurrency-test: ## Run deterministic independent-cursor race regressions
+	timeout 15m $(MAKE) --no-print-directory test \
+		DISPOSABLE_DB=$(DISPOSABLE_DB) TAGS="$(CONCURRENCY_TAGS)"
+
+concurrency-inventory-check: ## Prove all focused race tests belong to the full suite
+	python3 tools/check_concurrency_inventory.py
+
+prepare-frontend-test:
+	@$(COMPOSE) up -d db odoo
+	@$(MAKE) --no-print-directory reset-test-db
+	$(ODOO) -d $(DISPOSABLE_DB) -i $(MODULES_ARG) --without-demo \
+		--stop-after-init --http-port=0 --gevent-port=0 --log-level=warn
+	@# The long-lived web process can discover the freshly created database while
+	@# installation is still running (for example through cron), caching a partial
+	@# registry. Restart after installation so Hoot always sees the complete one.
+	@$(COMPOSE) restart odoo
+	@for attempt in $$(seq 1 90); do \
+		$(COMPOSE) exec -T odoo curl -fsS http://localhost:8069/web/health >/dev/null 2>&1 \
+			&& exit 0; \
+		sleep 1; \
+	done; \
+	echo "Odoo did not become healthy after frontend database installation" >&2; \
+	exit 1
+
+assets-check:
+	$(ODOO) shell -d $(DISPOSABLE_DB) --no-http --log-level=warn \
+		< tools/odoo_asset_gate.py
+
+browser-check:
+	@mkdir -p "$(HOOT_ARTIFACTS)"
+	docker run --rm --network host --ipc=host \
+		-e HOOT_BASE_URL="$(HOOT_BASE_URL)" \
+		-e HOOT_DATABASE="$(DISPOSABLE_DB)" \
+		-e HOOT_OUTPUT_DIR=/artifacts \
+		-v "$(CURDIR):/work:ro" \
+		-v "$(HOOT_ARTIFACTS):/artifacts" \
+		--entrypoint node "$(BROWSER_IMAGE)" /work/tools/run_hoot.mjs
+
+frontend-test: prepare-frontend-test ## Install once; run assets and Hoot with separate logs
+	@mkdir -p "$(FRONTEND_ARTIFACTS)"
+	@$(MAKE) --no-print-directory assets-check >"$(FRONTEND_ARTIFACTS)/assets.log" 2>&1 \
+		|| { cat "$(FRONTEND_ARTIFACTS)/assets.log"; exit 1; }
+	@cat "$(FRONTEND_ARTIFACTS)/assets.log"
+	@$(MAKE) --no-print-directory browser-check >"$(FRONTEND_ARTIFACTS)/browser.log" 2>&1 \
+		|| { cat "$(FRONTEND_ARTIFACTS)/browser.log"; exit 1; }
+	@cat "$(FRONTEND_ARTIFACTS)/browser.log"
+
+assets-test: prepare-frontend-test ## Standalone clean asset compilation gate
+	@$(MAKE) --no-print-directory assets-check DISPOSABLE_DB=$(DISPOSABLE_DB)
+
+browser-test: prepare-frontend-test ## Standalone clean Hoot browser gate
+	@$(MAKE) --no-print-directory browser-check DISPOSABLE_DB=$(DISPOSABLE_DB)
+
 check: lint format-check typecheck i18n-check po-parse-check brand-check dependency-check \
-       bridge-contract-check ## Everything CI runs that needs no container
+       bridge-contract-check policy-test migration-check concurrency-inventory-check ## Static CI gates
 	python3 tools/check_addons.py
+
+policy-test: ## Exercise static security and dependency rules against canaries
+	python3 -m unittest tools.test_check_addons tools.test_dependency_policy \
+		tools.test_ci_changed_paths tools.test_ci_release_admission \
+		tools.test_ci_required_gate
+
+migration-check: ## Match migration files, phases, and manifest version bumps
+	python3 tools/check_migration_matrix.py
 
 bridge-contract-check: ## Fail if the committed control-bridge contract has drifted
 	python3 tools/bridge_contract.py --check
@@ -142,15 +238,15 @@ i18n-pot: ## Re-export every POT from DB_NAME; the catalogue-freshness gate
 	uv run --no-project --with polib python tools/i18n_seed_po.py $(shell ls addons)
 
 lint: ## Ruff, using the correctness ruleset in pyproject.toml
-	$(RUFF) check .
+	$(RUFF) check $(PYTHON_ROOTS)
 
 format: ## Apply the formatter and import order in place
-	$(RUFF) check --select I --fix .
-	$(RUFF) format .
+	$(RUFF) check --select I --fix $(PYTHON_ROOTS)
+	$(RUFF) format $(PYTHON_ROOTS)
 
 format-check: ## Fail if anything is unformatted or the imports are unsorted
-	$(RUFF) format --check .
-	$(RUFF) check --select I .
+	$(RUFF) format --check $(PYTHON_ROOTS)
+	$(RUFF) check --select I $(PYTHON_ROOTS)
 
 # `tools/` is real Python and is enforced. `addons/` is advisory: `odoo` ships no
 # stubs and is not importable outside the container, so every ORM symbol is

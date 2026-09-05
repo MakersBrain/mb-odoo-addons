@@ -64,13 +64,9 @@
             ]
         }"/>
     </record>
-  </data>
-  <!-- This assignment intentionally runs on upgrades. Odoo creates new records
-       inside noupdate data, but does not replay functions in that block. -->
-  <data>
-      <function model="mb.label.template" name="write">
-          <value eval="[ref('template_wip_lot_30x20')]"/>
-          <value eval="{'current_version_id': ref('template_wip_lot_30x20_v1')}"/>
-      </function>
+    <function model="mb.label.template" name="write">
+        <value eval="[ref('template_wip_lot_30x20')]"/>
+        <value eval="{'current_version_id': ref('template_wip_lot_30x20_v1')}"/>
+    </function>
   </data>
 </odoo>

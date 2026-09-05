@@ -1,0 +1,66 @@
+[
+  {
+    "module": "l10n_fr_micro_urssaf",
+    "installed_version": "19.0.2.0.1",
+    "target_version": "19.0.2.0.2",
+    "directory": "19.0.2.0.2",
+    "phase": "pre",
+    "postcondition": "all dated-rule overlap preflights pass and invariant lock rows load"
+  },
+  {
+    "module": "mb_ceramics_firing",
+    "installed_version": "19.0.3.0.1",
+    "target_version": "19.0.3.0.3",
+    "directory": "19.0.3.0.3",
+    "phase": "pre",
+    "postcondition": "kiln occupancy preflight passes before serialized model code loads"
+  },
+  {
+    "module": "mb_commercial_operations_depot",
+    "installed_version": "19.0.2.1.0",
+    "target_version": "19.0.2.1.2",
+    "directory": "19.0.2.1.2",
+    "phase": "pre",
+    "postcondition": "active depot-contract overlap preflight passes"
+  },
+  {
+    "module": "mb_commercial_operations_stock",
+    "installed_version": "19.0.2.0.1",
+    "target_version": "19.0.2.0.2",
+    "directory": "19.0.2.0.2",
+    "phase": "pre",
+    "postcondition": "duplicate tracked-lot preflight passes and the unique key exists"
+  },
+  {
+    "module": "mb_invoice_capture",
+    "installed_version": "19.0.1.5.3",
+    "target_version": "19.0.1.5.5",
+    "directory": "19.0.1.5.5",
+    "phase": "post",
+    "postcondition": "stored supplier matching keys are recomputed for predecessor partners"
+  },
+  {
+    "module": "mb_label",
+    "installed_version": "19.0.1.2.2",
+    "target_version": "19.0.1.2.5",
+    "directory": "19.0.1.2.4",
+    "phase": "pre",
+    "postcondition": "active-default duplicate preflight passes"
+  },
+  {
+    "module": "mb_label",
+    "installed_version": "19.0.1.2.2",
+    "target_version": "19.0.1.2.5",
+    "directory": "19.0.1.2.5",
+    "phase": "post",
+    "postcondition": "every company has label seeds and a predecessor-selected v99 remains current"
+  },
+  {
+    "module": "mb_webshop",
+    "installed_version": "19.0.1.5.2",
+    "target_version": "19.0.1.6.0",
+    "directory": "19.0.1.6.0",
+    "phase": "pre",
+    "postcondition": "legacy stock holds have a required company matching their order"
+  }
+]

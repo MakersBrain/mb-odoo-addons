@@ -4,12 +4,18 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import SQL
 
 from .depot_scenario import DEFAULT_TERM_MONTHS
 
 
 class MbCommercialContract(models.Model):
     _inherit = "mb.commercial.contract"
+
+    _DEPOT_OVERLAP_FIELDS = frozenset(
+        {"active", "company_id", "date_end", "date_start", "depot_warehouse_id"}
+    )
+    _OPEN_ENDED_CONTRACT_DATE = fields.Date.to_date("9999-12-31")
 
     depot_warehouse_id = fields.Many2one(
         "stock.warehouse",
@@ -119,7 +125,38 @@ class MbCommercialContract(models.Model):
         for contract in self:
             contract.rent_bill_ids = contract.rent_period_ids.bill_id
 
-    @api.constrains("depot_warehouse_id", "active", "date_start", "date_end")
+    @api.model
+    def _lock_depot_warehouses(self, warehouse_ids):
+        """Serialize depot invariants on stable parents under REPEATABLE READ."""
+        for warehouse_id in sorted(
+            {warehouse_id for warehouse_id in warehouse_ids if warehouse_id}
+        ):
+            self.env.cr.execute(
+                SQL(
+                    "UPDATE stock_warehouse SET id = id WHERE id = %s",
+                    warehouse_id,
+                )
+            )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        default_active = self.env.context.get("default_active", True)
+        self._lock_depot_warehouses(
+            values.get("depot_warehouse_id") or self.env.context.get("default_depot_warehouse_id")
+            for values in vals_list
+            if values.get("active", default_active)
+        )
+        return super().create(vals_list)
+
+    def write(self, values):
+        if self._DEPOT_OVERLAP_FIELDS.intersection(values):
+            warehouse_ids = set(self.depot_warehouse_id.ids)
+            if values.get("depot_warehouse_id"):
+                warehouse_ids.add(values["depot_warehouse_id"])
+            self._lock_depot_warehouses(warehouse_ids)
+        return super().write(values)
+
+    @api.constrains("active", "company_id", "date_end", "date_start", "depot_warehouse_id")
     def _check_single_active_depot_contract(self):
         for contract in self.filtered(lambda item: item.active and item.depot_warehouse_id):
             others = self.search(
@@ -128,7 +165,7 @@ class MbCommercialContract(models.Model):
                     ("active", "=", True),
                     ("company_id", "=", contract.company_id.id),
                     ("depot_warehouse_id", "=", contract.depot_warehouse_id.id),
-                    ("date_start", "<=", contract.date_end or fields.Date.to_date("9999-12-31")),
+                    ("date_start", "<=", contract.date_end or self._OPEN_ENDED_CONTRACT_DATE),
                     "|",
                     ("date_end", "=", False),
                     ("date_end", ">=", contract.date_start),
@@ -217,6 +254,7 @@ class MbCommercialContract(models.Model):
             raise ValidationError(_("Choose the rent service product first."))
         period_date = self.rent_period_to_prepare or fields.Date.context_today(self)
         period_start = period_date.replace(day=1)
+        self._lock_depot_warehouses(self.depot_warehouse_id.ids)
         period = self.env["mb.commercial.rent.period"].search(
             [
                 ("contract_id", "=", self.id),

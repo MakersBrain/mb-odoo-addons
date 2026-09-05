@@ -165,6 +165,13 @@ class MbKilnConnection(models.Model):
                 (100.0 * connection.backfill_offset / total) if total else 0.0
             )
 
+    @api.depends(
+        "kiln_ids",
+        "kiln_ids.active",
+        "kiln_ids.firing_ids",
+        "kiln_ids.program_ids",
+        "kiln_ids.program_ids.active",
+    )
     def _compute_counts(self):
         # Two aggregates over every connection's kilns at once, rather than two
         # search_count per connection.

@@ -786,6 +786,7 @@ class InventoryCapture(models.Model):
             )
             raise
 
+    @api.private
     def ingest_result(self, payload):
         self.ensure_one()
         if str(payload.get("capture_id") or "").lower() != self.capture_uuid:

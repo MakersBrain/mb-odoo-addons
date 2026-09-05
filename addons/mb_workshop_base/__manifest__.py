@@ -33,7 +33,7 @@ autocomplete that shows a name and no price, which is the wrong end of the
 conversation for someone quoting from a bench. The active pricelist's price is
 appended to the display name, through context keys so nothing else changes.
 """,
-    "version": "19.0.2.0.0",
+    "version": "19.0.2.0.1",
     "license": "AGPL-3",
     "category": "Inventory/Inventory",
     "author": "MakersBrain",
@@ -46,6 +46,8 @@ appended to the display name, through context keys so nothing else changes.
         "sale",
         # The generic product autocomplete is extended for every backend form.
         "web",
+        # Owns product XML IDs referenced directly by views and defaults.
+        "product",
     ],
     "data": [
         "data/mb_workshop_calendar.xml",

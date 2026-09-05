@@ -191,7 +191,7 @@ class MbLabelPrintJob(models.Model):
                 )
         return super().write(vals)
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_unrendered(self):
         if self.filtered(lambda job: job.state in ("rendered", "printed")):
             raise UserError(_("Rendered print jobs are audit records and cannot be deleted."))
-        return super().unlink()

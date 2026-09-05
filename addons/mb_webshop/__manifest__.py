@@ -10,7 +10,7 @@ catalogue, checkout, stock validation, delivery and click-and-collect flows.
 The control plane can restrict and re-enable the complete storefront without
 uninstalling modules or deleting historical orders.
 """,
-    "version": "19.0.1.5.2",
+    "version": "19.0.1.6.0",
     "license": "AGPL-3",
     "category": "Website/eCommerce",
     "author": "MakersBrain",
@@ -20,6 +20,8 @@ uninstalling modules or deleting historical orders.
         "website_sale_stock",
         "website_sale_collect",
         "delivery",
+        "stock",
+        "website_sale",
     ],
     "data": [
         "security/return_security.xml",

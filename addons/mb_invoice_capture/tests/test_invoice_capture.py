@@ -1,9 +1,13 @@
 import base64
 import hashlib
+import importlib.util
 import uuid
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from odoo import fields
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo.service.model import get_public_method
 from odoo.tests import TransactionCase, tagged
 
 
@@ -52,6 +56,54 @@ class TestInvoiceCapture(TransactionCase):
                 )
             )
         cls.source = b"%PDF-1.4\nfixture invoice\n%%EOF"
+
+    def test_capture_ingress_is_private_but_review_actions_remain_public(self):
+        with self.assertRaises(AccessError):
+            get_public_method(self.env["mb.invoice.capture"], "ingest")
+        self.assertTrue(
+            get_public_method(self.env["mb.invoice.capture"], "action_create_reviewed_bill")
+        )
+
+    def test_late_receipt_failure_rolls_back_capture_and_retry_applies_once(self):
+        payload = self.payload()
+        receipts = self.env["mb.control.operation.receipt"].sudo()
+        operation_key = f"invoice:test:{uuid.uuid4()}"
+        domain = [
+            ("company_id", "=", self.company.id),
+            ("external_document_id", "=", payload["external_document_id"]),
+        ]
+        attachment_domain = [("res_model", "=", "mb.invoice.capture")]
+        before_attachments = self.env["ir.attachment"].sudo().search_count(attachment_domain)
+
+        with (
+            patch.object(
+                type(receipts),
+                "record",
+                side_effect=ValidationError("receipt persistence failed"),
+            ),
+            self.assertRaisesRegex(ValidationError, "receipt persistence failed"),
+        ):
+            receipts._execute_once(
+                operation_key,
+                "invoice.capture",
+                "digest",
+                lambda: self.Capture.ingest(payload),
+            )
+
+        self.assertFalse(self.Capture.search(domain))
+        self.assertEqual(
+            self.env["ir.attachment"].sudo().search_count(attachment_domain),
+            before_attachments,
+        )
+        self.assertFalse(receipts.for_replay(operation_key, "invoice.capture", "digest"))
+
+        action = MagicMock(side_effect=lambda: self.Capture.ingest(payload))
+        result = receipts._execute_once(operation_key, "invoice.capture", "digest", action)
+        replay = receipts._execute_once(operation_key, "invoice.capture", "digest", action)
+
+        self.assertEqual(replay, result)
+        self.assertEqual(action.call_count, 1)
+        self.assertEqual(self.Capture.search_count(domain), 1)
 
     def payload(self, **changes):
         payload = {
@@ -159,6 +211,133 @@ class TestInvoiceCapture(TransactionCase):
 
         self.assertEqual(result["status"], "draft_bill")
         self.assertEqual(self.Capture.browse(result["capture_id"]).move_id.partner_id, self.partner)
+
+    def test_supplier_normalized_keys_follow_master_data(self):
+        self.partner.write(
+            {
+                "name": "  Clay   SUPPLIER  ",
+                "vat": "fr 40-303.265.045",
+                "company_registry": "303 265 045 00017",
+            }
+        )
+
+        self.assertEqual(self.partner.mb_invoice_vat_key, "FR40303265045")
+        self.assertEqual(self.partner.mb_invoice_registry_key, "30326504500017")
+        self.assertEqual(self.partner.mb_invoice_siren_key, "303265045")
+        self.assertEqual(self.partner.mb_invoice_name_key, "clay supplier")
+
+    def test_supplier_matching_uses_ranked_indexed_keys(self):
+        registry_partner = self.env["res.partner"].create(
+            {
+                "name": "Registry Supplier",
+                "company_registry": "123 456 789 00012",
+            }
+        )
+
+        by_siret = self.Capture._match_supplier({"supplier_siret": "12345678900012"}, self.company)
+        by_siren = self.Capture._match_supplier({"supplier_siren": "123 456 789"}, self.company)
+        by_name = self.Capture._match_supplier(
+            {"supplier_name": "  REGISTRY   supplier "}, self.company
+        )
+
+        self.assertEqual(by_siret, registry_partner)
+        self.assertEqual(by_siren, registry_partner)
+        self.assertEqual(by_name, registry_partner)
+
+    def test_strong_supplier_ambiguity_does_not_fall_back_to_name(self):
+        duplicate = self.env["res.partner"].create(
+            {
+                "name": "Different unique name",
+                "vat": self.partner.vat,
+            }
+        )
+
+        matched = self.Capture._match_supplier(
+            {
+                "supplier_vat": self.partner.vat,
+                "supplier_name": duplicate.name,
+            },
+            self.company,
+        )
+
+        self.assertIsInstance(matched, tuple)
+        self.assertIn("VAT", matched[1])
+
+    def test_supplier_matching_excludes_child_contacts_and_other_companies(self):
+        child = self.env["res.partner"].create(
+            {
+                "name": "Supplier purchasing contact",
+                "parent_id": self.partner.id,
+                "vat": "FR00111111111",
+            }
+        )
+        other_company = self.env["res.company"].create({"name": "Capture other company"})
+        other_supplier = self.env["res.partner"].create(
+            {
+                "name": "Other-company supplier",
+                "vat": "FR00222222222",
+                "company_id": other_company.id,
+            }
+        )
+
+        child_match = self.Capture._match_supplier({"supplier_name": child.name}, self.company)
+        other_company_match = self.Capture._match_supplier(
+            {"supplier_vat": other_supplier.vat}, self.company
+        )
+
+        self.assertIsInstance(child_match, tuple)
+        self.assertIsInstance(other_company_match, tuple)
+
+    def test_supplier_matching_materializes_at_most_two_candidates_per_stage(self):
+        PartnerModel = type(self.env["res.partner"])
+        original_search = PartnerModel.search
+        limits = []
+
+        def tracked_search(partners, domain, offset=0, limit=None, order=None):
+            limits.append(limit)
+            return original_search(partners, domain, offset=offset, limit=limit, order=order)
+
+        with patch.object(PartnerModel, "search", tracked_search):
+            matched = self.Capture._match_supplier(
+                {
+                    "supplier_vat": "FR00999999999",
+                    "supplier_siren": "999999999",
+                    "supplier_name": "Missing bounded supplier",
+                },
+                self.company,
+            )
+
+        self.assertIsInstance(matched, tuple)
+        self.assertEqual(limits, [2, 2, 2])
+
+    def test_supplier_key_migration_is_idempotent(self):
+        path = Path(__file__).parents[1] / "migrations/19.0.1.5.5/post-migrate.py"
+        spec = importlib.util.spec_from_file_location("mb_invoice_capture_perf_01", path)
+        migration = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(migration)
+        key_fields = list(migration.KEY_FIELDS)
+        self.env.flush_all()
+        self.env.cr.execute(
+            """
+                UPDATE res_partner
+                   SET mb_invoice_vat_key = NULL,
+                       mb_invoice_registry_key = NULL,
+                       mb_invoice_siren_key = NULL,
+                       mb_invoice_name_key = NULL
+                 WHERE id = %s
+            """,
+            [self.partner.id],
+        )
+        self.partner.invalidate_recordset(key_fields)
+
+        migration.migrate(self.env.cr, "19.0.1.5.4")
+        self.partner.invalidate_recordset(key_fields)
+        first_values = tuple(self.partner[field_name] for field_name in key_fields)
+        migration.migrate(self.env.cr, "19.0.1.5.4")
+        self.partner.invalidate_recordset(key_fields)
+
+        self.assertEqual(tuple(self.partner[field_name] for field_name in key_fields), first_values)
+        self.assertEqual(self.partner.mb_invoice_vat_key, "FR40303265045")
 
     def test_review_can_create_editable_draft_after_supplier_is_selected(self):
         invoice = dict(
