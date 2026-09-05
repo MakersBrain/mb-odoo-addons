@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0-20260810\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-15 20:18+0000\n"
-"PO-Revision-Date: 2026-08-15 20:18+0000\n"
+"POT-Creation-Date: 2026-09-05 21:16+0000\n"
+"PO-Revision-Date: 2026-09-05 21:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -126,8 +126,18 @@ msgid "Confirmed supplier"
 msgstr ""
 
 #. module: mb_invoice_capture
+#: model:ir.model,name:mb_invoice_capture.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: mb_invoice_capture
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__content_digest
 msgid "Content Digest"
+msgstr ""
+
+#. module: mb_invoice_capture
+#: model:ir.model,website_form_label:mb_invoice_capture.model_res_partner
+msgid "Create a Customer"
 msgstr ""
 
 #. module: mb_invoice_capture
@@ -184,6 +194,7 @@ msgstr ""
 #. module: mb_invoice_capture
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__display_name
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__display_name
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -354,6 +365,7 @@ msgstr ""
 #. module: mb_invoice_capture
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture__id
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__id
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__id
 msgid "ID"
 msgstr ""
 
@@ -516,6 +528,30 @@ msgstr ""
 #. module: mb_invoice_capture
 #: model:ir.model.fields,field_description:mb_invoice_capture.field_mb_invoice_capture_line__review_product_id
 msgid "Matched product"
+msgstr ""
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__mb_invoice_name_key
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_users__mb_invoice_name_key
+msgid "Mb Invoice Name Key"
+msgstr ""
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__mb_invoice_registry_key
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_users__mb_invoice_registry_key
+msgid "Mb Invoice Registry Key"
+msgstr ""
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__mb_invoice_siren_key
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_users__mb_invoice_siren_key
+msgid "Mb Invoice Siren Key"
+msgstr ""
+
+#. module: mb_invoice_capture
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_partner__mb_invoice_vat_key
+#: model:ir.model.fields,field_description:mb_invoice_capture.field_res_users__mb_invoice_vat_key
+msgid "Mb Invoice Vat Key"
 msgstr ""
 
 #. module: mb_invoice_capture
@@ -760,6 +796,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/mb_invoice_capture/models/invoice_capture.py:0
 msgid "Several suppliers have the extracted SIREN."
+msgstr ""
+
+#. module: mb_invoice_capture
+#. odoo-python
+#: code:addons/mb_invoice_capture/models/invoice_capture.py:0
+msgid "Several suppliers have the extracted SIRET."
 msgstr ""
 
 #. module: mb_invoice_capture

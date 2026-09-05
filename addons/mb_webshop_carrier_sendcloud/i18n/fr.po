@@ -27,24 +27,45 @@ msgid "Configure a Sendcloud outbound option before testing."
 msgstr "Configurez une option d’expédition Sendcloud avant le test."
 
 #. module: mb_webshop_carrier_sendcloud
-#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_height_cm
-msgid "Default parcel height (cm)"
-msgstr "Hauteur du colis par défaut (cm)"
-
-#. module: mb_webshop_carrier_sendcloud
-#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_length_cm
-msgid "Default parcel length (cm)"
-msgstr "Longueur du colis par défaut (cm)"
-
-#. module: mb_webshop_carrier_sendcloud
-#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_width_cm
-msgid "Default parcel width (cm)"
-msgstr "Largeur du colis par défaut (cm)"
+#: model:ir.model.fields,help:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_content_description
+msgid ""
+"Default goods description sent to Sendcloud for customs and carrier "
+"documents."
+msgstr ""
+"Description des marchandises envoyée par défaut à Sendcloud pour les documents "
+"douaniers et de transport."
 
 #. module: mb_webshop_carrier_sendcloud
 #: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__display_name
 msgid "Display Name"
 msgstr "Nom d’affichage"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,help:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_height_cm
+msgid ""
+"Fallback parcel height sent only for Sendcloud shipments without package "
+"dimensions."
+msgstr ""
+"Hauteur de colis de repli envoyée uniquement pour les expéditions Sendcloud "
+"sans dimensions de colis."
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,help:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_length_cm
+msgid ""
+"Fallback parcel length sent only for Sendcloud shipments without package "
+"dimensions."
+msgstr ""
+"Longueur de colis de repli envoyée uniquement pour les expéditions Sendcloud "
+"sans dimensions de colis."
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,help:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_width_cm
+msgid ""
+"Fallback parcel width sent only for Sendcloud shipments without package "
+"dimensions."
+msgstr ""
+"Largeur de colis de repli envoyée uniquement pour les expéditions Sendcloud "
+"sans dimensions de colis."
 
 #. module: mb_webshop_carrier_sendcloud
 #: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__id
@@ -60,11 +81,6 @@ msgstr "Dernier webhook Sendcloud"
 #: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_use_locations
 msgid "Offer uses service points"
 msgstr "L’offre utilise des points relais"
-
-#. module: mb_webshop_carrier_sendcloud
-#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_content_description
-msgid "Parcel content description"
-msgstr "Description du contenu du colis"
 
 #. module: mb_webshop_carrier_sendcloud
 #: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__delivery_type
@@ -103,6 +119,26 @@ msgstr "Filtre de transporteur Sendcloud"
 #: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_contract_id
 msgid "Sendcloud contract ID"
 msgstr "Identifiant de contrat Sendcloud"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_height_cm
+msgid "Sendcloud default parcel height (cm)"
+msgstr "Hauteur de colis Sendcloud par défaut (cm)"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_length_cm
+msgid "Sendcloud default parcel length (cm)"
+msgstr "Longueur de colis Sendcloud par défaut (cm)"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_width_cm
+msgid "Sendcloud default parcel width (cm)"
+msgstr "Largeur de colis Sendcloud par défaut (cm)"
+
+#. module: mb_webshop_carrier_sendcloud
+#: model:ir.model.fields,field_description:mb_webshop_carrier_sendcloud.field_delivery_carrier__mb_sendcloud_content_description
+msgid "Sendcloud parcel content description"
+msgstr "Description du contenu du colis Sendcloud"
 
 #. module: mb_webshop_carrier_sendcloud
 #. odoo-python

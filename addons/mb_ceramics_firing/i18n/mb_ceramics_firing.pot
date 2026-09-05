@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0-20260810\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-15 20:18+0000\n"
-"PO-Revision-Date: 2026-08-15 20:18+0000\n"
+"POT-Creation-Date: 2026-09-05 21:16+0000\n"
+"PO-Revision-Date: 2026-09-05 21:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -429,6 +429,7 @@ msgstr ""
 
 #. module: mb_ceramics_firing
 #: model:ir.actions.act_window,name:mb_ceramics_firing.mb_firing_action
+#: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln__firing_ids
 #: model:ir.model.fields,field_description:mb_ceramics_firing.field_mb_kiln_program__firing_ids
 #: model:ir.ui.menu,name:mb_ceramics_firing.menu_mb_firing
 #: model_terms:ir.ui.view,arch_db:mb_ceramics_firing.mb_kiln_program_view_form

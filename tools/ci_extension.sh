@@ -30,4 +30,8 @@ container=$(docker create mb-odoo-extension:ci)
 trap 'docker rm -f "$container" >/dev/null 2>&1 || true' EXIT
 docker cp "$container:/payload/." "$target"
 test -s "$target/manifest.json"
+# mktemp creates the host directory as 0700. The official Odoo image runs as
+# uid 100, so a bind mount of that directory exists but is not traversable from
+# the test container unless the materialization root itself is made readable.
+chmod 0755 "$target"
 printf '%s\n' "$target"

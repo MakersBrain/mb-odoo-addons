@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0-20260803\n"
+"Project-Id-Version: Odoo Server 19.0-20260810\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-21 09:18+0000\n"
-"PO-Revision-Date: 2026-08-21 09:18+0000\n"
+"POT-Creation-Date: 2026-09-05 21:16+0000\n"
+"PO-Revision-Date: 2026-09-05 21:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -35,6 +35,26 @@ msgstr ""
 #. module: mb_webshop_carrier_boxtal
 #: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_content_category
 msgid "Boxtal content category"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_height_cm
+msgid "Boxtal default parcel height (cm)"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_length_cm
+msgid "Boxtal default parcel length (cm)"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_width_cm
+msgid "Boxtal default parcel width (cm)"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_content_description
+msgid "Boxtal parcel content description"
 msgstr ""
 
 #. module: mb_webshop_carrier_boxtal
@@ -76,23 +96,35 @@ msgid ""
 msgstr ""
 
 #. module: mb_webshop_carrier_boxtal
-#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_height_cm
-msgid "Default parcel height (cm)"
-msgstr ""
-
-#. module: mb_webshop_carrier_boxtal
-#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_length_cm
-msgid "Default parcel length (cm)"
-msgstr ""
-
-#. module: mb_webshop_carrier_boxtal
-#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_width_cm
-msgid "Default parcel width (cm)"
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_content_description
+msgid ""
+"Default goods description sent to Boxtal for customs and carrier documents."
 msgstr ""
 
 #. module: mb_webshop_carrier_boxtal
 #: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_height_cm
+msgid ""
+"Fallback parcel height sent only for Boxtal shipments without package "
+"dimensions."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_length_cm
+msgid ""
+"Fallback parcel length sent only for Boxtal shipments without package "
+"dimensions."
+msgstr ""
+
+#. module: mb_webshop_carrier_boxtal
+#: model:ir.model.fields,help:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_width_cm
+msgid ""
+"Fallback parcel width sent only for Boxtal shipments without package "
+"dimensions."
 msgstr ""
 
 #. module: mb_webshop_carrier_boxtal
@@ -111,11 +143,6 @@ msgstr ""
 #. module: mb_webshop_carrier_boxtal
 #: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_use_locations
 msgid "Offer uses parcel points"
-msgstr ""
-
-#. module: mb_webshop_carrier_boxtal
-#: model:ir.model.fields,field_description:mb_webshop_carrier_boxtal.field_delivery_carrier__mb_boxtal_content_description
-msgid "Parcel content description"
 msgstr ""
 
 #. module: mb_webshop_carrier_boxtal
