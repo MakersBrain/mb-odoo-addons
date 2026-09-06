@@ -1,6 +1,6 @@
 # CI runner-minutes optimization evidence
 
-Status: candidate implemented; hosted-runner qualification pending
+Status: rollout complete; ten-run savings comparison pending
 Baseline queried: 2026-09-05
 Source: GitHub Actions API for `MakersBrain/mb-odoo-addons`, workflow `ci.yml`
 
@@ -99,6 +99,27 @@ registry. The preparation target now restarts the web service after installation
 and waits for health before either check-only phase. This preserves the single
 installation while ensuring both assets and Hoot use a complete registry.
 
+## Hosted rollout qualification
+
+The rollout was qualified on the pull request, on the exact merged commit, and
+again after removing the temporary compatibility checks. The first candidate
+run is retained as failure evidence: it exposed an unreadable packaged-addons
+bind mount and stale POT catalogues, and `Required CI` failed as designed. Both
+causes were corrected before merge.
+
+| Run | Event and purpose | Result | Wall time |
+|---|---|---|---:|
+| [33991948562](https://github.com/MakersBrain/mb-odoo-addons/actions/runs/33991948562) | Initial rollout PR | Failed closed; server and catalogue defects found | 5m15s |
+| [33992709750](https://github.com/MakersBrain/mb-odoo-addons/actions/runs/33992709750) | Corrected rollout PR | Passed, including 703 server tests | 8m36s |
+| [33993150014](https://github.com/MakersBrain/mb-odoo-addons/actions/runs/33993150014) | Merged rollout on `main` | Passed before protection migration | 8m34s |
+| [33993800288](https://github.com/MakersBrain/mb-odoo-addons/actions/runs/33993800288) | Remove compatibility aliases PR | Passed with the final eight-job graph | 8m29s |
+| [33994224065](https://github.com/MakersBrain/mb-odoo-addons/actions/runs/33994224065) | Final `main` graph | Passed; `Required CI` succeeded | 8m01s |
+
+Branch protection was then verified with strict/up-to-date checking enabled and
+one required GitHub Actions context: `Required CI`. The legacy `Static checks`,
+`Clean install`, `Upgrade in place`, `Catalogue freshness`, and `Server tests`
+requirements and the two temporary workflow aliases are no longer present.
+
 ## Qualification and stop condition
 
 After this workflow reaches a branch, record ten comparable add-on pull-request
@@ -108,8 +129,8 @@ wall-time increase, unchanged-or-higher discovery counts, and no new classifier,
 database, or cache-related reruns. No dependency or Docker cache was added because
 the available evidence does not yet prove a net saving.
 
-Branch protection currently requires `Static checks`, `Clean install`, `Upgrade in
-place`, `Catalogue freshness`, and `Server tests`. Do not remove those contexts
-until `Required CI` exists on the default branch. Immediately after that first full
-run, require `Required CI`, verify it blocks a failing selected lane, and then remove
-the obsolete contexts.
+The rollout and branch-protection migration are complete. The remaining
+measurement task is to collect ten comparable add-on pull-request runs of the
+final graph before accepting or rejecting the plan's 30% summed-runner-minute
+target. The initial failed rollout run is failure evidence, not one of those ten
+comparable post-rollout samples.
